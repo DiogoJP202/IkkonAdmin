@@ -161,6 +161,18 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.MapControllerRoute(
+    name: "escola",
+    pattern: "escola",
+    defaults: new { controller = "Institucional", action = "Escola" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "eventos",
+    pattern: "eventos",
+    defaults: new { controller = "Institucional", action = "Eventos" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
     name: "institucional",
     pattern: "institucional/{action=Index}/{id?}",
     defaults: new { controller = "Institucional" })

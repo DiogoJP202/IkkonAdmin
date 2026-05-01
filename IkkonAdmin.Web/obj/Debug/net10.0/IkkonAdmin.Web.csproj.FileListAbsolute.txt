@@ -218,5 +218,5 @@ C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\Ik
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.genruntimeconfig.cache
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\ref\IkkonAdmin.Web.dll
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-u2su4jbucb-u2su4jbucb.gz
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-niypux6vii-niypux6vii.gz
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\3683xvfcmr-{0}-zh8c726snt-zh8c726snt.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-xvdtp77mxp-xvdtp77mxp.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\3683xvfcmr-{0}-6itv138fo7-6itv138fo7.gz

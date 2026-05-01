@@ -4020,7 +4020,7 @@ body.auth-body {
   margin: 0 0 1.2rem;
   font-size: clamp(2rem, 5.2vw, 4.3rem);
   line-height: 1.04;
-  letter-spacing: -0.015em;
+  letter-spacing: 0;
   color: #111b32;
   text-wrap: balance;
 }
@@ -4347,6 +4347,162 @@ body.auth-body {
   flex-shrink: 0;
 }
 
+.public-area-hero {
+  min-height: 82vh;
+}
+
+.public-escola-hero .institucional-hero-media {
+  background-image:
+    linear-gradient(120deg, rgba(20, 25, 24, 0.22), rgba(20, 25, 24, 0.38)),
+    url("/Images/AulaTaiko.png");
+  background-position: center 38%;
+}
+
+.public-escola-hero .institucional-hero-overlay {
+  background:
+    radial-gradient(880px 320px at 78% 18%, rgba(47, 79, 111, 0.3), transparent 58%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.22), rgba(10, 10, 10, 0.78));
+}
+
+.public-eventos-hero .institucional-hero-media {
+  background-image:
+    linear-gradient(120deg, rgba(26, 18, 18, 0.26), rgba(26, 18, 18, 0.4)),
+    url("/Images/Apresenta%C3%A7%C3%A3o3.jpg");
+  background-position: center 42%;
+}
+
+.public-eventos-hero .institucional-hero-overlay {
+  background:
+    radial-gradient(900px 330px at 80% 15%, rgba(139, 30, 33, 0.43), transparent 56%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.16), rgba(10, 10, 10, 0.78));
+}
+
+.public-home-paths {
+  background: #f2eee7;
+  border-bottom: 1px solid var(--land-border);
+}
+
+.public-path-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.public-path-card {
+  min-height: 18rem;
+  border: 1px solid #ddd4c8;
+  border-radius: 0.95rem;
+  background: #fffdf9;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-shadow: 0 9px 20px rgba(24, 22, 19, 0.06);
+}
+
+.public-path-card span {
+  color: var(--land-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.public-path-card h3 {
+  color: var(--land-dark);
+  font-size: 1.55rem;
+  margin: 0.7rem 0 0.6rem;
+}
+
+.public-path-card p {
+  color: var(--land-muted);
+  margin-bottom: 1.1rem;
+}
+
+.public-path-card .btn {
+  margin-top: auto;
+}
+
+.public-path-card-escola {
+  border-top: 4px solid #334f6c;
+}
+
+.public-path-card-eventos {
+  border-top: 4px solid var(--land-primary);
+}
+
+.public-home-about {
+  background: var(--land-surface);
+}
+
+.public-eventos-intro {
+  background: #f7f3ec;
+  border-bottom: 1px solid var(--land-border);
+}
+
+.public-event-types {
+  background:
+    radial-gradient(700px 220px at 110% 0%, rgba(139, 30, 33, 0.08), transparent 60%),
+    linear-gradient(180deg, #f5f1ea 0%, #f0ece5 100%);
+}
+
+.public-event-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.public-video-section {
+  background: #fffdf9;
+  border-top: 1px solid var(--land-border);
+  border-bottom: 1px solid var(--land-border);
+}
+
+.public-video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.35rem;
+}
+
+.public-video-card {
+  border: 1px solid #ded6ca;
+  border-radius: 0.95rem;
+  background: #f9f6f0;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(37, 34, 30, 0.06);
+}
+
+.public-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #171717;
+}
+
+.public-video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.public-video-content {
+  padding: 1rem;
+}
+
+.public-video-content h3 {
+  color: #221f1b;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.public-video-content p {
+  color: #655f55;
+  margin: 0;
+  font-size: 0.94rem;
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -4372,6 +4528,10 @@ body.auth-body {
     padding-top: 5rem;
   }
 
+  .public-area-hero {
+    min-height: 74vh;
+  }
+
   .institucional-about-wrap {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -4386,6 +4546,15 @@ body.auth-body {
 
   .institucional-eventos-media-card {
     min-height: 25rem;
+  }
+
+  .public-path-grid,
+  .public-video-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .public-event-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -4428,11 +4597,21 @@ body.auth-body {
   .institucional-about-media {
     min-height: 17rem;
   }
+
+  .public-event-type-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .public-path-card {
+    min-height: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .institucional-page .btn,
   .institucional-card,
+  .public-path-card,
+  .public-video-card,
   .institucional-header,
   .institucional-eventos-photo,
   .institucional-evento-dot,

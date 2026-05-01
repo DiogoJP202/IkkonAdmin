@@ -36,6 +36,10 @@
   };
 
   const updateActiveLink = () => {
+    if (sectionLinks.length === 0) {
+      return;
+    }
+
     const scrollPos = window.scrollY + 130;
     let activeId = "";
 
@@ -49,7 +53,6 @@
     navLinks.forEach(link => {
       const href = link.getAttribute("href") ?? "";
       if (!href.startsWith("#")) {
-        link.classList.remove("active");
         return;
       }
 

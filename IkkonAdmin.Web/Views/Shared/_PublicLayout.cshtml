@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ikkon SPTD</title>
-    <meta name="description" content="Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows." />
+    <title>@ViewData["Title"]</title>
+    <meta name="description" content="@(ViewData["Description"] ?? "Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.")" />
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -1,0 +1,21 @@
+@model IReadOnlyList<PublicVideoCardViewModel>
+
+<div class="public-video-grid">
+    @foreach (var video in Model)
+    {
+        <article class="public-video-card">
+            <div class="public-video-frame">
+                <iframe
+                    src="@($"https://www.youtube.com/embed/{video.VideoId}")"
+                    title="@video.Titulo"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="public-video-content">
+                <h3>@video.Titulo</h3>
+                <p>@video.Descricao</p>
+            </div>
+        </article>
+    }
+</div>

@@ -1,0 +1,32 @@
+@{
+    var current = (ViewData["PublicSection"] as string ?? "home").ToLowerInvariant();
+}
+
+<header class="institucional-header fixed-top">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-xxl px-3 px-lg-4">
+            <a class="navbar-brand institucional-brand" href="/">
+                <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON SPTD" class="institucional-brand-logo" />
+                <span class="institucional-brand-lines">
+                    <strong>IKKON SPTD</strong>
+                    <small>São Paulo Taiko Dojo</small>
+                </span>
+            </a>
+            <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="Alternar navegação">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navLanding">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="/">Início</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="/escola">Escola</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="/eventos">Eventos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/escola#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auth/login">Área interna</a></li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

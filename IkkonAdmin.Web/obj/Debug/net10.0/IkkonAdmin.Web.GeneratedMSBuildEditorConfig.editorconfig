@@ -138,6 +138,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Escola.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxFc2NvbGEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Eventos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxFdmVudG9zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -202,8 +210,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicContactCta.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb250YWN0Q3RhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicCourseCards.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb3Vyc2VDYXJkcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicEventosGallery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNFdmVudG9zR2FsbGVyeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFaqAlunos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNGYXFBbHVub3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFooter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNGb290ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicHeader.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNIZWFkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNMYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicVideoGrid.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNWaWRlb0dyaWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Sidebar.cshtml]
