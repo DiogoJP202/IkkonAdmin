@@ -1,0 +1,124 @@
+@model AlunoFormViewModel
+@{
+    ViewData["Title"] = "Editar Aluno";
+}
+
+<div class="alunos-page">
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <section class="card alunos-form-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="alunos-section-title mb-1">Edição de cadastro</h2>
+                        <p class="alunos-section-subtitle mb-0">Atualize dados do aluno e mantenha o histórico administrativo consistente.</p>
+                    </div>
+                    <span class="alunos-form-id">Aluno #@Model.Id</span>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="row g-3">
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <section class="col-12 alunos-form-section">
+                            <h3 class="alunos-form-section-title">Dados principais</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="NomeCompleto" class="form-label alunos-label">Nome completo</label>
+                                    <input asp-for="NomeCompleto" type="text" class="form-control" placeholder="Ex.: Kenji Tanaka" autocomplete="name" />
+                                    <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label asp-for="CPF" class="form-label alunos-label">CPF</label>
+                                    <input asp-for="CPF" type="text" class="form-control" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" autocomplete="off" />
+                                    <span asp-validation-for="CPF" class="text-danger"></span>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label asp-for="RG" class="form-label alunos-label">RG</label>
+                                    <input asp-for="RG" type="text" class="form-control" placeholder="Ex.: 12.345.678-9" autocomplete="off" />
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="DataNascimento" class="form-label alunos-label">Data de nascimento</label>
+                                    <input asp-for="DataNascimento" type="date" class="form-control" autocomplete="bday" />
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="col-12 alunos-form-section">
+                            <h3 class="alunos-form-section-title">Contato</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="Celular" class="form-label alunos-label">Celular</label>
+                                    <input asp-for="Celular" type="tel" class="form-control" placeholder="(11) 99999-9999" inputmode="tel" autocomplete="tel-national" />
+                                </div>
+                                <div class="col-12 col-md-8">
+                                    <label asp-for="Email" class="form-label alunos-label">E-mail</label>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="aluno@exemplo.com" autocomplete="email" />
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Endereco" class="form-label alunos-label">Endereço</label>
+                                    <input asp-for="Endereco" type="text" class="form-control" placeholder="Rua, numero, bairro, cidade" autocomplete="street-address" />
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="ContatoEmergencia" class="form-label alunos-label">Contato de emergência</label>
+                                    <input asp-for="ContatoEmergencia" type="text" class="form-control" placeholder="Nome e telefone do contato" autocomplete="off" />
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="col-12 alunos-form-section">
+                            <h3 class="alunos-form-section-title">Vínculo interno</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="DataEntrada" class="form-label alunos-label">Data de entrada</label>
+                                    <input asp-for="DataEntrada" type="date" class="form-control" autocomplete="off" />
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="Status" class="form-label alunos-label">Status</label>
+                                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAlunoEnum>()" class="form-select"></select>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="TurmaId" class="form-label alunos-label">Turma</label>
+                                    <select asp-for="TurmaId" asp-items="ViewBag.Turmas" class="form-select">
+                                        <option value="">Sem turma</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="col-12 alunos-form-section">
+                            <h3 class="alunos-form-section-title">Observações</h3>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label asp-for="Observacoes" class="form-label alunos-label">Anotações internas</label>
+                                    <textarea asp-for="Observacoes" class="form-control" rows="4"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="col-12 d-flex justify-content-end gap-2 alunos-form-actions">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Voltar</a>
+                            <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <aside class="card alunos-detail-side">
+                <div class="card-body">
+                    <h3 class="alunos-section-title mb-3">Revisão recomendada</h3>
+                    <ul class="alunos-priority-list">
+                        <li>Confirme mudanças de status para evitar divergência com financeiro.</li>
+                        <li>Atualize turma quando houver remanejamento de horario.</li>
+                        <li>Mantenha observações curtas e objetivas para leitura rápida.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

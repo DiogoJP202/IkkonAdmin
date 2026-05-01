@@ -1,0 +1,135 @@
+@model ConfiguracoesIndexViewModel
+@{
+    ViewData["Title"] = "Configurações do Sistema";
+}
+
+<div class="admin-panel-page d-grid gap-3">
+    <partial name="_AdminNav" />
+
+    <section class="row g-3">
+        <div class="col-12 col-lg-8">
+            <article class="card admin-panel-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h6 mb-0">Parâmetros globais</h2>
+                    <small class="text-muted">Última atualização: @(Model.Form.UltimaAtualizacaoUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</small>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Sistema" method="post" class="row g-3">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Form.NomeEscola" class="form-label"></label>
+                            <input asp-for="Form.NomeEscola" class="form-control" />
+                            <span asp-validation-for="Form.NomeEscola" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Form.EmailFinanceiro" class="form-label"></label>
+                            <input asp-for="Form.EmailFinanceiro" class="form-control" />
+                            <span asp-validation-for="Form.EmailFinanceiro" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Form.TelefoneContato" class="form-label"></label>
+                            <input asp-for="Form.TelefoneContato" class="form-control" />
+                            <span asp-validation-for="Form.TelefoneContato" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.ValorMensalidadePadrao" class="form-label"></label>
+                            <input asp-for="Form.ValorMensalidadePadrao" class="form-control" />
+                            <span asp-validation-for="Form.ValorMensalidadePadrao" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.DiaVencimentoPadrao" class="form-label"></label>
+                            <input asp-for="Form.DiaVencimentoPadrao" class="form-control" />
+                            <span asp-validation-for="Form.DiaVencimentoPadrao" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.DiasToleranciaAtraso" class="form-label"></label>
+                            <input asp-for="Form.DiasToleranciaAtraso" class="form-control" />
+                            <span asp-validation-for="Form.DiasToleranciaAtraso" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.PercentualMultaAtraso" class="form-label"></label>
+                            <input asp-for="Form.PercentualMultaAtraso" class="form-control" />
+                            <span asp-validation-for="Form.PercentualMultaAtraso" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.PercentualJurosMes" class="form-label"></label>
+                            <input asp-for="Form.PercentualJurosMes" class="form-control" />
+                            <span asp-validation-for="Form.PercentualJurosMes" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label asp-for="Form.DiasAntecedenciaLembrete" class="form-label"></label>
+                            <input asp-for="Form.DiasAntecedenciaLembrete" class="form-control" />
+                            <span asp-validation-for="Form.DiasAntecedenciaLembrete" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Form.MensagemBoasVindasPadrao" class="form-label"></label>
+                            <textarea asp-for="Form.MensagemBoasVindasPadrao" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Form.MensagemBoasVindasPadrao" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label asp-for="Form.ChecklistAdmissaoPadrao" class="form-label"></label>
+                            <textarea asp-for="Form.ChecklistAdmissaoPadrao" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Form.ChecklistAdmissaoPadrao" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-input" />
+                                <label asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-label"></label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-input" />
+                                <label asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-label"></label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input asp-for="Form.EnviarLembreteCobranca" class="form-check-input" />
+                                <label asp-for="Form.EnviarLembreteCobranca" class="form-check-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-input" />
+                                <label asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-label"></label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-input" />
+                                <label asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-label"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-danger">Salvar configurações</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        </div>
+        <div class="col-12 col-lg-4">
+            <article class="card admin-panel-card h-100">
+                <div class="card-header">
+                    <h2 class="h6 mb-0">Resumo operacional</h2>
+                </div>
+                <div class="card-body">
+                    <div class="admin-stat-list">
+                        <div class="admin-stat-row"><span>Alunos ativos</span><strong>@Model.Resumo.AlunosAtivos</strong></div>
+                        <div class="admin-stat-row"><span>Turmas ativas</span><strong>@Model.Resumo.TurmasAtivas</strong></div>
+                        <div class="admin-stat-row"><span>Mensalidades atrasadas</span><strong>@Model.Resumo.MensalidadesAtrasadas</strong></div>
+                        <div class="admin-stat-row"><span>Desligamentos em aberto</span><strong>@Model.Resumo.DesligamentosEmAberto</strong></div>
+                        <div class="admin-stat-row"><span>Exames próximos (30 dias)</span><strong>@Model.Resumo.ExamesProximos30Dias</strong></div>
+                    </div>
+                    <hr />
+                    <form asp-action="RestaurarSistema" method="post" onsubmit="return confirm('Restaurar configurações padrão do sistema?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger w-100">Restaurar padrão</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,144 @@
+@model TurmaFormViewModel
+@{
+    ViewData["Title"] = "Nova Turma";
+}
+
+<div class="turmas-page">
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <section class="card turmas-form-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="turmas-section-title mb-1">Cadastro de turma</h2>
+                        <p class="turmas-section-subtitle mb-0">Defina modalidade, horário e alunos vinculados para iniciar a operação da turma.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Create" method="post" class="row g-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <section class="col-12 turmas-form-section">
+                            <h3 class="turmas-form-section-title">Dados da turma</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-5">
+                                    <label asp-for="Nome" class="form-label turmas-label">Nome da turma</label>
+                                    <input asp-for="Nome" type="text" class="form-control" placeholder="Ex.: Taiko Iniciante - Noite" autocomplete="off" />
+                                    <span asp-validation-for="Nome" class="text-danger"></span>
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label asp-for="Modalidade" class="form-label turmas-label">Modalidade</label>
+                                    <input asp-for="Modalidade" type="text" class="form-control" placeholder="Ex.: Taiko" autocomplete="off" />
+                                    <span asp-validation-for="Modalidade" class="text-danger"></span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="Horario" class="form-label turmas-label">Horário</label>
+                                    <input asp-for="Horario" type="text" class="form-control" placeholder="Ex.: Seg e Qua - 19h30" autocomplete="off" />
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check turmas-check">
+                                        <input asp-for="Ativa" class="form-check-input" />
+                                        <label asp-for="Ativa" class="form-check-label">Turma ativa</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="col-12 turmas-form-section">
+                            <h3 class="turmas-form-section-title">Observações</h3>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label asp-for="Observacoes" class="form-label turmas-label">Anotações internas</label>
+                                    <textarea asp-for="Observacoes" class="form-control" rows="3" placeholder="Informações de coordenação, sala, materiais ou recados internos"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="col-12 turmas-form-section">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-2">
+                                <h3 class="turmas-form-section-title mb-0">Associar alunos</h3>
+                                <small class="text-muted">@Model.AlunosDisponiveis.Count aluno(s) disponível(is)</small>
+                            </div>
+
+                            <div class="mb-2">
+                                <input type="search" id="buscaAlunosTurma" class="form-control" placeholder="Buscar aluno por nome" autocomplete="off" />
+                            </div>
+
+                            <div class="turmas-alunos-box" id="listaAlunosTurma">
+                                @if (Model.AlunosDisponiveis.Count == 0)
+                                {
+                                    <p class="text-muted mb-0">Não há alunos disponíveis para associação.</p>
+                                }
+                                else
+                                {
+                                    @foreach (var aluno in Model.AlunosDisponiveis)
+                                    {
+                                        var selecionado = Model.AlunosIds.Contains(aluno.Id);
+                                        <div class="form-check turmas-aluno-item mb-2" data-nome="@aluno.NomeCompleto.ToLowerInvariant()">
+                                            @if (selecionado)
+                                            {
+                                                <input class="form-check-input" type="checkbox" name="AlunosIds" value="@aluno.Id" id="aluno_@aluno.Id" checked />
+                                            }
+                                            else
+                                            {
+                                                <input class="form-check-input" type="checkbox" name="AlunosIds" value="@aluno.Id" id="aluno_@aluno.Id" />
+                                            }
+                                            <label class="form-check-label" for="aluno_@aluno.Id">
+                                                @aluno.NomeCompleto
+                                                <small class="text-muted">(@aluno.Status)</small>
+                                                @if (!string.IsNullOrWhiteSpace(aluno.TurmaAtual))
+                                                {
+                                                    <small class="text-muted">- atual: @aluno.TurmaAtual</small>
+                                                }
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <small class="text-muted">Um aluno pode participar de mais de uma turma ao mesmo tempo.</small>
+                        </section>
+
+                        <div class="col-12 d-flex justify-content-end gap-2 turmas-form-actions">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button class="btn btn-primary" type="submit">Salvar turma</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <aside class="card turmas-side-card">
+                <div class="card-body">
+                    <h3 class="turmas-section-title mb-3">Boas práticas</h3>
+                    <ul class="turmas-priority-list">
+                        <li>Use nomes de turma claros para facilitar busca e alocação.</li>
+                        <li>Padronize formato de horário para leitura rápida no painel.</li>
+                        <li>Revise se os alunos selecionados pertencem à modalidade correta.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const inputBusca = document.getElementById("buscaAlunosTurma");
+            const lista = document.getElementById("listaAlunosTurma");
+            if (!inputBusca || !lista) return;
+
+            inputBusca.addEventListener("input", function () {
+                const termo = (inputBusca.value || "").toLowerCase().trim();
+                const itens = lista.querySelectorAll(".turmas-aluno-item");
+
+                itens.forEach(function (item) {
+                    const nome = item.getAttribute("data-nome") || "";
+                    item.style.display = termo === "" || nome.includes(termo) ? "" : "none";
+                });
+            });
+        })();
+    </script>
+}

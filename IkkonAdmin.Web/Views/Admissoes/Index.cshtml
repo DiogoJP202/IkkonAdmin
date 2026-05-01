@@ -1,0 +1,283 @@
+@using IkkonAdmin.Web.Security
+@model AdmissaoIndexViewModel
+@{
+    ViewData["Title"] = "Admissões";
+    var canAdmissoesCreate = User.HasPermission(AppPermissions.AdmissoesCreate);
+    var canAlunosCreate = User.HasPermission(AppPermissions.AlunosCreate);
+    var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+
+    var total = Model.Admissoes.Count;
+    var emAndamento = Model.Admissoes.Count(x => x.Status == StatusAdmissaoEnum.EmAndamento);
+    var matriculados = Model.Admissoes.Count(x => x.Status == StatusAdmissaoEnum.Matriculado);
+    var pendentesChecklist = Model.Admissoes.Count(x => x.ChecklistConcluido < 3 && x.Status != StatusAdmissaoEnum.Cancelado);
+    var semMatricula = Model.Admissoes.Count(x => !x.AlunoId.HasValue && x.Status != StatusAdmissaoEnum.Cancelado);
+    var proximasAulas = Model.Admissoes
+        .Where(x => x.Status != StatusAdmissaoEnum.Cancelado && x.DataAulaExperimental >= DateOnly.FromDateTime(DateTime.Today))
+        .OrderBy(x => x.DataAulaExperimental)
+        .Take(3)
+        .ToList();
+
+    var filtrosAtivos = new List<string>();
+    if (!string.IsNullOrWhiteSpace(Model.Busca))
+    {
+        filtrosAtivos.Add($"Busca: {Model.Busca}");
+    }
+    if (Model.Status.HasValue)
+    {
+        filtrosAtivos.Add($"Status: {Model.Status.Value}");
+    }
+}
+
+@functions {
+    private static string StatusPillClass(StatusAdmissaoEnum status)
+    {
+        return status switch
+        {
+            StatusAdmissaoEnum.Matriculado => "admissoes-status-pill admissoes-status-success",
+            StatusAdmissaoEnum.Cancelado => "admissoes-status-pill admissoes-status-muted",
+            StatusAdmissaoEnum.EmAndamento => "admissoes-status-pill admissoes-status-warning",
+            _ => "admissoes-status-pill admissoes-status-info"
+        };
+    }
+}
+
+<div class="admissoes-page d-grid gap-3">
+    <section class="admissoes-hero rounded-3 p-3 p-lg-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-xl-8">
+                <p class="admissoes-eyebrow mb-2">Operação de entrada</p>
+                <h1 class="admissoes-title mb-2">Central de Admissões</h1>
+                <p class="admissoes-subtitle mb-0">
+                    Acompanhe rapidamente quem entrou no funil, quem precisa de ação imediata e quais processos estão prontos para matrícula.
+                </p>
+            </div>
+            <div class="col-12 col-xl-4">
+                <div class="admissoes-quick-actions">
+                    @if (canAdmissoesCreate)
+                    {
+                        <a asp-action="Create" class="btn btn-primary">Nova admissão</a>
+                    }
+                    @if (canAlunosCreate)
+                    {
+                        <a asp-controller="Alunos" asp-action="Create" class="btn btn-outline-secondary">Cadastrar aluno</a>
+                    }
+                    @if (canFinanceiroView)
+                    {
+                        <a asp-controller="Financeiro" asp-action="Index" class="btn btn-outline-secondary">Abrir financeiro</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-6 col-xl-2">
+            <article class="admissoes-kpi-card admissoes-kpi-highlight">
+                <span class="admissoes-kpi-label">Total</span>
+                <strong class="admissoes-kpi-value">@total</strong>
+                <span class="admissoes-kpi-foot">Processos no painel</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-2">
+            <article class="admissoes-kpi-card admissoes-kpi-warning">
+                <span class="admissoes-kpi-label">Em andamento</span>
+                <strong class="admissoes-kpi-value">@emAndamento</strong>
+                <span class="admissoes-kpi-foot">Exigem acompanhamento</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-2">
+            <article class="admissoes-kpi-card admissoes-kpi-success">
+                <span class="admissoes-kpi-label">Matriculados</span>
+                <strong class="admissoes-kpi-value">@matriculados</strong>
+                <span class="admissoes-kpi-foot">Convertidos com sucesso</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="admissoes-kpi-card admissoes-kpi-danger">
+                <span class="admissoes-kpi-label">Checklist pendente</span>
+                <strong class="admissoes-kpi-value">@pendentesChecklist</strong>
+                <span class="admissoes-kpi-foot">Contrato, pagamento ou integração</span>
+            </article>
+        </div>
+        <div class="col-12 col-xl-3">
+            <article class="admissoes-kpi-card admissoes-kpi-info">
+                <span class="admissoes-kpi-label">Sem matrícula</span>
+                <strong class="admissoes-kpi-value">@semMatricula</strong>
+                <span class="admissoes-kpi-foot">Aguardando vínculo com aluno</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="card admissoes-filter-card">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-5">
+                    <label asp-for="Busca" class="admissoes-label">Busca</label>
+                    <input asp-for="Busca" class="form-control" placeholder="Nome do interessado ou aluno vinculado" autocomplete="off" />
+                </div>
+                <div class="col-12 col-lg-3">
+                    <label asp-for="Status" class="admissoes-label">Status</label>
+                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAdmissaoEnum>()" class="form-select">
+                        <option value="">Todos os status</option>
+                    </select>
+                </div>
+                <div class="col-6 col-lg-2 d-grid">
+                    <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
+                </div>
+                <div class="col-6 col-lg-2 d-grid">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+                @if (filtrosAtivos.Count > 0)
+                {
+                    <div class="col-12">
+                        <div class="admissoes-active-filters">
+                            @foreach (var filtro in filtrosAtivos)
+                            {
+                                <span class="admissoes-filter-chip">@filtro</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </form>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-12 col-xxl-8">
+            <div class="card admissoes-table-card h-100">
+                <div class="card-header">
+                    <div>
+                        <h2 class="admissoes-section-title mb-1">Fila de admissões</h2>
+                        <p class="admissoes-section-subtitle mb-0">Priorize processos com checklist incompleto e sem matrícula.</p>
+                    </div>
+                    <span class="badge text-bg-light border">@total registros</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 admissoes-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Interessado</th>
+                                <th>Aula experimental</th>
+                                <th>Status</th>
+                                <th>Checklist</th>
+                                <th>Matrícula</th>
+                                <th>Aluno vinculado</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Admissoes.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="admissoes-empty-state text-center py-4">
+                                            <h4>Nenhuma admissão encontrada.</h4>
+                                            <p class="mb-3">Ajuste os filtros ou registre uma nova admissão.</p>
+                                            @if (canAdmissoesCreate)
+                                            {
+                                                <a asp-action="Create" class="btn btn-primary">Nova admissão</a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model.Admissoes)
+                                {
+                                    var linhaCritica = item.ChecklistConcluido < 3 && item.Status == StatusAdmissaoEnum.EmAndamento;
+
+                                    <tr class="@(linhaCritica ? "admissoes-row-attention" : string.Empty)">
+                                        <td>
+                                            <div class="admissoes-name-cell">
+                                                <span class="admissoes-name">@item.NomeInteressado</span>
+                                                <span class="admissoes-meta">Processo #@item.Id</span>
+                                            </div>
+                                        </td>
+                                        <td>@item.DataAulaExperimental.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="@StatusPillClass(item.Status)">@item.Status</span></td>
+                                        <td>
+                                            <div class="progress admissoes-checklist-progress" role="progressbar" aria-label="Checklist de admissão" aria-valuenow="@item.ChecklistConcluido" aria-valuemin="0" aria-valuemax="3">
+                                                <div class="progress-bar" style="width:@((item.ChecklistConcluido * 100) / 3)%"></div>
+                                            </div>
+                                            <small class="text-muted">@item.ChecklistConcluido/3 etapas</small>
+                                        </td>
+                                        <td>@(item.DataMatricula.HasValue ? item.DataMatricula.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                        <td>
+                                            @if (item.AlunoId.HasValue)
+                                            {
+                                                @if (canAlunosView)
+                                                {
+                                                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="text-decoration-none">
+                                                        @(item.AlunoNome ?? $"Aluno #{item.AlunoId}")
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span>@(item.AlunoNome ?? $"Aluno #{item.AlunoId}")</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Não vinculado</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary admissoes-action-btn">Gerenciar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xxl-4">
+            <div class="card admissoes-side-card h-100">
+                <div class="card-header">
+                    <div>
+                        <h2 class="admissoes-section-title mb-1">Próximas aulas</h2>
+                        <p class="admissoes-section-subtitle mb-0">Agenda imediata para acompanhamento.</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (proximasAulas.Count == 0)
+                    {
+                        <p class="text-muted mb-0">Não há aulas experimentais futuras no momento.</p>
+                    }
+                    else
+                    {
+                        <ul class="admissoes-priority-list">
+                            @foreach (var aula in proximasAulas)
+                            {
+                                <li>
+                                    <strong>@aula.NomeInteressado</strong>
+                                    <span>@aula.DataAulaExperimental.ToString("dd/MM/yyyy") - @aula.Status</span>
+                                    <a asp-action="Details" asp-route-id="@aula.Id" class="link-secondary text-decoration-none">Abrir processo</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (Model.Admissoes.Count > 0)
+    {
+        <section class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted">Exibindo @Model.Admissoes.Count registro(s).</small>
+            @if (canAdmissoesCreate)
+            {
+                <a asp-action="Create" class="btn btn-primary btn-sm">Registrar nova admissão</a>
+            }
+        </section>
+    }
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

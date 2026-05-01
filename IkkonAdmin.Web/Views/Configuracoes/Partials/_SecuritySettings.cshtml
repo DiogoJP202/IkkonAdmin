@@ -1,0 +1,89 @@
+﻿@model UserSettingsPageViewModel
+
+<article class="card user-settings-card">
+    <div class="card-header user-settings-card-header">
+        <div>
+            <h2 class="user-settings-card-title mb-1">Segurança</h2>
+            <p class="user-settings-card-subtitle mb-0">Altere sua senha e acompanhe o status de segurança da conta.</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12 col-lg-7">
+                <form asp-action="AlterarSenha" method="post" data-config-form data-reset-on-success="true">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="SenhaAtual">Senha atual</label>
+                            <input type="password" class="form-control" id="SenhaAtual" name="SenhaAtual" autocomplete="current-password" placeholder="Informe sua senha atual" />
+                            <span class="text-danger small field-error" data-field-error="SenhaAtual"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="NovaSenha">Nova senha</label>
+                            <input type="password" class="form-control" id="NovaSenha" name="NovaSenha" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" />
+                            <span class="text-danger small field-error" data-field-error="NovaSenha"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="ConfirmacaoNovaSenha">Confirmar nova senha</label>
+                            <input type="password" class="form-control" id="ConfirmacaoNovaSenha" name="ConfirmacaoNovaSenha" autocomplete="new-password" placeholder="Repita a nova senha" />
+                            <span class="text-danger small field-error" data-field-error="ConfirmacaoNovaSenha"></span>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-danger" data-loading-text="Atualizando...">Alterar senha</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <div class="user-settings-info-list d-grid gap-2">
+                    <article class="user-settings-info-item">
+                        <span>Status da conta</span>
+                        <strong>@(Model.SecurityStatus.ContaAtiva ? "Ativa" : "Inativa")</strong>
+                    </article>
+                    <article class="user-settings-info-item">
+                        <span>Último login</span>
+                        <strong>@(Model.SecurityStatus.UltimoLoginUtc.HasValue ? Model.SecurityStatus.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "Sem registro")</strong>
+                    </article>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <h3 class="h6 mb-2">Histórico de acessos</h3>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle user-settings-history-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Data e hora</th>
+                            <th>IP</th>
+                            <th>Evento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model.SecurityStatus.HistoricoAcessos.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="text-muted">Nenhum acesso registrado ainda.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var acesso in Model.SecurityStatus.HistoricoAcessos)
+                        {
+                            <tr>
+                                <td>@acesso.DataAcessoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>@(string.IsNullOrWhiteSpace(acesso.EnderecoIp) ? "-" : acesso.EnderecoIp)</td>
+                                <td>@acesso.Descricao</td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</article>

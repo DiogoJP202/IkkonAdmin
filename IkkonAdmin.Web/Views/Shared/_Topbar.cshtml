@@ -1,0 +1,17 @@
+﻿<header class="admin-topbar">
+    <div>
+        <h1 class="h5 mb-1">@ViewData["Title"]</h1>
+        <small class="text-muted">Painel administrativo interno</small>
+    </div>
+    <div class="text-end admin-topbar-actions">
+        <small class="text-muted d-block">@DateTime.Now.ToString("dd/MM/yyyy")</small>
+        <small class="text-muted d-block">@(User?.Identity?.Name ?? "Operação interna")</small>
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <form asp-controller="Auth" asp-action="Logout" method="post" class="mt-2">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Sair</button>
+            </form>
+        }
+    </div>
+</header>

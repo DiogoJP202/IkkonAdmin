@@ -1,0 +1,45 @@
+﻿@model UserSettingsPageViewModel
+@using IkkonAdmin.Web.Security
+@{
+    Layout = User.IsInRole(AppRoles.Aluno) ? "_AuthLayout" : "_Layout";
+    ViewData["Title"] = "Configurações";
+}
+
+<div class="user-settings-page d-grid gap-3">
+    <section class="user-settings-hero rounded-3 p-3 p-lg-4">
+        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-end">
+            <div>
+                <p class="user-settings-eyebrow mb-2">Gerenciamento de conta</p>
+                <h1 class="user-settings-title mb-2">Conta e Preferências</h1>
+                <p class="user-settings-subtitle mb-0">
+                    Gerenciar dados pessoais, segurança e preferências da sua conta.
+                </p>
+            </div>
+            <a href="/" class="btn btn-outline-secondary">Voltar ao site</a>
+        </div>
+    </section>
+
+    <div id="userSettingsFeedback" class="alert d-none" role="alert" aria-live="polite"></div>
+
+    <div class="d-grid gap-3">
+        <section class="user-settings-section">
+            <partial name="Partials/_AccountInfo" model="Model" />
+        </section>
+
+        <section class="user-settings-section">
+            <partial name="Partials/_SecuritySettings" model="Model" />
+        </section>
+
+        <section class="user-settings-section">
+            <partial name="Partials/_Preferences" model="Model" />
+        </section>
+
+        <section class="user-settings-section">
+            <partial name="Partials/_AccountType" model="Model" />
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/configuracoes.js" asp-append-version="true"></script>
+}

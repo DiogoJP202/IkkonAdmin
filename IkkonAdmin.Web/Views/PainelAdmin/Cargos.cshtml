@@ -1,0 +1,186 @@
+@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@model AdminRolesIndexViewModel
+@{
+    ViewData["Title"] = "Cargos";
+    var totalPaginas = (int)Math.Ceiling(Model.TotalRegistros / (double)Model.TamanhoPagina);
+    totalPaginas = Math.Max(1, totalPaginas);
+
+    var canEditarPermissoes = User.HasPermission(AppPermissions.EditarPermissoes);
+}
+
+<div class="admin-panel-page d-grid gap-3">
+    <partial name="_AdminNav" />
+
+    <section class="card admin-panel-card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h2 class="h6 mb-0">Filtros</h2>
+            @if (canEditarPermissoes)
+            {
+                <a href="/admin/painel/NovoCargo" class="btn btn-sm btn-danger">Novo cargo</a>
+            }
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Cargos" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="busca">Busca</label>
+                    <input class="form-control" id="busca" name="busca" value="@Model.Busca" placeholder="Nome, codigo ou descricao" />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="tipo">Tipo</label>
+                    <select class="form-select" id="tipo" name="tipo">
+                        @if (!Model.Tipo.HasValue) { <option value="" selected>Todos</option> } else { <option value="">Todos</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Admin) { <option value="@TipoAcessoEnum.Admin" selected>Admin</option> } else { <option value="@TipoAcessoEnum.Admin">Admin</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Funcionario) { <option value="@TipoAcessoEnum.Funcionario" selected>Funcionario</option> } else { <option value="@TipoAcessoEnum.Funcionario">Funcionario</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Aluno) { <option value="@TipoAcessoEnum.Aluno" selected>Aluno</option> } else { <option value="@TipoAcessoEnum.Aluno">Aluno</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="ativo">Status</label>
+                    <select class="form-select" id="ativo" name="ativo">
+                        @if (Model.Ativo is null) { <option value="" selected>Todos</option> } else { <option value="">Todos</option> }
+                        @if (Model.Ativo == true) { <option value="true" selected>Ativo</option> } else { <option value="true">Ativo</option> }
+                        @if (Model.Ativo == false) { <option value="false" selected>Inativo</option> } else { <option value="false">Inativo</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="tamanhoPagina">Registros</label>
+                    <select class="form-select" id="tamanhoPagina" name="tamanhoPagina">
+                        @if (Model.TamanhoPagina == 10) { <option value="10" selected>10</option> } else { <option value="10">10</option> }
+                        @if (Model.TamanhoPagina == 20) { <option value="20" selected>20</option> } else { <option value="20">20</option> }
+                        @if (Model.TamanhoPagina == 30) { <option value="30" selected>30</option> } else { <option value="30">30</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-danger w-100">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="card admin-panel-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h6 mb-0">Cargos (@Model.TotalRegistros)</h2>
+            <small class="text-muted">Pagina @Model.PaginaAtual de @totalPaginas</small>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cargo</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Permissoes</th>
+                        <th>Usuarios</th>
+                        <th>Criado em</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Roles.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Nenhum cargo encontrado.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var role in Model.Roles)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@role.Nome</div>
+                                <div class="text-muted small">@role.Codigo</div>
+                                @if (!string.IsNullOrWhiteSpace(role.Descricao))
+                                {
+                                    <div class="text-muted small">@role.Descricao</div>
+                                }
+                            </td>
+                            <td>@role.TipoAcesso</td>
+                            <td>
+                                @if (role.Ativo)
+                                {
+                                    <span class="badge text-bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary">Inativo</span>
+                                }
+                                @if (role.IsSistema)
+                                {
+                                    <span class="badge text-bg-dark ms-1">Sistema</span>
+                                }
+                            </td>
+                            <td>@role.TotalPermissoes</td>
+                            <td>@role.TotalUsuarios</td>
+                            <td>@role.DataCriacaoUtc.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if (canEditarPermissoes)
+                                    {
+                                        <a href="/admin/painel/EditarCargo/@role.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                    }
+                                    @if (!role.IsSistema)
+                                    {
+                                        <form asp-action="AlterarStatusCargo" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@role.Id" />
+                                            <input type="hidden" name="ativo" value="@(role.Ativo ? "false" : "true")" />
+                                            <button type="submit" class="btn btn-sm @(role.Ativo ? "btn-outline-warning" : "btn-outline-success")">@(role.Ativo ? "Desativar" : "Ativar")</button>
+                                        </form>
+                                        <form asp-action="ExcluirCargo" method="post" class="d-inline" onsubmit="return confirm('Confirmar remocao do cargo?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@role.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPaginas > 1)
+        {
+            <div class="card-footer">
+                <nav aria-label="Paginacao de cargos">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.PaginaAtual <= 1 ? "disabled" : null)">
+                            <a class="page-link"
+                               asp-action="Cargos"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-tipo="@Model.Tipo"
+                               asp-route-ativo="@Model.Ativo"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual - 1)">Anterior</a>
+                        </li>
+                        @for (var p = 1; p <= totalPaginas; p++)
+                        {
+                            <li class="page-item @(p == Model.PaginaAtual ? "active" : null)">
+                                <a class="page-link"
+                                   asp-action="Cargos"
+                                   asp-route-busca="@Model.Busca"
+                                   asp-route-tipo="@Model.Tipo"
+                                   asp-route-ativo="@Model.Ativo"
+                                   asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                                   asp-route-pagina="@p">@p</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PaginaAtual >= totalPaginas ? "disabled" : null)">
+                            <a class="page-link"
+                               asp-action="Cargos"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-tipo="@Model.Tipo"
+                               asp-route-ativo="@Model.Ativo"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual + 1)">Proxima</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </section>
+</div>

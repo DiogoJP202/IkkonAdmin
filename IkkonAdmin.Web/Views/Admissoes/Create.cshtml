@@ -1,0 +1,133 @@
+@using IkkonAdmin.Web.Security
+@model AdmissaoViewModel
+@{
+    ViewData["Title"] = "Nova Admissão";
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var canTurmasView = User.HasPermission(AppPermissions.TurmasView);
+}
+
+<div class="admissoes-page d-grid gap-3">
+    <section class="admissoes-hero rounded-3 p-3 p-lg-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-lg-8">
+                <p class="admissoes-eyebrow mb-2">Nova entrada</p>
+                <h1 class="admissoes-title mb-2">Registrar admissão</h1>
+                <p class="admissoes-subtitle mb-0">
+                    Abra o processo com os dados essenciais da aula experimental e marque o checklist inicial para organizar o fluxo de matrícula.
+                </p>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="admissoes-quick-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para a lista</a>
+                    @if (canAlunosView)
+                    {
+                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
+                    }
+                    @if (canTurmasView)
+                    {
+                        <a asp-controller="Turmas" asp-action="Index" class="btn btn-outline-secondary">Consultar turmas</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <div class="card admissoes-form-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="admissoes-section-title mb-1">Dados da admissão</h2>
+                        <p class="admissoes-section-subtitle mb-0">Preencha os campos principais para iniciar o processo.</p>
+                    </div>
+                    <span class="admissoes-form-id">Novo processo</span>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" class="row g-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="col-12 admissoes-form-section">
+                            <h3 class="admissoes-form-section-title">Identificação inicial</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-8">
+                                    <label asp-for="NomeInteressado" class="admissoes-label">Nome do interessado</label>
+                                    <input asp-for="NomeInteressado" class="form-control" placeholder="Ex.: Maria Fernanda Sato" autocomplete="name" />
+                                    <span asp-validation-for="NomeInteressado" class="text-danger"></span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="DataAulaExperimental" class="admissoes-label">Data da aula experimental</label>
+                                    <input asp-for="DataAulaExperimental" type="date" class="form-control" />
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <label asp-for="Status" class="admissoes-label">Status inicial</label>
+                                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAdmissaoEnum>()" class="form-select"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 admissoes-form-section">
+                            <h3 class="admissoes-form-section-title">Checklist operacional</h3>
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    <div class="form-check admissoes-check">
+                                        <input asp-for="ContratoAssinado" class="form-check-input" />
+                                        <label asp-for="ContratoAssinado" class="form-check-label">Contrato assinado</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-check admissoes-check">
+                                        <input asp-for="PagamentoInicialConfirmado" class="form-check-input" />
+                                        <label asp-for="PagamentoInicialConfirmado" class="form-check-label">Pagamento inicial confirmado</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="form-check admissoes-check">
+                                        <input asp-for="IntegracaoConcluida" class="form-check-input" />
+                                        <label asp-for="IntegracaoConcluida" class="form-check-label">Integração concluída</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="ChecklistObservacoes" class="admissoes-label">Observações do checklist</label>
+                                    <textarea asp-for="ChecklistObservacoes" rows="4" class="form-control" placeholder="Observações internas sobre contrato, pagamentos, grupos e onboarding."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-2 admissoes-form-actions">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar admissão</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-4">
+            <div class="card admissoes-side-card h-100">
+                <div class="card-header">
+                    <h2 class="admissoes-section-title mb-0">Guia rápido</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="admissoes-priority-list mb-0">
+                        <li>
+                            <strong>Evite iniciar como Matriculado</strong>
+                            <span>Use este status apenas depois de criar o aluno na etapa de detalhes.</span>
+                        </li>
+                        <li>
+                            <strong>Checklist completo</strong>
+                            <span>Marque contrato, pagamento inicial e integração para evitar pendências futuras.</span>
+                        </li>
+                        <li>
+                            <strong>Observações objetivas</strong>
+                            <span>Registre somente o necessário para a equipe agir com rapidez.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

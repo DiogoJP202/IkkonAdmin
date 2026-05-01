@@ -1,0 +1,208 @@
+@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@model AdminUsuariosIndexViewModel
+@{
+    ViewData["Title"] = "Gestao de Usuarios";
+    var totalPaginas = (int)Math.Ceiling(Model.TotalRegistros / (double)Model.TamanhoPagina);
+    totalPaginas = Math.Max(1, totalPaginas);
+
+    var canGerenciarUsuarios = User.HasPermission(AppPermissions.GerenciarUsuarios);
+    var canEditarPermissoes = User.HasPermission(AppPermissions.EditarPermissoes);
+}
+
+<div class="admin-panel-page d-grid gap-3">
+    <partial name="_AdminNav" />
+
+    <section class="card admin-panel-card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h2 class="h6 mb-0">Filtros</h2>
+            @if (canGerenciarUsuarios)
+            {
+                <a href="/admin/painel/NovoUsuario" class="btn btn-sm btn-danger">Novo usuario</a>
+            }
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Usuarios" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="busca">Busca</label>
+                    <input class="form-control" id="busca" name="busca" value="@Model.Busca" placeholder="Nome, e-mail ou login" />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="tipo">Tipo</label>
+                    <select class="form-select" id="tipo" name="tipo">
+                        @if (!Model.Tipo.HasValue) { <option value="" selected>Todos</option> } else { <option value="">Todos</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Admin) { <option value="@TipoAcessoEnum.Admin" selected>Admin</option> } else { <option value="@TipoAcessoEnum.Admin">Admin</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Funcionario) { <option value="@TipoAcessoEnum.Funcionario" selected>Funcionario</option> } else { <option value="@TipoAcessoEnum.Funcionario">Funcionario</option> }
+                        @if (Model.Tipo == TipoAcessoEnum.Aluno) { <option value="@TipoAcessoEnum.Aluno" selected>Aluno</option> } else { <option value="@TipoAcessoEnum.Aluno">Aluno</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="ativo">Status</label>
+                    <select class="form-select" id="ativo" name="ativo">
+                        @if (Model.Ativo is null) { <option value="" selected>Todos</option> } else { <option value="">Todos</option> }
+                        @if (Model.Ativo == true) { <option value="true" selected>Ativo</option> } else { <option value="true">Ativo</option> }
+                        @if (Model.Ativo == false) { <option value="false" selected>Inativo</option> } else { <option value="false">Inativo</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="tamanhoPagina">Registros</label>
+                    <select class="form-select" id="tamanhoPagina" name="tamanhoPagina">
+                        @if (Model.TamanhoPagina == 10) { <option value="10" selected>10</option> } else { <option value="10">10</option> }
+                        @if (Model.TamanhoPagina == 20) { <option value="20" selected>20</option> } else { <option value="20">20</option> }
+                        @if (Model.TamanhoPagina == 30) { <option value="30" selected>30</option> } else { <option value="30">30</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 d-flex align-items-center">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="incluirExcluidos" name="incluirExcluidos" value="true" @(Model.IncluirExcluidos ? "checked" : null) />
+                        <label class="form-check-label" for="incluirExcluidos">Excluidos</label>
+                    </div>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">Filtrar</button>
+                    <a href="/admin/painel/Usuarios" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="card admin-panel-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h6 mb-0">Usuarios (@Model.TotalRegistros)</h2>
+            <small class="text-muted">Pagina @Model.PaginaAtual de @totalPaginas</small>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Login</th>
+                        <th>Cargo</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                        <th>Ultimo login</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Usuarios.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Nenhum usuario encontrado.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.Usuarios)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@item.Nome</div>
+                                <div class="text-muted small">@(item.Email ?? "-")</div>
+                            </td>
+                            <td>@item.Login</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.RoleNome))
+                                {
+                                    <div class="fw-semibold">@item.RoleNome</div>
+                                    <div class="text-muted small">@item.RoleCodigo</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>@item.TipoAcesso</td>
+                            <td>
+                                @if (item.Excluido)
+                                {
+                                    <span class="badge text-bg-dark">Excluido</span>
+                                }
+                                else if (item.Ativo)
+                                {
+                                    <span class="badge text-bg-success">Ativo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary">Inativo</span>
+                                }
+                            </td>
+                            <td>@item.DataCriacaoUtc.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td>@(item.UltimoLoginUtc.HasValue ? item.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if (!item.Excluido)
+                                    {
+                                        @if (canGerenciarUsuarios)
+                                        {
+                                            <a href="/admin/painel/EditarUsuario/@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                        }
+                                        @if (canEditarPermissoes)
+                                        {
+                                            <a href="/admin/painel/Acessos/@item.Id" class="btn btn-sm btn-outline-primary">Acessos</a>
+                                        }
+                                        @if (canGerenciarUsuarios)
+                                        {
+                                            <form asp-action="AlterarStatusUsuario" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="ativo" value="@(item.Ativo ? "false" : "true")" />
+                                                <button type="submit" class="btn btn-sm @(item.Ativo ? "btn-outline-warning" : "btn-outline-success")">@(item.Ativo ? "Desativar" : "Ativar")</button>
+                                            </form>
+                                            <form asp-action="ExcluirUsuario" method="post" class="d-inline" onsubmit="return confirm('Confirmar exclusao logica do usuario?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                                            </form>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (totalPaginas > 1)
+        {
+            <div class="card-footer">
+                <nav aria-label="Paginacao de usuarios">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.PaginaAtual <= 1 ? "disabled" : null)">
+                            <a class="page-link" asp-action="Usuarios"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-tipo="@Model.Tipo"
+                               asp-route-ativo="@Model.Ativo"
+                               asp-route-incluirExcluidos="@Model.IncluirExcluidos"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual - 1)">Anterior</a>
+                        </li>
+                        @for (var p = 1; p <= totalPaginas; p++)
+                        {
+                            <li class="page-item @(p == Model.PaginaAtual ? "active" : null)">
+                                <a class="page-link" asp-action="Usuarios"
+                                   asp-route-busca="@Model.Busca"
+                                   asp-route-tipo="@Model.Tipo"
+                                   asp-route-ativo="@Model.Ativo"
+                                   asp-route-incluirExcluidos="@Model.IncluirExcluidos"
+                                   asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                                   asp-route-pagina="@p">@p</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PaginaAtual >= totalPaginas ? "disabled" : null)">
+                            <a class="page-link" asp-action="Usuarios"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-tipo="@Model.Tipo"
+                               asp-route-ativo="@Model.Ativo"
+                               asp-route-incluirExcluidos="@Model.IncluirExcluidos"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual + 1)">Proxima</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </section>
+</div>

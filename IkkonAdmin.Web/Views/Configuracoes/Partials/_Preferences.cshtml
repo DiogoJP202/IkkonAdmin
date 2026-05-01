@@ -1,0 +1,68 @@
+﻿@model UserSettingsPageViewModel
+
+<article class="card user-settings-card">
+    <div class="card-header user-settings-card-header">
+        <div>
+            <h2 class="user-settings-card-title mb-1">Preferências</h2>
+            <p class="user-settings-card-subtitle mb-0">Ajuste tema, idioma e notificações para sua experiência diária.</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="AtualizarPreferencias" method="post" data-config-form>
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="TemaPreferencia">Tema</label>
+                    <select class="form-select" id="TemaPreferencia" name="TemaPreferencia">
+                        @if (Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro)
+                        {
+                            <option value="@TemaPreferenciaEnum.Claro" selected>Claro</option>
+                            <option value="@TemaPreferenciaEnum.Escuro">Escuro</option>
+                        }
+                        else
+                        {
+                            <option value="@TemaPreferenciaEnum.Claro">Claro</option>
+                            <option value="@TemaPreferenciaEnum.Escuro" selected>Escuro</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="IdiomaPreferencia">Idioma</label>
+                    <select class="form-select" id="IdiomaPreferencia" name="IdiomaPreferencia">
+                        @if (Model.Preferences.IdiomaPreferencia == IdiomaPreferenciaEnum.PtBr)
+                        {
+                            <option value="@IdiomaPreferenciaEnum.PtBr" selected>Português (Brasil)</option>
+                            <option value="@IdiomaPreferenciaEnum.EnUs">English (US)</option>
+                        }
+                        else
+                        {
+                            <option value="@IdiomaPreferenciaEnum.PtBr">Português (Brasil)</option>
+                            <option value="@IdiomaPreferenciaEnum.EnUs" selected>English (US)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="form-check user-settings-check">
+                        <input class="form-check-input" type="checkbox" id="NotificarEmail" name="NotificarEmail" value="true" @(Model.Preferences.NotificarEmail ? "checked" : null) />
+                        <input type="hidden" name="NotificarEmail" value="false" />
+                        <label class="form-check-label" for="NotificarEmail">Receber notificações por e-mail</label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="form-check user-settings-check">
+                        <input class="form-check-input" type="checkbox" id="NotificarSistema" name="NotificarSistema" value="true" @(Model.Preferences.NotificarSistema ? "checked" : null) />
+                        <input type="hidden" name="NotificarSistema" value="false" />
+                        <label class="form-check-label" for="NotificarSistema">Receber notificações no sistema</label>
+                    </div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-danger" data-loading-text="Salvando...">Salvar preferências</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</article>

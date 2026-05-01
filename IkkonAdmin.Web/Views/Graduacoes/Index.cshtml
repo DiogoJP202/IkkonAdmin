@@ -1,0 +1,360 @@
+@using IkkonAdmin.Web.Security
+@model GraduacaoIndexViewModel
+@{
+    ViewData["Title"] = "Graduações";
+    var canGraduacoesCreate = User.HasPermission(AppPermissions.GraduacoesCreate);
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var canTurmasView = User.HasPermission(AppPermissions.TurmasView);
+
+    var totalResultados = Model.Graduacoes.Count;
+    var aprovados = Model.Graduacoes.Count(x => x.ResultadoAprovado);
+    var reprovados = Model.Graduacoes.Count(x => !x.ResultadoAprovado);
+    var pendenteCertificado = Model.Graduacoes.Count(x => x.ResultadoAprovado && !x.CertificadoEmitido);
+    var pendenteOmamori = Model.Graduacoes.Count(x => x.ResultadoAprovado && !x.OmamoriAtualizado);
+
+    var filtrosAtivos = new List<string>();
+    if (!string.IsNullOrWhiteSpace(Model.Busca))
+    {
+        filtrosAtivos.Add($"Busca: {Model.Busca}");
+    }
+    if (Model.ApenasAprovados.HasValue)
+    {
+        filtrosAtivos.Add(Model.ApenasAprovados.Value ? "Resultado: Aprovados" : "Resultado: Reprovados");
+    }
+}
+
+<div class="graduacoes-page d-grid gap-3">
+    <section class="graduacoes-hero rounded-3 p-3 p-lg-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-xl-8">
+                <p class="graduacoes-eyebrow mb-2">Progressão técnica</p>
+                <h1 class="graduacoes-title mb-2">Central de Graduações</h1>
+                <p class="graduacoes-subtitle mb-0">
+                    Gerencie exames, resultados e histórico de evolução dos alunos com foco em rastreabilidade e agilidade operacional.
+                </p>
+            </div>
+            <div class="col-12 col-xl-4">
+                <div class="graduacoes-quick-actions">
+                    @if (canGraduacoesCreate)
+                    {
+                        <a asp-action="Create" class="btn btn-primary">Registrar resultado</a>
+                    }
+                    @if (canAlunosView)
+                    {
+                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
+                    }
+                    @if (canTurmasView)
+                    {
+                        <a asp-controller="Turmas" asp-action="Index" class="btn btn-outline-secondary">Abrir turmas</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-3">
+        <div class="col-6 col-xl-2">
+            <article class="graduacoes-kpi-card graduacoes-kpi-highlight">
+                <span class="graduacoes-kpi-label">Resultados</span>
+                <strong class="graduacoes-kpi-value">@totalResultados</strong>
+                <span class="graduacoes-kpi-foot">Registros no painel</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-2">
+            <article class="graduacoes-kpi-card graduacoes-kpi-success">
+                <span class="graduacoes-kpi-label">Aprovados</span>
+                <strong class="graduacoes-kpi-value">@aprovados</strong>
+                <span class="graduacoes-kpi-foot">Progressões concluídas</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-2">
+            <article class="graduacoes-kpi-card graduacoes-kpi-danger">
+                <span class="graduacoes-kpi-label">Reprovados</span>
+                <strong class="graduacoes-kpi-value">@reprovados</strong>
+                <span class="graduacoes-kpi-foot">Exigem acompanhamento</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="graduacoes-kpi-card graduacoes-kpi-warning">
+                <span class="graduacoes-kpi-label">Certificado pendente</span>
+                <strong class="graduacoes-kpi-value">@pendenteCertificado</strong>
+                <span class="graduacoes-kpi-foot">Aprovados sem emissão</span>
+            </article>
+        </div>
+        <div class="col-12 col-xl-3">
+            <article class="graduacoes-kpi-card graduacoes-kpi-info">
+                <span class="graduacoes-kpi-label">Omamori pendente</span>
+                <strong class="graduacoes-kpi-value">@pendenteOmamori</strong>
+                <span class="graduacoes-kpi-foot">Aprovados sem atualização</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="card graduacoes-filter-card">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-5">
+                    <label asp-for="Busca" class="graduacoes-label">Busca</label>
+                    <input asp-for="Busca" class="form-control" placeholder="Buscar por aluno ou CPF" autocomplete="off" />
+                </div>
+                <div class="col-12 col-lg-3">
+                    <label asp-for="ApenasAprovados" class="graduacoes-label">Resultado</label>
+                    <select asp-for="ApenasAprovados" class="form-select">
+                        <option value="">Todos os resultados</option>
+                        @if (Model.ApenasAprovados == true)
+                        {
+                            <option value="true" selected>Aprovados</option>
+                        }
+                        else
+                        {
+                            <option value="true">Aprovados</option>
+                        }
+                        @if (Model.ApenasAprovados == false)
+                        {
+                            <option value="false" selected>Reprovados</option>
+                        }
+                        else
+                        {
+                            <option value="false">Reprovados</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-lg-2 d-grid">
+                    <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
+                </div>
+                <div class="col-6 col-lg-2 d-grid">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+                @if (filtrosAtivos.Count > 0)
+                {
+                    <div class="col-12">
+                        <div class="graduacoes-active-filters">
+                            @foreach (var filtro in filtrosAtivos)
+                            {
+                                <span class="graduacoes-filter-chip">@filtro</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </form>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-12 col-xxl-8">
+            <section class="card graduacoes-table-card h-100">
+                <div class="card-header">
+                    <div>
+                        <h2 class="graduacoes-section-title mb-1">Histórico de graduações</h2>
+                        <p class="graduacoes-section-subtitle mb-0">Acompanhe evolução por aluno e identifique pendências pós-aprovação.</p>
+                    </div>
+                    <span class="badge text-bg-light border">@totalResultados registros</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 graduacoes-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Aluno</th>
+                                <th>Turma</th>
+                                <th>Exame</th>
+                                <th>Resultado</th>
+                                <th>Nível</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Graduacoes.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="graduacoes-empty-state text-center py-4">
+                                            <h4>Nenhum resultado encontrado.</h4>
+                                            <p class="mb-3">Ajuste os filtros ou registre um novo resultado.</p>
+                                            @if (canGraduacoesCreate)
+                                            {
+                                                <a asp-action="Create" class="btn btn-primary">Registrar resultado</a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model.Graduacoes)
+                                {
+                                    var pendentePosAprovacao = item.ResultadoAprovado && (!item.CertificadoEmitido || !item.OmamoriAtualizado);
+                                    <tr class="@(pendentePosAprovacao ? "graduacoes-row-attention" : string.Empty)">
+                                        <td>
+                                            <div class="graduacoes-name-cell">
+                                                @if (canAlunosView)
+                                                {
+                                                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="text-decoration-none graduacoes-name">@item.AlunoNome</a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="graduacoes-name">@item.AlunoNome</span>
+                                                }
+                                                <span class="graduacoes-meta">Resultado #@item.Id</span>
+                                            </div>
+                                        </td>
+                                        <td>@(item.TurmaNome ?? "-")</td>
+                                        <td>
+                                            @if (item.ExameGraduacaoId.HasValue && item.DataExame.HasValue)
+                                            {
+                                                <span>#@item.ExameGraduacaoId - @item.DataExame.Value.ToString("dd/MM/yyyy")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Registro avulso</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div>@item.DataResultado.ToString("dd/MM/yyyy")</div>
+                                            @if (item.ResultadoAprovado)
+                                            {
+                                                <span class="graduacoes-status-pill graduacoes-status-success">Aprovado</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="graduacoes-status-pill graduacoes-status-danger">Reprovado</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @item.NivelAnterior
+                                            @if (item.NivelNovo.HasValue)
+                                            {
+                                                <span>? @item.NivelNovo</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary graduacoes-action-btn">Detalhes</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-12 col-xxl-4">
+            <section class="card graduacoes-side-card mb-3">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Criar exame</h2>
+                </div>
+                <div class="card-body">
+                    @if (canGraduacoesCreate)
+                    {
+                        <form asp-action="CriarExame" method="post" class="row g-3">
+                            @Html.AntiForgeryToken()
+                            <div class="col-12">
+                                <label class="graduacoes-label">Data do exame</label>
+                                <input type="date" name="DataExame" value="@Model.NovoExame.DataExame.ToString("yyyy-MM-dd")" class="form-control" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="graduacoes-label">Local</label>
+                                <input type="text" name="Local" value="@Model.NovoExame.Local" class="form-control" maxlength="150" placeholder="Ex.: Dojô Ikkon" />
+                            </div>
+                            <div class="col-12">
+                                <label class="graduacoes-label">Nível pretendido</label>
+                                <select name="NivelPretendido" class="form-select">
+                                    @foreach (var nivel in Html.GetEnumSelectList<NivelGraduacaoEnum>())
+                                    {
+                                        if (nivel.Value == ((int)Model.NovoExame.NivelPretendido).ToString())
+                                        {
+                                            <option value="@nivel.Value" selected>@nivel.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@nivel.Value">@nivel.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="graduacoes-label">Observações</label>
+                                <textarea name="Observacoes" rows="3" class="form-control" maxlength="500" placeholder="Informações logísticas do exame.">@Model.NovoExame.Observacoes</textarea>
+                            </div>
+                            <div class="col-12 d-grid">
+                                <button type="submit" class="btn btn-outline-primary">Salvar exame</button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">Você não tem permissão para criar exames.</div>
+                    }
+                </div>
+            </section>
+
+            <section class="card graduacoes-side-card mb-3">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Exames recentes</h2>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @if (Model.Exames.Count == 0)
+                        {
+                            <li class="list-group-item text-muted">Nenhum exame cadastrado.</li>
+                        }
+                        else
+                        {
+                            @foreach (var exame in Model.Exames)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fw-semibold">@exame.DataExame.ToString("dd/MM/yyyy")</div>
+                                        <div class="small text-muted">Nível: @exame.NivelPretendido</div>
+                                        <div class="small text-muted">Local: @(string.IsNullOrWhiteSpace(exame.Local) ? "-" : exame.Local)</div>
+                                    </div>
+                                    <span class="badge text-bg-secondary">@exame.ResultadosRegistrados</span>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </section>
+
+            <section class="card graduacoes-side-card">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Alunos aptos</h2>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @if (Model.AlunosAptos.Count == 0)
+                        {
+                            <li class="list-group-item text-muted">Nenhum aluno apto no momento.</li>
+                        }
+                        else
+                        {
+                            @foreach (var aluno in Model.AlunosAptos)
+                            {
+                                <li class="list-group-item">
+                                    <div class="fw-semibold">
+                                        @if (canAlunosView)
+                                        {
+                                            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@aluno.AlunoId" class="text-decoration-none">@aluno.AlunoNome</a>
+                                        }
+                                        else
+                                        {
+                                            @aluno.AlunoNome
+                                        }
+                                    </div>
+                                    <div class="small text-muted">Turma: @(aluno.TurmaNome ?? "-")</div>
+                                    <div class="small text-muted">
+                                        Nível atual: @aluno.NivelAtual
+                                        @if (aluno.UltimoResultado.HasValue)
+                                        {
+                                            <span>| Último resultado: @aluno.UltimoResultado.Value.ToString("dd/MM/yyyy")</span>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

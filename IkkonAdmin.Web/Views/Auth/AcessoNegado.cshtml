@@ -1,0 +1,32 @@
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Acesso negado";
+}
+
+<div class="auth-page">
+    <div class="auth-page-bg" aria-hidden="true"></div>
+    <div class="container px-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-7 col-xl-5">
+                <article class="auth-card">
+                    <div class="auth-card-head">
+                        <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo Ikkon" class="auth-logo" />
+                        <div>
+                            <p class="auth-kicker mb-1">Permissões</p>
+                            <h1 class="auth-title mb-0">Acesso negado</h1>
+                        </div>
+                    </div>
+
+                    <p class="auth-subtitle mb-3">
+                        Sua conta está autenticada, mas não possui permissão para acessar esta página.
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-danger" href="/admin">Voltar para o painel</a>
+                        <a class="btn btn-outline-secondary" href="/configuracoes">Abrir configurações</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>

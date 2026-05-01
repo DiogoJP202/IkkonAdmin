@@ -1,0 +1,198 @@
+@using IkkonAdmin.Web.Security
+@model GraduacaoViewModel
+@{
+    ViewData["Title"] = "Registrar Resultado";
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var canTurmasView = User.HasPermission(AppPermissions.TurmasView);
+}
+
+<div class="graduacoes-page d-grid gap-3">
+    <section class="graduacoes-hero rounded-3 p-3 p-lg-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-12 col-lg-8">
+                <p class="graduacoes-eyebrow mb-2">Novo resultado</p>
+                <h1 class="graduacoes-title mb-2">Registrar resultado de graduação</h1>
+                <p class="graduacoes-subtitle mb-0">
+                    Registre o resultado do aluno, vincule a um exame existente ou crie um novo exame no mesmo fluxo.
+                </p>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="graduacoes-quick-actions">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para a lista</a>
+                    @if (canAlunosView)
+                    {
+                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
+                    }
+                    @if (canTurmasView)
+                    {
+                        <a asp-controller="Turmas" asp-action="Index" class="btn btn-outline-secondary">Consultar turmas</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-8">
+            <div class="card graduacoes-form-card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="graduacoes-section-title mb-1">Dados do resultado</h2>
+                        <p class="graduacoes-section-subtitle mb-0">Preencha aluno, exame e status final de graduação.</p>
+                    </div>
+                    <span class="graduacoes-form-id">Novo registro</span>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" class="row g-3">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="col-12 graduacoes-form-section">
+                            <h3 class="graduacoes-form-section-title">Aluno e resultado</h3>
+                            <div class="row g-3">
+                                <div class="col-12 col-lg-8">
+                                    <label asp-for="AlunoId" class="graduacoes-label">Aluno</label>
+                                    <select asp-for="AlunoId" class="form-select">
+                                        <option value="">Selecione</option>
+                                        @foreach (var aluno in Model.AlunosDisponiveis)
+                                        {
+                                            if (aluno.Id == Model.AlunoId)
+                                            {
+                                                <option value="@aluno.Id" selected>
+                                                    @aluno.Nome | Turma: @(aluno.TurmaNome ?? "-") | Nível atual: @aluno.NivelAtual
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@aluno.Id">
+                                                    @aluno.Nome | Turma: @(aluno.TurmaNome ?? "-") | Nível atual: @aluno.NivelAtual
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="AlunoId" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-lg-4">
+                                    <label asp-for="DataResultado" class="graduacoes-label">Data do resultado</label>
+                                    <input asp-for="DataResultado" type="date" class="form-control" />
+                                    <span asp-validation-for="DataResultado" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-lg-4">
+                                    <div class="form-check graduacoes-check mt-2">
+                                        <input asp-for="ResultadoAprovado" class="form-check-input" />
+                                        <label asp-for="ResultadoAprovado" class="form-check-label">Resultado aprovado</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-4">
+                                    <label asp-for="NivelNovo" class="graduacoes-label">Nível novo</label>
+                                    <select asp-for="NivelNovo" asp-items="Html.GetEnumSelectList<NivelGraduacaoEnum>()" class="form-select">
+                                        <option value="">Não se aplica</option>
+                                    </select>
+                                    <span asp-validation-for="NivelNovo" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-lg-4">
+                                    <div class="form-check graduacoes-check mt-2">
+                                        <input asp-for="CertificadoEmitido" class="form-check-input" />
+                                        <label asp-for="CertificadoEmitido" class="form-check-label">Certificado emitido</label>
+                                    </div>
+                                    <div class="form-check graduacoes-check mt-2">
+                                        <input asp-for="OmamoriAtualizado" class="form-check-input" />
+                                        <label asp-for="OmamoriAtualizado" class="form-check-label">Omamori/colar atualizado</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 graduacoes-form-section">
+                            <h3 class="graduacoes-form-section-title">Exame de graduação</h3>
+                            <p class="text-muted small mb-3">Selecione um exame existente ou preencha os campos abaixo para criar um novo exame com o resultado.</p>
+                            <div class="row g-3">
+                                <div class="col-12 col-lg-6">
+                                    <label asp-for="ExameGraduacaoId" class="graduacoes-label">Exame existente</label>
+                                    <select asp-for="ExameGraduacaoId" class="form-select">
+                                        <option value="">Sem exame vinculado</option>
+                                        @foreach (var exame in Model.ExamesDisponiveis)
+                                        {
+                                            if (Model.ExameGraduacaoId.HasValue && Model.ExameGraduacaoId.Value == exame.Id)
+                                            {
+                                                <option value="@exame.Id" selected>
+                                                    #@exame.Id | @exame.DataExame.ToString("dd/MM/yyyy") | @exame.NivelPretendido | @(string.IsNullOrWhiteSpace(exame.Local) ? "-" : exame.Local)
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@exame.Id">
+                                                    #@exame.Id | @exame.DataExame.ToString("dd/MM/yyyy") | @exame.NivelPretendido | @(string.IsNullOrWhiteSpace(exame.Local) ? "-" : exame.Local)
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="ExameGraduacaoId" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-lg-3">
+                                    <label asp-for="DataExameNovo" class="graduacoes-label">Novo exame - data</label>
+                                    <input asp-for="DataExameNovo" type="date" class="form-control" />
+                                    <span asp-validation-for="DataExameNovo" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12 col-lg-3">
+                                    <label asp-for="NivelPretendidoExameNovo" class="graduacoes-label">Novo exame - nível</label>
+                                    <select asp-for="NivelPretendidoExameNovo" asp-items="Html.GetEnumSelectList<NivelGraduacaoEnum>()" class="form-select"></select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="LocalExameNovo" class="graduacoes-label">Novo exame - local</label>
+                                    <input asp-for="LocalExameNovo" class="form-control" maxlength="150" placeholder="Ex.: Palco principal" />
+                                    <span asp-validation-for="LocalExameNovo" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Observacoes" class="graduacoes-label">Observações</label>
+                            <textarea asp-for="Observacoes" class="form-control" rows="3" placeholder="Registre observações pedagógicas e administrativas."></textarea>
+                            <span asp-validation-for="Observacoes" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-2 graduacoes-form-actions">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar resultado</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="card graduacoes-side-card h-100">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Guia rápido</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="graduacoes-priority-list mb-0">
+                        <li>
+                            <strong>Validação do exame</strong>
+                            <span>Vincule ao exame correto para manter histórico consistente por turma e data.</span>
+                        </li>
+                        <li>
+                            <strong>Pós-aprovação</strong>
+                            <span>Atualize certificado e omamori para evitar pendências após o resultado.</span>
+                        </li>
+                        <li>
+                            <strong>Observações objetivas</strong>
+                            <span>Registre somente informações relevantes para acompanhamento pedagógico.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

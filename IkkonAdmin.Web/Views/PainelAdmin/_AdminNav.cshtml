@@ -1,0 +1,43 @@
+@using IkkonAdmin.Web.Security
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+
+    var isVisaoGeral = action == "Index";
+    var isUsuarios = action is "Usuarios" or "NovoUsuario" or "EditarUsuario" or "Acessos";
+    var isCargos = action is "Cargos" or "NovoCargo" or "EditarCargo";
+    var isLogs = action == "Logs";
+    var isSistema = action == "Sistema";
+
+    var canVisualizar = User.HasPermission(AppPermissions.VisualizarDados);
+    var canUsuarios = User.HasPermission(AppPermissions.GerenciarUsuarios);
+    var canCargos = User.HasPermission(AppPermissions.GerenciarCargos);
+    var canLogs = User.HasPermission(AppPermissions.GerenciarSistema);
+    var canSistema = User.HasPermission(AppPermissions.GerenciarSistema);
+}
+
+<nav class="admin-panel-nav card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+        <div class="d-flex flex-wrap gap-2">
+            @if (canVisualizar)
+            {
+                <a class="btn btn-sm @(isVisaoGeral ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel">Visao geral</a>
+            }
+            @if (canUsuarios)
+            {
+                <a class="btn btn-sm @(isUsuarios ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Usuarios">Usuarios</a>
+            }
+            @if (canCargos)
+            {
+                <a class="btn btn-sm @(isCargos ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Cargos">Cargos</a>
+            }
+            @if (canLogs)
+            {
+                <a class="btn btn-sm @(isLogs ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Logs">Logs</a>
+            }
+            @if (canSistema)
+            {
+                <a class="btn btn-sm @(isSistema ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Sistema">Sistema</a>
+            }
+        </div>
+    </div>
+</nav>

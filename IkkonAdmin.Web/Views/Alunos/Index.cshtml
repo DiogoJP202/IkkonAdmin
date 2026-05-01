@@ -1,0 +1,351 @@
+@using IkkonAdmin.Web.Security
+@model AlunoIndexViewModel
+@{
+    ViewData["Title"] = "Alunos";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var canCreateAluno = User.HasPermission(AppPermissions.AlunosCreate);
+    var canEditAluno = User.HasPermission(AppPermissions.AlunosEdit);
+    var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
+    var canAdmissoesView = User.HasPermission(AppPermissions.AdmissoesView);
+
+    var totalAlunos = 0;
+    var alunosAtivos = 0;
+    var alunosEmAdmissao = 0;
+    var alunosSemTurma = 0;
+    var alunosEmAtencao = 0;
+
+    foreach (var aluno in Model.Alunos)
+    {
+        totalAlunos++;
+
+        if (aluno.Status == StatusAlunoEnum.Ativo)
+        {
+            alunosAtivos++;
+        }
+
+        if (aluno.Status == StatusAlunoEnum.EmAdmissao)
+        {
+            alunosEmAdmissao++;
+        }
+
+        if (aluno.Status == StatusAlunoEnum.Inativo || aluno.Status == StatusAlunoEnum.Desligado)
+        {
+            alunosEmAtencao++;
+        }
+
+        if (string.IsNullOrWhiteSpace(aluno.Turma))
+        {
+            alunosSemTurma++;
+        }
+    }
+
+    var filtrosAplicados =
+        !string.IsNullOrWhiteSpace(Model.Busca) ||
+        Model.Status.HasValue ||
+        Model.TurmaId.HasValue;
+
+    var totalPaginas = Math.Max(1, Model.TotalPaginas);
+    var paginaAtual = Math.Clamp(Model.PaginaAtual, 1, totalPaginas);
+    var paginaInicial = Math.Max(1, paginaAtual - 2);
+    var paginaFinal = Math.Min(totalPaginas, paginaAtual + 2);
+}
+
+@functions {
+    private static string StatusBadgeClass(StatusAlunoEnum status)
+    {
+        return status switch
+        {
+            StatusAlunoEnum.Ativo => "alunos-status-pill alunos-status-success",
+            StatusAlunoEnum.Inativo => "alunos-status-pill alunos-status-muted",
+            StatusAlunoEnum.Desligado => "alunos-status-pill alunos-status-danger",
+            _ => "alunos-status-pill alunos-status-warning"
+        };
+    }
+}
+
+<div class="alunos-page">
+    <section class="card alunos-hero mb-3">
+        <div class="card-body p-3 p-lg-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-lg-7">
+                    <div class="alunos-eyebrow">Gestão de Alunos</div>
+                    <h2 class="alunos-title mb-2">Painel operacional do cadastro</h2>
+                    <p class="alunos-subtitle mb-0">
+                        Consulte situações de turma, status e dados de contato em uma única tela para reduzir retrabalho no atendimento.
+                    </p>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="alunos-quick-actions">
+                        @if (canCreateAluno)
+                        {
+                            <a asp-action="Create" class="btn btn-primary">Novo aluno</a>
+                        }
+                        @if (canFinanceiroView)
+                        {
+                            <a asp-controller="Financeiro" asp-action="Index" class="btn btn-outline-secondary">Ver financeiro</a>
+                        }
+                        @if (canAdmissoesView)
+                        {
+                            <a asp-controller="Admissoes" asp-action="Index" class="btn btn-outline-secondary">Acompanhar admissões</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-3">
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="alunos-kpi-card">
+                <span class="alunos-kpi-label">Total filtrado</span>
+                <strong class="alunos-kpi-value">@totalAlunos</strong>
+                <span class="alunos-kpi-foot">Registros retornados na busca</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="alunos-kpi-card alunos-kpi-highlight">
+                <span class="alunos-kpi-label">Alunos ativos</span>
+                <strong class="alunos-kpi-value">@alunosAtivos</strong>
+                <span class="alunos-kpi-foot">Base atual em acompanhamento</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="alunos-kpi-card alunos-kpi-attention">
+                <span class="alunos-kpi-label">Em admissão</span>
+                <strong class="alunos-kpi-value">@alunosEmAdmissao</strong>
+                <span class="alunos-kpi-foot">Requer onboarding e integração</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="alunos-kpi-card alunos-kpi-warning">
+                <span class="alunos-kpi-label">Sem turma definida</span>
+                <strong class="alunos-kpi-value">@alunosSemTurma</strong>
+                <span class="alunos-kpi-foot">Ajustar alocação para planejamento</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="card alunos-filter-card mb-3">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-5">
+                    <label asp-for="Busca" class="form-label alunos-label">Busca</label>
+                    <input asp-for="Busca" type="search" class="form-control" placeholder="Nome, CPF ou telefone" autocomplete="off" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Status" class="form-label alunos-label">Status</label>
+                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAlunoEnum>()" class="form-select">
+                        <option value="">Todos os status</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6 col-lg-2">
+                    <label asp-for="TurmaId" class="form-label alunos-label">Turma</label>
+                    <select asp-for="TurmaId" class="form-select">
+                        <option value="">Todas as turmas</option>
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            if (Model.TurmaId == turma.Id)
+                            {
+                                <option value="@turma.Id" selected>@turma.Nome</option>
+                            }
+                            else
+                            {
+                                <option value="@turma.Id">@turma.Nome</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-md-3 col-lg-1">
+                    <label asp-for="TamanhoPagina" class="form-label alunos-label">Registros</label>
+                    <select asp-for="TamanhoPagina" name="tamanhoPagina" class="form-select">
+                        <option value="10" selected="@(Model.TamanhoPagina == 10)">10</option>
+                        <option value="20" selected="@(Model.TamanhoPagina == 20)">20</option>
+                        <option value="30" selected="@(Model.TamanhoPagina == 30)">30</option>
+                    </select>
+                </div>
+                <div class="col-6 col-lg-1 d-grid">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+                <div class="col-6 col-lg-1 d-grid">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+
+            @if (filtrosAplicados)
+            {
+                <div class="alunos-active-filters mt-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.Busca))
+                    {
+                        <span class="alunos-filter-chip">Busca: @Model.Busca</span>
+                    }
+                    @if (Model.Status.HasValue)
+                    {
+                        <span class="alunos-filter-chip">Status: @Model.Status.Value</span>
+                    }
+                    @if (Model.TurmaId.HasValue)
+                    {
+                        string? turmaSelecionadaNome = null;
+                        foreach (var turma in Model.Turmas)
+                        {
+                            if (turma.Id == Model.TurmaId.Value)
+                            {
+                                turmaSelecionadaNome = turma.Nome;
+                                break;
+                            }
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(turmaSelecionadaNome))
+                        {
+                            <span class="alunos-filter-chip">Turma: @turmaSelecionadaNome</span>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="card alunos-table-card">
+        <div class="card-header">
+            <div>
+                <h3 class="alunos-section-title mb-1">Lista de alunos</h3>
+                <p class="alunos-section-subtitle mb-0">
+                    @totalAlunos registro(s), @alunosEmAtencao em situação de atenção.
+                </p>
+            </div>
+            @if (canCreateAluno)
+            {
+                <div>
+                    <a asp-action="Create" class="btn btn-primary">Novo aluno</a>
+                </div>
+            }
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 alunos-table">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Contato</th>
+                        <th>CPF</th>
+                        <th>Turma</th>
+                        <th>Status</th>
+                        <th>Entrada</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Alunos.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="alunos-empty-state">
+                                    <h4>Nenhum aluno encontrado</h4>
+                                    <p class="mb-0">Revise os filtros aplicados ou cadastre um novo aluno para iniciar o acompanhamento.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var aluno in Model.Alunos)
+                        {
+                            var linhaAtencao = aluno.Status != StatusAlunoEnum.Ativo ? "alunos-row-attention" : string.Empty;
+                            <tr class="@linhaAtencao">
+                                <td>
+                                    <div class="alunos-name-cell">
+                                        <span class="alunos-name">@aluno.NomeCompleto</span>
+                                        <small class="alunos-meta">ID @aluno.Id</small>
+                                    </div>
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(aluno.Celular) ? "-" : aluno.Celular)</td>
+                                <td>@aluno.CPF</td>
+                                <td>@(string.IsNullOrWhiteSpace(aluno.Turma) ? "Sem turma" : aluno.Turma)</td>
+                                <td>
+                                    <span class="@StatusBadgeClass(aluno.Status)">@aluno.Status</span>
+                                </td>
+                                <td>@aluno.DataEntrada.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end">
+                                    <div class="dropdown position-static alunos-row-actions">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle alunos-action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Ações
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end alunos-row-menu">
+                                            <li><a class="dropdown-item" asp-action="Details" asp-route-id="@aluno.Id">Ver detalhes</a></li>
+                                            @if (canEditAluno)
+                                            {
+                                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@aluno.Id">Editar cadastro</a></li>
+                                            }
+                                            @if (canFinanceiroView)
+                                            {
+                                                <li><a class="dropdown-item" asp-controller="Financeiro" asp-action="HistoricoAluno" asp-route-alunoId="@aluno.Id">Histórico financeiro</a></li>
+                                            }
+                                            @if (canEditAluno)
+                                            {
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><h6 class="dropdown-header">Alterar status</h6></li>
+                                                @foreach (var status in Enum.GetValues<StatusAlunoEnum>())
+                                                {
+                                                    var statusAtual = aluno.Status == status;
+                                                    <li>
+                                                        <form asp-action="AlterarStatus" method="post">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@aluno.Id" />
+                                                            <input type="hidden" name="status" value="@status" />
+                                                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                                            <button type="submit" class="dropdown-item @(statusAtual ? "active" : string.Empty)" disabled="@statusAtual">
+                                                                Marcar como @status
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    @if (totalPaginas > 1)
+    {
+        <nav class="mt-3" aria-label="Paginação de alunos">
+            <ul class="pagination pagination-sm mb-0 justify-content-end">
+                <li class="page-item @(paginaAtual <= 1 ? "disabled" : string.Empty)">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-busca="@Model.Busca"
+                       asp-route-status="@Model.Status"
+                       asp-route-turmaId="@Model.TurmaId"
+                       asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                       asp-route-pagina="@(paginaAtual - 1)">Anterior</a>
+                </li>
+
+                @for (var p = paginaInicial; p <= paginaFinal; p++)
+                {
+                    <li class="page-item @(p == paginaAtual ? "active" : string.Empty)">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-busca="@Model.Busca"
+                           asp-route-status="@Model.Status"
+                           asp-route-turmaId="@Model.TurmaId"
+                           asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                           asp-route-pagina="@p">@p</a>
+                    </li>
+                }
+
+                <li class="page-item @(paginaAtual >= totalPaginas ? "disabled" : string.Empty)">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-busca="@Model.Busca"
+                       asp-route-status="@Model.Status"
+                       asp-route-turmaId="@Model.TurmaId"
+                       asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                       asp-route-pagina="@(paginaAtual + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

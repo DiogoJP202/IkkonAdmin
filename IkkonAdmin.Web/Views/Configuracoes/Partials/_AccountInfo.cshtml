@@ -1,0 +1,57 @@
+﻿@model UserSettingsPageViewModel
+
+<article class="card user-settings-card">
+    <div class="card-header user-settings-card-header">
+        <div>
+            <h2 class="user-settings-card-title mb-1">Dados da conta</h2>
+            <p class="user-settings-card-subtitle mb-0">Atualize dados pessoais e foto de perfil.</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="AtualizarConta" method="post" enctype="multipart/form-data" data-config-form>
+            @Html.AntiForgeryToken()
+            <div class="row g-3 align-items-start">
+                <div class="col-12 col-lg-4">
+                    <div class="user-profile-photo-wrap">
+                        <img id="userPhotoPreview"
+                             src="@(string.IsNullOrWhiteSpace(Model.AccountInfo.FotoPerfilUrl) ? "/Images/Ikkon_Icon.png" : Model.AccountInfo.FotoPerfilUrl)"
+                             alt="Foto de perfil"
+                             class="user-profile-photo" />
+                        <label for="FotoPerfil" class="btn btn-sm btn-outline-secondary mt-2">Alterar foto</label>
+                        <input id="FotoPerfil" name="FotoPerfil" type="file" accept="image/png,image/jpeg,image/webp" class="d-none" data-photo-input data-photo-preview="#userPhotoPreview" />
+                        <small class="text-muted d-block mt-2">Formatos: JPG, PNG, WEBP. Tamanho máximo: 2 MB.</small>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-8">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="NomeCompleto">Nome completo</label>
+                            <input class="form-control" id="NomeCompleto" name="NomeCompleto" value="@Model.AccountInfo.NomeCompleto" maxlength="200" placeholder="Seu nome completo" />
+                            <span class="text-danger small field-error" data-field-error="NomeCompleto"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="Email">E-mail</label>
+                            <input type="email" class="form-control" id="Email" name="Email" value="@Model.AccountInfo.Email" maxlength="150" placeholder="seu.email@dominio.com" />
+                            <span class="text-danger small field-error" data-field-error="Email"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="Telefone">Telefone</label>
+                            <input type="tel" class="form-control" id="Telefone" name="Telefone" value="@Model.AccountInfo.Telefone" maxlength="30" placeholder="(11) 90000-0000" />
+                            <span class="text-danger small field-error" data-field-error="Telefone"></span>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="badge text-bg-@(Model.AccountInfo.ContaAtiva ? "success" : "secondary")">
+                                Conta @(Model.AccountInfo.ContaAtiva ? "ativa" : "inativa")
+                            </span>
+                            <button type="submit" class="btn btn-danger" data-loading-text="Salvando...">Salvar alterações</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</article>

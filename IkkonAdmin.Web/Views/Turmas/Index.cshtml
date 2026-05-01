@@ -1,0 +1,239 @@
+@using IkkonAdmin.Web.Security
+@model TurmaIndexViewModel
+@{
+    ViewData["Title"] = "Turmas";
+    var canTurmasCreate = User.HasPermission(AppPermissions.TurmasCreate);
+    var canTurmasEdit = User.HasPermission(AppPermissions.TurmasEdit);
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
+
+    var totalTurmas = 0;
+    var turmasAtivas = 0;
+    var totalAlunos = 0;
+    var turmasSemAlunos = 0;
+
+    foreach (var turma in Model.Turmas)
+    {
+        totalTurmas++;
+        totalAlunos += turma.QuantidadeAlunos;
+
+        if (turma.Ativa)
+        {
+            turmasAtivas++;
+        }
+
+        if (turma.QuantidadeAlunos == 0)
+        {
+            turmasSemAlunos++;
+        }
+    }
+
+    var mediaAlunos = totalTurmas == 0 ? 0 : Math.Round((decimal)totalAlunos / totalTurmas, 1);
+    var filtrosAplicados = !string.IsNullOrWhiteSpace(Model.Busca) || Model.Ativa.HasValue;
+}
+
+@functions {
+    private static string TurmaStatusClass(bool ativa)
+    {
+        return ativa
+            ? "turmas-status-pill turmas-status-success"
+            : "turmas-status-pill turmas-status-muted";
+    }
+}
+
+<div class="turmas-page">
+    <section class="card turmas-hero mb-3">
+        <div class="card-body p-3 p-lg-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-12 col-lg-7">
+                    <div class="turmas-eyebrow">Gestão de Turmas</div>
+                    <h2 class="turmas-title mb-2">Planejamento e alocação operacional</h2>
+                    <p class="turmas-subtitle mb-0">
+                        Organize modalidades, horários e distribuição de alunos em uma visão única para facilitar ajustes diários da equipe.
+                    </p>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="turmas-quick-actions">
+                        @if (canTurmasCreate)
+                        {
+                            <a asp-action="Create" class="btn btn-primary">Nova turma</a>
+                        }
+                        @if (canAlunosView)
+                        {
+                            <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Ver alunos</a>
+                        }
+                        @if (canFinanceiroView)
+                        {
+                            <a asp-controller="Financeiro" asp-action="Index" class="btn btn-outline-secondary">Ver financeiro</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-3 mb-3">
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="turmas-kpi-card">
+                <span class="turmas-kpi-label">Total de turmas</span>
+                <strong class="turmas-kpi-value">@totalTurmas</strong>
+                <span class="turmas-kpi-foot">Registros retornados nos filtros</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="turmas-kpi-card turmas-kpi-highlight">
+                <span class="turmas-kpi-label">Turmas ativas</span>
+                <strong class="turmas-kpi-value">@turmasAtivas</strong>
+                <span class="turmas-kpi-foot">Em operação no momento</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="turmas-kpi-card turmas-kpi-attention">
+                <span class="turmas-kpi-label">Alunos alocados</span>
+                <strong class="turmas-kpi-value">@totalAlunos</strong>
+                <span class="turmas-kpi-foot">Média de @mediaAlunos por turma</span>
+            </article>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+            <article class="turmas-kpi-card turmas-kpi-warning">
+                <span class="turmas-kpi-label">Turmas sem alunos</span>
+                <strong class="turmas-kpi-value">@turmasSemAlunos</strong>
+                <span class="turmas-kpi-foot">Revisar ocupação e divulgação</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="card turmas-filter-card mb-3">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-6">
+                    <label asp-for="Busca" class="form-label turmas-label">Busca</label>
+                    <input asp-for="Busca" type="search" class="form-control" placeholder="Nome da turma, modalidade ou horário" autocomplete="off" />
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label asp-for="Ativa" class="form-label turmas-label">Status</label>
+                    <select asp-for="Ativa" class="form-select">
+                        <option value="">Todas as turmas</option>
+                        @if (Model.Ativa == true)
+                        {
+                            <option value="true" selected>Ativas</option>
+                        }
+                        else
+                        {
+                            <option value="true">Ativas</option>
+                        }
+                        @if (Model.Ativa == false)
+                        {
+                            <option value="false" selected>Inativas</option>
+                        }
+                        else
+                        {
+                            <option value="false">Inativas</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-lg-1 d-grid">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+                <div class="col-6 col-lg-1 d-grid">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+                @if (canTurmasCreate)
+                {
+                    <div class="col-12 col-lg-1 d-grid">
+                        <a asp-action="Create" class="btn btn-outline-primary">Nova</a>
+                    </div>
+                }
+            </form>
+
+            @if (filtrosAplicados)
+            {
+                <div class="turmas-active-filters mt-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.Busca))
+                    {
+                        <span class="turmas-filter-chip">Busca: @Model.Busca</span>
+                    }
+                    @if (Model.Ativa.HasValue)
+                    {
+                        <span class="turmas-filter-chip">Status: @(Model.Ativa.Value ? "Ativa" : "Inativa")</span>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    <section class="card turmas-table-card">
+        <div class="card-header">
+            <div>
+                <h3 class="turmas-section-title mb-1">Lista de turmas</h3>
+                <p class="turmas-section-subtitle mb-0">@totalTurmas turma(s), @totalAlunos aluno(s) alocado(s) no total.</p>
+            </div>
+            @if (canTurmasCreate)
+            {
+                <div>
+                    <a asp-action="Create" class="btn btn-primary">Nova turma</a>
+                </div>
+            }
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 turmas-table">
+                <thead>
+                    <tr>
+                        <th>Turma</th>
+                        <th>Modalidade</th>
+                        <th>Horário</th>
+                        <th>Alunos</th>
+                        <th>Status</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Turmas.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="turmas-empty-state">
+                                    <h4>Nenhuma turma encontrada</h4>
+                                    <p class="mb-0">Revise os filtros aplicados ou cadastre uma nova turma para iniciar a alocação de alunos.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            var linhaAtencao = !turma.Ativa || turma.QuantidadeAlunos == 0 ? "turmas-row-attention" : string.Empty;
+                            <tr class="@linhaAtencao">
+                                <td>
+                                    <div class="turmas-name-cell">
+                                        <span class="turmas-name">@turma.Nome</span>
+                                        <small class="turmas-meta">ID @turma.Id</small>
+                                    </div>
+                                </td>
+                                <td>@turma.Modalidade</td>
+                                <td>@(string.IsNullOrWhiteSpace(turma.Horario) ? "-" : turma.Horario)</td>
+                                <td>@turma.QuantidadeAlunos</td>
+                                <td>
+                                    <span class="@TurmaStatusClass(turma.Ativa)">@(turma.Ativa ? "Ativa" : "Inativa")</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        @if (canTurmasEdit)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@turma.Id" class="btn btn-outline-secondary">Editar</a>
+                                        }
+                                        @if (canAlunosView)
+                                        {
+                                            <a asp-controller="Alunos" asp-action="Index" asp-route-turmaId="@turma.Id" class="btn btn-outline-primary">Ver alunos</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

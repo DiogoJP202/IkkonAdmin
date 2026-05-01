@@ -1,0 +1,31 @@
+﻿@model UserSettingsPageViewModel
+
+<article class="card user-settings-card">
+    <div class="card-header user-settings-card-header">
+        <div>
+            <h2 class="user-settings-card-title mb-1">Tipo de conta</h2>
+            <p class="user-settings-card-subtitle mb-0">Informações de perfil e permissões básicas associadas ao seu acesso.</p>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <article class="user-settings-account-type-box">
+                    <span>Perfil atual</span>
+                    <strong>@Model.AccountType.NomeTipoConta</strong>
+                </article>
+            </div>
+            <div class="col-12 col-md-8">
+                <article class="user-settings-permissions-box">
+                    <h3>Permissões básicas</h3>
+                    <ul class="mb-0">
+                        @foreach (var permission in Model.AccountType.PermissoesBasicas)
+                        {
+                            <li>@permission</li>
+                        }
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </div>
+</article>

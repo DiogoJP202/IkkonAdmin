@@ -1,0 +1,70 @@
+@using IkkonAdmin.Web.Security
+@{
+    var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty).ToLowerInvariant();
+    string IsActive(string controller) => currentController == controller.ToLowerInvariant() ? "active" : string.Empty;
+
+    var canDashboard = User.HasPermission(AppPermissions.DashboardView);
+    var canAlunos = User.HasPermission(AppPermissions.AlunosView);
+    var canTurmas = User.HasPermission(AppPermissions.TurmasView);
+    var canFinanceiro = User.HasPermission(AppPermissions.FinanceiroView);
+    var canAdmissoes = User.HasPermission(AppPermissions.AdmissoesView);
+    var canDesligamentos = User.HasPermission(AppPermissions.DesligamentosView);
+    var canGraduacoes = User.HasPermission(AppPermissions.GraduacoesView);
+    var canConfiguracoes = User.HasPermission(AppPermissions.ConfiguracoesView);
+
+    var canAdminPanel = User.IsInRole(AppRoles.Admin) && User.HasAnyPermission(
+        AppPermissions.VisualizarDados,
+        AppPermissions.GerenciarUsuarios,
+        AppPermissions.GerenciarCargos,
+        AppPermissions.GerenciarSistema,
+        AppPermissions.EditarPermissoes);
+}
+
+<aside class="admin-sidebar">
+    <div class="sidebar-brand">
+        <a href="/admin" class="sidebar-brand-link text-decoration-none text-white">
+            <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo da escola" class="sidebar-brand-logo" />
+            <span class="sidebar-brand-title fw-semibold">IkkonAdmin</span>
+        </a>
+        <div class="small text-white-50 sidebar-brand-subtitle">Escola de Taiko</div>
+    </div>
+
+    <nav class="nav flex-column sidebar-nav">
+        @if (canDashboard)
+        {
+            <a href="/admin" class="nav-link @IsActive("Home")">Dashboard</a>
+        }
+        @if (canAlunos)
+        {
+            <a href="/admin/Alunos" class="nav-link @IsActive("Alunos")">Alunos</a>
+        }
+        @if (canTurmas)
+        {
+            <a href="/admin/Turmas" class="nav-link @IsActive("Turmas")">Turmas</a>
+        }
+        @if (canFinanceiro)
+        {
+            <a href="/admin/Financeiro" class="nav-link @IsActive("Financeiro")">Financeiro</a>
+        }
+        @if (canAdmissoes)
+        {
+            <a href="/admin/Admissoes" class="nav-link @IsActive("Admissoes")">Admissoes</a>
+        }
+        @if (canDesligamentos)
+        {
+            <a href="/admin/Desligamentos" class="nav-link @IsActive("Desligamentos")">Desligamentos</a>
+        }
+        @if (canGraduacoes)
+        {
+            <a href="/admin/Graduacoes" class="nav-link @IsActive("Graduacoes")">Graduacoes</a>
+        }
+        @if (canConfiguracoes)
+        {
+            <a href="/configuracoes" class="nav-link @IsActive("Configuracoes")">Configuracoes</a>
+        }
+        @if (canAdminPanel)
+        {
+            <a href="/admin/painel" class="nav-link @IsActive("PainelAdmin")">Administracao</a>
+        }
+    </nav>
+</aside>

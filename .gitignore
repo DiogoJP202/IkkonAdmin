@@ -1,0 +1,53 @@
+﻿# Build artifacts
+[Bb]in/
+[Oo]bj/
+artifacts/
+out/
+publish/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE folders
+.vs/
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# Entity Framework / local tooling
+.dotnet/
+
+# Local app settings/secrets (keep templates tracked)
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if used for frontend tooling)
+node_modules/
+
+# Test output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Temporary files
+*.tmp
+*.temp

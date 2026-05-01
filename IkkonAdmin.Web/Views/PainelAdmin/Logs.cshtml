@@ -1,0 +1,131 @@
+@model AdminLogsIndexViewModel
+@{
+    ViewData["Title"] = "Logs e Auditoria";
+    var totalPaginas = (int)Math.Ceiling(Model.TotalRegistros / (double)Model.TamanhoPagina);
+    totalPaginas = Math.Max(1, totalPaginas);
+}
+
+<div class="admin-panel-page d-grid gap-3">
+    <partial name="_AdminNav" />
+
+    <section class="card admin-panel-card">
+        <div class="card-header">
+            <h2 class="h6 mb-0">Filtros de auditoria</h2>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Logs" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="busca">Busca</label>
+                    <input class="form-control" id="busca" name="busca" value="@Model.Busca" placeholder="Ação, entidade ou descrição" />
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label mb-1" for="usuarioResponsavelId">Responsável</label>
+                    <select class="form-select" id="usuarioResponsavelId" name="usuarioResponsavelId">
+                        @if (!Model.UsuarioResponsavelId.HasValue) { <option value="" selected>Todos</option> } else { <option value="">Todos</option> }
+                        @foreach (var responsavel in Model.Responsaveis)
+                        {
+                            if (Model.UsuarioResponsavelId == responsavel.Id)
+                            {
+                                <option value="@responsavel.Id" selected>@responsavel.Nome</option>
+                            }
+                            else
+                            {
+                                <option value="@responsavel.Id">@responsavel.Nome</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label mb-1" for="tamanhoPagina">Registros</label>
+                    <select class="form-select" id="tamanhoPagina" name="tamanhoPagina">
+                        @if (Model.TamanhoPagina == 10) { <option value="10" selected>10</option> } else { <option value="10">10</option> }
+                        @if (Model.TamanhoPagina == 20) { <option value="20" selected>20</option> } else { <option value="20">20</option> }
+                        @if (Model.TamanhoPagina == 30) { <option value="30" selected>30</option> } else { <option value="30">30</option> }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-danger w-100">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="card admin-panel-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h6 mb-0">Eventos registrados (@Model.TotalRegistros)</h2>
+            <small class="text-muted">Página @Model.PaginaAtual de @totalPaginas</small>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Ação</th>
+                        <th>Entidade</th>
+                        <th>Responsável</th>
+                        <th>Afetado</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Logs.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">Nenhum log encontrado.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td>@log.DataEventoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                            <td><span class="badge text-bg-light border">@log.Acao</span></td>
+                            <td>@log.Entidade @(string.IsNullOrWhiteSpace(log.EntidadeId) ? string.Empty : $"#{log.EntidadeId}")</td>
+                            <td>@(log.ResponsavelNome ?? "-")</td>
+                            <td>@(log.AfetadoNome ?? "-")</td>
+                            <td>@(log.Descricao ?? "-")</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (totalPaginas > 1)
+        {
+            <div class="card-footer">
+                <nav aria-label="Paginação de logs">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.PaginaAtual <= 1 ? "disabled" : null)">
+                            <a class="page-link"
+                               asp-action="Logs"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-usuarioResponsavelId="@Model.UsuarioResponsavelId"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual - 1)">Anterior</a>
+                        </li>
+                        @for (var p = 1; p <= totalPaginas; p++)
+                        {
+                            <li class="page-item @(p == Model.PaginaAtual ? "active" : null)">
+                                <a class="page-link"
+                                   asp-action="Logs"
+                                   asp-route-busca="@Model.Busca"
+                                   asp-route-usuarioResponsavelId="@Model.UsuarioResponsavelId"
+                                   asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                                   asp-route-pagina="@p">@p</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PaginaAtual >= totalPaginas ? "disabled" : null)">
+                            <a class="page-link"
+                               asp-action="Logs"
+                               asp-route-busca="@Model.Busca"
+                               asp-route-usuarioResponsavelId="@Model.UsuarioResponsavelId"
+                               asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                               asp-route-pagina="@(Model.PaginaAtual + 1)">Próxima</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </section>
+</div>

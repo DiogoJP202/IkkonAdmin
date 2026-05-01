@@ -1,0 +1,199 @@
+@using IkkonAdmin.Web.Security
+@model GraduacaoDetalhesViewModel
+@{
+    ViewData["Title"] = "Detalhes da Graduação";
+    var canGraduacoesCreate = User.HasPermission(AppPermissions.GraduacoesCreate);
+    var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var totalHistorico = Model.HistoricoAluno.Count;
+    var aprovadosHistorico = Model.HistoricoAluno.Count(x => x.ResultadoAprovado);
+    var reprovadosHistorico = Model.HistoricoAluno.Count(x => !x.ResultadoAprovado);
+}
+
+<div class="graduacoes-page d-grid gap-3">
+    <section class="graduacoes-hero rounded-3 p-3 p-lg-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+            <div>
+                <p class="graduacoes-eyebrow mb-2">Detalhes do resultado</p>
+                <h1 class="graduacoes-title mb-2">@Model.AlunoNome</h1>
+                <p class="graduacoes-subtitle mb-0">Turma: <strong>@(Model.TurmaNome ?? "-")</strong></p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-start">
+                @if (Model.ResultadoAprovado)
+                {
+                    <span class="graduacoes-status-pill graduacoes-status-success">Aprovado</span>
+                }
+                else
+                {
+                    <span class="graduacoes-status-pill graduacoes-status-danger">Reprovado</span>
+                }
+                @if (canAlunosView)
+                {
+                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn btn-sm btn-outline-primary">Abrir aluno</a>
+                }
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Voltar</a>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-6 col-md-3">
+                <article class="graduacoes-kpi-card graduacoes-kpi-highlight">
+                    <span class="graduacoes-kpi-label">Resultado</span>
+                    <strong class="graduacoes-kpi-value">#@Model.Id</strong>
+                    <span class="graduacoes-kpi-foot">Identificador</span>
+                </article>
+            </div>
+            <div class="col-6 col-md-3">
+                <article class="graduacoes-kpi-card graduacoes-kpi-success">
+                    <span class="graduacoes-kpi-label">Histórico total</span>
+                    <strong class="graduacoes-kpi-value">@totalHistorico</strong>
+                    <span class="graduacoes-kpi-foot">Registros do aluno</span>
+                </article>
+            </div>
+            <div class="col-6 col-md-3">
+                <article class="graduacoes-kpi-card graduacoes-kpi-info">
+                    <span class="graduacoes-kpi-label">Aprovados</span>
+                    <strong class="graduacoes-kpi-value">@aprovadosHistorico</strong>
+                    <span class="graduacoes-kpi-foot">No histórico</span>
+                </article>
+            </div>
+            <div class="col-6 col-md-3">
+                <article class="graduacoes-kpi-card graduacoes-kpi-danger">
+                    <span class="graduacoes-kpi-label">Reprovados</span>
+                    <strong class="graduacoes-kpi-value">@reprovadosHistorico</strong>
+                    <span class="graduacoes-kpi-foot">No histórico</span>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-12 col-lg-7">
+            <div class="card graduacoes-side-card h-100">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Resultado registrado</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <p class="mb-1"><strong>Data do resultado:</strong> @Model.DataResultado.ToString("dd/MM/yyyy")</p>
+                            <p class="mb-1"><strong>Nível anterior:</strong> @Model.NivelAnterior</p>
+                            <p class="mb-1"><strong>Nível novo:</strong> @(Model.NivelNovo?.ToString() ?? "-")</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <p class="mb-1"><strong>Certificado:</strong> @(Model.CertificadoEmitido ? "Emitido" : "Pendente")</p>
+                            <p class="mb-1"><strong>Omamori/colar:</strong> @(Model.OmamoriAtualizado ? "Atualizado" : "Pendente")</p>
+                            <p class="mb-1"><strong>Status:</strong> @(Model.ResultadoAprovado ? "Aprovado" : "Reprovado")</p>
+                        </div>
+                        <div class="col-12">
+                            <p class="mb-1"><strong>Observações:</strong></p>
+                            <div class="text-muted">@(string.IsNullOrWhiteSpace(Model.Observacoes) ? "-" : Model.Observacoes)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card graduacoes-side-card mb-3">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Exame vinculado</h2>
+                </div>
+                <div class="card-body">
+                    @if (Model.ExameGraduacaoId.HasValue)
+                    {
+                        <p class="mb-1"><strong>ID:</strong> #@Model.ExameGraduacaoId</p>
+                        <p class="mb-1"><strong>Data:</strong> @(Model.DataExame?.ToString("dd/MM/yyyy") ?? "-")</p>
+                        <p class="mb-1"><strong>Local:</strong> @(string.IsNullOrWhiteSpace(Model.LocalExame) ? "-" : Model.LocalExame)</p>
+                        <p class="mb-0"><strong>Nível pretendido:</strong> @(Model.NivelPretendidoExame?.ToString() ?? "-")</p>
+                    }
+                    else
+                    {
+                        <p class="mb-0 text-muted">Resultado registrado sem exame vinculado.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card graduacoes-side-card">
+                <div class="card-header">
+                    <h2 class="graduacoes-section-title mb-0">Ações rápidas</h2>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    @if (canGraduacoesCreate)
+                    {
+                        <a asp-action="Create" class="btn btn-primary">Novo resultado</a>
+                    }
+                    @if (canAlunosView)
+                    {
+                        <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn btn-outline-secondary">Abrir perfil do aluno</a>
+                    }
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para graduações</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="card graduacoes-table-card">
+        <div class="card-header">
+            <div>
+                <h2 class="graduacoes-section-title mb-1">Histórico de graduação do aluno</h2>
+                <p class="graduacoes-section-subtitle mb-0">Use esta linha do tempo para validar consistência da progressão.</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 graduacoes-table">
+                <thead class="table-light">
+                    <tr>
+                        <th>Data</th>
+                        <th>Resultado</th>
+                        <th>Nível</th>
+                        <th class="text-end">Detalhe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.HistoricoAluno.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">Nenhum histórico de graduação encontrado.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.HistoricoAluno)
+                        {
+                            <tr>
+                                <td>@item.DataResultado.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.ResultadoAprovado)
+                                    {
+                                        <span class="graduacoes-status-pill graduacoes-status-success">Aprovado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="graduacoes-status-pill graduacoes-status-danger">Reprovado</span>
+                                    }
+                                </td>
+                                <td>
+                                    @item.NivelAnterior
+                                    @if (item.NivelNovo.HasValue)
+                                    {
+                                        <span>? @item.NivelNovo</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (item.Id == Model.Id)
+                                    {
+                                        <span class="badge text-bg-primary">Atual</span>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

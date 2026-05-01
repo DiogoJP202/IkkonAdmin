@@ -1,0 +1,302 @@
+﻿@{
+    Layout = "_PublicLayout";
+    ViewData["Title"] = "Ikkon SPTD | Escola de Taiko";
+}
+
+<div class="institucional-page">
+    <header class="institucional-header fixed-top">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-xxl px-3 px-lg-4">
+                <a class="navbar-brand institucional-brand" href="#inicio">
+                    <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo Ikkon SPTD" class="institucional-brand-logo" />
+                    <span class="institucional-brand-lines">
+                        <strong>Ikkon SPTD</strong>
+                        <small>Escola de Taiko</small>
+                    </span>
+                </a>
+                <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="Alternar navegação">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navLanding">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                        <li class="nav-item"><a class="nav-link" href="#sobre">Sobre</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#cursos">Cursos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#eventos">Eventos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/auth/login">Área interna</a></li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">Contato</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="inicio" class="institucional-hero reveal">
+        <div class="institucional-hero-media" aria-hidden="true"></div>
+        <div class="institucional-hero-overlay"></div>
+        <div class="container-xxl px-3 px-lg-4 position-relative">
+            <div class="row justify-content-center justify-content-lg-start">
+                <div class="col-12 col-lg-8 col-xl-7">
+                    <p class="institucional-kicker mb-2">Ensino de percussão japonesa para todos</p>
+                    <h1 class="institucional-hero-title">A força do taiko em São Paulo</h1>
+                    <p class="institucional-hero-subtitle">
+                        Há 10 anos ensinando taiko, fue e teoria musical para todos, unindo cultura japonesa, disciplina, musicalidade e presença de palco.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a class="btn btn-danger btn-lg" href="#sobre">Conheça a escola</a>
+                        <a class="btn btn-outline-light btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20agendar%20uma%20aula%20experimental." target="_blank" rel="noopener">Agende uma aula</a>
+                    </div>
+                    <div class="institucional-hero-badge mt-4">Agenda aberta para eventos e shows</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sobre" class="institucional-section institucional-about reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-about-wrap">
+                <figure class="institucional-about-media mb-0">
+                    <img src="~/Images/AulaTaiko.png" asp-append-version="true" alt="Aula de taiko com tambores japoneses na Ikkon SPTD" class="institucional-about-image" loading="lazy" />
+                </figure>
+                <article class="institucional-about-content">
+                    <h2 class="institucional-about-title">Tradição e contemporaneidade em São Paulo</h2>
+                    <p class="institucional-about-text">
+                        A Ikkon SPTD é uma escola dedicada ao ensino de percussão japonesa e música tradicional, com 10 anos de trajetória em São Paulo.
+                    </p>
+                    <p class="institucional-about-text">
+                        Aqui, você encontra um espaço acolhedor para desenvolver musicalidade, disciplina, expressão corporal e conexão com a cultura japonesa,
+                        seja você iniciante absoluto ou alguém que já tem experiência musical.
+                    </p>
+                    <p class="institucional-about-text">
+                        Nosso trabalho vai além das aulas: participamos de eventos, shows e apresentações que levam a força e a beleza do taiko para diferentes públicos e contextos.
+                    </p>
+                    <p class="institucional-about-text mb-0">
+                        Acreditamos no poder transformador da música em grupo, na energia que surge quando tocamos juntos e no respeito profundo pela tradição que nos inspira.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="cursos" class="institucional-section institucional-cursos reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">O que ensinamos</p>
+                <h2 class="institucional-section-title">Formação musical com base cultural e prática de grupo</h2>
+            </div>
+            <div class="row g-3 g-lg-4 mt-1">
+                <div class="col-12 col-md-6 col-xl-4">
+                    <article class="institucional-card">
+                        <h3>Taiko</h3>
+                        <p>
+                            Técnica de golpes, postura, precisão rítmica e construção de presença.
+                            O aluno desenvolve força, coordenação, escuta coletiva e impacto de palco.
+                        </p>
+                    </article>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4">
+                    <article class="institucional-card">
+                        <h3>Fue</h3>
+                        <p>
+                            Desenvolvimento de respiração, afinação, fraseado e controle sonoro.
+                            O estudo do fue amplia musicalidade e sensibilidade dentro do repertório japonês.
+                        </p>
+                    </article>
+                </div>
+                <div class="col-12 col-md-12 col-xl-4">
+                    <article class="institucional-card">
+                        <h3>Teoria Musical</h3>
+                        <p>
+                            Leitura rítmica, estrutura musical e compreensão de arranjos.
+                            A teoria dá autonomia para evoluir com segurança e consistência.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section institucional-publico reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-12 col-lg-5">
+                    <div class="institucional-section-head">
+                        <p class="institucional-kicker mb-2">Para quem é</p>
+                        <h2 class="institucional-section-title">Um espaço para começar, evoluir e pertencer</h2>
+                    </div>
+                    <p class="institucional-copy mb-0">
+                        A Ikkon recebe iniciantes, pessoas sem experiência musical, crianças, jovens e adultos.
+                        Seja por hobby, por interesse cultural ou por desejo de palco, o caminho começa com orientação clara e progressão real.
+                    </p>
+                </div>
+                <div class="col-12 col-lg-7">
+                    <div class="institucional-tags">
+                        <span>Iniciantes absolutos</span>
+                        <span>Sem experiência prévia</span>
+                        <span>Crianças, jovens e adultos</span>
+                        <span>Interesse em cultura japonesa</span>
+                        <span>Prática por hobby</span>
+                        <span>Participação em apresentações</span>
+                        <span>Disciplina e desenvolvimento pessoal</span>
+                        <span>Treino em comunidade</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="diferenciais" class="institucional-section institucional-diferenciais reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">Diferenciais</p>
+                <h2 class="institucional-section-title">Por que aprender na Ikkon SPTD</h2>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>10 anos de experiência</h3><p>Trajetória consolidada no ensino de percussão japonesa em São Paulo.</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Ensino do zero</h3><p>Metodologia acessível para quem está começando sem base musical.</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Ambiente acolhedor</h3><p>Disciplina com escuta, respeito e integração entre os alunos.</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Cultura e palco</h3><p>Vivência cultural aliada a eventos, shows e apresentações.</p></article></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="eventos" class="institucional-section institucional-eventos reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-eventos-wrap">
+                <div class="institucional-eventos-content">
+                    <p class="institucional-kicker mb-2">Apresentações e eventos</p>
+                    <h2 class="institucional-section-title">A Ikkon SPTD não é apenas uma escola, somos também um grupo de apresentações</h2>
+                    <p class="institucional-copy institucional-eventos-copy mb-0">
+                        Levamos a força do taiko para eventos, shows e celebrações, com presença de palco, disciplina musical e impacto cultural.
+                    </p>
+
+                    <article class="institucional-mma-box mt-4">
+                        <p class="institucional-mma-question mb-2">"Vocês tocam em eventos de MMA?"</p>
+                        <p class="mb-0">
+                            Sim. A Ikkon também participa de eventos esportivos, festivais culturais, shows e apresentações especiais.
+                            Levamos energia e presença para diferentes públicos e contextos.
+                        </p>
+                    </article>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-12 col-sm-6">
+                            <article class="institucional-evento-stat">
+                                <strong>10+</strong>
+                                <span>Anos de trajetória</span>
+                            </article>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <article class="institucional-evento-stat">
+                                <strong>100+</strong>
+                                <span>Apresentações</span>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="institucional-eventos-media-wrap">
+                    <div class="institucional-eventos-media-card" id="eventosGaleria" aria-live="polite" aria-label="Galeria de apresentações da Ikkon SPTD">
+                        <img class="institucional-eventos-photo is-active" src="~/Images/Apresentação3.jpg" asp-append-version="true" alt="Apresentação de taiko em evento cultural" loading="lazy" aria-hidden="false" />
+                        <img class="institucional-eventos-photo" src="~/Images/FotoAlunos.jpg" asp-append-version="true" alt="Performance de percussão japonesa no palco" loading="lazy" aria-hidden="true" />
+                        <img class="institucional-eventos-photo" src="~/Images/Alunos2.jfif" asp-append-version="true" alt="Grupo em apresentação com tambores japoneses" loading="lazy" aria-hidden="true" />
+                    </div>
+                    <div class="institucional-eventos-dots" role="tablist" aria-label="Selecionar foto da galeria de eventos">
+                        <button type="button" class="institucional-evento-dot is-active" data-index="0" role="tab" aria-label="Exibir foto 1" aria-selected="true"></button>
+                        <button type="button" class="institucional-evento-dot" data-index="1" role="tab" aria-label="Exibir foto 2" aria-selected="false" tabindex="-1"></button>
+                        <button type="button" class="institucional-evento-dot" data-index="2" role="tab" aria-label="Exibir foto 3" aria-selected="false" tabindex="-1"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="institucional-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">FAQ</p>
+                <h2 class="institucional-section-title">Dúvidas frequentes</h2>
+            </div>
+            <div class="accordion institucional-faq mt-3" id="faqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">Preciso ser descendente de japoneses para estudar taiko?</button></h3>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion"><div class="accordion-body">Não. A escola é aberta para todos, sem qualquer restrição de origem. Nosso compromisso é com o respeito à cultura e com o aprendizado acessível.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">Participar de apresentações públicas é obrigatório?</button></h3>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Não é obrigatório. Quem deseja participar de eventos e shows recebe preparação, mas o aluno pode focar apenas no processo de aula e desenvolvimento pessoal.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">Nunca estudei música. Ainda assim posso começar?</button></h3>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Sim. Ensinamos desde o absoluto zero, com progressão técnica clara em ritmo, coordenação, postura e leitura musical básica.</div></div>
+                </div>
+                <div class="accordion-item">
+                    <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">Qual é a idade mínima para começar?</button></h3>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">Avaliamos caso a caso, mas em geral por volta dos 10 anos a criança já consegue acompanhar bem a dinâmica das aulas.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="institucional-section institucional-contato reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-12 col-lg-7">
+                    <p class="institucional-kicker mb-2">Entre em contato</p>
+                    <h2 class="institucional-section-title">Quer começar nas aulas ou levar a Ikkon para seu evento?</h2>
+                    <p class="institucional-copy mb-0">
+                        Fale com a escola para aulas, apresentações e projetos especiais.
+                        Estamos com agenda aberta para eventos e shows.
+                    </p>
+                    <p class="institucional-address mt-3 mb-0">
+                        Rua Domingos de Morais, 2975, São Paulo, Brazil
+                    </p>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="institucional-cta-box d-grid gap-2">
+                        <a class="btn btn-danger btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20as%20aulas." target="_blank" rel="noopener">Entrar em contato no WhatsApp</a>
+                        <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20aula%20experimental%20na%20Ikkon%20SPTD." target="_blank" rel="noopener">Agendar aula experimental</a>
+                        <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento." target="_blank" rel="noopener">Solicitar apresentação para evento</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="institucional-footer">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="row g-4">
+                <div class="col-12 col-lg-4">
+                    <div class="institucional-footer-brand">
+                        <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo Ikkon SPTD" class="institucional-footer-logo" />
+                        <div>
+                            <h2>Ikkon SPTD | Escola de Taiko</h2>
+                            <p class="mb-0">Ensino de percussão japonesa para todos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <h3>Contato</h3>
+                    <ul class="list-unstyled mb-0 institucional-footer-nav">
+                        <li><a href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">WhatsApp: +55 11 93779-9916</a></li>
+                        <li><a href="mailto:contato@ikkontaiko.com">E-mail: contato@ikkontaiko.com</a></li>
+                        <li><a href="https://www.instagram.com/ikkontaiko/" target="_blank" rel="noopener">Instagram</a></li>
+                        <li><a href="https://www.tiktok.com/%40ikkontaiko" target="_blank" rel="noopener">TikTok</a></li>
+                        <li><a href="https://web.facebook.com/ikkontaiko/?_rdc=1&_rdr#" target="_blank" rel="noopener">Facebook</a></li>
+                        <li>Rua Domingos de Morais, 2975, São Paulo, Brazil</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <h3>Navegação</h3>
+                    <ul class="list-unstyled mb-0 institucional-footer-nav">
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#cursos">Cursos</a></li>
+                        <li><a href="#eventos">Eventos</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
