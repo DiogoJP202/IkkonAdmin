@@ -1,0 +1,33 @@
+@model AreaAlunoTurmasViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Minhas Turmas";
+}
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Turmas vinculadas</h3>
+            <p class="mb-0 text-muted">Turma principal: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "não definida" : Model.TurmaPrincipal)</p>
+        </div>
+    </div>
+
+    <div class="aluno-portal-turma-grid">
+        @if (Model.Turmas.Count == 0)
+        {
+            <p class="text-muted mb-0">Nenhuma turma vinculada no momento.</p>
+        }
+        else
+        {
+            @foreach (var turma in Model.Turmas)
+            {
+                <article class="aluno-portal-turma-card">
+                    <span>@turma.Modalidade</span>
+                    <h3>@turma.Nome</h3>
+                    <p>@(string.IsNullOrWhiteSpace(turma.Horario) ? "Horário não informado" : turma.Horario)</p>
+                    <small>Vinculado em @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
+                </article>
+            }
+        }
+    </div>
+</section>

@@ -1,0 +1,26 @@
+@model AreaAlunoPerfilViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Meu Perfil";
+}
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Dados cadastrais</h3>
+            <p class="mb-0 text-muted">Informações básicas registradas pela equipe administrativa.</p>
+        </div>
+    </div>
+
+    <div class="aluno-portal-data-grid">
+        <article><span>Nome completo</span><strong>@Model.NomeCompleto</strong></article>
+        <article><span>CPF</span><strong>@Model.CPF</strong></article>
+        <article><span>RG</span><strong>@(string.IsNullOrWhiteSpace(Model.RG) ? "-" : Model.RG)</strong></article>
+        <article><span>Data de nascimento</span><strong>@(Model.DataNascimento.HasValue ? Model.DataNascimento.Value.ToString("dd/MM/yyyy") : "-")</strong></article>
+        <article><span>E-mail</span><strong>@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</strong></article>
+        <article><span>Celular</span><strong>@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</strong></article>
+        <article><span>Contato de emergência</span><strong>@(string.IsNullOrWhiteSpace(Model.ContatoEmergencia) ? "-" : Model.ContatoEmergencia)</strong></article>
+        <article><span>Status</span><strong>@Model.Status</strong></article>
+        <article class="aluno-portal-data-wide"><span>Endereço</span><strong>@(string.IsNullOrWhiteSpace(Model.Endereco) ? "-" : Model.Endereco)</strong></article>
+    </div>
+</section>

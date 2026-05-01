@@ -8,7 +8,7 @@ Este documento lista os usuários padrão do sistema **IkkonAdmin** para cada ti
 |---|---|---|---|---|
 | Admin | Administrador | `funcionario.admin` | `Ikkon@123` | `/admin/painel` |
 | Funcionário | Funcionário | `funcionario.operacional` | `Func@123` | `/admin` |
-| Aluno | Aluno | `aluno.demo` | `Aluno@123` | `/aluno` |
+| Aluno | Área do Aluno | `aluno.demo` | `Aluno@123` | `/area-do-aluno` |
 
 ## Observações
 
@@ -16,3 +16,4 @@ Este documento lista os usuários padrão do sistema **IkkonAdmin** para cada ti
 - Os acessos acima são destinados apenas para **desenvolvimento/demonstração**.
 - Em produção, altere todas as senhas padrão imediatamente.
 - Após mudanças de roles/permissões, faça logout/login para atualizar as claims da sessão.
+- O login administrativo fica em `/auth/login`; o login do aluno fica separado em `/aluno/login`.

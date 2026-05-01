@@ -130,6 +130,7 @@ builder.Services.AddScoped<IConfiguracaoService, ConfiguracaoService>();
 builder.Services.AddScoped<IAdminPainelService, AdminPainelService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAreaAlunoService, AreaAlunoService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
 
 var app = builder.Build();
@@ -183,6 +184,13 @@ app.MapControllerRoute(
     pattern: "auth/{action=Login}/{id?}",
     defaults: new { controller = "Auth" })
     .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "area-do-aluno",
+    pattern: "area-do-aluno/{action=Index}/{id?}",
+    defaults: new { controller = "AlunoArea" })
+    .WithStaticAssets()
+    .RequireAuthorization(AuthorizationPolicies.Aluno);
 
 app.MapControllerRoute(
     name: "configuracoes",

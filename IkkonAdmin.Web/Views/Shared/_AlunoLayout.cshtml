@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Área do Aluno IKKON</title>
+    <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="aluno-portal-body">
+    <div class="aluno-portal-shell">
+        <aside class="aluno-portal-sidebar">
+            <a class="aluno-portal-brand" href="/area-do-aluno">
+                <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON" />
+                <span>
+                    <strong>IKKON SPTD</strong>
+                    <small>Área do Aluno</small>
+                </span>
+            </a>
+
+            <nav class="aluno-portal-nav" aria-label="Navegação da Área do Aluno">
+                <a class="@(Context.Request.Path.Value?.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno">Início</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">Meu Perfil</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/financeiro", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/financeiro">Financeiro</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/turmas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/turmas">Turmas</a>
+            </nav>
+
+            <form action="/aluno/sair" method="post" class="mt-auto">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-light w-100">Sair</button>
+            </form>
+        </aside>
+
+        <main class="aluno-portal-main">
+            <div class="aluno-portal-topbar">
+                <div>
+                    <span class="aluno-portal-eyebrow">Portal</span>
+                    <h1>@ViewData["Title"]</h1>
+                </div>
+                <a href="/" class="btn btn-outline-secondary btn-sm">Site institucional</a>
+            </div>
+
+            <div class="aluno-portal-content">
+                <partial name="_Alerts" />
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

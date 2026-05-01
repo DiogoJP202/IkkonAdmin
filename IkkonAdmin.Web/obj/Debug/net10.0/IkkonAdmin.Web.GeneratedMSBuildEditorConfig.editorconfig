@@ -42,8 +42,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaXNzb2VzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/AcessoIndisponivel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEFjZXNzb0luZGlzcG9uaXZlbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Financeiro.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEZpbmFuY2Vpcm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Perfil.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXFBlcmZpbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Turmas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXFR1cm1hcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoAuth/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BdXRoXExvZ2luLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Create.cshtml]
@@ -200,6 +220,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Alerts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbGVydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AlunoLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbHVub0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AuthLayout.cshtml]

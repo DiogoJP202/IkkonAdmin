@@ -1,27 +1,107 @@
-﻿@{
-    Layout = "_AuthLayout";
+@model AreaAlunoDashboardViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Área do Aluno";
 }
 
-<div class="auth-page">
-    <div class="auth-page-bg" aria-hidden="true"></div>
-    <div class="container px-3">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8 col-xl-6">
-                <section class="card border-0 shadow-sm">
-                    <div class="card-body p-4 p-lg-5">
-                        <p class="text-uppercase small fw-semibold text-secondary mb-2">Área do aluno</p>
-                        <h2 class="h4 mb-2">Bem-vindo(a) à área exclusiva do aluno</h2>
-                        <p class="text-muted mb-4">
-                            Esta área já está preparada para receber conteúdos de mensalidades, presença, graduação e comunicados.
-                            A implementação completa será evoluída nas próximas etapas.
-                        </p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a href="/configuracoes" class="btn btn-danger">Abrir minhas configurações</a>
-                            <a href="/" class="btn btn-outline-secondary">Voltar ao site institucional</a>
-                        </div>
-                    </div>
-                </section>
-            </div>
+<div class="aluno-portal-page">
+    <section class="aluno-portal-hero">
+        <div>
+            <span class="aluno-portal-eyebrow">Olá, @Model.NomeCompleto</span>
+            <h2>Seu painel de acompanhamento</h2>
+            <p>Consulte seus dados principais, turmas vinculadas e mensalidades recentes.</p>
+        </div>
+        <span class="aluno-portal-status">@Model.Status</span>
+    </section>
+
+    <section class="aluno-portal-kpis">
+        <article>
+            <span>Total em aberto</span>
+            <strong>@Model.TotalEmAberto.ToString("C")</strong>
+        </article>
+        <article>
+            <span>Mensalidades atrasadas</span>
+            <strong>@Model.MensalidadesAtrasadas</strong>
+        </article>
+        <article>
+            <span>Turma principal</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "Sem turma" : Model.TurmaPrincipal)</strong>
+        </article>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-7">
+            <section class="aluno-portal-panel">
+                <div class="aluno-portal-panel-head">
+                    <h3>Mensalidades recentes</h3>
+                    <a href="/area-do-aluno/financeiro">Ver financeiro</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 aluno-portal-table">
+                        <thead>
+                            <tr>
+                                <th>Competência</th>
+                                <th>Vencimento</th>
+                                <th>Status</th>
+                                <th class="text-end">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.MensalidadesRecentes.Count == 0)
+                            {
+                                <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma mensalidade encontrada.</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var mensalidade in Model.MensalidadesRecentes)
+                                {
+                                    <tr>
+                                        <td>@mensalidade.Competencia.ToString("MM/yyyy")</td>
+                                        <td>@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
+                                        <td><span class="aluno-portal-pill">@mensalidade.Status</span></td>
+                                        <td class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        <div class="col-12 col-xl-5">
+            <section class="aluno-portal-panel">
+                <div class="aluno-portal-panel-head">
+                    <h3>Atalhos</h3>
+                </div>
+                <div class="aluno-portal-actions">
+                    <a href="/area-do-aluno/perfil">Meu perfil</a>
+                    <a href="/area-do-aluno/financeiro">Minhas mensalidades</a>
+                    <a href="/area-do-aluno/turmas">Minhas turmas</a>
+                </div>
+            </section>
+
+            <section class="aluno-portal-panel mt-3">
+                <div class="aluno-portal-panel-head">
+                    <h3>Turmas vinculadas</h3>
+                    <a href="/area-do-aluno/turmas">Ver todas</a>
+                </div>
+                <div class="aluno-portal-list">
+                    @if (Model.Turmas.Count == 0)
+                    {
+                        <p class="text-muted mb-0">Nenhuma turma vinculada no momento.</p>
+                    }
+                    else
+                    {
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            <div class="aluno-portal-list-item">
+                                <strong>@turma.Nome</strong>
+                                <span>@turma.Modalidade @(string.IsNullOrWhiteSpace(turma.Horario) ? string.Empty : $"| {turma.Horario}")</span>
+                            </div>
+                        }
+                    }
+                </div>
+            </section>
         </div>
     </div>
 </div>

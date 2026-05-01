@@ -52,6 +52,12 @@ public class AuthController(IAuthService authService) : Controller
             return View(model);
         }
 
+        if (model.TipoAcesso == TipoAcessoEnum.Aluno)
+        {
+            ModelState.AddModelError(string.Empty, "Use o login da Área do Aluno para acessar o portal do aluno.");
+            return View(model);
+        }
+
         var authResult = await authService.AutenticarAsync(
             model.LoginOuEmail,
             model.Senha,
@@ -66,35 +72,7 @@ public class AuthController(IAuthService authService) : Controller
         }
 
         var rolePrincipal = AppRoles.FromTipoAcesso(authResult.Usuario.TipoAcesso);
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, authResult.Usuario.Id.ToString()),
-            new(ClaimTypes.Name, authResult.Usuario.NomeExibicao),
-            new(AppClaimTypes.TipoAcesso, authResult.Usuario.TipoAcesso.ToString())
-        };
-
-        if (!string.IsNullOrWhiteSpace(authResult.Usuario.Email))
-        {
-            claims.Add(new Claim(ClaimTypes.Email, authResult.Usuario.Email));
-        }
-
-        foreach (var role in authResult.Roles.Distinct(StringComparer.OrdinalIgnoreCase))
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-
-        if (!authResult.Roles.Contains(rolePrincipal, StringComparer.OrdinalIgnoreCase))
-        {
-            claims.Add(new Claim(ClaimTypes.Role, rolePrincipal));
-        }
-
-        foreach (var permissao in authResult.Permissoes.Distinct(StringComparer.OrdinalIgnoreCase))
-        {
-            claims.Add(new Claim(AppClaimTypes.Permissao, permissao));
-        }
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+        var claimsPrincipal = AuthClaimsFactory.CriarPrincipal(authResult);
 
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
@@ -149,7 +127,8 @@ public class AuthController(IAuthService authService) : Controller
 
         if (role == AppRoles.Aluno)
         {
-            return returnUrl.StartsWith("/aluno", StringComparison.OrdinalIgnoreCase);
+            return returnUrl.StartsWith("/area-do-aluno", StringComparison.OrdinalIgnoreCase) ||
+                   returnUrl.StartsWith("/aluno", StringComparison.OrdinalIgnoreCase);
         }
 
         return false;
@@ -161,7 +140,7 @@ public class AuthController(IAuthService authService) : Controller
         {
             AppRoles.Admin => "/admin/painel",
             AppRoles.Funcionario => "/admin",
-            AppRoles.Aluno => "/aluno",
+            AppRoles.Aluno => "/area-do-aluno",
             _ => "/auth/login"
         };
     }

@@ -1,0 +1,62 @@
+@model AreaAlunoFinanceiroViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Minhas Mensalidades";
+}
+
+<section class="aluno-portal-kpis mb-3">
+    <article>
+        <span>Total pago</span>
+        <strong>@Model.TotalPago.ToString("C")</strong>
+    </article>
+    <article>
+        <span>Total em aberto</span>
+        <strong>@Model.TotalEmAberto.ToString("C")</strong>
+    </article>
+    <article>
+        <span>Mensalidades atrasadas</span>
+        <strong>@Model.MensalidadesAtrasadas</strong>
+    </article>
+</section>
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Histórico financeiro</h3>
+            <p class="mb-0 text-muted">Consulta das mensalidades registradas no sistema.</p>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 aluno-portal-table">
+            <thead>
+                <tr>
+                    <th>Competência</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Pagamento</th>
+                    <th class="text-end">Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Mensalidades.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma mensalidade encontrada.</td></tr>
+                }
+                else
+                {
+                    @foreach (var mensalidade in Model.Mensalidades)
+                    {
+                        <tr>
+                            <td>@mensalidade.Competencia.ToString("MM/yyyy")</td>
+                            <td>@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
+                            <td><span class="aluno-portal-pill">@mensalidade.Status</span></td>
+                            <td>@(mensalidade.DataPagamento.HasValue ? mensalidade.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

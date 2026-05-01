@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IkkonAdmin.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b018547dbe302e7ed6d782a10f8e73a3d25cd091")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+562f18bedf1f2dc0b99eddb6ee410d5615d0bed7")]
 [assembly: System.Reflection.AssemblyProductAttribute("IkkonAdmin.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IkkonAdmin.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
