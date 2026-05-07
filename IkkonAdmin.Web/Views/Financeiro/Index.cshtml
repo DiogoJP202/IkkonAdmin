@@ -2,178 +2,325 @@
 @model FinanceiroIndexViewModel
 @{
     ViewData["Title"] = "Financeiro";
+
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var canFinanceiroCreate = User.HasPermission(AppPermissions.FinanceiroCreate);
     var canFinanceiroEdit = User.HasPermission(AppPermissions.FinanceiroEdit);
     var canDashboardView = User.HasPermission(AppPermissions.DashboardView);
+
+    var culturaInvariante = System.Globalization.CultureInfo.InvariantCulture;
+    var hoje = DateOnly.FromDateTime(DateTime.Today);
     var itensCriticos = Model.Mensalidades.Count(x => x.Status == StatusMensalidadeEnum.Atrasado);
+    var pagosNoRecorte = Model.Mensalidades.Count(x => x.Status == StatusMensalidadeEnum.Pago);
     var filtrosAplicados = !string.IsNullOrWhiteSpace(Model.BuscaAluno) || Model.StatusFiltro.HasValue;
     var totalPaginas = Math.Max(1, Model.TotalPaginas);
     var paginaAtual = Math.Clamp(Model.PaginaAtual, 1, totalPaginas);
     var paginaInicial = Math.Max(1, paginaAtual - 2);
     var paginaFinal = Math.Min(totalPaginas, paginaAtual + 2);
+    var primeiroRegistro = Model.TotalRegistros == 0 ? 0 : ((paginaAtual - 1) * Model.TamanhoPagina) + 1;
+    var ultimoRegistro = Math.Min(Model.TotalRegistros, paginaAtual * Model.TamanhoPagina);
 }
 
 @functions {
-    private static string MensalidadeStatusClass(StatusMensalidadeEnum status)
+    private static string StatusMensalidadeTexto(StatusMensalidadeEnum status)
     {
         return status switch
         {
-            StatusMensalidadeEnum.Pago => "financeiro-status-pill financeiro-status-success",
-            StatusMensalidadeEnum.Atrasado => "financeiro-status-pill financeiro-status-danger",
-            StatusMensalidadeEnum.Cancelado => "financeiro-status-pill financeiro-status-muted",
-            _ => "financeiro-status-pill financeiro-status-warning"
+            StatusMensalidadeEnum.Pendente => "Pendente",
+            StatusMensalidadeEnum.Pago => "Pago",
+            StatusMensalidadeEnum.Atrasado => "Atrasado",
+            StatusMensalidadeEnum.Cancelado => "Cancelado",
+            _ => status.ToString()
         };
+    }
+
+    private static string StatusMensalidadeClasse(StatusMensalidadeEnum status)
+    {
+        return status switch
+        {
+            StatusMensalidadeEnum.Pago => "is-success",
+            StatusMensalidadeEnum.Atrasado => "is-danger",
+            StatusMensalidadeEnum.Cancelado => "is-muted",
+            _ => "is-warning"
+        };
+    }
+
+    private static string VencimentoClasse(DateOnly vencimento, StatusMensalidadeEnum status, DateOnly hoje)
+    {
+        if (status == StatusMensalidadeEnum.Pago)
+        {
+            return "is-success";
+        }
+
+        if (status == StatusMensalidadeEnum.Cancelado)
+        {
+            return "is-muted";
+        }
+
+        if (vencimento < hoje || status == StatusMensalidadeEnum.Atrasado)
+        {
+            return "is-danger";
+        }
+
+        if (vencimento == hoje)
+        {
+            return "is-warning";
+        }
+
+        return "is-info";
+    }
+
+    private static string VencimentoTexto(DateOnly vencimento, StatusMensalidadeEnum status, DateOnly hoje)
+    {
+        if (status == StatusMensalidadeEnum.Pago)
+        {
+            return "Pago";
+        }
+
+        if (status == StatusMensalidadeEnum.Cancelado)
+        {
+            return "Cancelado";
+        }
+
+        var dias = vencimento.DayNumber - hoje.DayNumber;
+        if (dias < 0)
+        {
+            var atraso = Math.Abs(dias);
+            return $"{atraso} {(atraso == 1 ? "dia" : "dias")} em atraso";
+        }
+
+        if (dias == 0)
+        {
+            return "Vence hoje";
+        }
+
+        if (dias == 1)
+        {
+            return "Vence amanhã";
+        }
+
+        return $"Vence em {dias} dias";
+    }
+
+    private static string InicialAluno(string nome)
+    {
+        return string.IsNullOrWhiteSpace(nome)
+            ? "A"
+            : nome.Trim()[0].ToString().ToUpperInvariant();
     }
 }
 
-<div class="financeiro-page">
-    <section class="card financeiro-hero mb-3">
-        <div class="card-body p-3 p-lg-4">
-            <div class="row g-3 align-items-center">
-                <div class="col-12 col-lg-7">
-                    <div class="financeiro-eyebrow">Operação Financeira</div>
-                    <h2 class="financeiro-title mb-2">Cobrança, recebimento e inadimplência</h2>
-                    <p class="financeiro-subtitle mb-0">
-                        Acompanhe o ciclo mensal, priorize riscos e registre pagamentos com menos atrito no dia a dia administrativo.
-                    </p>
-                </div>
-                <div class="col-12 col-lg-5">
-                    <div class="financeiro-quick-actions">
-                        @if (canFinanceiroCreate)
-                        {
-                            <a asp-action="RegistrarPagamento" asp-route-returnUrl="@returnUrl" class="btn btn-primary">Registrar pagamento</a>
-                        }
-                        <a asp-action="Atrasados" class="btn btn-outline-danger">Ver atrasados</a>
-                        @if (canDashboardView)
-                        {
-                            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">Abrir dashboard</a>
-                        }
-                    </div>
-                </div>
+<div class="financeiro-v2-page">
+    <section class="financeiro-v2-hero mb-4">
+        <div class="financeiro-v2-hero-copy">
+            <span class="financeiro-v2-eyebrow">Operação financeira</span>
+            <h1>Cobranças, recebimentos e inadimplência</h1>
+            <p>
+                Acompanhe o ciclo mensal, priorize atrasos, ajuste valores e registre pagamentos com menos atrito na rotina administrativa.
+            </p>
+
+            <div class="financeiro-v2-meta">
+                <span>Registros <strong>@Model.TotalRegistros</strong></span>
+                <span>Críticos nesta página <strong>@itensCriticos</strong></span>
+                <span>Pagos nesta página <strong>@pagosNoRecorte</strong></span>
             </div>
         </div>
-    </section>
 
-    <section class="row g-3 mb-3">
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="financeiro-kpi-card financeiro-kpi-warning">
-                <span class="financeiro-kpi-label">Pendentes</span>
-                <strong class="financeiro-kpi-value">@Model.Pendentes</strong>
-                <span class="financeiro-kpi-foot">Mensalidades aguardando pagamento</span>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="financeiro-kpi-card financeiro-kpi-danger">
-                <span class="financeiro-kpi-label">Atrasadas</span>
-                <strong class="financeiro-kpi-value">@Model.Atrasadas</strong>
-                <span class="financeiro-kpi-foot">@itensCriticos registro(s) crítico(s) no recorte</span>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="financeiro-kpi-card financeiro-kpi-success">
-                <span class="financeiro-kpi-label">Recebido no mês</span>
-                <strong class="financeiro-kpi-value">@Model.ValorRecebidoMes.ToString("C")</strong>
-                <span class="financeiro-kpi-foot">Entradas confirmadas no período</span>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="financeiro-kpi-card">
-                <span class="financeiro-kpi-label">Total em aberto</span>
-                <strong class="financeiro-kpi-value">@Model.ValorEmAberto.ToString("C")</strong>
-                <span class="financeiro-kpi-foot">Exposição financeira atual</span>
-            </article>
-        </div>
-    </section>
-
-    <section class="card financeiro-filter-card mb-3">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-12 col-xl-7">
-                    <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                        <div class="col-12 col-md-7">
-                            <label asp-for="BuscaAluno" class="form-label financeiro-label">Buscar aluno</label>
-                            <input asp-for="BuscaAluno" type="search" class="form-control" placeholder="Nome, CPF ou telefone" autocomplete="off" />
-                        </div>
-                        <div class="col-12 col-md-5">
-                            <label asp-for="StatusFiltro" class="form-label financeiro-label">Status da mensalidade</label>
-                            <select asp-for="StatusFiltro" asp-items="Html.GetEnumSelectList<StatusMensalidadeEnum>()" class="form-select">
-                                <option value="">Todos os status</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <label asp-for="TamanhoPagina" class="form-label financeiro-label">Registros</label>
-                            <select asp-for="TamanhoPagina" name="tamanhoPagina" class="form-select">
-                                <option value="10" selected="@(Model.TamanhoPagina == 10)">10</option>
-                                <option value="20" selected="@(Model.TamanhoPagina == 20)">20</option>
-                                <option value="30" selected="@(Model.TamanhoPagina == 30)">30</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-md-3 d-grid">
-                            <button type="submit" class="btn btn-primary">Filtrar</button>
-                        </div>
-                        <div class="col-6 col-md-3 d-grid">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
-                        </div>
-                    </form>
-                </div>
-
-                @if (canFinanceiroCreate)
-                {
-                    <div class="col-12 col-xl-5">
-                        <form asp-action="GerarMensalidades" method="post" class="row g-3 align-items-end financeiro-geracao-box">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="returnUrl" value="@returnUrl" />
-
-                            <div class="col-12">
-                                <h3 class="financeiro-form-title">Gerar mensalidades</h3>
-                                <p class="financeiro-form-subtitle mb-0">Cria cobranças para a competência selecionada sem duplicar registros já existentes.</p>
-                            </div>
-
-                            <div class="col-6">
-                                <label class="form-label financeiro-label" for="mesCompetenciaGeracao">Mês</label>
-                                <input id="mesCompetenciaGeracao" type="number" name="mesCompetenciaGeracao" min="1" max="12" class="form-control" value="@Model.MesCompetenciaGeracao" />
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label financeiro-label" for="anoCompetenciaGeracao">Ano</label>
-                                <input id="anoCompetenciaGeracao" type="number" name="anoCompetenciaGeracao" min="2000" max="2100" class="form-control" value="@Model.AnoCompetenciaGeracao" />
-                            </div>
-                            <div class="col-12 d-grid">
-                                <button type="submit" class="btn btn-outline-primary">Gerar mensalidades</button>
-                            </div>
-                        </form>
-                    </div>
-                }
-            </div>
-
-            @if (filtrosAplicados)
+        <div class="financeiro-v2-hero-actions">
+            @if (canFinanceiroCreate)
             {
-                <div class="financeiro-active-filters mt-3">
-                    @if (!string.IsNullOrWhiteSpace(Model.BuscaAluno))
-                    {
-                        <span class="financeiro-filter-chip">Busca: @Model.BuscaAluno</span>
-                    }
-                    @if (Model.StatusFiltro.HasValue)
-                    {
-                        <span class="financeiro-filter-chip">Status: @Model.StatusFiltro.Value</span>
-                    }
-                </div>
+                <a asp-action="RegistrarPagamento" asp-route-returnUrl="@returnUrl" class="btn financeiro-v2-btn financeiro-v2-btn-primary">Registrar pagamento</a>
+            }
+            <a asp-action="Atrasados" class="btn financeiro-v2-btn financeiro-v2-btn-danger">Ver atrasados</a>
+            @if (canDashboardView)
+            {
+                <a asp-controller="Home" asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Dashboard</a>
             }
         </div>
     </section>
 
-    <section class="card financeiro-table-card">
-        <div class="card-header">
-            <div>
-                <h3 class="financeiro-section-title mb-1">Mensalidades</h3>
-                <p class="financeiro-section-subtitle mb-0">@Model.Mensalidades.Count registro(s) no resultado atual.</p>
+    <section class="financeiro-v2-kpi-grid mb-4" aria-label="Indicadores financeiros">
+        <article class="financeiro-v2-kpi-card is-warning">
+            <div class="financeiro-v2-kpi-top">
+                <span>Pendentes</span>
+                <b>Cobrança</b>
             </div>
-            <div>
-                <a asp-action="Atrasados" class="btn btn-outline-danger">Ver atrasados</a>
+            <strong>@Model.Pendentes</strong>
+            <small>Mensalidades aguardando pagamento.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card is-danger">
+            <div class="financeiro-v2-kpi-top">
+                <span>Atrasadas</span>
+                <b>Prioridade</b>
             </div>
+            <strong>@Model.Atrasadas</strong>
+            <small>@itensCriticos registro(s) crítico(s) nesta página.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card is-success">
+            <div class="financeiro-v2-kpi-top">
+                <span>Recebido</span>
+                <b>Mês</b>
+            </div>
+            <strong>@Model.ValorRecebidoMes.ToString("C")</strong>
+            <small>Entradas confirmadas no período.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card">
+            <div class="financeiro-v2-kpi-top">
+                <span>Em aberto</span>
+                <b>Exposição</b>
+            </div>
+            <strong>@Model.ValorEmAberto.ToString("C")</strong>
+            <small>Total financeiro ainda não recebido.</small>
+        </article>
+    </section>
+
+    <section class="financeiro-v2-filter-card mb-4">
+        <div class="financeiro-v2-filter-area">
+            <div>
+                <div class="financeiro-v2-card-heading">
+                    <span class="financeiro-v2-eyebrow">Filtros</span>
+                    <h2>Encontrar mensalidade</h2>
+                    <p>Busque por aluno e filtre por status da mensalidade.</p>
+                </div>
+
+                <form asp-action="Index" method="get" class="financeiro-v2-filter-grid">
+                    <div class="financeiro-v2-field financeiro-v2-field-search">
+                        <label asp-for="BuscaAluno">Buscar aluno</label>
+                        <input asp-for="BuscaAluno"
+                               type="search"
+                               class="form-control financeiro-v2-control"
+                               placeholder="Digite nome, CPF ou telefone"
+                               autocomplete="off"
+                               inputmode="search" />
+                    </div>
+
+                    <div class="financeiro-v2-field">
+                        <label asp-for="StatusFiltro">Status</label>
+                        <select asp-for="StatusFiltro" class="form-select financeiro-v2-control">
+                            <option value="">Todos os status</option>
+                            @foreach (var status in Enum.GetValues<StatusMensalidadeEnum>())
+                            {
+                                if (Model.StatusFiltro == status)
+                                {
+                                    <option value="@status" selected>@StatusMensalidadeTexto(status)</option>
+                                }
+                                else
+                                {
+                                    <option value="@status">@StatusMensalidadeTexto(status)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="financeiro-v2-field">
+                        <label asp-for="TamanhoPagina">Registros</label>
+                        <select asp-for="TamanhoPagina" name="tamanhoPagina" class="form-select financeiro-v2-control">
+                            @if (Model.TamanhoPagina == 10)
+                            {
+                                <option value="10" selected>10 por página</option>
+                            }
+                            else
+                            {
+                                <option value="10">10 por página</option>
+                            }
+
+                            @if (Model.TamanhoPagina == 20)
+                            {
+                                <option value="20" selected>20 por página</option>
+                            }
+                            else
+                            {
+                                <option value="20">20 por página</option>
+                            }
+
+                            @if (Model.TamanhoPagina == 30)
+                            {
+                                <option value="30" selected>30 por página</option>
+                            }
+                            else
+                            {
+                                <option value="30">30 por página</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="financeiro-v2-filter-actions">
+                        <button type="submit" class="btn financeiro-v2-btn financeiro-v2-btn-primary">Aplicar filtros</button>
+                        <a asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Limpar</a>
+                    </div>
+                </form>
+
+                @if (filtrosAplicados)
+                {
+                    <div class="financeiro-v2-active-filters">
+                        @if (!string.IsNullOrWhiteSpace(Model.BuscaAluno))
+                        {
+                            <span>Busca: <strong>@Model.BuscaAluno</strong></span>
+                        }
+                        @if (Model.StatusFiltro.HasValue)
+                        {
+                            <span>Status: <strong>@StatusMensalidadeTexto(Model.StatusFiltro.Value)</strong></span>
+                        }
+                    </div>
+                }
+            </div>
+
+            @if (canFinanceiroCreate)
+            {
+                <form asp-action="GerarMensalidades" method="post" class="financeiro-v2-generation-card">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                    <span class="financeiro-v2-eyebrow">Competência</span>
+                    <h2>Gerar mensalidades</h2>
+                    <p>Cria cobranças para o mês selecionado sem duplicar registros existentes.</p>
+
+                    <div class="financeiro-v2-generation-grid">
+                        <div class="financeiro-v2-field">
+                            <label for="mesCompetenciaGeracao">Mês</label>
+                            <input id="mesCompetenciaGeracao"
+                                   type="number"
+                                   name="mesCompetenciaGeracao"
+                                   min="1"
+                                   max="12"
+                                   class="form-control financeiro-v2-control"
+                                   placeholder="Ex.: 5"
+                                   value="@Model.MesCompetenciaGeracao" />
+                        </div>
+                        <div class="financeiro-v2-field">
+                            <label for="anoCompetenciaGeracao">Ano</label>
+                            <input id="anoCompetenciaGeracao"
+                                   type="number"
+                                   name="anoCompetenciaGeracao"
+                                   min="2000"
+                                   max="2100"
+                                   class="form-control financeiro-v2-control"
+                                   placeholder="Ex.: 2026"
+                                   value="@Model.AnoCompetenciaGeracao" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn financeiro-v2-btn financeiro-v2-btn-primary w-100">Gerar mensalidades</button>
+                </form>
+            }
         </div>
+    </section>
+
+    <section class="financeiro-v2-table-panel">
+        <div class="financeiro-v2-panel-heading">
+            <div>
+                <span class="financeiro-v2-eyebrow">Mensalidades</span>
+                <h2>Lista financeira</h2>
+                <p>Exibindo @primeiroRegistro-@ultimoRegistro de @Model.TotalRegistros registro(s).</p>
+            </div>
+            <a asp-action="Atrasados" class="btn financeiro-v2-btn financeiro-v2-btn-danger">Ver atrasados</a>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 financeiro-table">
+            <table class="table financeiro-v2-table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Aluno</th>
@@ -190,10 +337,10 @@
                     @if (Model.Mensalidades.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="financeiro-empty-state">
-                                    <h4>Nenhuma mensalidade encontrada</h4>
-                                    <p class="mb-0">Revise os filtros aplicados ou gere mensalidades para a competência desejada.</p>
+                            <td colspan="8">
+                                <div class="financeiro-v2-empty-state">
+                                    <strong>Nenhuma mensalidade encontrada.</strong>
+                                    <span>Revise os filtros aplicados ou gere mensalidades para a competência desejada.</span>
                                 </div>
                             </td>
                         </tr>
@@ -202,62 +349,86 @@
                     {
                         @foreach (var item in Model.Mensalidades)
                         {
+                            var vencimentoClasse = VencimentoClasse(item.DataVencimento, item.Status, hoje);
+                            var valorFinalFormatado = item.ValorFinal.ToString("0.00", culturaInvariante);
+
                             <tr>
                                 <td>
-                                    <a asp-action="HistoricoAluno" asp-route-alunoId="@item.AlunoId" class="text-decoration-none fw-semibold">@item.Aluno</a>
+                                    <div class="financeiro-v2-student-cell">
+                                        <span>@InicialAluno(item.Aluno)</span>
+                                        <div>
+                                            <a asp-action="HistoricoAluno" asp-route-alunoId="@item.AlunoId">@item.Aluno</a>
+                                            <small>Mensalidade #@item.MensalidadeId</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>@item.Competencia.ToString("MM/yyyy")</td>
-                                <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
-                                <td><span class="@MensalidadeStatusClass(item.Status)">@item.Status</span></td>
+                                <td>
+                                    <div class="financeiro-v2-date-cell">
+                                        <strong>@item.DataVencimento.ToString("dd/MM/yyyy")</strong>
+                                        <span class="financeiro-v2-due-pill @vencimentoClasse">@VencimentoTexto(item.DataVencimento, item.Status, hoje)</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="financeiro-v2-status-pill @StatusMensalidadeClasse(item.Status)">
+                                        @StatusMensalidadeTexto(item.Status)
+                                    </span>
+                                </td>
                                 <td class="text-end">@item.ValorBase.ToString("C")</td>
                                 <td class="text-end">
                                     @if (canFinanceiroEdit)
                                     {
-                                        <form asp-action="AtualizarValorFinal" method="post" class="d-inline-flex gap-1 justify-content-end financeiro-inline-form">
+                                        <form asp-action="AtualizarValorFinal" method="post" class="financeiro-v2-inline-form">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="mensalidadeId" value="@item.MensalidadeId" />
                                             <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                            <input type="number" name="valorFinal" step="0.01" min="0" class="form-control form-control-sm text-end" value="@item.ValorFinal" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Salvar</button>
+                                            <input type="number"
+                                                   name="valorFinal"
+                                                   step="0.01"
+                                                   min="0"
+                                                   class="form-control financeiro-v2-control text-end"
+                                                   aria-label="Valor final da mensalidade de @item.Aluno"
+                                                   value="@valorFinalFormatado" />
+                                            <button type="submit" class="btn financeiro-v2-btn-table">Salvar</button>
                                         </form>
                                     }
                                     else
                                     {
-                                        @item.ValorFinal.ToString("C")
+                                        <strong>@item.ValorFinal.ToString("C")</strong>
                                     }
                                 </td>
                                 <td>@(item.DataPagamento.HasValue ? item.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
                                 <td class="text-end">
-                                    <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                    <div class="financeiro-v2-row-actions">
                                         @if (canFinanceiroCreate)
                                         {
                                             <a asp-action="RegistrarPagamento"
                                                asp-route-mensalidadeId="@item.MensalidadeId"
                                                asp-route-returnUrl="@returnUrl"
-                                               class="btn btn-sm btn-outline-primary">
+                                               class="btn financeiro-v2-btn-table financeiro-v2-btn-table-primary">
                                                 Registrar
                                             </a>
                                         }
                                         @if (canFinanceiroEdit)
                                         {
-                                            <form asp-action="AlterarStatusMensalidade" method="post" class="d-inline-flex gap-1 financeiro-inline-form">
+                                            <form asp-action="AlterarStatusMensalidade" method="post" class="financeiro-v2-status-form">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="mensalidadeId" value="@item.MensalidadeId" />
                                                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                                <select name="status" class="form-select form-select-sm">
+                                                <select name="status" class="form-select financeiro-v2-control" aria-label="Alterar status da mensalidade de @item.Aluno">
                                                     @foreach (var status in Enum.GetValues<StatusMensalidadeEnum>())
                                                     {
                                                         if (item.Status == status)
                                                         {
-                                                            <option value="@status" selected>@status</option>
+                                                            <option value="@status" selected>@StatusMensalidadeTexto(status)</option>
                                                         }
                                                         else
                                                         {
-                                                            <option value="@status">@status</option>
+                                                            <option value="@status">@StatusMensalidadeTexto(status)</option>
                                                         }
                                                     }
                                                 </select>
-                                                <button type="submit" class="btn btn-sm btn-outline-dark">OK</button>
+                                                <button type="submit" class="btn financeiro-v2-btn-table">OK</button>
                                             </form>
                                         }
                                         @if (!canFinanceiroCreate && !canFinanceiroEdit)
@@ -276,8 +447,8 @@
 
     @if (totalPaginas > 1)
     {
-        <nav class="mt-3" aria-label="Paginação de mensalidades">
-            <ul class="pagination pagination-sm mb-0 justify-content-end">
+        <nav class="financeiro-v2-pagination" aria-label="Paginação de mensalidades">
+            <ul class="pagination pagination-sm mb-0">
                 <li class="page-item @(paginaAtual <= 1 ? "disabled" : string.Empty)">
                     <a class="page-link"
                        asp-action="Index"

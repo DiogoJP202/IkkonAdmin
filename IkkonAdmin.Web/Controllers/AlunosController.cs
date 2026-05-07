@@ -84,12 +84,12 @@ public class AlunosController(IAlunoService alunoService) : Controller
 
         if (model.CPF.Length != 11)
         {
-            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF valido com 11 digitos.");
+            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF válido com 11 dígitos.");
         }
 
         if (await alunoService.ExisteCpfAsync(model.CPF, cancellationToken: cancellationToken))
         {
-            ModelState.AddModelError(nameof(model.CPF), "Ja existe um aluno cadastrado com este CPF.");
+            ModelState.AddModelError(nameof(model.CPF), "Já existe um aluno cadastrado com este CPF.");
         }
 
         if (!ModelState.IsValid)
@@ -168,12 +168,12 @@ public class AlunosController(IAlunoService alunoService) : Controller
 
         if (model.CPF.Length != 11)
         {
-            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF valido com 11 digitos.");
+            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF válido com 11 dígitos.");
         }
 
         if (await alunoService.ExisteCpfAsync(model.CPF, model.Id, cancellationToken))
         {
-            ModelState.AddModelError(nameof(model.CPF), "Ja existe um aluno cadastrado com este CPF.");
+            ModelState.AddModelError(nameof(model.CPF), "Já existe um aluno cadastrado com este CPF.");
         }
 
         if (!ModelState.IsValid)

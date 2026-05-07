@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using IkkonAdmin.Web.Enums;
 
 namespace IkkonAdmin.Web.Models.ViewModels;

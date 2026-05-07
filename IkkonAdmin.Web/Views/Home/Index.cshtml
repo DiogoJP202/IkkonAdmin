@@ -6,7 +6,7 @@
     {
         new { Valor = 1, Nome = "Janeiro" },
         new { Valor = 2, Nome = "Fevereiro" },
-        new { Valor = 3, Nome = "Mar&ccedil;o" },
+        new { Valor = 3, Nome = "Março" },
         new { Valor = 4, Nome = "Abril" },
         new { Valor = 5, Nome = "Maio" },
         new { Valor = 6, Nome = "Junho" },
@@ -21,340 +21,447 @@
     var anos = Enumerable.Range(Model.AnoReferencia - 1, 3);
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var pendenciasCriticas = Model.Inadimplentes.Count(x => x.MaiorDiasAtraso >= 15);
+    var vencemHoje = Model.ProximosVencimentos.Count(x => x.DiasParaVencimento == 0);
+    var vencemAteTresDias = Model.ProximosVencimentos.Count(x => x.DiasParaVencimento >= 0 && x.DiasParaVencimento <= 3);
+    var totalAbertoCompetencia = Model.ProximosVencimentos.Sum(x => x.Valor);
+    var culturaPtBr = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
 }
 
-<div class="dashboard-page">
-    <section class="dashboard-hero card border-0 mb-3">
-        <div class="card-body p-3 p-lg-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-12 col-xl-7">
-                    <div class="dashboard-eyebrow">Central operacional</div>
-                    <h2 class="dashboard-title mb-2">Vis&atilde;o financeira e acad&ecirc;mica da escola</h2>
-                    <p class="dashboard-subtitle mb-3">
-                        Monitor de cobran&ccedil;as, alunos que exigem aten&ccedil;&atilde;o e atividades recentes.
-                    </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="dashboard-chip dashboard-chip-neutral">Compet&ecirc;ncia: @Model.MesAnoReferenciaDescricao</span>
-                        <span class="dashboard-chip dashboard-chip-attention">Inadimplentes: @Model.QuantidadeAlunosInadimplentes</span>
-                        <span class="dashboard-chip dashboard-chip-critical">Pend&ecirc;ncias cr&iacute;ticas: @pendenciasCriticas</span>
-                    </div>
-                </div>
-                <div class="col-12 col-xl-5">
-                    <form asp-action="Index" method="get" class="dashboard-filter-box">
-                        <div class="row g-2">
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label mb-1">M&ecirc;s de refer&ecirc;ncia</label>
-                                <select name="mesReferencia" class="form-select form-select-sm">
-                                    @foreach (var mes in meses)
-                                    {
-                                        if (mes.Valor == Model.MesReferencia)
-                                        {
-                                            <option value="@mes.Valor" selected>@Html.Raw(mes.Nome)</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@mes.Valor">@Html.Raw(mes.Nome)</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <label class="form-label mb-1">Ano</label>
-                                <select name="anoReferencia" class="form-select form-select-sm">
-                                    @foreach (var ano in anos)
-                                    {
-                                        if (ano == Model.AnoReferencia)
-                                        {
-                                            <option value="@ano" selected>@ano</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@ano">@ano</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label mb-1">Turma</label>
-                                <select name="turmaId" class="form-select form-select-sm">
-                                    <option value="">Todas as turmas</option>
-                                    @foreach (var turma in Model.TurmasDisponiveis)
-                                    {
-                                        if (Model.TurmaIdFiltro.HasValue && turma.Id == Model.TurmaIdFiltro.Value)
-                                        {
-                                            <option value="@turma.Id" selected>@turma.Nome</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@turma.Id">@turma.Nome</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-12 d-grid">
-                                <button type="submit" class="btn btn-sm btn-primary">Aplicar filtros</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+@functions {
+    private static string VencimentoClasse(int diasParaVencimento, StatusMensalidadeEnum status)
+    {
+        if (diasParaVencimento < 0 || status == StatusMensalidadeEnum.Atrasado)
+        {
+            return "is-overdue";
+        }
+
+        if (diasParaVencimento == 0)
+        {
+            return "is-today";
+        }
+
+        if (diasParaVencimento <= 3)
+        {
+            return "is-soon";
+        }
+
+        return "is-open";
+    }
+
+    private static string VencimentoTexto(int diasParaVencimento, StatusMensalidadeEnum status)
+    {
+        if (diasParaVencimento < 0 || status == StatusMensalidadeEnum.Atrasado)
+        {
+            var dias = Math.Abs(diasParaVencimento);
+            return $"{dias} {(dias == 1 ? "dia" : "dias")} em atraso";
+        }
+
+        if (diasParaVencimento == 0)
+        {
+            return "Vence hoje";
+        }
+
+        if (diasParaVencimento == 1)
+        {
+            return "Vence amanhã";
+        }
+
+        return $"Vence em {diasParaVencimento} dias";
+    }
+
+    private static string RiscoClasse(int maiorDiasAtraso)
+    {
+        if (maiorDiasAtraso >= 30)
+        {
+            return "is-critical";
+        }
+
+        if (maiorDiasAtraso >= 10)
+        {
+            return "is-attention";
+        }
+
+        return "is-moderate";
+    }
+
+    private static string InicialAluno(string nome)
+    {
+        return string.IsNullOrWhiteSpace(nome)
+            ? "A"
+            : nome.Trim()[0].ToString().ToUpperInvariant();
+    }
+}
+
+<div class="dashboard-v2-page">
+    <section class="dashboard-v2-hero mb-4">
+        <div class="dashboard-v2-hero-copy">
+            <span class="dashboard-v2-eyebrow">Central operacional</span>
+            <h1>Dashboard administrativo</h1>
+            <p>
+                Acompanhe alunos, mensalidades, inadimplência e atividades recentes em uma visão direta para a rotina da escola.
+            </p>
+
+            <div class="dashboard-v2-meta">
+                <span>Competência <strong>@Model.MesAnoReferenciaDescricao</strong></span>
+                <span>Inadimplentes <strong>@Model.QuantidadeAlunosInadimplentes</strong></span>
+                <span>Pendências críticas <strong>@pendenciasCriticas</strong></span>
             </div>
         </div>
-    </section>
 
-    <section class="row g-2 g-lg-3 mb-3">
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-            <a asp-controller="Financeiro"
-               asp-action="RegistrarPagamento"
-               asp-route-returnUrl="@returnUrl"
-               class="dashboard-action-link">
-                Registrar pagamento
-            </a>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-            <a asp-controller="Financeiro" asp-action="Index" class="dashboard-action-link">
-                Abrir financeiro
-            </a>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-            <form asp-controller="Financeiro" asp-action="GerarMensalidades" method="post" class="h-100">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="anoCompetenciaGeracao" value="@Model.AnoReferencia" />
-                <input type="hidden" name="mesCompetenciaGeracao" value="@Model.MesReferencia" />
-                <input type="hidden" name="returnUrl" value="@returnUrl" />
-                <button type="submit" class="dashboard-action-link dashboard-action-button">
-                    Gerar mensalidades
-                </button>
-            </form>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-            <a asp-controller="Alunos" asp-action="Create" class="dashboard-action-link">
-                Cadastrar aluno
-            </a>
-        </div>
-    </section>
+        <form asp-action="Index" method="get" class="dashboard-v2-filter-card">
+            <div class="dashboard-v2-filter-heading">
+                <strong>Filtros do painel</strong>
+                <span>Refine a operação por competência e turma.</span>
+            </div>
 
-    <section class="row g-3 mb-3">
-        <div class="col-12 col-sm-6 col-xl-3">
-            <article class="dashboard-kpi dashboard-kpi-neutral">
-                <div class="dashboard-kpi-label">Alunos ativos</div>
-                <div class="dashboard-kpi-value">@Model.QuantidadeAlunosAtivos</div>
-                <div class="dashboard-kpi-foot">Base operacional ativa</div>
-            </article>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <article class="dashboard-kpi dashboard-kpi-warning">
-                <div class="dashboard-kpi-label">Pendentes da compet&ecirc;ncia</div>
-                <div class="dashboard-kpi-value">@Model.MensalidadesPendentes</div>
-                <div class="dashboard-kpi-foot">Compet&ecirc;ncia @Model.MesAnoReferenciaDescricao</div>
-            </article>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <article class="dashboard-kpi dashboard-kpi-danger">
-                <div class="dashboard-kpi-label">Mensalidades atrasadas</div>
-                <div class="dashboard-kpi-value">@Model.MensalidadesAtrasadas</div>
-                <div class="dashboard-kpi-foot">@Model.QuantidadeAlunosInadimplentes aluno(s) com atraso</div>
-            </article>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-3">
-            <article class="dashboard-kpi dashboard-kpi-success">
-                <div class="dashboard-kpi-label">Receita recebida no m&ecirc;s</div>
-                <div class="dashboard-kpi-value">@Model.ReceitaRecebidaNoMes.ToString("C")</div>
-                <div class="dashboard-kpi-foot">Total em atraso: @Model.TotalEmAtraso.ToString("C")</div>
-            </article>
-        </div>
-    </section>
-
-    <section class="row g-3 mb-3">
-        <div class="col-12 col-xxl-8">
-            <div class="card dashboard-panel h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="dashboard-panel-title mb-1">Agenda de cobran&ccedil;a</h3>
-                        <p class="dashboard-panel-subtitle mb-0">Itens pendentes e atrasados da compet&ecirc;ncia selecionada.</p>
-                    </div>
-                    <a asp-controller="Financeiro" asp-action="Index" class="btn btn-sm btn-outline-secondary">Ver financeiro</a>
-                </div>
-                <div class="table-responsive">
-                    <table class="table dashboard-table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Turma</th>
-                                <th>Vencimento</th>
-                                <th class="text-end">Valor</th>
-                                <th>Status</th>
-                                <th class="text-end">A&ccedil;&otilde;es</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.ProximosVencimentos.Count == 0)
+            <div class="dashboard-v2-filter-grid">
+                <div class="dashboard-v2-field">
+                    <label for="mesReferencia">Mês de referência</label>
+                    <select id="mesReferencia" name="mesReferencia" class="form-select dashboard-v2-control" aria-label="Mês de referência">
+                        @foreach (var mes in meses)
+                        {
+                            if (mes.Valor == Model.MesReferencia)
                             {
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">Nenhuma cobran&ccedil;a em aberto para a compet&ecirc;ncia selecionada.</td>
-                                </tr>
+                                <option value="@mes.Valor" selected>@mes.Nome</option>
                             }
                             else
                             {
-                                @foreach (var item in Model.ProximosVencimentos)
-                                {
-                                    var situacaoClasse = item.DiasParaVencimento < 0 || item.Status == StatusMensalidadeEnum.Atrasado
-                                        ? "badge text-bg-danger"
-                                        : item.DiasParaVencimento <= 3
-                                            ? "badge text-bg-warning"
-                                            : "badge text-bg-info";
-
-                                    var situacaoTexto = item.DiasParaVencimento < 0
-                                        ? $"{Math.Abs(item.DiasParaVencimento)} dia(s) em atraso"
-                                        : item.DiasParaVencimento == 0
-                                            ? "Vence hoje"
-                                            : $"Vence em {item.DiasParaVencimento} dia(s)";
-
-                                    <tr>
-                                        <td>
-                                            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="fw-semibold text-decoration-none">@item.Aluno</a>
-                                        </td>
-                                        <td>@(item.Turma ?? "-")</td>
-                                        <td>@item.Vencimento.ToString("dd/MM/yyyy")</td>
-                                        <td class="text-end">@item.Valor.ToString("C")</td>
-                                        <td><span class="@situacaoClasse">@situacaoTexto</span></td>
-                                        <td class="text-end">
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="btn btn-outline-secondary">Aluno</a>
-                                                <a asp-controller="Financeiro"
-                                                   asp-action="RegistrarPagamento"
-                                                   asp-route-mensalidadeId="@item.MensalidadeId"
-                                                   asp-route-returnUrl="@returnUrl"
-                                                   class="btn btn-outline-primary">Registrar</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
+                                <option value="@mes.Valor">@mes.Nome</option>
                             }
-                        </tbody>
-                    </table>
+                        }
+                    </select>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-12 col-xxl-4">
-            <div class="card dashboard-panel h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="dashboard-panel-title mb-1">Alunos que exigem aten&ccedil;&atilde;o</h3>
-                        <p class="dashboard-panel-subtitle mb-0">Priorize os maiores riscos de inadimpl&ecirc;ncia.</p>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.Inadimplentes.Count == 0)
-                    {
-                        <div class="p-4 text-muted text-center">N&atilde;o h&aacute; inadimplentes para o filtro atual.</div>
-                    }
-                    else
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var item in Model.Inadimplentes)
+                <div class="dashboard-v2-field">
+                    <label for="anoReferencia">Ano</label>
+                    <select id="anoReferencia" name="anoReferencia" class="form-select dashboard-v2-control" aria-label="Ano de referência">
+                        @foreach (var ano in anos)
+                        {
+                            if (ano == Model.AnoReferencia)
                             {
-                                var riscoClasse = item.MaiorDiasAtraso >= 30
-                                    ? "dashboard-risk-critical"
-                                    : item.MaiorDiasAtraso >= 10
-                                        ? "dashboard-risk-attention"
-                                        : "dashboard-risk-moderate";
-
-                                <li class="list-group-item dashboard-risk-item @riscoClasse">
-                                    <div class="d-flex justify-content-between align-items-start gap-2">
-                                        <div>
-                                            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="fw-semibold text-decoration-none">@item.Aluno</a>
-                                            <div class="small text-muted">
-                                                Turma: @(item.Turma ?? "-") | @item.QuantidadeMensalidades mensalidade(s) em aberto
-                                            </div>
-                                        </div>
-                                        <span class="badge text-bg-light border">@item.MaiorDiasAtraso d</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <strong>@item.TotalEmAberto.ToString("C")</strong>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-controller="Financeiro" asp-action="HistoricoAluno" asp-route-alunoId="@item.AlunoId" class="btn btn-outline-secondary">Hist&oacute;rico</a>
-                                            <a asp-controller="Financeiro"
-                                               asp-action="RegistrarPagamento"
-                                               asp-route-returnUrl="@returnUrl"
-                                               class="btn btn-outline-primary">Cobrar</a>
-                                        </div>
-                                    </div>
-                                </li>
+                                <option value="@ano" selected>@ano</option>
                             }
-                        </ul>
-                    }
+                            else
+                            {
+                                <option value="@ano">@ano</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="dashboard-v2-field dashboard-v2-field-wide">
+                    <label for="turmaId">Turma</label>
+                    <select id="turmaId" name="turmaId" class="form-select dashboard-v2-control" aria-label="Filtrar por turma">
+                        <option value="">Todas as turmas</option>
+                        @foreach (var turma in Model.TurmasDisponiveis)
+                        {
+                            if (Model.TurmaIdFiltro.HasValue && turma.Id == Model.TurmaIdFiltro.Value)
+                            {
+                                <option value="@turma.Id" selected>@turma.Nome</option>
+                            }
+                            else
+                            {
+                                <option value="@turma.Id">@turma.Nome</option>
+                            }
+                        }
+                    </select>
                 </div>
             </div>
-        </div>
+
+            <button type="submit" class="btn dashboard-v2-btn dashboard-v2-btn-primary w-100">
+                Aplicar filtros
+            </button>
+        </form>
     </section>
 
-    <section class="row g-3">
-        <div class="col-12 col-xxl-7">
-            <div class="card dashboard-panel h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="dashboard-panel-title mb-1">Atividades recentes</h3>
-                        <p class="dashboard-panel-subtitle mb-0">&Uacute;ltimos eventos registrados no hist&oacute;rico dos alunos.</p>
-                    </div>
+    <section class="dashboard-v2-actions mb-4" aria-label="Ações rápidas">
+        <a asp-controller="Financeiro"
+           asp-action="RegistrarPagamento"
+           asp-route-returnUrl="@returnUrl"
+           class="dashboard-v2-action-card">
+            <span>Pagamento</span>
+            <strong>Registrar pagamento</strong>
+            <small>Baixe mensalidades manualmente.</small>
+        </a>
+
+        <a asp-controller="Financeiro" asp-action="Index" class="dashboard-v2-action-card">
+            <span>Financeiro</span>
+            <strong>Abrir financeiro</strong>
+            <small>Consulte cobranças e histórico.</small>
+        </a>
+
+        <form asp-controller="Financeiro" asp-action="GerarMensalidades" method="post" class="dashboard-v2-action-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="anoCompetenciaGeracao" value="@Model.AnoReferencia" />
+            <input type="hidden" name="mesCompetenciaGeracao" value="@Model.MesReferencia" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="dashboard-v2-action-card dashboard-v2-action-button">
+                <span>Competência</span>
+                <strong>Gerar mensalidades</strong>
+                <small>Crie cobranças para o mês selecionado.</small>
+            </button>
+        </form>
+
+        <a asp-controller="Alunos" asp-action="Create" class="dashboard-v2-action-card">
+            <span>Alunos</span>
+            <strong>Cadastrar aluno</strong>
+            <small>Inclua um novo aluno na base.</small>
+        </a>
+    </section>
+
+    <section class="dashboard-v2-kpi-grid mb-4" aria-label="Indicadores principais">
+        <article class="dashboard-v2-kpi-card">
+            <div class="dashboard-v2-kpi-top">
+                <span>Alunos ativos</span>
+                <b>Base</b>
+            </div>
+            <strong>@Model.QuantidadeAlunosAtivos</strong>
+            <small>Alunos em operação na escola.</small>
+        </article>
+
+        <article class="dashboard-v2-kpi-card is-warning">
+            <div class="dashboard-v2-kpi-top">
+                <span>Pendentes</span>
+                <b>@Model.MesAnoReferenciaDescricao</b>
+            </div>
+            <strong>@Model.MensalidadesPendentes</strong>
+            <small>@totalAbertoCompetencia.ToString("C") em cobranças abertas.</small>
+        </article>
+
+        <article class="dashboard-v2-kpi-card is-danger">
+            <div class="dashboard-v2-kpi-top">
+                <span>Atrasadas</span>
+                <b>Prioridade</b>
+            </div>
+            <strong>@Model.MensalidadesAtrasadas</strong>
+            <small>@Model.QuantidadeAlunosInadimplentes aluno(s) com atraso.</small>
+        </article>
+
+        <article class="dashboard-v2-kpi-card is-success">
+            <div class="dashboard-v2-kpi-top">
+                <span>Receita recebida</span>
+                <b>Mês</b>
+            </div>
+            <strong>@Model.ReceitaRecebidaNoMes.ToString("C")</strong>
+            <small>Total em atraso: @Model.TotalEmAtraso.ToString("C").</small>
+        </article>
+    </section>
+
+    <section class="dashboard-v2-main-grid mb-4">
+        <div class="dashboard-v2-panel dashboard-v2-panel-large">
+            <div class="dashboard-v2-panel-heading">
+                <div>
+                    <span class="dashboard-v2-eyebrow">Cobranças</span>
+                    <h2>Agenda de cobrança</h2>
+                    <p>@vencemHoje vencendo hoje, @vencemAteTresDias vencendo em até 3 dias.</p>
                 </div>
-                <ul class="list-group list-group-flush">
-                    @if (Model.AtividadesRecentes.Count == 0)
-                    {
-                        <li class="list-group-item text-muted">Sem atividades recentes para os filtros aplicados.</li>
-                    }
-                    else
-                    {
-                        @foreach (var item in Model.AtividadesRecentes)
+                <a asp-controller="Financeiro" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">
+                    Ver financeiro
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table dashboard-v2-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Turma</th>
+                            <th>Vencimento</th>
+                            <th class="text-end">Valor</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ProximosVencimentos.Count == 0)
                         {
-                            <li class="list-group-item dashboard-activity-item">
-                                <div class="d-flex justify-content-between align-items-start gap-2">
-                                    <div>
-                                        <span class="dashboard-activity-tag">@item.TipoEvento</span>
-                                        <div class="mt-1">@item.Descricao</div>
+                            <tr>
+                                <td colspan="6">
+                                    <div class="dashboard-v2-empty-state">
+                                        <strong>Nenhuma cobrança em aberto.</strong>
+                                        <span>Os filtros atuais não retornaram mensalidades pendentes ou atrasadas.</span>
                                     </div>
-                                    <small class="text-muted text-nowrap">@item.Data.ToString("dd/MM/yyyy HH:mm")</small>
-                                </div>
-                            </li>
+                                </td>
+                            </tr>
                         }
-                    }
-                </ul>
+                        else
+                        {
+                            @foreach (var item in Model.ProximosVencimentos)
+                            {
+                                var vencimentoClasse = VencimentoClasse(item.DiasParaVencimento, item.Status);
+
+                                <tr>
+                                    <td>
+                                        <div class="dashboard-v2-student-cell">
+                                            <span>@InicialAluno(item.Aluno)</span>
+                                            <div>
+                                                <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId">@item.Aluno</a>
+                                                <small>Mensalidade #@item.MensalidadeId</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@(item.Turma ?? "Sem turma")</td>
+                                    <td>
+                                        <div class="dashboard-v2-date-cell">
+                                            <strong>@item.Vencimento.ToString("dd/MM/yyyy")</strong>
+                                            <small>@item.Vencimento.ToString("dddd", culturaPtBr)</small>
+                                        </div>
+                                    </td>
+                                    <td class="text-end fw-bold">@item.Valor.ToString("C")</td>
+                                    <td>
+                                        <span class="dashboard-v2-due-pill @vencimentoClasse">
+                                            @VencimentoTexto(item.DiasParaVencimento, item.Status)
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="dashboard-v2-row-actions">
+                                            <a asp-controller="Alunos"
+                                               asp-action="Details"
+                                               asp-route-id="@item.AlunoId"
+                                               class="btn dashboard-v2-btn-table">
+                                                Aluno
+                                            </a>
+                                            <a asp-controller="Financeiro"
+                                               asp-action="RegistrarPagamento"
+                                               asp-route-mensalidadeId="@item.MensalidadeId"
+                                               asp-route-returnUrl="@returnUrl"
+                                               class="btn dashboard-v2-btn-table dashboard-v2-btn-table-primary">
+                                                Registrar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="col-12 col-xxl-5">
-            <div class="card dashboard-panel h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="dashboard-panel-title mb-1">Prioridades do turno</h3>
-                        <p class="dashboard-panel-subtitle mb-0">Resumo r&aacute;pido para orientar a opera&ccedil;&atilde;o.</p>
-                    </div>
+        <aside class="dashboard-v2-panel">
+            <div class="dashboard-v2-panel-heading">
+                <div>
+                    <span class="dashboard-v2-eyebrow">Atenção</span>
+                    <h2>Inadimplência</h2>
+                    <p>Priorize alunos com maior atraso e valor em aberto.</p>
                 </div>
-                <div class="card-body">
-                    <ul class="dashboard-priority-list">
-                        <li class="dashboard-priority-item">
-                            <span class="dashboard-priority-dot dashboard-priority-danger"></span>
-                            @Model.MensalidadesAtrasadas mensalidade(s) atrasada(s) para tratar imediatamente.
-                        </li>
-                        <li class="dashboard-priority-item">
-                            <span class="dashboard-priority-dot dashboard-priority-warning"></span>
-                            @Model.MensalidadesPendentes mensalidade(s) pendente(s) na compet&ecirc;ncia @Model.MesAnoReferenciaDescricao.
-                        </li>
-                        <li class="dashboard-priority-item">
-                            <span class="dashboard-priority-dot dashboard-priority-info"></span>
-                            Receita do m&ecirc;s em @Model.ReceitaRecebidaNoMes.ToString("C") e inadimpl&ecirc;ncia total em @Model.TotalEmAtraso.ToString("C").
-                        </li>
-                        <li class="dashboard-priority-item">
-                            <span class="dashboard-priority-dot dashboard-priority-success"></span>
-                            Base ativa atual: @Model.QuantidadeAlunosAtivos aluno(s).
-                        </li>
-                    </ul>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a asp-controller="Financeiro" asp-action="Atrasados" class="btn btn-sm btn-outline-danger">Ver atrasados</a>
-                        <a asp-controller="Admissoes" asp-action="Index" class="btn btn-sm btn-outline-secondary">Acompanhar admiss&otilde;es</a>
-                        <a asp-controller="Desligamentos" asp-action="Index" class="btn btn-sm btn-outline-secondary">Acompanhar desligamentos</a>
-                    </div>
+            </div>
+
+            @if (Model.Inadimplentes.Count == 0)
+            {
+                <div class="dashboard-v2-empty-state dashboard-v2-empty-compact">
+                    <strong>Sem inadimplentes no filtro.</strong>
+                    <span>A operação financeira está limpa para a seleção atual.</span>
                 </div>
+            }
+            else
+            {
+                <div class="dashboard-v2-risk-list">
+                    @foreach (var item in Model.Inadimplentes)
+                    {
+                        var riscoClasse = RiscoClasse(item.MaiorDiasAtraso);
+
+                        <article class="dashboard-v2-risk-card @riscoClasse">
+                            <div class="dashboard-v2-risk-header">
+                                <div>
+                                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId">@item.Aluno</a>
+                                    <small>@(item.Turma ?? "Sem turma") · @item.QuantidadeMensalidades mensalidade(s)</small>
+                                </div>
+                                <span>@item.MaiorDiasAtraso d</span>
+                            </div>
+                            <div class="dashboard-v2-risk-footer">
+                                <strong>@item.TotalEmAberto.ToString("C")</strong>
+                                <div class="dashboard-v2-row-actions">
+                                    <a asp-controller="Financeiro"
+                                       asp-action="HistoricoAluno"
+                                       asp-route-alunoId="@item.AlunoId"
+                                       class="btn dashboard-v2-btn-table">
+                                        Histórico
+                                    </a>
+                                    <a asp-controller="Financeiro"
+                                       asp-action="RegistrarPagamento"
+                                       asp-route-returnUrl="@returnUrl"
+                                       class="btn dashboard-v2-btn-table dashboard-v2-btn-table-primary">
+                                        Cobrar
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </aside>
+    </section>
+
+    <section class="dashboard-v2-bottom-grid">
+        <div class="dashboard-v2-panel">
+            <div class="dashboard-v2-panel-heading">
+                <div>
+                    <span class="dashboard-v2-eyebrow">Histórico</span>
+                    <h2>Atividades recentes</h2>
+                    <p>Últimos movimentos registrados na base de alunos.</p>
+                </div>
+            </div>
+
+            @if (Model.AtividadesRecentes.Count == 0)
+            {
+                <div class="dashboard-v2-empty-state dashboard-v2-empty-compact">
+                    <strong>Sem atividades recentes.</strong>
+                    <span>Nenhum evento foi registrado para os filtros aplicados.</span>
+                </div>
+            }
+            else
+            {
+                <div class="dashboard-v2-timeline">
+                    @foreach (var item in Model.AtividadesRecentes)
+                    {
+                        <article class="dashboard-v2-timeline-item">
+                            <span class="dashboard-v2-timeline-dot"></span>
+                            <div>
+                                <div class="dashboard-v2-timeline-meta">
+                                    <strong>@item.TipoEvento</strong>
+                                    <time>@item.Data.ToString("dd/MM/yyyy HH:mm")</time>
+                                </div>
+                                <p>@item.Descricao</p>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="dashboard-v2-priority-card">
+            <span class="dashboard-v2-eyebrow">Plano rápido</span>
+            <h2>Prioridades do turno</h2>
+            <p>Use este bloco para decidir o que tratar primeiro na operação diária.</p>
+
+            <ul>
+                <li>
+                    <span class="is-danger"></span>
+                    <strong>@Model.MensalidadesAtrasadas mensalidade(s) atrasada(s)</strong>
+                    <small>Tratar cobranças vencidas antes de novas rotinas administrativas.</small>
+                </li>
+                <li>
+                    <span class="is-warning"></span>
+                    <strong>@Model.MensalidadesPendentes pendente(s) na competência</strong>
+                    <small>Validar pagamentos recebidos e comprovantes enviados.</small>
+                </li>
+                <li>
+                    <span class="is-info"></span>
+                    <strong>@Model.TotalEmAtraso.ToString("C") em aberto</strong>
+                    <small>Acompanhar acordos, descontos e casos recorrentes.</small>
+                </li>
+                <li>
+                    <span class="is-success"></span>
+                    <strong>@Model.QuantidadeAlunosAtivos aluno(s) ativo(s)</strong>
+                    <small>Base atual para mensalidades e planejamento de turmas.</small>
+                </li>
+            </ul>
+
+            <div class="dashboard-v2-priority-actions">
+                <a asp-controller="Financeiro" asp-action="Atrasados" class="btn dashboard-v2-btn dashboard-v2-btn-danger">Ver atrasados</a>
+                <a asp-controller="Admissoes" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">Admissões</a>
+                <a asp-controller="Desligamentos" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">Desligamentos</a>
             </div>
         </div>
     </section>

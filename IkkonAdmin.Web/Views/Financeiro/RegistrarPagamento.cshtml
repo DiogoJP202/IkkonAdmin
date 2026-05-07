@@ -1,116 +1,251 @@
 @model RegistrarPagamentoViewModel
 @{
     ViewData["Title"] = "Registrar Pagamento";
+    var possuiContexto = !string.IsNullOrWhiteSpace(Model.AlunoNome);
 }
 
-<div class="financeiro-page">
-    @if (!string.IsNullOrWhiteSpace(Model.AlunoNome))
+@functions {
+    private static string StatusMensalidadeTexto(StatusMensalidadeEnum? status)
     {
-        <section class="card financeiro-profile-card mb-3">
-            <div class="card-body p-3 p-lg-4">
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <span class="financeiro-data-label">Aluno</span>
-                        <strong class="financeiro-data-value">@Model.AlunoNome</strong>
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <span class="financeiro-data-label">Competência</span>
-                        <strong class="financeiro-data-value">@(Model.Competencia?.ToString("MM/yyyy") ?? "-")</strong>
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <span class="financeiro-data-label">Vencimento</span>
-                        <strong class="financeiro-data-value">@(Model.DataVencimento?.ToString("dd/MM/yyyy") ?? "-")</strong>
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <span class="financeiro-data-label">Status</span>
-                        <strong class="financeiro-data-value">@(Model.StatusMensalidadeAtual?.ToString() ?? "-")</strong>
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <span class="financeiro-data-label">Valor atual</span>
-                        <strong class="financeiro-data-value">@(Model.ValorMensalidadeAtual?.ToString("C") ?? "-")</strong>
-                    </div>
+        return status switch
+        {
+            StatusMensalidadeEnum.Pendente => "Pendente",
+            StatusMensalidadeEnum.Pago => "Pago",
+            StatusMensalidadeEnum.Atrasado => "Atrasado",
+            StatusMensalidadeEnum.Cancelado => "Cancelado",
+            null => "-",
+            _ => status.ToString() ?? "-"
+        };
+    }
+
+    private static string StatusMensalidadeClasse(StatusMensalidadeEnum? status)
+    {
+        return status switch
+        {
+            StatusMensalidadeEnum.Pago => "is-success",
+            StatusMensalidadeEnum.Atrasado => "is-danger",
+            StatusMensalidadeEnum.Cancelado => "is-muted",
+            _ => "is-warning"
+        };
+    }
+
+    private static string FormaPagamentoTexto(FormaPagamentoEnum forma)
+    {
+        return forma switch
+        {
+            FormaPagamentoEnum.Pix => "Pix",
+            FormaPagamentoEnum.Transferencia => "Transferência",
+            FormaPagamentoEnum.Dinheiro => "Dinheiro",
+            FormaPagamentoEnum.Cartao => "Cartão",
+            FormaPagamentoEnum.Boleto => "Boleto",
+            _ => forma.ToString()
+        };
+    }
+}
+
+<div class="financeiro-v2-page">
+    <section class="financeiro-v2-form-hero mb-4">
+        <div>
+            <span class="financeiro-v2-eyebrow">Recebimento</span>
+            <h1>Registrar pagamento</h1>
+            <p>
+                Confirme mensalidade, valor e forma de pagamento antes de salvar. O registro marcará a mensalidade como paga.
+            </p>
+        </div>
+        <div class="financeiro-v2-hero-actions">
+            @if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
+            {
+                <a href="@Model.ReturnUrl" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Voltar</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Voltar ao financeiro</a>
+            }
+        </div>
+    </section>
+
+    @if (possuiContexto)
+    {
+        <section class="financeiro-v2-profile-card mb-4">
+            <div class="financeiro-v2-profile-main">
+                <div>
+                    <span class="financeiro-v2-eyebrow">Mensalidade selecionada</span>
+                    <h2>@Model.AlunoNome</h2>
+                    <p>Confira os dados da cobrança antes de lançar o recebimento.</p>
                 </div>
+            </div>
+
+            <div class="financeiro-v2-context-grid">
+                <article>
+                    <span>Competência</span>
+                    <strong>@(Model.Competencia?.ToString("MM/yyyy") ?? "-")</strong>
+                </article>
+                <article>
+                    <span>Vencimento</span>
+                    <strong>@(Model.DataVencimento?.ToString("dd/MM/yyyy") ?? "-")</strong>
+                </article>
+                <article>
+                    <span>Status</span>
+                    <strong>
+                        <span class="financeiro-v2-status-pill @StatusMensalidadeClasse(Model.StatusMensalidadeAtual)">
+                            @StatusMensalidadeTexto(Model.StatusMensalidadeAtual)
+                        </span>
+                    </strong>
+                </article>
+                <article>
+                    <span>Valor atual</span>
+                    <strong>@(Model.ValorMensalidadeAtual?.ToString("C") ?? "-")</strong>
+                </article>
             </div>
         </section>
     }
+    else
+    {
+        <section class="financeiro-v2-alert-card mb-4">
+            <strong>Registro manual por ID</strong>
+            <span>Informe o ID do aluno e da mensalidade. Para reduzir erro operacional, prefira abrir o pagamento a partir da lista financeira.</span>
+        </section>
+    }
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-8">
-            <section class="card financeiro-form-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="financeiro-section-title mb-1">Lançamento de pagamento</h2>
-                        <p class="financeiro-section-subtitle mb-0">Preencha os dados e confirme para atualizar automaticamente a mensalidade.</p>
+    <div class="financeiro-v2-form-layout">
+        <section class="financeiro-v2-form-panel">
+            <form asp-action="RegistrarPagamento" method="post" class="financeiro-v2-form">
+                <input asp-for="AlunoNome" type="hidden" />
+                <input asp-for="Competencia" type="hidden" />
+                <input asp-for="DataVencimento" type="hidden" />
+                <input asp-for="ValorMensalidadeAtual" type="hidden" />
+                <input asp-for="StatusMensalidadeAtual" type="hidden" />
+                <input asp-for="ReturnUrl" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly" class="financeiro-v2-validation-summary"></div>
+
+                <section class="financeiro-v2-form-section">
+                    <div class="financeiro-v2-section-title">
+                        <span>01</span>
+                        <div>
+                            <h2>Identificação</h2>
+                            <p>IDs usados para vincular o pagamento à mensalidade correta.</p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card-body">
-                    <form asp-action="RegistrarPagamento" method="post" class="row g-3">
-                        <input asp-for="AlunoNome" type="hidden" />
-                        <input asp-for="Competencia" type="hidden" />
-                        <input asp-for="DataVencimento" type="hidden" />
-                        <input asp-for="ValorMensalidadeAtual" type="hidden" />
-                        <input asp-for="StatusMensalidadeAtual" type="hidden" />
-                        <input asp-for="ReturnUrl" type="hidden" />
-
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                        <div class="col-12 col-md-3">
-                            <label asp-for="AlunoId" class="form-label financeiro-label">Aluno ID</label>
-                            <input asp-for="AlunoId" type="number" min="1" class="form-control" />
+                    <div class="financeiro-v2-form-grid">
+                        <div class="financeiro-v2-field">
+                            <label asp-for="AlunoId">Aluno ID</label>
+                            <input asp-for="AlunoId"
+                                   type="number"
+                                   min="1"
+                                   class="form-control financeiro-v2-control"
+                                   placeholder="Ex.: 12"
+                                   readonly="@possuiContexto" />
                             <span asp-validation-for="AlunoId" class="text-danger"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="MensalidadeId" class="form-label financeiro-label">Mensalidade ID</label>
-                            <input asp-for="MensalidadeId" type="number" min="1" class="form-control" />
+
+                        <div class="financeiro-v2-field">
+                            <label asp-for="MensalidadeId">Mensalidade ID</label>
+                            <input asp-for="MensalidadeId"
+                                   type="number"
+                                   min="1"
+                                   class="form-control financeiro-v2-control"
+                                   placeholder="Ex.: 120"
+                                   readonly="@possuiContexto" />
                             <span asp-validation-for="MensalidadeId" class="text-danger"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="DataPagamento" class="form-label financeiro-label">Data do pagamento</label>
-                            <input asp-for="DataPagamento" type="datetime-local" class="form-control" />
+                    </div>
+                </section>
+
+                <section class="financeiro-v2-form-section">
+                    <div class="financeiro-v2-section-title">
+                        <span>02</span>
+                        <div>
+                            <h2>Pagamento</h2>
+                            <p>Dados do recebimento confirmado pela equipe.</p>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="ValorPago" class="form-label financeiro-label">Valor pago</label>
-                            <input asp-for="ValorPago" type="number" min="0.01" step="0.01" class="form-control" placeholder="0,00" />
+                    </div>
+
+                    <div class="financeiro-v2-form-grid">
+                        <div class="financeiro-v2-field">
+                            <label asp-for="DataPagamento">Data do pagamento</label>
+                            <input asp-for="DataPagamento"
+                                   type="datetime-local"
+                                   class="form-control financeiro-v2-control" />
+                            <span asp-validation-for="DataPagamento" class="text-danger"></span>
+                        </div>
+
+                        <div class="financeiro-v2-field">
+                            <label asp-for="ValorPago">Valor pago</label>
+                            <input asp-for="ValorPago"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01"
+                                   class="form-control financeiro-v2-control"
+                                   placeholder="Ex.: 260,00"
+                                   inputmode="decimal" />
                             <span asp-validation-for="ValorPago" class="text-danger"></span>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <label asp-for="FormaPagamento" class="form-label financeiro-label">Forma de pagamento</label>
-                            <select asp-for="FormaPagamento" asp-items="Html.GetEnumSelectList<FormaPagamentoEnum>()" class="form-select"></select>
-                        </div>
-                        <div class="col-12">
-                            <label asp-for="Observacoes" class="form-label financeiro-label">Observações</label>
-                            <textarea asp-for="Observacoes" class="form-control" rows="3" placeholder="Informações complementares do recebimento"></textarea>
-                        </div>
 
-                        <div class="col-12 d-flex justify-content-end gap-2 financeiro-form-actions">
-                            @if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
-                            {
-                                <a href="@Model.ReturnUrl" class="btn btn-outline-secondary">Cancelar</a>
-                            }
-                            else
-                            {
-                                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            }
-                            <button type="submit" class="btn btn-primary">Registrar pagamento</button>
+                        <div class="financeiro-v2-field">
+                            <label asp-for="FormaPagamento">Forma de pagamento</label>
+                            <select asp-for="FormaPagamento" class="form-select financeiro-v2-control">
+                                @foreach (var forma in Enum.GetValues<FormaPagamentoEnum>())
+                                {
+                                    if (Model.FormaPagamento == forma)
+                                    {
+                                        <option value="@forma" selected>@FormaPagamentoTexto(forma)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@forma">@FormaPagamentoTexto(forma)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="FormaPagamento" class="text-danger"></span>
                         </div>
-                    </form>
-                </div>
-            </section>
-        </div>
+                    </div>
+                </section>
 
-        <div class="col-12 col-xl-4">
-            <aside class="card financeiro-side-card">
-                <div class="card-body">
-                    <h3 class="financeiro-section-title mb-3">Checklist de conferência</h3>
-                    <ul class="financeiro-priority-list">
-                        <li>Confirme se a mensalidade e o aluno estão corretos.</li>
-                        <li>Valide valor pago e forma antes de salvar.</li>
-                        <li>Use observações para registrar exceções do acordo.</li>
-                    </ul>
+                <section class="financeiro-v2-form-section">
+                    <div class="financeiro-v2-section-title">
+                        <span>03</span>
+                        <div>
+                            <h2>Observações</h2>
+                            <p>Registre exceções, acordos ou referência do comprovante quando necessário.</p>
+                        </div>
+                    </div>
+
+                    <div class="financeiro-v2-field">
+                        <label asp-for="Observacoes">Anotações do recebimento</label>
+                        <textarea asp-for="Observacoes"
+                                  class="form-control financeiro-v2-control"
+                                  rows="4"
+                                  placeholder="Ex.: comprovante recebido por WhatsApp, pagamento parcial acordado, referência Pix."></textarea>
+                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                    </div>
+                </section>
+
+                <div class="financeiro-v2-form-actions">
+                    @if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
+                    {
+                        <a href="@Model.ReturnUrl" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Cancelar</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Cancelar</a>
+                    }
+                    <button type="submit" class="btn financeiro-v2-btn financeiro-v2-btn-primary">Registrar pagamento</button>
                 </div>
-            </aside>
-        </div>
+            </form>
+        </section>
+
+        <aside class="financeiro-v2-assist-card">
+            <span class="financeiro-v2-eyebrow">Checklist</span>
+            <h2>Conferência antes de salvar</h2>
+            <ul>
+                <li>Confirme se aluno e mensalidade correspondem ao comprovante.</li>
+                <li>Valide valor pago, data e forma de pagamento.</li>
+                <li>Use observações para registrar acordos ou exceções.</li>
+                <li>Após salvar, a mensalidade será marcada como paga.</li>
+            </ul>
+        </aside>
     </div>
 </div>
 

@@ -1,7 +1,9 @@
+﻿@using IkkonAdmin.Web.Enums
 @using IkkonAdmin.Web.Security
 @model DesligamentoIndexViewModel
 @{
     ViewData["Title"] = "Desligamentos";
+
     var canDesligamentosCreate = User.HasPermission(AppPermissions.DesligamentosCreate);
     var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
     var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
@@ -11,6 +13,13 @@
     var confirmados = Model.Desligamentos.Count(x => x.Confirmado);
     var pendenciasFinanceiras = Model.Desligamentos.Count(x => (x.PendenciaFinanceira + x.MultaRescisoria) > 0m && !x.Confirmado);
     var semChecklistFinal = Model.Desligamentos.Count(x => (!x.RequerimentoRecebido || !x.AcessosRemovidos) && !x.Confirmado);
+    var valorAberto = Model.Desligamentos.Where(x => !x.Confirmado).Sum(x => x.PendenciaFinanceira + x.MultaRescisoria);
+    var casosCriticos = Model.Desligamentos
+        .Where(x => !x.Confirmado && ((x.PendenciaFinanceira + x.MultaRescisoria) > 0m || !x.RequerimentoRecebido || !x.AcessosRemovidos))
+        .OrderByDescending(x => x.PendenciaFinanceira + x.MultaRescisoria)
+        .ThenBy(x => x.DataSolicitacao)
+        .Take(5)
+        .ToList();
 
     var filtrosAtivos = new List<string>();
     if (!string.IsNullOrWhiteSpace(Model.Busca))
@@ -19,211 +28,285 @@
     }
     if (Model.Confirmado.HasValue)
     {
-        filtrosAtivos.Add(Model.Confirmado.Value ? "Status: Confirmados" : "Status: Em aberto");
+        filtrosAtivos.Add(Model.Confirmado.Value ? "Status: confirmados" : "Status: em aberto");
     }
 }
 
-<div class="desligamentos-page d-grid gap-3">
-    <section class="desligamentos-hero rounded-3 p-3 p-lg-4">
-        <div class="row g-3 align-items-end">
-            <div class="col-12 col-xl-8">
-                <p class="desligamentos-eyebrow mb-2">Saída de alunos</p>
-                <h1 class="desligamentos-title mb-2">Central de Desligamentos</h1>
-                <p class="desligamentos-subtitle mb-0">
-                    Controle solicitações de desligamento, pendências financeiras e conclusão do checklist operacional em uma única fila.
-                </p>
+@functions {
+    private static string InicialPessoa(string nome)
+    {
+        return string.IsNullOrWhiteSpace(nome)
+            ? "D"
+            : nome.Trim()[0].ToString().ToUpperInvariant();
+    }
+
+    private static string StatusAlunoTexto(StatusAlunoEnum status)
+    {
+        return status switch
+        {
+            StatusAlunoEnum.EmAdmissao => "Em admissão",
+            StatusAlunoEnum.Ativo => "Ativo",
+            StatusAlunoEnum.Inativo => "Inativo",
+            StatusAlunoEnum.Desligado => "Desligado",
+            _ => status.ToString()
+        };
+    }
+}
+
+<div class="desligamentos-v2-page">
+    <section class="desligamentos-v2-hero mb-4">
+        <div class="desligamentos-v2-hero-copy">
+            <span class="desligamentos-v2-eyebrow">Saída de alunos</span>
+            <h1>Central de Desligamentos</h1>
+            <p>
+                Acompanhe solicitações, pendências financeiras, requerimentos e remoção de acessos em uma fila operacional clara.
+            </p>
+            <div class="desligamentos-v2-meta">
+                <span><strong>@emAberto</strong> em aberto</span>
+                <span><strong>@pendenciasFinanceiras</strong> com valores pendentes</span>
+                <span><strong>@valorAberto.ToString("C")</strong> em encerramento</span>
             </div>
-            <div class="col-12 col-xl-4">
-                <div class="desligamentos-quick-actions">
-                    @if (canDesligamentosCreate)
-                    {
-                        <a asp-action="Create" class="btn btn-primary">Novo desligamento</a>
-                    }
-                    @if (canAlunosView)
-                    {
-                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
-                    }
-                    @if (canFinanceiroView)
-                    {
-                        <a asp-controller="Financeiro" asp-action="Atrasados" class="btn btn-outline-secondary">Ver inadimplência</a>
-                    }
-                </div>
+        </div>
+
+        <div class="desligamentos-v2-hero-actions">
+            @if (canDesligamentosCreate)
+            {
+                <a asp-action="Create" class="btn desligamentos-v2-btn desligamentos-v2-btn-primary">Novo desligamento</a>
+            }
+            @if (canAlunosView)
+            {
+                <a asp-controller="Alunos" asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Consultar alunos</a>
+            }
+            @if (canFinanceiroView)
+            {
+                <a asp-controller="Financeiro" asp-action="Atrasados" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Ver inadimplência</a>
+            }
+        </div>
+    </section>
+
+    <section class="desligamentos-v2-kpi-grid mb-4" aria-label="Indicadores de desligamentos">
+        <article class="desligamentos-v2-kpi-card">
+            <div class="desligamentos-v2-kpi-top">
+                <span>Total</span>
+                <b>Processos</b>
             </div>
-        </div>
+            <strong>@total</strong>
+            <small>Registros de desligamento cadastrados.</small>
+        </article>
+
+        <article class="desligamentos-v2-kpi-card is-warning">
+            <div class="desligamentos-v2-kpi-top">
+                <span>Em aberto</span>
+                <b>Ação</b>
+            </div>
+            <strong>@emAberto</strong>
+            <small>Casos que ainda exigem tratativa.</small>
+        </article>
+
+        <article class="desligamentos-v2-kpi-card is-danger">
+            <div class="desligamentos-v2-kpi-top">
+                <span>Pendência</span>
+                <b>Financeiro</b>
+            </div>
+            <strong>@pendenciasFinanceiras</strong>
+            <small>Processos abertos com valores pendentes.</small>
+        </article>
+
+        <article class="desligamentos-v2-kpi-card is-success">
+            <div class="desligamentos-v2-kpi-top">
+                <span>Concluídos</span>
+                <b>Fechado</b>
+            </div>
+            <strong>@confirmados</strong>
+            <small>Desligamentos já confirmados.</small>
+        </article>
     </section>
 
-    <section class="row g-3">
-        <div class="col-6 col-xl-2">
-            <article class="desligamentos-kpi-card desligamentos-kpi-highlight">
-                <span class="desligamentos-kpi-label">Total</span>
-                <strong class="desligamentos-kpi-value">@total</strong>
-                <span class="desligamentos-kpi-foot">Processos registrados</span>
-            </article>
-        </div>
-        <div class="col-6 col-xl-2">
-            <article class="desligamentos-kpi-card desligamentos-kpi-warning">
-                <span class="desligamentos-kpi-label">Em aberto</span>
-                <strong class="desligamentos-kpi-value">@emAberto</strong>
-                <span class="desligamentos-kpi-foot">Exigem tratativa</span>
-            </article>
-        </div>
-        <div class="col-6 col-xl-2">
-            <article class="desligamentos-kpi-card desligamentos-kpi-success">
-                <span class="desligamentos-kpi-label">Confirmados</span>
-                <strong class="desligamentos-kpi-value">@confirmados</strong>
-                <span class="desligamentos-kpi-foot">Concluídos</span>
-            </article>
-        </div>
-        <div class="col-6 col-xl-3">
-            <article class="desligamentos-kpi-card desligamentos-kpi-danger">
-                <span class="desligamentos-kpi-label">Com pendência financeira</span>
-                <strong class="desligamentos-kpi-value">@pendenciasFinanceiras</strong>
-                <span class="desligamentos-kpi-foot">Em aberto com valores pendentes</span>
-            </article>
-        </div>
-        <div class="col-12 col-xl-3">
-            <article class="desligamentos-kpi-card desligamentos-kpi-info">
-                <span class="desligamentos-kpi-label">Checklist incompleto</span>
-                <strong class="desligamentos-kpi-value">@semChecklistFinal</strong>
-                <span class="desligamentos-kpi-foot">Requerimento ou acessos pendentes</span>
-            </article>
-        </div>
-    </section>
-
-    <section class="card desligamentos-filter-card">
-        <div class="card-body">
-            <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                <div class="col-12 col-lg-5">
-                    <label asp-for="Busca" class="desligamentos-label">Busca</label>
-                    <input asp-for="Busca" class="form-control" placeholder="Buscar por aluno ou CPF" autocomplete="off" />
-                </div>
-                <div class="col-12 col-lg-3">
-                    <label asp-for="Confirmado" class="desligamentos-label">Status</label>
-                    <select asp-for="Confirmado" class="form-select">
-                        <option value="">Todos</option>
-                        @if (Model.Confirmado == true)
-                        {
-                            <option value="true" selected>Confirmados</option>
-                        }
-                        else
-                        {
-                            <option value="true">Confirmados</option>
-                        }
-                        @if (Model.Confirmado == false)
-                        {
-                            <option value="false" selected>Em aberto</option>
-                        }
-                        else
-                        {
-                            <option value="false">Em aberto</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-6 col-lg-2 d-grid">
-                    <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
-                </div>
-                <div class="col-6 col-lg-2 d-grid">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
-                </div>
-                @if (filtrosAtivos.Count > 0)
-                {
-                    <div class="col-12">
-                        <div class="desligamentos-active-filters">
-                            @foreach (var filtro in filtrosAtivos)
-                            {
-                                <span class="desligamentos-filter-chip">@filtro</span>
-                            }
-                        </div>
-                    </div>
-                }
-            </form>
-        </div>
-    </section>
-
-    <section class="card desligamentos-table-card">
-        <div class="card-header">
+    <section class="desligamentos-v2-filter-card mb-4">
+        <div class="desligamentos-v2-card-heading">
             <div>
-                <h2 class="desligamentos-section-title mb-1">Fila de desligamentos</h2>
-                <p class="desligamentos-section-subtitle mb-0">Priorize casos em aberto com pendências financeiras e checklist incompleto.</p>
+                <span class="desligamentos-v2-eyebrow">Filtros</span>
+                <h2>Refinar fila</h2>
+                <p>Busque por aluno e separe processos abertos de desligamentos já concluídos.</p>
             </div>
-            <span class="badge text-bg-light border">@total registros</span>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 desligamentos-table">
-                <thead class="table-light">
-                    <tr>
-                        <th>Aluno</th>
-                        <th>Solicitação</th>
-                        <th>Confirmação</th>
-                        <th class="text-end">Pendência</th>
-                        <th class="text-end">Multa</th>
-                        <th>Checklist</th>
-                        <th class="text-end">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Desligamentos.Count == 0)
+
+        <form asp-action="Index" method="get" class="desligamentos-v2-filter-grid">
+            <div class="desligamentos-v2-field desligamentos-v2-field-search">
+                <label asp-for="Busca">Busca</label>
+                <input asp-for="Busca"
+                       type="search"
+                       class="form-control desligamentos-v2-control"
+                       placeholder="Buscar por aluno ou CPF"
+                       autocomplete="off" />
+            </div>
+
+            <div class="desligamentos-v2-field">
+                <label asp-for="Confirmado">Status</label>
+                <select asp-for="Confirmado" class="form-select desligamentos-v2-control">
+                    <option value="">Todos</option>
+                    @if (Model.Confirmado == true)
                     {
-                        <tr>
-                                    <td colspan="7">
-                                        <div class="desligamentos-empty-state text-center py-4">
-                                            <h4>Nenhum desligamento encontrado.</h4>
-                                            <p class="mb-3">Ajuste os filtros ou registre um novo desligamento.</p>
-                                            @if (canDesligamentosCreate)
-                                            {
-                                                <a asp-action="Create" class="btn btn-primary">Novo desligamento</a>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
+                        <option value="true" selected>Confirmados</option>
                     }
                     else
                     {
-                        @foreach (var item in Model.Desligamentos)
-                        {
-                            var critico = !item.Confirmado && ((item.PendenciaFinanceira + item.MultaRescisoria) > 0m || !item.RequerimentoRecebido || !item.AcessosRemovidos);
+                        <option value="true">Confirmados</option>
+                    }
+                    @if (Model.Confirmado == false)
+                    {
+                        <option value="false" selected>Em aberto</option>
+                    }
+                    else
+                    {
+                        <option value="false">Em aberto</option>
+                    }
+                </select>
+            </div>
 
-                            <tr class="@(critico ? "desligamentos-row-attention" : string.Empty)">
-                                <td>
-                                    <div class="desligamentos-name-cell">
-                                        @if (canAlunosView)
+            <div class="desligamentos-v2-filter-actions">
+                <button type="submit" class="btn desligamentos-v2-btn desligamentos-v2-btn-primary">Aplicar filtros</button>
+                <a asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Limpar</a>
+            </div>
+        </form>
+
+        @if (filtrosAtivos.Count > 0)
+        {
+            <div class="desligamentos-v2-active-filters">
+                @foreach (var filtro in filtrosAtivos)
+                {
+                    <span>@filtro</span>
+                }
+            </div>
+        }
+    </section>
+
+    <div class="desligamentos-v2-main-grid">
+        <section class="desligamentos-v2-table-panel">
+            <div class="desligamentos-v2-panel-heading">
+                <div>
+                    <span class="desligamentos-v2-eyebrow">Fila operacional</span>
+                    <h2>Processos de desligamento</h2>
+                    <p>Priorize casos em aberto com pendência financeira ou checklist incompleto.</p>
+                </div>
+                <span class="desligamentos-v2-count-pill">@total registro(s)</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table desligamentos-v2-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Solicitação</th>
+                            <th>Status</th>
+                            <th class="text-end">Pendência</th>
+                            <th class="text-end">Multa</th>
+                            <th>Checklist</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Desligamentos.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="desligamentos-v2-empty-state">
+                                        <strong>Nenhum desligamento encontrado</strong>
+                                        <span>Ajuste os filtros ou registre uma nova solicitação de desligamento.</span>
+                                        @if (canDesligamentosCreate)
                                         {
-                                            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="text-decoration-none desligamentos-name">@item.AlunoNome</a>
+                                            <a asp-action="Create" class="btn desligamentos-v2-btn desligamentos-v2-btn-primary">Novo desligamento</a>
                                         }
-                                        else
-                                        {
-                                            <span class="desligamentos-name">@item.AlunoNome</span>
-                                        }
-                                        <span class="desligamentos-meta">Processo #@item.Id</span>
                                     </div>
-                                </td>
-                                <td>@item.DataSolicitacao.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @if (item.DataConfirmacao.HasValue)
-                                    {
-                                        <span class="desligamentos-status-pill desligamentos-status-success">@item.DataConfirmacao.Value.ToString("dd/MM/yyyy")</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="desligamentos-status-pill desligamentos-status-warning">Em aberto</span>
-                                    }
-                                </td>
-                                <td class="text-end">@item.PendenciaFinanceira.ToString("C")</td>
-                                <td class="text-end">@item.MultaRescisoria.ToString("C")</td>
-                                <td>
-                                    <div class="d-flex flex-column gap-1">
-                                        <span class="small @(item.RequerimentoRecebido ? "text-success" : "text-muted")">@(item.RequerimentoRecebido ? "Requerimento recebido" : "Requerimento pendente")</span>
-                                        <span class="small @(item.AcessosRemovidos ? "text-success" : "text-muted")">@(item.AcessosRemovidos ? "Acessos removidos" : "Acessos pendentes")</span>
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary desligamentos-action-btn">Gerenciar</a>
                                 </td>
                             </tr>
                         }
+                        else
+                        {
+                            foreach (var item in Model.Desligamentos)
+                            {
+                                var valorTotal = item.PendenciaFinanceira + item.MultaRescisoria;
+                                var checklistConcluido = (item.RequerimentoRecebido ? 1 : 0) + (item.AcessosRemovidos ? 1 : 0);
+                                var percentualChecklist = (checklistConcluido * 100) / 2;
+                                var critico = !item.Confirmado && (valorTotal > 0m || checklistConcluido < 2);
+
+                                <tr class="@(critico ? "is-attention" : string.Empty)">
+                                    <td>
+                                        <div class="desligamentos-v2-person-cell">
+                                            <span>@InicialPessoa(item.AlunoNome)</span>
+                                            <div>
+                                                @if (canAlunosView)
+                                                {
+                                                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId" class="desligamentos-v2-link">@item.AlunoNome</a>
+                                                }
+                                                else
+                                                {
+                                                    <strong>@item.AlunoNome</strong>
+                                                }
+                                                <small>Processo #@item.Id · @StatusAlunoTexto(item.StatusAluno)</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@item.DataSolicitacao.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.Confirmado)
+                                        {
+                                            <span class="desligamentos-v2-status-pill is-success">Confirmado em @item.DataConfirmacao!.Value.ToString("dd/MM")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="desligamentos-v2-status-pill is-warning">Em aberto</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">@item.PendenciaFinanceira.ToString("C")</td>
+                                    <td class="text-end">@item.MultaRescisoria.ToString("C")</td>
+                                    <td>
+                                        <div class="desligamentos-v2-check-mini">
+                                            <div class="desligamentos-v2-progress" role="progressbar" aria-label="Checklist de desligamento" aria-valuenow="@checklistConcluido" aria-valuemin="0" aria-valuemax="2">
+                                                <span style="width:@percentualChecklist%"></span>
+                                            </div>
+                                            <small>@checklistConcluido/2 etapas</small>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn desligamentos-v2-btn-table desligamentos-v2-btn-table-primary">Gerenciar</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="desligamentos-v2-side-card">
+            <span class="desligamentos-v2-eyebrow">Atenção</span>
+            <h2>Casos críticos</h2>
+            <p>Processos abertos com valores pendentes ou checklist de encerramento incompleto.</p>
+
+            @if (casosCriticos.Count == 0)
+            {
+                <div class="desligamentos-v2-empty-state desligamentos-v2-empty-compact">
+                    <strong>Nenhum caso crítico</strong>
+                    <span>Os processos em aberto não possuem pendências relevantes.</span>
+                </div>
+            }
+            else
+            {
+                <div class="desligamentos-v2-critical-list">
+                    @foreach (var item in casosCriticos)
+                    {
+                        var valorTotal = item.PendenciaFinanceira + item.MultaRescisoria;
+                        <article>
+                            <div>
+                                <strong>@item.AlunoNome</strong>
+                                <span>@valorTotal.ToString("C") · @item.DataSolicitacao.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <a asp-action="Details" asp-route-id="@item.Id">Abrir</a>
+                        </article>
                     }
-                </tbody>
-            </table>
-        </div>
-    </section>
+                </div>
+            }
+        </aside>
+    </div>
 </div>

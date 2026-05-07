@@ -2,44 +2,112 @@
 @model FinanceiroAtrasadosViewModel
 @{
     ViewData["Title"] = "Mensalidades Atrasadas";
+
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var canFinanceiroCreate = User.HasPermission(AppPermissions.FinanceiroCreate);
+    var atrasosCriticos = Model.Itens.Count(x => x.DiasAtraso >= 30);
+    var atrasosAtencao = Model.Itens.Count(x => x.DiasAtraso is >= 10 and < 30);
+    var maiorAtraso = Model.Itens.Count == 0 ? 0 : Model.Itens.Max(x => x.DiasAtraso);
 }
 
-<div class="financeiro-page">
-    <section class="card financeiro-hero mb-3">
-        <div class="card-body p-3 p-lg-4">
-            <div class="row g-3 align-items-center">
-                <div class="col-12 col-lg-8">
-                    <div class="financeiro-eyebrow">Inadimplência</div>
-                    <h2 class="financeiro-title mb-2">Recuperação de atrasos</h2>
-                    <p class="financeiro-subtitle mb-0">
-                        Priorize mensalidades vencidas com maior impacto financeiro e acione rapidamente o registro de pagamento.
-                    </p>
-                </div>
-                <div class="col-12 col-lg-4">
-                    <article class="financeiro-kpi-card financeiro-kpi-danger">
-                        <span class="financeiro-kpi-label">Total em atraso</span>
-                        <strong class="financeiro-kpi-value">@Model.TotalEmAtraso.ToString("C")</strong>
-                        <span class="financeiro-kpi-foot">@Model.Itens.Count item(ns) em aberto</span>
-                    </article>
-                </div>
+@functions {
+    private static string AtrasoClasse(int diasAtraso)
+    {
+        if (diasAtraso >= 30)
+        {
+            return "is-danger";
+        }
+
+        if (diasAtraso >= 10)
+        {
+            return "is-warning";
+        }
+
+        return "is-muted";
+    }
+
+    private static string InicialAluno(string nome)
+    {
+        return string.IsNullOrWhiteSpace(nome)
+            ? "A"
+            : nome.Trim()[0].ToString().ToUpperInvariant();
+    }
+}
+
+<div class="financeiro-v2-page">
+    <section class="financeiro-v2-hero mb-4">
+        <div class="financeiro-v2-hero-copy">
+            <span class="financeiro-v2-eyebrow">Inadimplência</span>
+            <h1>Recuperação de atrasos</h1>
+            <p>
+                Priorize mensalidades vencidas por tempo de atraso e valor em aberto para orientar cobranças e acordos.
+            </p>
+
+            <div class="financeiro-v2-meta">
+                <span>Total em atraso <strong>@Model.TotalEmAtraso.ToString("C")</strong></span>
+                <span>Itens vencidos <strong>@Model.Itens.Count</strong></span>
+                <span>Maior atraso <strong>@maiorAtraso dias</strong></span>
             </div>
+        </div>
+
+        <div class="financeiro-v2-hero-actions">
+            <a asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Voltar ao financeiro</a>
+            @if (canFinanceiroCreate)
+            {
+                <a asp-action="RegistrarPagamento" asp-route-returnUrl="@returnUrl" class="btn financeiro-v2-btn financeiro-v2-btn-primary">Registrar pagamento</a>
+            }
         </div>
     </section>
 
-    <section class="card financeiro-table-card">
-        <div class="card-header">
-            <div>
-                <h3 class="financeiro-section-title mb-1">Mensalidades em atraso</h3>
-                <p class="financeiro-section-subtitle mb-0">Ordene ações pelos dias de atraso e valor devido.</p>
+    <section class="financeiro-v2-kpi-grid mb-4" aria-label="Indicadores de atraso">
+        <article class="financeiro-v2-kpi-card is-danger">
+            <div class="financeiro-v2-kpi-top">
+                <span>Total em atraso</span>
+                <b>Exposição</b>
             </div>
+            <strong>@Model.TotalEmAtraso.ToString("C")</strong>
+            <small>Valor vencido aguardando regularização.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card">
+            <div class="financeiro-v2-kpi-top">
+                <span>Itens</span>
+                <b>Abertos</b>
+            </div>
+            <strong>@Model.Itens.Count</strong>
+            <small>Mensalidades vencidas no momento.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card is-danger">
+            <div class="financeiro-v2-kpi-top">
+                <span>Críticos</span>
+                <b>30+ dias</b>
+            </div>
+            <strong>@atrasosCriticos</strong>
+            <small>Casos que exigem ação prioritária.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card is-warning">
+            <div class="financeiro-v2-kpi-top">
+                <span>Atenção</span>
+                <b>10-29 dias</b>
+            </div>
+            <strong>@atrasosAtencao</strong>
+            <small>Casos para lembrete ou negociação.</small>
+        </article>
+    </section>
+
+    <section class="financeiro-v2-table-panel">
+        <div class="financeiro-v2-panel-heading">
             <div>
-                <a asp-action="Index" class="btn btn-outline-secondary">Voltar ao financeiro</a>
+                <span class="financeiro-v2-eyebrow">Cobrança</span>
+                <h2>Mensalidades em atraso</h2>
+                <p>Ordene ações pelos dias de atraso e valor devido.</p>
             </div>
         </div>
+
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 financeiro-table">
+            <table class="table financeiro-v2-table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Aluno</th>
@@ -54,10 +122,10 @@
                     @if (Model.Itens.Count == 0)
                     {
                         <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <div class="financeiro-empty-state">
-                                    <h4>Nenhum atraso encontrado</h4>
-                                    <p class="mb-0">Não há mensalidades vencidas no momento para o recorte atual.</p>
+                            <td colspan="6">
+                                <div class="financeiro-v2-empty-state">
+                                    <strong>Nenhum atraso encontrado.</strong>
+                                    <span>Não há mensalidades vencidas no momento.</span>
                                 </div>
                             </td>
                         </tr>
@@ -66,34 +134,41 @@
                     {
                         @foreach (var item in Model.Itens)
                         {
-                            var atrasoClass = item.DiasAtraso >= 30
-                                ? "financeiro-status-pill financeiro-status-danger"
-                                : item.DiasAtraso >= 10
-                                    ? "financeiro-status-pill financeiro-status-warning"
-                                    : "financeiro-status-pill financeiro-status-muted";
-
                             <tr>
                                 <td>
-                                    <a asp-action="HistoricoAluno" asp-route-alunoId="@item.AlunoId" class="text-decoration-none fw-semibold">@item.Aluno</a>
+                                    <div class="financeiro-v2-student-cell">
+                                        <span>@InicialAluno(item.Aluno)</span>
+                                        <div>
+                                            <a asp-action="HistoricoAluno" asp-route-alunoId="@item.AlunoId">@item.Aluno</a>
+                                            <small>Mensalidade #@item.MensalidadeId</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>@item.Competencia.ToString("MM/yyyy")</td>
                                 <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
-                                <td><span class="@atrasoClass">@item.DiasAtraso dia(s)</span></td>
-                                <td class="text-end">@item.ValorFinal.ToString("C")</td>
+                                <td>
+                                    <span class="financeiro-v2-status-pill @AtrasoClasse(item.DiasAtraso)">
+                                        @item.DiasAtraso dia(s)
+                                    </span>
+                                </td>
+                                <td class="text-end fw-bold">@item.ValorFinal.ToString("C")</td>
                                 <td class="text-end">
-                                    @if (canFinanceiroCreate)
-                                    {
-                                        <a asp-action="RegistrarPagamento"
-                                           asp-route-mensalidadeId="@item.MensalidadeId"
-                                           asp-route-returnUrl="@returnUrl"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Registrar pagamento
+                                    <div class="financeiro-v2-row-actions">
+                                        <a asp-action="HistoricoAluno"
+                                           asp-route-alunoId="@item.AlunoId"
+                                           class="btn financeiro-v2-btn-table">
+                                            Histórico
                                         </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted small">Sem permissão</span>
-                                    }
+                                        @if (canFinanceiroCreate)
+                                        {
+                                            <a asp-action="RegistrarPagamento"
+                                               asp-route-mensalidadeId="@item.MensalidadeId"
+                                               asp-route-returnUrl="@returnUrl"
+                                               class="btn financeiro-v2-btn-table financeiro-v2-btn-table-primary">
+                                                Registrar
+                                            </a>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }

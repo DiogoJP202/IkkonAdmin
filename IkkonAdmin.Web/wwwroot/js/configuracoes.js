@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   const feedback = document.getElementById("userSettingsFeedback");
   const forms = document.querySelectorAll("form[data-config-form]");
 

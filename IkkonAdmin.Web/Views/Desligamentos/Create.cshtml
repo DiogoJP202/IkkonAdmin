@@ -1,162 +1,211 @@
+﻿@using IkkonAdmin.Web.Enums
 @using IkkonAdmin.Web.Security
 @model DesligamentoCreateViewModel
 @{
     ViewData["Title"] = "Novo Desligamento";
+
     var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
     var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
+    var totalEstimado = Model.PendenciaFinanceira + Model.MultaRescisoria;
 }
 
-<div class="desligamentos-page d-grid gap-3">
-    <section class="desligamentos-hero rounded-3 p-3 p-lg-4">
-        <div class="row g-3 align-items-center">
-            <div class="col-12 col-lg-8">
-                <p class="desligamentos-eyebrow mb-2">Nova solicitação</p>
-                <h1 class="desligamentos-title mb-2">Registrar desligamento</h1>
-                <p class="desligamentos-subtitle mb-0">
-                    Abra o processo de saída com motivo, pendências e checklist inicial para evitar retrabalho no fechamento.
-                </p>
-            </div>
-            <div class="col-12 col-lg-4">
-                <div class="desligamentos-quick-actions">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para a lista</a>
-                    @if (canAlunosView)
-                    {
-                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
-                    }
-                    @if (canFinanceiroView)
-                    {
-                        <a asp-controller="Financeiro" asp-action="Index" class="btn btn-outline-secondary">Abrir financeiro</a>
-                    }
-                </div>
-            </div>
+@functions {
+    private static string StatusAlunoTexto(StatusAlunoEnum status)
+    {
+        return status switch
+        {
+            StatusAlunoEnum.EmAdmissao => "Em admissão",
+            StatusAlunoEnum.Ativo => "Ativo",
+            StatusAlunoEnum.Inativo => "Inativo",
+            StatusAlunoEnum.Desligado => "Desligado",
+            _ => status.ToString()
+        };
+    }
+}
+
+<div class="desligamentos-v2-page">
+    <section class="desligamentos-v2-form-hero mb-4">
+        <div>
+            <span class="desligamentos-v2-eyebrow">Nova solicitação</span>
+            <h1>Registrar desligamento</h1>
+            <p>
+                Abra o processo de saída com motivo, valores, requerimento e checklist inicial para evitar pendências no fechamento.
+            </p>
+        </div>
+
+        <div class="desligamentos-v2-hero-actions">
+            <a asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Voltar para lista</a>
+            @if (canAlunosView)
+            {
+                <a asp-controller="Alunos" asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Consultar alunos</a>
+            }
+            @if (canFinanceiroView)
+            {
+                <a asp-controller="Financeiro" asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Abrir financeiro</a>
+            }
         </div>
     </section>
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-8">
-            <div class="card desligamentos-form-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="desligamentos-section-title mb-1">Dados do desligamento</h2>
-                        <p class="desligamentos-section-subtitle mb-0">Preencha os campos operacionais para iniciar o processo.</p>
+    <div class="desligamentos-v2-form-layout">
+        <section class="desligamentos-v2-form-panel">
+            <form asp-action="Create" method="post" class="desligamentos-v2-form">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="desligamentos-v2-validation-summary"></div>
+
+                <section class="desligamentos-v2-form-section">
+                    <div class="desligamentos-v2-section-title">
+                        <span>01</span>
+                        <div>
+                            <h2>Identificação e motivo</h2>
+                            <p>Selecione o aluno e registre o contexto da solicitação de desligamento.</p>
+                        </div>
                     </div>
-                    <span class="desligamentos-form-id">Novo processo</span>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post" class="row g-3">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                        <div class="col-12 desligamentos-form-section">
-                            <h3 class="desligamentos-form-section-title">Identificação e motivo</h3>
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label asp-for="AlunoId" class="desligamentos-label">Aluno</label>
-                                    <select asp-for="AlunoId" class="form-select">
-                                        <option value="">Selecione um aluno</option>
-                                        @foreach (var aluno in Model.AlunosDisponiveis)
-                                        {
-                                            if (Model.AlunoId == aluno.Id)
-                                            {
-                                                <option value="@aluno.Id" selected>
-                                                    @aluno.Nome (@aluno.Status) @(string.IsNullOrWhiteSpace(aluno.Turma) ? string.Empty : $"- {aluno.Turma}")
-                                                </option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@aluno.Id">
-                                                    @aluno.Nome (@aluno.Status) @(string.IsNullOrWhiteSpace(aluno.Turma) ? string.Empty : $"- {aluno.Turma}")
-                                                </option>
-                                            }
-                                        }
-                                    </select>
-                                    <span asp-validation-for="AlunoId" class="text-danger"></span>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="DataSolicitacao" class="desligamentos-label">Data da solicitação</label>
-                                    <input asp-for="DataSolicitacao" type="date" class="form-control" />
-                                </div>
-                                <div class="col-12 col-md-8">
-                                    <div class="form-check desligamentos-check mt-md-4">
-                                        <input asp-for="CalcularPendenciasAutomaticamente" class="form-check-input" />
-                                        <label asp-for="CalcularPendenciasAutomaticamente" class="form-check-label">Calcular pendências automaticamente</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="Motivo" class="desligamentos-label">Motivo</label>
-                                    <textarea asp-for="Motivo" class="form-control" rows="4" placeholder="Descreva o motivo do desligamento de forma objetiva."></textarea>
-                                    <span asp-validation-for="Motivo" class="text-danger"></span>
-                                </div>
-                            </div>
+                    <div class="desligamentos-v2-form-grid">
+                        <div class="desligamentos-v2-field desligamentos-v2-field-span-2">
+                            <label asp-for="AlunoId">Aluno</label>
+                            <select asp-for="AlunoId" class="form-select desligamentos-v2-control">
+                                <option value="">Selecione um aluno</option>
+                                @foreach (var aluno in Model.AlunosDisponiveis)
+                                {
+                                    var label = $"{aluno.Nome} ({StatusAlunoTexto(aluno.Status)})";
+                                    if (!string.IsNullOrWhiteSpace(aluno.Turma))
+                                    {
+                                        label += $" - {aluno.Turma}";
+                                    }
+
+                                    if (Model.AlunoId == aluno.Id)
+                                    {
+                                        <option value="@aluno.Id" selected>@label</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@aluno.Id">@label</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="AlunoId" class="text-danger"></span>
                         </div>
 
-                        <div class="col-12 desligamentos-form-section">
-                            <h3 class="desligamentos-form-section-title">Financeiro e checklist</h3>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="PendenciaFinanceira" class="desligamentos-label">Pendência financeira</label>
-                                    <input asp-for="PendenciaFinanceira" class="form-control" inputmode="decimal" />
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="MultaRescisoria" class="desligamentos-label">Multa rescisória</label>
-                                    <input asp-for="MultaRescisoria" class="form-control" inputmode="decimal" />
-                                </div>
-                                <div class="col-12 col-md-4 d-flex align-items-end">
-                                    <div class="desligamentos-checklist-box w-100">
-                                        <strong>Total estimado</strong>
-                                        <div class="text-muted">Pendência + multa</div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <div class="form-check desligamentos-check">
-                                        <input asp-for="RequerimentoRecebido" class="form-check-input" />
-                                        <label asp-for="RequerimentoRecebido" class="form-check-label">Requerimento recebido</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <div class="form-check desligamentos-check">
-                                        <input asp-for="AcessosRemovidos" class="form-check-input" />
-                                        <label asp-for="AcessosRemovidos" class="form-check-label">Acessos removidos</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="Observacoes" class="desligamentos-label">Observações</label>
-                                    <textarea asp-for="Observacoes" class="form-control" rows="3" placeholder="Registre pendências, acordos e próximas ações."></textarea>
-                                </div>
-                            </div>
+                        <div class="desligamentos-v2-field">
+                            <label asp-for="DataSolicitacao">Data da solicitação</label>
+                            <input asp-for="DataSolicitacao"
+                                   type="date"
+                                   class="form-control desligamentos-v2-control" />
+                            <span asp-validation-for="DataSolicitacao" class="text-danger"></span>
                         </div>
 
-                        <div class="col-12 d-flex justify-content-end gap-2 desligamentos-form-actions">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Salvar desligamento</button>
+                        <div class="desligamentos-v2-field desligamentos-v2-field-span-3">
+                            <label asp-for="Motivo">Motivo</label>
+                            <textarea asp-for="Motivo"
+                                      rows="4"
+                                      class="form-control desligamentos-v2-control"
+                                      placeholder="Ex.: aluno solicitou desligamento por mudança de rotina; combinar encerramento financeiro e remoção dos acessos."></textarea>
+                            <span asp-validation-for="Motivo" class="text-danger"></span>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+                    </div>
+                </section>
 
-        <div class="col-12 col-xl-4">
-            <div class="card desligamentos-side-card h-100">
-                <div class="card-header">
-                    <h2 class="desligamentos-section-title mb-0">Guia rápido</h2>
+                <section class="desligamentos-v2-form-section">
+                    <div class="desligamentos-v2-section-title">
+                        <span>02</span>
+                        <div>
+                            <h2>Financeiro e checklist</h2>
+                            <p>Informe valores do encerramento e marque apenas etapas já concluídas.</p>
+                        </div>
+                    </div>
+
+                    <div class="desligamentos-v2-form-grid">
+                        <div class="desligamentos-v2-field">
+                            <label asp-for="PendenciaFinanceira">Pendência financeira</label>
+                            <input asp-for="PendenciaFinanceira"
+                                   type="text"
+                                   class="form-control desligamentos-v2-control"
+                                   inputmode="decimal"
+                                   placeholder="0,00" />
+                            <span asp-validation-for="PendenciaFinanceira" class="text-danger"></span>
+                        </div>
+
+                        <div class="desligamentos-v2-field">
+                            <label asp-for="MultaRescisoria">Multa rescisória</label>
+                            <input asp-for="MultaRescisoria"
+                                   type="text"
+                                   class="form-control desligamentos-v2-control"
+                                   inputmode="decimal"
+                                   placeholder="0,00" />
+                            <span asp-validation-for="MultaRescisoria" class="text-danger"></span>
+                        </div>
+
+                        <div class="desligamentos-v2-total-card">
+                            <span>Total estimado</span>
+                            <strong>@totalEstimado.ToString("C")</strong>
+                            <small>Pendência + multa rescisória.</small>
+                        </div>
+
+                        <label class="desligamentos-v2-check-card desligamentos-v2-field-span-3">
+                            <input asp-for="CalcularPendenciasAutomaticamente" class="form-check-input" />
+                            <span>
+                                <strong>Calcular pendências automaticamente</strong>
+                                <small>O sistema recalcula o valor em aberto do aluno ao salvar o processo.</small>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="desligamentos-v2-check-grid mt-3">
+                        <label class="desligamentos-v2-check-card">
+                            <input asp-for="RequerimentoRecebido" class="form-check-input" />
+                            <span>
+                                <strong>Requerimento recebido</strong>
+                                <small>Solicitação formal recebida e anexada/registrada.</small>
+                            </span>
+                        </label>
+
+                        <label class="desligamentos-v2-check-card">
+                            <input asp-for="AcessosRemovidos" class="form-check-input" />
+                            <span>
+                                <strong>Acessos removidos</strong>
+                                <small>Grupos, Drive e demais acessos foram encerrados.</small>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="desligamentos-v2-form-section">
+                    <div class="desligamentos-v2-section-title">
+                        <span>03</span>
+                        <div>
+                            <h2>Observações</h2>
+                            <p>Registre acordos, pendências e próximos passos para a equipe interna.</p>
+                        </div>
+                    </div>
+
+                    <div class="desligamentos-v2-field">
+                        <label asp-for="Observacoes">Observações</label>
+                        <textarea asp-for="Observacoes"
+                                  rows="3"
+                                  class="form-control desligamentos-v2-control"
+                                  placeholder="Ex.: aguardar assinatura do requerimento; confirmar multa; remover do grupo da turma."></textarea>
+                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                    </div>
+                </section>
+
+                <div class="desligamentos-v2-form-actions">
+                    <a asp-action="Index" class="btn desligamentos-v2-btn desligamentos-v2-btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn desligamentos-v2-btn desligamentos-v2-btn-primary">Salvar desligamento</button>
                 </div>
-                <div class="card-body">
-                    <ul class="desligamentos-priority-list mb-0">
-                        <li>
-                            <strong>Revise valores</strong>
-                            <span>Confirme pendências e multa antes de concluir o processo.</span>
-                        </li>
-                        <li>
-                            <strong>Checklist completo</strong>
-                            <span>Marque requerimento e remoção de acessos para evitar falhas operacionais.</span>
-                        </li>
-                        <li>
-                            <strong>Observações objetivas</strong>
-                            <span>Registre apenas o contexto necessário para a equipe executar os próximos passos.</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+            </form>
+        </section>
+
+        <aside class="desligamentos-v2-assist-card">
+            <span class="desligamentos-v2-eyebrow">Guia rápido</span>
+            <h2>Como fechar sem retrabalho</h2>
+            <ul>
+                <li>Confirme valores antes de concluir, principalmente pendências e multa rescisória.</li>
+                <li>Não marque checklist como concluído se o requerimento ou remoção de acessos ainda dependem de alguém.</li>
+                <li>Use observações objetivas para deixar claro o próximo responsável e a próxima ação.</li>
+                <li>O desligamento só encerra cobranças futuras quando for confirmado nos detalhes do processo.</li>
+            </ul>
+        </aside>
     </div>
 </div>
 

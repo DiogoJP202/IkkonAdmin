@@ -7,36 +7,48 @@
     var canEditAluno = User.HasPermission(AppPermissions.AlunosEdit);
     var canFinanceiroView = User.HasPermission(AppPermissions.FinanceiroView);
     var canFinanceiroCreate = User.HasPermission(AppPermissions.FinanceiroCreate);
+
     var inicialNome = string.IsNullOrWhiteSpace(Model.NomeCompleto)
         ? "A"
-        : Model.NomeCompleto[..1].ToUpperInvariant();
+        : Model.NomeCompleto.Trim()[0].ToString().ToUpperInvariant();
 
-    var mensalidadesPendentes = 0;
-    foreach (var mensalidade in Model.Mensalidades)
-    {
-        if (mensalidade.Status == StatusMensalidadeEnum.Pendente || mensalidade.Status == StatusMensalidadeEnum.Atrasado)
-        {
-            mensalidadesPendentes++;
-        }
-    }
-
-    DateTime? ultimaAtividade = null;
-    foreach (var evento in Model.Historico)
-    {
-        ultimaAtividade = evento.DataEvento;
-        break;
-    }
+    var mensalidadesPendentes = Model.Mensalidades.Count(x => x.Status is StatusMensalidadeEnum.Pendente or StatusMensalidadeEnum.Atrasado);
+    var ultimaAtividade = Model.Historico.FirstOrDefault()?.DataEvento;
 }
 
 @functions {
+    private static string StatusAlunoTexto(StatusAlunoEnum status)
+    {
+        return status switch
+        {
+            StatusAlunoEnum.EmAdmissao => "Em admissão",
+            StatusAlunoEnum.Ativo => "Ativo",
+            StatusAlunoEnum.Inativo => "Inativo",
+            StatusAlunoEnum.Desligado => "Desligado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusMensalidadeTexto(StatusMensalidadeEnum status)
+    {
+        return status switch
+        {
+            StatusMensalidadeEnum.Pendente => "Pendente",
+            StatusMensalidadeEnum.Pago => "Pago",
+            StatusMensalidadeEnum.Atrasado => "Atrasado",
+            StatusMensalidadeEnum.Cancelado => "Cancelado",
+            _ => status.ToString()
+        };
+    }
+
     private static string AlunoStatusClass(StatusAlunoEnum status)
     {
         return status switch
         {
-            StatusAlunoEnum.Ativo => "alunos-status-pill alunos-status-success",
-            StatusAlunoEnum.Inativo => "alunos-status-pill alunos-status-muted",
-            StatusAlunoEnum.Desligado => "alunos-status-pill alunos-status-danger",
-            _ => "alunos-status-pill alunos-status-warning"
+            StatusAlunoEnum.Ativo => "is-success",
+            StatusAlunoEnum.Inativo => "is-muted",
+            StatusAlunoEnum.Desligado => "is-danger",
+            _ => "is-warning"
         };
     }
 
@@ -44,271 +56,297 @@
     {
         return status switch
         {
-            StatusMensalidadeEnum.Pago => "alunos-status-pill alunos-status-success",
-            StatusMensalidadeEnum.Pendente => "alunos-status-pill alunos-status-warning",
-            StatusMensalidadeEnum.Atrasado => "alunos-status-pill alunos-status-danger",
-            _ => "alunos-status-pill alunos-status-muted"
+            StatusMensalidadeEnum.Pago => "is-success",
+            StatusMensalidadeEnum.Pendente => "is-warning",
+            StatusMensalidadeEnum.Atrasado => "is-danger",
+            _ => "is-muted"
         };
     }
 }
 
-<div class="alunos-page alunos-details-page">
-    <section class="card alunos-profile-card mb-3">
-        <div class="card-body p-3 p-lg-4">
-            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-                <div class="alunos-profile-main">
-                    <div class="alunos-avatar">@inicialNome</div>
-                    <div>
-                        <h2 class="alunos-title mb-1">@Model.NomeCompleto</h2>
-                        <div class="alunos-profile-meta">
-                            <span>CPF: @Model.CPF</span>
-                            <span class="alunos-meta-separator">|</span>
-                            <span>Turma: @(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</span>
-                            <span class="alunos-meta-separator">|</span>
-                            <span>Entrada: @Model.DataEntrada.ToString("dd/MM/yyyy")</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="alunos-profile-actions">
-                    <span class="@AlunoStatusClass(Model.Status)">@Model.Status</span>
-                    @if (canEditAluno)
-                    {
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar cadastro</a>
-                    }
-                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para lista</a>
+<div class="alunos-v2-page">
+    <section class="alunos-v2-profile-hero mb-4">
+        <div class="alunos-v2-profile-main">
+            <div class="alunos-v2-avatar">@inicialNome</div>
+            <div>
+                <span class="alunos-v2-eyebrow">Perfil administrativo</span>
+                <h1>@Model.NomeCompleto</h1>
+                <div class="alunos-v2-profile-meta">
+                    <span>CPF @Model.CPF</span>
+                    <span>Turma @(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</span>
+                    <span>Entrada @Model.DataEntrada.ToString("dd/MM/yyyy")</span>
                 </div>
             </div>
+        </div>
 
+        <div class="alunos-v2-profile-actions">
+            <span class="alunos-v2-status-pill @AlunoStatusClass(Model.Status)">
+                @StatusAlunoTexto(Model.Status)
+            </span>
             @if (canEditAluno)
             {
-                <div class="alunos-status-switch mt-3">
-                    <span class="alunos-status-label">Alterar status:</span>
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach (var status in Enum.GetValues<StatusAlunoEnum>())
-                        {
-                            <form asp-action="AlterarStatus" method="post">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@Model.Id" />
-                                <input type="hidden" name="status" value="@status" />
-                                <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="btn btn-sm alunos-status-btn @(Model.Status == status ? "btn-primary" : "btn-outline-secondary")" disabled="@(Model.Status == status)">
-                                    @status
-                                </button>
-                            </form>
-                        }
-                    </div>
-                </div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn alunos-v2-btn alunos-v2-btn-primary">Editar cadastro</a>
             }
+            <a asp-action="Index" class="btn alunos-v2-btn alunos-v2-btn-ghost">Voltar para lista</a>
         </div>
     </section>
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-8">
-            <section class="card alunos-detail-panel">
-                <div class="card-header">
-                    <ul class="nav nav-pills alunos-tabs" id="alunoDetailsTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral" type="button" role="tab">Dados cadastrais</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="financeiro-tab" data-bs-toggle="tab" data-bs-target="#financeiro" type="button" role="tab">Financeiro</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">Histórico</button>
-                        </li>
-                    </ul>
+    @if (canEditAluno)
+    {
+        <section class="alunos-v2-status-panel mb-4">
+            <div>
+                <strong>Alterar status do aluno</strong>
+                <span>Use com cuidado, pois o status impacta operação, financeiro e histórico.</span>
+            </div>
+            <div class="alunos-v2-status-actions">
+                @foreach (var status in Enum.GetValues<StatusAlunoEnum>())
+                {
+                    <form asp-action="AlterarStatus" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="@status" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        @if (Model.Status == status)
+                        {
+                            <button type="submit" class="btn alunos-v2-btn alunos-v2-btn-primary" disabled>
+                                @StatusAlunoTexto(status)
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn alunos-v2-btn alunos-v2-btn-ghost">
+                                @StatusAlunoTexto(status)
+                            </button>
+                        }
+                    </form>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="alunos-v2-kpi-grid mb-4" aria-label="Resumo do aluno">
+        <article class="alunos-v2-kpi-card is-success">
+            <div class="alunos-v2-kpi-top">
+                <span>Total pago</span>
+                <b>Financeiro</b>
+            </div>
+            <strong>@Model.TotalPago.ToString("C")</strong>
+            <small>Pagamentos registrados no histórico.</small>
+        </article>
+
+        <article class="alunos-v2-kpi-card is-warning">
+            <div class="alunos-v2-kpi-top">
+                <span>Em aberto</span>
+                <b>Pendências</b>
+            </div>
+            <strong>@Model.TotalEmAberto.ToString("C")</strong>
+            <small>@mensalidadesPendentes mensalidade(s) pendente(s).</small>
+        </article>
+
+        <article class="alunos-v2-kpi-card is-danger">
+            <div class="alunos-v2-kpi-top">
+                <span>Atrasadas</span>
+                <b>Risco</b>
+            </div>
+            <strong>@Model.MensalidadesAtrasadas</strong>
+            <small>Mensalidades com atraso ativo.</small>
+        </article>
+
+        <article class="alunos-v2-kpi-card">
+            <div class="alunos-v2-kpi-top">
+                <span>Última atividade</span>
+                <b>Histórico</b>
+            </div>
+            <strong>@(ultimaAtividade.HasValue ? ultimaAtividade.Value.ToString("dd/MM") : "-")</strong>
+            <small>@(ultimaAtividade.HasValue ? ultimaAtividade.Value.ToString("dd/MM/yyyy HH:mm") : "Sem histórico recente.")</small>
+        </article>
+    </section>
+
+    <div class="alunos-v2-details-grid">
+        <section class="alunos-v2-detail-panel">
+            <div class="alunos-v2-panel-heading">
+                <div>
+                    <span class="alunos-v2-eyebrow">Cadastro</span>
+                    <h2>Informações do aluno</h2>
+                    <p>Dados visíveis para a equipe administrativa.</p>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills alunos-v2-tabs" id="alunoDetailsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral" type="button" role="tab" aria-controls="geral" aria-selected="true">
+                        Dados cadastrais
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="financeiro-tab" data-bs-toggle="tab" data-bs-target="#financeiro" type="button" role="tab" aria-controls="financeiro" aria-selected="false">
+                        Financeiro
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab" aria-controls="historico" aria-selected="false">
+                        Histórico
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="geral" role="tabpanel" aria-labelledby="geral-tab">
+                    <div class="alunos-v2-data-grid">
+                        <article class="alunos-v2-data-card">
+                            <span>RG</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.RG) ? "-" : Model.RG)</strong>
+                        </article>
+                        <article class="alunos-v2-data-card">
+                            <span>Data de nascimento</span>
+                            <strong>@(Model.DataNascimento.HasValue ? Model.DataNascimento.Value.ToString("dd/MM/yyyy") : "-")</strong>
+                        </article>
+                        <article class="alunos-v2-data-card">
+                            <span>Celular</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</strong>
+                        </article>
+                        <article class="alunos-v2-data-card">
+                            <span>E-mail</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</strong>
+                        </article>
+                        <article class="alunos-v2-data-card alunos-v2-data-card-wide">
+                            <span>Contato de emergência</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.ContatoEmergencia) ? "-" : Model.ContatoEmergencia)</strong>
+                        </article>
+                        <article class="alunos-v2-data-card alunos-v2-data-card-wide">
+                            <span>Endereço</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Endereco) ? "-" : Model.Endereco)</strong>
+                        </article>
+                        <article class="alunos-v2-data-card alunos-v2-data-card-wide">
+                            <span>Observações internas</span>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Observacoes) ? "-" : Model.Observacoes)</strong>
+                        </article>
+                    </div>
                 </div>
 
-                <div class="tab-content" id="alunoDetailsTabContent">
-                    <div class="tab-pane fade show active" id="geral" role="tabpanel" aria-labelledby="geral-tab">
-                        <div class="p-3 p-lg-4">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">RG</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.RG) ? "-" : Model.RG)</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">Data de nascimento</span>
-                                        <strong class="alunos-data-value">@(Model.DataNascimento.HasValue ? Model.DataNascimento.Value.ToString("dd/MM/yyyy") : "-")</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">Celular</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">E-mail</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">Contato de emergência</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.ContatoEmergencia) ? "-" : Model.ContatoEmergencia)</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">Endereço</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.Endereco) ? "-" : Model.Endereco)</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12">
-                                    <article class="alunos-data-card">
-                                        <span class="alunos-data-label">Observações</span>
-                                        <strong class="alunos-data-value">@(string.IsNullOrWhiteSpace(Model.Observacoes) ? "-" : Model.Observacoes)</strong>
-                                    </article>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="financeiro" role="tabpanel" aria-labelledby="financeiro-tab">
-                        <div class="p-3 p-lg-4">
-                            <div class="row g-3 mb-3">
-                                <div class="col-12 col-md-4">
-                                    <article class="alunos-mini-kpi">
-                                        <span class="alunos-kpi-label">Total pago</span>
-                                        <strong class="alunos-kpi-value">@Model.TotalPago.ToString("C")</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <article class="alunos-mini-kpi">
-                                        <span class="alunos-kpi-label">Total em aberto</span>
-                                        <strong class="alunos-kpi-value">@Model.TotalEmAberto.ToString("C")</strong>
-                                    </article>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <article class="alunos-mini-kpi alunos-mini-kpi-danger">
-                                        <span class="alunos-kpi-label">Mensalidades atrasadas</span>
-                                        <strong class="alunos-kpi-value">@Model.MensalidadesAtrasadas</strong>
-                                    </article>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 alunos-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Competência</th>
-                                            <th>Vencimento</th>
-                                            <th>Status</th>
-                                            <th class="text-end">Valor</th>
-                                            <th>Pagamento</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if (Model.Mensalidades.Count == 0)
-                                        {
-                                            <tr>
-                                                <td colspan="5" class="text-center text-muted py-4">Nenhuma mensalidade registrada para este aluno.</td>
-                                            </tr>
-                                        }
-                                        else
-                                        {
-                                            @foreach (var item in Model.Mensalidades)
-                                            {
-                                                <tr>
-                                                    <td>@item.Competencia.ToString("MM/yyyy")</td>
-                                                    <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
-                                                    <td><span class="@MensalidadeStatusClass(item.Status)">@item.Status</span></td>
-                                                    <td class="text-end">@item.ValorFinal.ToString("C")</td>
-                                                    <td>@(item.DataPagamento.HasValue ? item.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
-                                                </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="historico" role="tabpanel" aria-labelledby="historico-tab">
-                        <div class="p-3 p-lg-4">
-                            @if (Model.Historico.Count == 0)
-                            {
-                                <div class="alunos-empty-state">
-                                    <h4>Nenhuma atividade registrada</h4>
-                                    <p class="mb-0">As movimentações do aluno aparecerão aqui.</p>
-                                </div>
-                            }
-                            else
-                            {
-                                <ol class="alunos-history-list">
-                                    @foreach (var item in Model.Historico)
-                                    {
-                                        <li class="alunos-history-item">
-                                            <div class="alunos-history-header">
-                                                <span class="alunos-history-type">@item.TipoEvento</span>
-                                                <small class="text-muted">@item.DataEvento.ToString("dd/MM/yyyy HH:mm")</small>
+                <div class="tab-pane fade" id="financeiro" role="tabpanel" aria-labelledby="financeiro-tab">
+                    <div class="table-responsive">
+                        <table class="table alunos-v2-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Competência</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Valor</th>
+                                    <th>Pagamento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Mensalidades.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="alunos-v2-empty-state">
+                                                <strong>Nenhuma mensalidade registrada.</strong>
+                                                <span>O histórico financeiro do aluno aparecerá aqui.</span>
                                             </div>
-                                            <p class="mb-0">@item.Descricao</p>
-                                        </li>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model.Mensalidades)
+                                    {
+                                        <tr>
+                                            <td>@item.Competencia.ToString("MM/yyyy")</td>
+                                            <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <span class="alunos-v2-status-pill @MensalidadeStatusClass(item.Status)">
+                                                    @StatusMensalidadeTexto(item.Status)
+                                                </span>
+                                            </td>
+                                            <td class="text-end fw-bold">@item.ValorFinal.ToString("C")</td>
+                                            <td>@(item.DataPagamento.HasValue ? item.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                        </tr>
                                     }
-                                </ol>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="historico" role="tabpanel" aria-labelledby="historico-tab">
+                    @if (Model.Historico.Count == 0)
+                    {
+                        <div class="alunos-v2-empty-state">
+                            <strong>Nenhuma atividade registrada.</strong>
+                            <span>As movimentações do aluno aparecerão aqui.</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alunos-v2-timeline">
+                            @foreach (var item in Model.Historico)
+                            {
+                                <article class="alunos-v2-timeline-item">
+                                    <span class="alunos-v2-timeline-dot"></span>
+                                    <div>
+                                        <div class="alunos-v2-timeline-meta">
+                                            <strong>@item.TipoEvento</strong>
+                                            <time>@item.DataEvento.ToString("dd/MM/yyyy HH:mm")</time>
+                                        </div>
+                                        <p>@item.Descricao</p>
+                                    </div>
+                                </article>
                             }
                         </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <aside class="alunos-v2-side-stack">
+            <section class="alunos-v2-side-card">
+                <span class="alunos-v2-eyebrow">Resumo rápido</span>
+                <h2>Operação</h2>
+                <dl class="alunos-v2-summary-list">
+                    <div>
+                        <dt>Turma</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</dd>
                     </div>
+                    <div>
+                        <dt>Pendências financeiras</dt>
+                        <dd>@mensalidadesPendentes mensalidade(s)</dd>
+                    </div>
+                    <div>
+                        <dt>Última atividade</dt>
+                        <dd>@(ultimaAtividade.HasValue ? ultimaAtividade.Value.ToString("dd/MM/yyyy HH:mm") : "Sem histórico")</dd>
+                    </div>
+                    <div>
+                        <dt>Contato</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="alunos-v2-assist-card alunos-v2-assist-card-compact">
+                <span class="alunos-v2-eyebrow">Ações rápidas</span>
+                <h2>Próximos passos</h2>
+                <div class="alunos-v2-side-actions">
+                    @if (canEditAluno)
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn alunos-v2-btn alunos-v2-btn-primary">Editar cadastro</a>
+                    }
+                    @if (canFinanceiroView)
+                    {
+                        <a asp-controller="Financeiro" asp-action="HistoricoAluno" asp-route-alunoId="@Model.Id" class="btn alunos-v2-btn alunos-v2-btn-dark-ghost">Histórico financeiro</a>
+                    }
+                    @if (canFinanceiroCreate)
+                    {
+                        <a asp-controller="Financeiro"
+                           asp-action="RegistrarPagamento"
+                           asp-route-returnUrl="@returnUrl"
+                           class="btn alunos-v2-btn alunos-v2-btn-dark-ghost">
+                            Registrar pagamento
+                        </a>
+                    }
                 </div>
             </section>
-        </div>
-
-        <div class="col-12 col-xl-4">
-            <aside class="d-grid gap-3">
-                <section class="card alunos-detail-side">
-                    <div class="card-body">
-                        <h3 class="alunos-section-title mb-3">Resumo rápido</h3>
-                        <ul class="alunos-summary-list">
-                            <li>
-                                <span>Turma</span>
-                                <strong>@(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</strong>
-                            </li>
-                            <li>
-                                <span>Pendências financeiras</span>
-                                <strong>@mensalidadesPendentes mensalidade(s)</strong>
-                            </li>
-                            <li>
-                                <span>Última atividade</span>
-                                <strong>@(ultimaAtividade.HasValue ? ultimaAtividade.Value.ToString("dd/MM/yyyy HH:mm") : "Sem histórico")</strong>
-                            </li>
-                            <li>
-                                <span>E-mail</span>
-                                <strong>@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</strong>
-                            </li>
-                            <li>
-                                <span>Contato</span>
-                                <strong>@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</strong>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
-
-                <section class="card alunos-detail-side">
-                    <div class="card-body">
-                        <h3 class="alunos-section-title mb-3">Ações rápidas</h3>
-                        <div class="d-grid gap-2">
-                            @if (canEditAluno)
-                            {
-                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar cadastro</a>
-                            }
-                            @if (canFinanceiroView)
-                            {
-                                <a asp-controller="Financeiro" asp-action="HistoricoAluno" asp-route-alunoId="@Model.Id" class="btn btn-outline-secondary">Histórico financeiro</a>
-                            }
-                            @if (canFinanceiroCreate)
-                            {
-                                <a asp-controller="Financeiro" asp-action="RegistrarPagamento" class="btn btn-outline-secondary">Registrar pagamento manual</a>
-                            }
-                        </div>
-                    </div>
-                </section>
-            </aside>
-        </div>
+        </aside>
     </div>
 </div>

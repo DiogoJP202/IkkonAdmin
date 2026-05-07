@@ -3,117 +3,234 @@
     ViewData["Title"] = "Novo Aluno";
 }
 
-<div class="alunos-page">
-    <div class="row g-3">
-        <div class="col-12 col-xl-8">
-            <section class="card alunos-form-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="alunos-section-title mb-1">Cadastro de aluno</h2>
-                        <p class="alunos-section-subtitle mb-0">Preencha os campos essenciais para iniciar o acompanhamento administrativo.</p>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post" class="row g-3">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@functions {
+    private static string StatusTexto(StatusAlunoEnum status)
+    {
+        return status switch
+        {
+            StatusAlunoEnum.EmAdmissao => "Em admissão",
+            StatusAlunoEnum.Ativo => "Ativo",
+            StatusAlunoEnum.Inativo => "Inativo",
+            StatusAlunoEnum.Desligado => "Desligado",
+            _ => status.ToString()
+        };
+    }
+}
 
-                        <section class="col-12 alunos-form-section">
-                            <h3 class="alunos-form-section-title">Dados principais</h3>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                    <label asp-for="NomeCompleto" class="form-label alunos-label">Nome completo</label>
-                                    <input asp-for="NomeCompleto" type="text" class="form-control" placeholder="Ex.: Kenji Tanaka" autocomplete="name" />
-                                    <span asp-validation-for="NomeCompleto" class="text-danger"></span>
-                                </div>
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="CPF" class="form-label alunos-label">CPF</label>
-                                    <input asp-for="CPF" type="text" class="form-control" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" autocomplete="off" />
-                                    <span asp-validation-for="CPF" class="text-danger"></span>
-                                </div>
-                                <div class="col-12 col-md-3">
-                                    <label asp-for="RG" class="form-label alunos-label">RG</label>
-                                    <input asp-for="RG" type="text" class="form-control" placeholder="Ex.: 12.345.678-9" autocomplete="off" />
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="DataNascimento" class="form-label alunos-label">Data de nascimento</label>
-                                    <input asp-for="DataNascimento" type="date" class="form-control" autocomplete="bday" />
-                                </div>
-                            </div>
-                        </section>
+<div class="alunos-v2-page">
+    <section class="alunos-v2-form-hero mb-4">
+        <div>
+            <span class="alunos-v2-eyebrow">Novo cadastro</span>
+            <h1>Cadastrar aluno</h1>
+            <p>
+                Registre os dados básicos do aluno para iniciar admissão, vínculo de turma e acompanhamento financeiro.
+            </p>
+        </div>
+        <div class="alunos-v2-hero-actions">
+            <a asp-action="Index" class="btn alunos-v2-btn alunos-v2-btn-ghost">Voltar para lista</a>
+        </div>
+    </section>
 
-                        <section class="col-12 alunos-form-section">
-                            <h3 class="alunos-form-section-title">Contato</h3>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="Celular" class="form-label alunos-label">Celular</label>
-                                    <input asp-for="Celular" type="tel" class="form-control" placeholder="(11) 99999-9999" inputmode="tel" autocomplete="tel-national" />
-                                </div>
-                                <div class="col-12 col-md-8">
-                                    <label asp-for="Email" class="form-label alunos-label">E-mail</label>
-                                    <input asp-for="Email" type="email" class="form-control" placeholder="aluno@exemplo.com" autocomplete="email" />
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="Endereco" class="form-label alunos-label">Endereço</label>
-                                    <input asp-for="Endereco" type="text" class="form-control" placeholder="Rua, numero, bairro, cidade" autocomplete="street-address" />
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="ContatoEmergencia" class="form-label alunos-label">Contato de emergência</label>
-                                    <input asp-for="ContatoEmergencia" type="text" class="form-control" placeholder="Nome e telefone do contato" autocomplete="off" />
-                                </div>
-                            </div>
-                        </section>
+    <div class="alunos-v2-form-layout">
+        <section class="alunos-v2-form-panel">
+            <form asp-action="Create" method="post" class="alunos-v2-form">
+                <div asp-validation-summary="ModelOnly" class="alunos-v2-validation-summary"></div>
 
-                        <section class="col-12 alunos-form-section">
-                            <h3 class="alunos-form-section-title">Vínculo interno</h3>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="DataEntrada" class="form-label alunos-label">Data de entrada</label>
-                                    <input asp-for="DataEntrada" type="date" class="form-control" autocomplete="off" />
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="Status" class="form-label alunos-label">Status</label>
-                                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAlunoEnum>()" class="form-select"></select>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="TurmaId" class="form-label alunos-label">Turma</label>
-                                    <select asp-for="TurmaId" asp-items="ViewBag.Turmas" class="form-select">
-                                        <option value="">Sem turma</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section class="col-12 alunos-form-section">
-                            <h3 class="alunos-form-section-title">Observações</h3>
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label asp-for="Observacoes" class="form-label alunos-label">Anotações internas</label>
-                                    <textarea asp-for="Observacoes" class="form-control" rows="4" placeholder="Informações complementares para equipe administrativa"></textarea>
-                                </div>
-                            </div>
-                        </section>
-
-                        <div class="col-12 d-flex justify-content-end gap-2 alunos-form-actions">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Salvar aluno</button>
+                <section class="alunos-v2-form-section">
+                    <div class="alunos-v2-section-title">
+                        <span>01</span>
+                        <div>
+                            <h2>Dados principais</h2>
+                            <p>Identificação civil usada no cadastro administrativo.</p>
                         </div>
-                    </form>
-                </div>
-            </section>
-        </div>
+                    </div>
 
-        <div class="col-12 col-xl-4">
-            <aside class="card alunos-detail-side">
-                <div class="card-body">
-                    <h3 class="alunos-section-title mb-3">Checklist rápido</h3>
-                    <ul class="alunos-priority-list">
-                        <li>Confirme se CPF e nome estão corretos antes de salvar.</li>
-                        <li>Defina turma inicial ou mantenha sem turma para tratar depois.</li>
-                        <li>Registre observações relevantes para admissão e integração.</li>
-                    </ul>
+                    <div class="alunos-v2-form-grid">
+                        <div class="alunos-v2-field alunos-v2-field-span-2">
+                            <label asp-for="NomeCompleto">Nome completo</label>
+                            <input asp-for="NomeCompleto"
+                                   type="text"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="Ex.: Kenji Tanaka"
+                                   autocomplete="name"
+                                   maxlength="150" />
+                            <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field">
+                            <label asp-for="CPF">CPF</label>
+                            <input asp-for="CPF"
+                                   type="text"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="000.000.000-00"
+                                   inputmode="numeric"
+                                   autocomplete="off"
+                                   maxlength="14" />
+                            <span asp-validation-for="CPF" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field">
+                            <label asp-for="RG">RG</label>
+                            <input asp-for="RG"
+                                   type="text"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="Ex.: 12.345.678-9"
+                                   autocomplete="off"
+                                   maxlength="20" />
+                            <span asp-validation-for="RG" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field">
+                            <label asp-for="DataNascimento">Data de nascimento</label>
+                            <input asp-for="DataNascimento"
+                                   type="date"
+                                   class="form-control alunos-v2-control"
+                                   autocomplete="bday" />
+                            <span asp-validation-for="DataNascimento" class="text-danger"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="alunos-v2-form-section">
+                    <div class="alunos-v2-section-title">
+                        <span>02</span>
+                        <div>
+                            <h2>Contato</h2>
+                            <p>Informações para comunicação com aluno e responsável de emergência.</p>
+                        </div>
+                    </div>
+
+                    <div class="alunos-v2-form-grid">
+                        <div class="alunos-v2-field">
+                            <label asp-for="Celular">Celular</label>
+                            <input asp-for="Celular"
+                                   type="tel"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="(11) 99999-9999"
+                                   inputmode="tel"
+                                   autocomplete="tel-national"
+                                   maxlength="20" />
+                            <span asp-validation-for="Celular" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field alunos-v2-field-span-2">
+                            <label asp-for="Email">E-mail</label>
+                            <input asp-for="Email"
+                                   type="email"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="aluno@exemplo.com"
+                                   autocomplete="email"
+                                   maxlength="150" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field alunos-v2-field-span-3">
+                            <label asp-for="Endereco">Endereço</label>
+                            <input asp-for="Endereco"
+                                   type="text"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="Rua, número, bairro, cidade"
+                                   autocomplete="street-address"
+                                   maxlength="200" />
+                            <span asp-validation-for="Endereco" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field alunos-v2-field-span-3">
+                            <label asp-for="ContatoEmergencia">Contato de emergência</label>
+                            <input asp-for="ContatoEmergencia"
+                                   type="text"
+                                   class="form-control alunos-v2-control"
+                                   placeholder="Nome, parentesco e telefone"
+                                   autocomplete="off"
+                                   maxlength="150" />
+                            <span asp-validation-for="ContatoEmergencia" class="text-danger"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="alunos-v2-form-section">
+                    <div class="alunos-v2-section-title">
+                        <span>03</span>
+                        <div>
+                            <h2>Vínculo interno</h2>
+                            <p>Status inicial e turma principal para organização administrativa.</p>
+                        </div>
+                    </div>
+
+                    <div class="alunos-v2-form-grid">
+                        <div class="alunos-v2-field">
+                            <label asp-for="DataEntrada">Data de entrada</label>
+                            <input asp-for="DataEntrada"
+                                   type="date"
+                                   class="form-control alunos-v2-control"
+                                   autocomplete="off" />
+                            <span asp-validation-for="DataEntrada" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field">
+                            <label asp-for="Status">Status</label>
+                            <select asp-for="Status" class="form-select alunos-v2-control">
+                                @foreach (var status in Enum.GetValues<StatusAlunoEnum>())
+                                {
+                                    if (Model.Status == status)
+                                    {
+                                        <option value="@status" selected>@StatusTexto(status)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@status">@StatusTexto(status)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="alunos-v2-field">
+                            <label asp-for="TurmaId">Turma principal</label>
+                            <select asp-for="TurmaId" asp-items="ViewBag.Turmas" class="form-select alunos-v2-control">
+                                <option value="">Sem turma definida</option>
+                            </select>
+                            <span asp-validation-for="TurmaId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="alunos-v2-form-section">
+                    <div class="alunos-v2-section-title">
+                        <span>04</span>
+                        <div>
+                            <h2>Observações internas</h2>
+                            <p>Anote informações úteis para a equipe. Evite dados sensíveis sem necessidade.</p>
+                        </div>
+                    </div>
+
+                    <div class="alunos-v2-field">
+                        <label asp-for="Observacoes">Anotações</label>
+                        <textarea asp-for="Observacoes"
+                                  class="form-control alunos-v2-control"
+                                  rows="4"
+                                  placeholder="Ex.: interesse em turma de sábado, precisa concluir contrato, observações de integração."></textarea>
+                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                    </div>
+                </section>
+
+                <div class="alunos-v2-form-actions">
+                    <a asp-action="Index" class="btn alunos-v2-btn alunos-v2-btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn alunos-v2-btn alunos-v2-btn-primary">Salvar aluno</button>
                 </div>
-            </aside>
-        </div>
+            </form>
+        </section>
+
+        <aside class="alunos-v2-assist-card">
+            <span class="alunos-v2-eyebrow">Checklist rápido</span>
+            <h2>Antes de salvar</h2>
+            <ul>
+                <li>Confirme nome completo e CPF para evitar duplicidade.</li>
+                <li>Use “Em admissão” quando contrato, pagamento inicial ou integração ainda estiverem pendentes.</li>
+                <li>Defina turma principal se a alocação já estiver confirmada.</li>
+                <li>Registre apenas observações úteis para operação interna.</li>
+            </ul>
+        </aside>
     </div>
 </div>
 

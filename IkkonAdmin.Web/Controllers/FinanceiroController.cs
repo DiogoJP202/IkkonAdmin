@@ -37,14 +37,14 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     {
         if (anoCompetenciaGeracao is < 2000 or > 2100 || mesCompetenciaGeracao is < 1 or > 12)
         {
-            TempData["Error"] = "Competencia invalida para geracao.";
+            TempData["Error"] = "Competência inválida para geração.";
             return RedirecionarLocal(returnUrl, nameof(Index));
         }
 
         var resultado = await financeiroService.GerarMensalidadesAsync(anoCompetenciaGeracao, mesCompetenciaGeracao, cancellationToken);
 
         TempData["Success"] =
-            $"Geracao concluida para {mesCompetenciaGeracao:D2}/{anoCompetenciaGeracao}. Criadas: {resultado.Criadas}. Ja existentes: {resultado.JaExistentes}.";
+            $"Geração concluída para {mesCompetenciaGeracao:D2}/{anoCompetenciaGeracao}. Criadas: {resultado.Criadas}. Já existentes: {resultado.JaExistentes}.";
 
         return RedirecionarLocal(returnUrl, nameof(Index));
     }
@@ -93,7 +93,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
         var sucesso = await financeiroService.RegistrarPagamentoAsync(model, cancellationToken);
         if (!sucesso)
         {
-            ModelState.AddModelError(string.Empty, "Nao foi possivel registrar o pagamento para a mensalidade informada.");
+            ModelState.AddModelError(string.Empty, "Não foi possível registrar o pagamento para a mensalidade informada.");
             ViewData["Title"] = "Registrar Pagamento";
             await RecarregarContextoPagamentoAsync(model, cancellationToken);
             return View(model);
@@ -110,14 +110,14 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     {
         if (valorFinal < 0)
         {
-            TempData["Error"] = "Valor final nao pode ser negativo.";
+            TempData["Error"] = "Valor final não pode ser negativo.";
             return RedirecionarLocal(returnUrl, nameof(Index));
         }
 
         var atualizado = await financeiroService.AtualizarValorFinalAsync(mensalidadeId, valorFinal, cancellationToken);
         TempData[atualizado ? "Success" : "Error"] = atualizado
             ? "Valor final atualizado."
-            : "Mensalidade nao encontrada para atualizar valor.";
+            : "Mensalidade não encontrada para atualizar valor.";
 
         return RedirecionarLocal(returnUrl, nameof(Index));
     }
@@ -134,7 +134,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
         var atualizado = await financeiroService.AlterarStatusMensalidadeAsync(mensalidadeId, status, cancellationToken);
         TempData[atualizado ? "Success" : "Error"] = atualizado
             ? "Status da mensalidade atualizado."
-            : "Mensalidade nao encontrada para alterar status.";
+            : "Mensalidade não encontrada para alterar status.";
 
         return RedirecionarLocal(returnUrl, nameof(Index));
     }
@@ -142,7 +142,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     [HttpGet]
     public async Task<IActionResult> HistoricoAluno(int alunoId, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Historico Financeiro";
+        ViewData["Title"] = "Histórico Financeiro";
         var vm = await financeiroService.ObterHistoricoAlunoAsync(alunoId, cancellationToken);
 
         if (vm is null)

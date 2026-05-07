@@ -1,158 +1,242 @@
-﻿@using IkkonAdmin.Web.Security
+@using IkkonAdmin.Web.Security
 @model FinanceiroHistoricoAlunoViewModel
 @{
     ViewData["Title"] = "Histórico Financeiro";
+
     var canFinanceiroCreate = User.HasPermission(AppPermissions.FinanceiroCreate);
     var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var mensalidadesPendentes = Model.Mensalidades.Count(x => x.Status is StatusMensalidadeEnum.Pendente or StatusMensalidadeEnum.Atrasado);
+    var mensalidadesPagas = Model.Mensalidades.Count(x => x.Status == StatusMensalidadeEnum.Pago);
+    var ultimoPagamento = Model.Pagamentos.OrderByDescending(x => x.DataPagamento).FirstOrDefault();
+    var inicialAluno = string.IsNullOrWhiteSpace(Model.AlunoNome)
+        ? "A"
+        : Model.AlunoNome.Trim()[0].ToString().ToUpperInvariant();
 }
 
 @functions {
-    private static string MensalidadeStatusClass(StatusMensalidadeEnum status)
+    private static string StatusMensalidadeTexto(StatusMensalidadeEnum status)
     {
         return status switch
         {
-            StatusMensalidadeEnum.Pago => "financeiro-status-pill financeiro-status-success",
-            StatusMensalidadeEnum.Atrasado => "financeiro-status-pill financeiro-status-danger",
-            StatusMensalidadeEnum.Cancelado => "financeiro-status-pill financeiro-status-muted",
-            _ => "financeiro-status-pill financeiro-status-warning"
+            StatusMensalidadeEnum.Pendente => "Pendente",
+            StatusMensalidadeEnum.Pago => "Pago",
+            StatusMensalidadeEnum.Atrasado => "Atrasado",
+            StatusMensalidadeEnum.Cancelado => "Cancelado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusMensalidadeClasse(StatusMensalidadeEnum status)
+    {
+        return status switch
+        {
+            StatusMensalidadeEnum.Pago => "is-success",
+            StatusMensalidadeEnum.Atrasado => "is-danger",
+            StatusMensalidadeEnum.Cancelado => "is-muted",
+            _ => "is-warning"
+        };
+    }
+
+    private static string FormaPagamentoTexto(FormaPagamentoEnum forma)
+    {
+        return forma switch
+        {
+            FormaPagamentoEnum.Pix => "Pix",
+            FormaPagamentoEnum.Transferencia => "Transferência",
+            FormaPagamentoEnum.Dinheiro => "Dinheiro",
+            FormaPagamentoEnum.Cartao => "Cartão",
+            FormaPagamentoEnum.Boleto => "Boleto",
+            _ => forma.ToString()
         };
     }
 }
 
-<div class="financeiro-page">
-    <section class="card financeiro-profile-card mb-3">
-        <div class="card-body p-3 p-lg-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-                <div>
-                    <div class="financeiro-eyebrow">Aluno</div>
-                    <h2 class="financeiro-title mb-1">@Model.AlunoNome</h2>
-                    <p class="financeiro-subtitle mb-0">Turma: @(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</p>
-                </div>
-                <div class="financeiro-profile-kpis">
-                    <article class="financeiro-mini-kpi">
-                        <span class="financeiro-kpi-label">Total pago</span>
-                        <strong class="financeiro-kpi-value">@Model.TotalPago.ToString("C")</strong>
-                    </article>
-                    <article class="financeiro-mini-kpi financeiro-mini-kpi-warning">
-                        <span class="financeiro-kpi-label">Total em aberto</span>
-                        <strong class="financeiro-kpi-value">@Model.TotalEmAberto.ToString("C")</strong>
-                    </article>
+<div class="financeiro-v2-page">
+    <section class="financeiro-v2-profile-hero mb-4">
+        <div class="financeiro-v2-profile-title">
+            <div class="financeiro-v2-avatar">@inicialAluno</div>
+            <div>
+                <span class="financeiro-v2-eyebrow">Histórico financeiro</span>
+                <h1>@Model.AlunoNome</h1>
+                <div class="financeiro-v2-meta">
+                    <span>Turma <strong>@(string.IsNullOrWhiteSpace(Model.Turma) ? "Sem turma" : Model.Turma)</strong></span>
+                    <span>Mensalidades <strong>@Model.Mensalidades.Count</strong></span>
+                    <span>Pagamentos <strong>@Model.Pagamentos.Count</strong></span>
                 </div>
             </div>
         </div>
+
+        <div class="financeiro-v2-hero-actions">
+            <a asp-action="Index" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Voltar financeiro</a>
+            @if (canAlunosView)
+            {
+                <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn financeiro-v2-btn financeiro-v2-btn-ghost">Abrir aluno</a>
+            }
+        </div>
     </section>
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-7">
-            <section class="card financeiro-table-card h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="financeiro-section-title mb-1">Mensalidades</h3>
-                        <p class="financeiro-section-subtitle mb-0">Histórico da evolução de cobrança por competência.</p>
-                    </div>
+    <section class="financeiro-v2-kpi-grid mb-4" aria-label="Resumo financeiro do aluno">
+        <article class="financeiro-v2-kpi-card is-success">
+            <div class="financeiro-v2-kpi-top">
+                <span>Total pago</span>
+                <b>Recebido</b>
+            </div>
+            <strong>@Model.TotalPago.ToString("C")</strong>
+            <small>@mensalidadesPagas mensalidade(s) pagas no histórico.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card is-warning">
+            <div class="financeiro-v2-kpi-top">
+                <span>Em aberto</span>
+                <b>Pendências</b>
+            </div>
+            <strong>@Model.TotalEmAberto.ToString("C")</strong>
+            <small>@mensalidadesPendentes mensalidade(s) pendente(s) ou atrasada(s).</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card">
+            <div class="financeiro-v2-kpi-top">
+                <span>Pagamentos</span>
+                <b>Registros</b>
+            </div>
+            <strong>@Model.Pagamentos.Count</strong>
+            <small>Recebimentos registrados para este aluno.</small>
+        </article>
+
+        <article class="financeiro-v2-kpi-card">
+            <div class="financeiro-v2-kpi-top">
+                <span>Último pagamento</span>
+                <b>Data</b>
+            </div>
+            <strong>@(ultimoPagamento is null ? "-" : ultimoPagamento.DataPagamento.ToString("dd/MM"))</strong>
+            <small>@(ultimoPagamento is null ? "Nenhum pagamento registrado." : ultimoPagamento.DataPagamento.ToString("dd/MM/yyyy HH:mm"))</small>
+        </article>
+    </section>
+
+    <div class="financeiro-v2-history-grid">
+        <section class="financeiro-v2-table-panel">
+            <div class="financeiro-v2-panel-heading">
+                <div>
+                    <span class="financeiro-v2-eyebrow">Cobranças</span>
+                    <h2>Mensalidades</h2>
+                    <p>Histórico por competência e status.</p>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 financeiro-table">
-                        <thead>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table financeiro-v2-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Competência</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th class="text-end">Valor</th>
+                            <th>Pagamento</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Mensalidades.Count == 0)
+                        {
                             <tr>
-                                <th>Competência</th>
-                                <th>Vencimento</th>
-                                <th>Status</th>
-                                <th class="text-end">Valor</th>
-                                <th>Pagamento</th>
-                                <th class="text-end">Ações</th>
+                                <td colspan="6">
+                                    <div class="financeiro-v2-empty-state">
+                                        <strong>Nenhuma mensalidade registrada.</strong>
+                                        <span>O histórico de cobranças do aluno aparecerá aqui.</span>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.Mensalidades.Count == 0)
+                        }
+                        else
+                        {
+                            @foreach (var item in Model.Mensalidades)
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">Nenhuma mensalidade registrada.</td>
+                                    <td>@item.Competencia.ToString("MM/yyyy")</td>
+                                    <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <span class="financeiro-v2-status-pill @StatusMensalidadeClasse(item.Status)">
+                                            @StatusMensalidadeTexto(item.Status)
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold">@item.ValorFinal.ToString("C")</td>
+                                    <td>@(item.DataPagamento.HasValue ? item.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
+                                    <td class="text-end">
+                                        @if (canFinanceiroCreate)
+                                        {
+                                            <a asp-action="RegistrarPagamento"
+                                               asp-route-mensalidadeId="@item.MensalidadeId"
+                                               asp-route-returnUrl="@returnUrl"
+                                               class="btn financeiro-v2-btn-table financeiro-v2-btn-table-primary">
+                                                Registrar
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Sem permissão</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
-                            else
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="financeiro-v2-table-panel">
+            <div class="financeiro-v2-panel-heading">
+                <div>
+                    <span class="financeiro-v2-eyebrow">Recebimentos</span>
+                    <h2>Pagamentos</h2>
+                    <p>Entradas registradas por data, competência e forma.</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table financeiro-v2-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Competência</th>
+                            <th>Forma</th>
+                            <th class="text-end">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Pagamentos.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <div class="financeiro-v2-empty-state">
+                                        <strong>Nenhum pagamento registrado.</strong>
+                                        <span>Os recebimentos do aluno aparecerão aqui.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model.Pagamentos)
                             {
-                                @foreach (var item in Model.Mensalidades)
+                                <tr>
+                                    <td>@item.DataPagamento.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@(item.Competencia.HasValue ? item.Competencia.Value.ToString("MM/yyyy") : "-")</td>
+                                    <td>@FormaPagamentoTexto(item.FormaPagamento)</td>
+                                    <td class="text-end fw-bold">@item.ValorPago.ToString("C")</td>
+                                </tr>
+                                @if (!string.IsNullOrWhiteSpace(item.Observacoes))
                                 {
-                                    <tr>
-                                        <td>@item.Competencia.ToString("MM/yyyy")</td>
-                                        <td>@item.DataVencimento.ToString("dd/MM/yyyy")</td>
-                                        <td><span class="@MensalidadeStatusClass(item.Status)">@item.Status</span></td>
-                                        <td class="text-end">@item.ValorFinal.ToString("C")</td>
-                                        <td>@(item.DataPagamento.HasValue ? item.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
-                                        <td class="text-end">
-                                            @if (canFinanceiroCreate)
-                                            {
-                                                <a asp-action="RegistrarPagamento"
-                                                   asp-route-mensalidadeId="@item.MensalidadeId"
-                                                   asp-route-returnUrl="@Context.Request.Path"
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    Registrar
-                                                </a>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted small">Sem permissão</span>
-                                            }
-                                        </td>
+                                    <tr class="financeiro-v2-note-row">
+                                        <td colspan="4">Observação: @item.Observacoes</td>
                                     </tr>
                                 }
                             }
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-
-        <div class="col-12 col-xl-5">
-            <section class="card financeiro-table-card h-100">
-                <div class="card-header">
-                    <div>
-                        <h3 class="financeiro-section-title mb-1">Pagamentos</h3>
-                        <p class="financeiro-section-subtitle mb-0">Recebimentos registrados com data e forma de pagamento.</p>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 financeiro-table">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Competência</th>
-                                <th>Forma</th>
-                                <th class="text-end">Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.Pagamentos.Count == 0)
-                            {
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">Nenhum pagamento registrado.</td>
-                                </tr>
-                            }
-                            else
-                            {
-                                @foreach (var item in Model.Pagamentos)
-                                {
-                                    <tr>
-                                        <td>@item.DataPagamento.ToString("dd/MM/yyyy HH:mm")</td>
-                                        <td>@(item.Competencia.HasValue ? item.Competencia.Value.ToString("MM/yyyy") : "-")</td>
-                                        <td>@item.FormaPagamento</td>
-                                        <td class="text-end">@item.ValorPago.ToString("C")</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <div class="mt-3 d-flex gap-2">
-        <a asp-action="Index" class="btn btn-outline-secondary">Voltar financeiro</a>
-        @if (canAlunosView)
-        {
-            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn btn-outline-primary">Abrir aluno</a>
-        }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
 </div>

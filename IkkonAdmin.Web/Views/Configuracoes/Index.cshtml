@@ -3,40 +3,93 @@
 @{
     Layout = User.IsInRole(AppRoles.Aluno) ? "_AuthLayout" : "_Layout";
     ViewData["Title"] = "Configurações";
+
+    var isAluno = User.IsInRole(AppRoles.Aluno);
+    var retornoUrl = isAluno ? "/area-do-aluno" : "/Home";
+    var ultimoLogin = Model.SecurityStatus.UltimoLoginUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sem registro";
 }
 
-<div class="user-settings-page d-grid gap-3">
-    <section class="user-settings-hero rounded-3 p-3 p-lg-4">
-        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-end">
-            <div>
-                <p class="user-settings-eyebrow mb-2">Gerenciamento de conta</p>
-                <h1 class="user-settings-title mb-2">Conta e Preferências</h1>
-                <p class="user-settings-subtitle mb-0">
-                    Gerenciar dados pessoais, segurança e preferências da sua conta.
-                </p>
+<div class="configuracoes-v2-page">
+    <section class="configuracoes-v2-hero mb-4">
+        <div class="configuracoes-v2-hero-copy">
+            <span class="configuracoes-v2-eyebrow">Gerenciamento de conta</span>
+            <h1>Conta e preferências</h1>
+            <p>
+                Atualize dados pessoais, senha, preferências e acompanhe os acessos recentes da sua conta.
+            </p>
+            <div class="configuracoes-v2-meta">
+                <span>Perfil <strong>@Model.AccountType.NomeTipoConta</strong></span>
+                <span>Status <strong>@(Model.SecurityStatus.ContaAtiva ? "Ativa" : "Inativa")</strong></span>
+                <span>Último login <strong>@ultimoLogin</strong></span>
             </div>
-            <a href="/" class="btn btn-outline-secondary">Voltar ao site</a>
+        </div>
+
+        <div class="configuracoes-v2-hero-actions">
+            <a href="@retornoUrl" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">Voltar</a>
         </div>
     </section>
 
-    <div id="userSettingsFeedback" class="alert d-none" role="alert" aria-live="polite"></div>
+    <div id="userSettingsFeedback" class="configuracoes-v2-feedback alert d-none" role="alert" aria-live="polite"></div>
 
-    <div class="d-grid gap-3">
-        <section class="user-settings-section">
+    <section class="configuracoes-v2-kpi-grid mb-4" aria-label="Resumo da conta">
+        <article class="configuracoes-v2-kpi-card @(Model.AccountInfo.ContaAtiva ? "is-success" : "is-danger")">
+            <div class="configuracoes-v2-kpi-top">
+                <span>Conta</span>
+                <b>Status</b>
+            </div>
+            <strong>@(Model.AccountInfo.ContaAtiva ? "Ativa" : "Inativa")</strong>
+            <small>Estado atual da sua conta no sistema.</small>
+        </article>
+
+        <article class="configuracoes-v2-kpi-card">
+            <div class="configuracoes-v2-kpi-top">
+                <span>Tipo</span>
+                <b>Acesso</b>
+            </div>
+            <strong>@Model.AccountType.NomeTipoConta</strong>
+            <small>Perfil de acesso definido pelo administrador.</small>
+        </article>
+
+        <article class="configuracoes-v2-kpi-card is-info">
+            <div class="configuracoes-v2-kpi-top">
+                <span>Histórico</span>
+                <b>Acessos</b>
+            </div>
+            <strong>@Model.SecurityStatus.HistoricoAcessos.Count</strong>
+            <small>Eventos recentes registrados para sua conta.</small>
+        </article>
+
+        <article class="configuracoes-v2-kpi-card is-warning">
+            <div class="configuracoes-v2-kpi-top">
+                <span>Preferências</span>
+                <b>Uso diário</b>
+            </div>
+            <strong>@(Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro ? "Claro" : "Escuro")</strong>
+            <small>Idioma: @(Model.Preferences.IdiomaPreferencia == IdiomaPreferenciaEnum.PtBr ? "Português" : "English").</small>
+        </article>
+    </section>
+
+    <div class="configuracoes-v2-grid">
+        <div class="configuracoes-v2-main-stack">
             <partial name="Partials/_AccountInfo" model="Model" />
-        </section>
-
-        <section class="user-settings-section">
             <partial name="Partials/_SecuritySettings" model="Model" />
-        </section>
-
-        <section class="user-settings-section">
             <partial name="Partials/_Preferences" model="Model" />
-        </section>
+        </div>
 
-        <section class="user-settings-section">
+        <aside class="configuracoes-v2-side-stack">
             <partial name="Partials/_AccountType" model="Model" />
-        </section>
+
+            <section class="configuracoes-v2-assist-card">
+                <span class="configuracoes-v2-eyebrow">Boas práticas</span>
+                <h2>Segurança diária</h2>
+                <ul>
+                    <li>Use uma senha forte e diferente de outros serviços.</li>
+                    <li>Revise o histórico de acessos quando notar comportamento estranho.</li>
+                    <li>Mantenha e-mail e telefone atualizados para suporte interno.</li>
+                    <li>Permissões e tipo de conta só podem ser alterados por administradores.</li>
+                </ul>
+            </section>
+        </aside>
     </div>
 </div>
 

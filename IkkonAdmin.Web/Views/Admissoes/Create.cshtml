@@ -2,130 +2,174 @@
 @model AdmissaoViewModel
 @{
     ViewData["Title"] = "Nova Admissão";
+
     var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
     var canTurmasView = User.HasPermission(AppPermissions.TurmasView);
 }
 
-<div class="admissoes-page d-grid gap-3">
-    <section class="admissoes-hero rounded-3 p-3 p-lg-4">
-        <div class="row g-3 align-items-center">
-            <div class="col-12 col-lg-8">
-                <p class="admissoes-eyebrow mb-2">Nova entrada</p>
-                <h1 class="admissoes-title mb-2">Registrar admissão</h1>
-                <p class="admissoes-subtitle mb-0">
-                    Abra o processo com os dados essenciais da aula experimental e marque o checklist inicial para organizar o fluxo de matrícula.
-                </p>
-            </div>
-            <div class="col-12 col-lg-4">
-                <div class="admissoes-quick-actions">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar para a lista</a>
-                    @if (canAlunosView)
-                    {
-                        <a asp-controller="Alunos" asp-action="Index" class="btn btn-outline-secondary">Consultar alunos</a>
-                    }
-                    @if (canTurmasView)
-                    {
-                        <a asp-controller="Turmas" asp-action="Index" class="btn btn-outline-secondary">Consultar turmas</a>
-                    }
-                </div>
-            </div>
+@functions {
+    private static string StatusTexto(StatusAdmissaoEnum status)
+    {
+        return status switch
+        {
+            StatusAdmissaoEnum.AulaExperimentalAgendada => "Aula experimental agendada",
+            StatusAdmissaoEnum.EmAndamento => "Em andamento",
+            StatusAdmissaoEnum.Matriculado => "Matriculado",
+            StatusAdmissaoEnum.Cancelado => "Cancelado",
+            _ => status.ToString()
+        };
+    }
+}
+
+<div class="admissoes-v2-page">
+    <section class="admissoes-v2-form-hero mb-4">
+        <div>
+            <span class="admissoes-v2-eyebrow">Nova entrada</span>
+            <h1>Registrar admissão</h1>
+            <p>
+                Abra o processo com a aula experimental e checklist inicial para organizar contrato, pagamento, matrícula e integração.
+            </p>
+        </div>
+        <div class="admissoes-v2-hero-actions">
+            <a asp-action="Index" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Voltar para lista</a>
+            @if (canAlunosView)
+            {
+                <a asp-controller="Alunos" asp-action="Index" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Consultar alunos</a>
+            }
+            @if (canTurmasView)
+            {
+                <a asp-controller="Turmas" asp-action="Index" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Consultar turmas</a>
+            }
         </div>
     </section>
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-8">
-            <div class="card admissoes-form-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="admissoes-section-title mb-1">Dados da admissão</h2>
-                        <p class="admissoes-section-subtitle mb-0">Preencha os campos principais para iniciar o processo.</p>
+    <div class="admissoes-v2-form-layout">
+        <section class="admissoes-v2-form-panel">
+            <form asp-action="Create" method="post" class="admissoes-v2-form">
+                <div asp-validation-summary="ModelOnly" class="admissoes-v2-validation-summary"></div>
+
+                <section class="admissoes-v2-form-section">
+                    <div class="admissoes-v2-section-title">
+                        <span>01</span>
+                        <div>
+                            <h2>Identificação inicial</h2>
+                            <p>Dados mínimos para iniciar o acompanhamento da aula experimental.</p>
+                        </div>
                     </div>
-                    <span class="admissoes-form-id">Novo processo</span>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post" class="row g-3">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                        <div class="col-12 admissoes-form-section">
-                            <h3 class="admissoes-form-section-title">Identificação inicial</h3>
-                            <div class="row g-3">
-                                <div class="col-12 col-md-8">
-                                    <label asp-for="NomeInteressado" class="admissoes-label">Nome do interessado</label>
-                                    <input asp-for="NomeInteressado" class="form-control" placeholder="Ex.: Maria Fernanda Sato" autocomplete="name" />
-                                    <span asp-validation-for="NomeInteressado" class="text-danger"></span>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="DataAulaExperimental" class="admissoes-label">Data da aula experimental</label>
-                                    <input asp-for="DataAulaExperimental" type="date" class="form-control" />
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label asp-for="Status" class="admissoes-label">Status inicial</label>
-                                    <select asp-for="Status" asp-items="Html.GetEnumSelectList<StatusAdmissaoEnum>()" class="form-select"></select>
-                                </div>
-                            </div>
+                    <div class="admissoes-v2-form-grid">
+                        <div class="admissoes-v2-field admissoes-v2-field-span-2">
+                            <label asp-for="NomeInteressado">Nome do interessado</label>
+                            <input asp-for="NomeInteressado"
+                                   type="text"
+                                   class="form-control admissoes-v2-control"
+                                   placeholder="Ex.: Maria Fernanda Sato"
+                                   autocomplete="name"
+                                   maxlength="150" />
+                            <span asp-validation-for="NomeInteressado" class="text-danger"></span>
                         </div>
 
-                        <div class="col-12 admissoes-form-section">
-                            <h3 class="admissoes-form-section-title">Checklist operacional</h3>
-                            <div class="row g-2">
-                                <div class="col-12 col-md-4">
-                                    <div class="form-check admissoes-check">
-                                        <input asp-for="ContratoAssinado" class="form-check-input" />
-                                        <label asp-for="ContratoAssinado" class="form-check-label">Contrato assinado</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="form-check admissoes-check">
-                                        <input asp-for="PagamentoInicialConfirmado" class="form-check-input" />
-                                        <label asp-for="PagamentoInicialConfirmado" class="form-check-label">Pagamento inicial confirmado</label>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="form-check admissoes-check">
-                                        <input asp-for="IntegracaoConcluida" class="form-check-input" />
-                                        <label asp-for="IntegracaoConcluida" class="form-check-label">Integração concluída</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="ChecklistObservacoes" class="admissoes-label">Observações do checklist</label>
-                                    <textarea asp-for="ChecklistObservacoes" rows="4" class="form-control" placeholder="Observações internas sobre contrato, pagamentos, grupos e onboarding."></textarea>
-                                </div>
-                            </div>
+                        <div class="admissoes-v2-field">
+                            <label asp-for="DataAulaExperimental">Data da aula experimental</label>
+                            <input asp-for="DataAulaExperimental"
+                                   type="date"
+                                   class="form-control admissoes-v2-control" />
+                            <span asp-validation-for="DataAulaExperimental" class="text-danger"></span>
                         </div>
 
-                        <div class="col-12 d-flex justify-content-end gap-2 admissoes-form-actions">
-                            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Salvar admissão</button>
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Status">Status inicial</label>
+                            <select asp-for="Status" class="form-select admissoes-v2-control">
+                                @foreach (var status in Enum.GetValues<StatusAdmissaoEnum>().Where(x => x != StatusAdmissaoEnum.Matriculado))
+                                {
+                                    if (Model.Status == status)
+                                    {
+                                        <option value="@status" selected>@StatusTexto(status)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@status">@StatusTexto(status)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
                         </div>
-                    </form>
+                    </div>
+                </section>
+
+                <section class="admissoes-v2-form-section">
+                    <div class="admissoes-v2-section-title">
+                        <span>02</span>
+                        <div>
+                            <h2>Checklist operacional</h2>
+                            <p>Marque apenas o que já foi confirmado. Esses campos podem ser atualizados depois.</p>
+                        </div>
+                    </div>
+
+                    <div class="admissoes-v2-check-grid">
+                        <label class="admissoes-v2-check-card">
+                            <input asp-for="ContratoAssinado" class="form-check-input" />
+                            <span>
+                                <strong>Contrato assinado</strong>
+                                <small>Documento recebido ou assinatura confirmada.</small>
+                            </span>
+                        </label>
+
+                        <label class="admissoes-v2-check-card">
+                            <input asp-for="PagamentoInicialConfirmado" class="form-check-input" />
+                            <span>
+                                <strong>Pagamento inicial confirmado</strong>
+                                <small>Pagamento de entrada validado pela equipe.</small>
+                            </span>
+                        </label>
+
+                        <label class="admissoes-v2-check-card">
+                            <input asp-for="IntegracaoConcluida" class="form-check-input" />
+                            <span>
+                                <strong>Integração concluída</strong>
+                                <small>Boas-vindas, grupos, horários e orientações iniciais.</small>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="admissoes-v2-form-section">
+                    <div class="admissoes-v2-section-title">
+                        <span>03</span>
+                        <div>
+                            <h2>Observações</h2>
+                            <p>Registre pendências, origem do contato e próximos passos para a equipe.</p>
+                        </div>
+                    </div>
+
+                    <div class="admissoes-v2-field">
+                        <label asp-for="ChecklistObservacoes">Observações do checklist</label>
+                        <textarea asp-for="ChecklistObservacoes"
+                                  rows="4"
+                                  class="form-control admissoes-v2-control"
+                                  placeholder="Ex.: veio pelo Instagram, aguarda contrato, enviar mensagem de boas-vindas, incluir no grupo."></textarea>
+                        <span asp-validation-for="ChecklistObservacoes" class="text-danger"></span>
+                    </div>
+                </section>
+
+                <div class="admissoes-v2-form-actions">
+                    <a asp-action="Index" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn admissoes-v2-btn admissoes-v2-btn-primary">Salvar admissão</button>
                 </div>
-            </div>
-        </div>
-        <div class="col-12 col-xl-4">
-            <div class="card admissoes-side-card h-100">
-                <div class="card-header">
-                    <h2 class="admissoes-section-title mb-0">Guia rápido</h2>
-                </div>
-                <div class="card-body">
-                    <ul class="admissoes-priority-list mb-0">
-                        <li>
-                            <strong>Evite iniciar como Matriculado</strong>
-                            <span>Use este status apenas depois de criar o aluno na etapa de detalhes.</span>
-                        </li>
-                        <li>
-                            <strong>Checklist completo</strong>
-                            <span>Marque contrato, pagamento inicial e integração para evitar pendências futuras.</span>
-                        </li>
-                        <li>
-                            <strong>Observações objetivas</strong>
-                            <span>Registre somente o necessário para a equipe agir com rapidez.</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+            </form>
+        </section>
+
+        <aside class="admissoes-v2-assist-card">
+            <span class="admissoes-v2-eyebrow">Guia rápido</span>
+            <h2>Como usar este fluxo</h2>
+            <ul>
+                <li>Não inicie um processo como “Matriculado”; esse status só deve vir depois da criação da matrícula.</li>
+                <li>Use o checklist para reduzir falhas entre contrato, pagamento e integração.</li>
+                <li>Mantenha observações curtas, objetivas e acionáveis.</li>
+                <li>Depois de salvar, abra os detalhes para converter a admissão em aluno.</li>
+            </ul>
+        </aside>
     </div>
-
 </div>
 
 @section Scripts {

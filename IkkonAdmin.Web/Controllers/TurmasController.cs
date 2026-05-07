@@ -62,7 +62,7 @@ public class TurmasController(ITurmaService turmaService) : Controller
 
         if (await turmaService.ExisteNomeAsync(model.Nome, cancellationToken: cancellationToken))
         {
-            ModelState.AddModelError(nameof(model.Nome), "Ja existe uma turma com esse nome.");
+            ModelState.AddModelError(nameof(model.Nome), "Já existe uma turma com esse nome.");
         }
 
         if (!ModelState.IsValid)
@@ -131,7 +131,7 @@ public class TurmasController(ITurmaService turmaService) : Controller
 
         if (await turmaService.ExisteNomeAsync(model.Nome, model.Id, cancellationToken))
         {
-            ModelState.AddModelError(nameof(model.Nome), "Ja existe uma turma com esse nome.");
+            ModelState.AddModelError(nameof(model.Nome), "Já existe uma turma com esse nome.");
         }
 
         if (!ModelState.IsValid)

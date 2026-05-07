@@ -2,300 +2,377 @@
 @model AdmissaoDetalhesViewModel
 @{
     ViewData["Title"] = "Detalhes da Admissão";
+
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var canAdmissoesEdit = User.HasPermission(AppPermissions.AdmissoesEdit);
     var canAdmissoesCreate = User.HasPermission(AppPermissions.AdmissoesCreate);
     var canAlunosView = User.HasPermission(AppPermissions.AlunosView);
     var checklistConcluido = (Model.ContratoAssinado ? 1 : 0) + (Model.PagamentoInicialConfirmado ? 1 : 0) + (Model.IntegracaoConcluida ? 1 : 0);
     var percentualChecklist = (checklistConcluido * 100) / 3;
+    var inicialPessoa = string.IsNullOrWhiteSpace(Model.NomeInteressado)
+        ? "A"
+        : Model.NomeInteressado.Trim()[0].ToString().ToUpperInvariant();
 }
 
 @functions {
-    private static string StatusPillClass(StatusAdmissaoEnum status)
+    private static string StatusTexto(StatusAdmissaoEnum status)
     {
         return status switch
         {
-            StatusAdmissaoEnum.Matriculado => "admissoes-status-pill admissoes-status-success",
-            StatusAdmissaoEnum.Cancelado => "admissoes-status-pill admissoes-status-muted",
-            StatusAdmissaoEnum.EmAndamento => "admissoes-status-pill admissoes-status-warning",
-            _ => "admissoes-status-pill admissoes-status-info"
+            StatusAdmissaoEnum.AulaExperimentalAgendada => "Aula experimental agendada",
+            StatusAdmissaoEnum.EmAndamento => "Em andamento",
+            StatusAdmissaoEnum.Matriculado => "Matriculado",
+            StatusAdmissaoEnum.Cancelado => "Cancelado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusClasse(StatusAdmissaoEnum status)
+    {
+        return status switch
+        {
+            StatusAdmissaoEnum.Matriculado => "is-success",
+            StatusAdmissaoEnum.Cancelado => "is-muted",
+            StatusAdmissaoEnum.EmAndamento => "is-warning",
+            _ => "is-info"
         };
     }
 }
 
-<div class="admissoes-page d-grid gap-3">
-    <section class="admissoes-hero rounded-3 p-3 p-lg-4">
-        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+<div class="admissoes-v2-page">
+    <section class="admissoes-v2-profile-hero mb-4">
+        <div class="admissoes-v2-profile-title">
+            <div class="admissoes-v2-avatar">@inicialPessoa</div>
             <div>
-                <p class="admissoes-eyebrow mb-2">Detalhes do processo</p>
-                <h1 class="admissoes-title mb-2">@Model.NomeInteressado</h1>
-                <p class="admissoes-subtitle mb-0">
-                    Aula experimental em <strong>@Model.DataAulaExperimental.ToString("dd/MM/yyyy")</strong>
+                <span class="admissoes-v2-eyebrow">Detalhes do processo</span>
+                <h1>@Model.NomeInteressado</h1>
+                <div class="admissoes-v2-meta">
+                    <span>Processo <strong>#@Model.Id</strong></span>
+                    <span>Aula <strong>@Model.DataAulaExperimental.ToString("dd/MM/yyyy")</strong></span>
                     @if (Model.DataMatricula.HasValue)
                     {
-                        <span>- Matrícula em <strong>@Model.DataMatricula.Value.ToString("dd/MM/yyyy")</strong></span>
+                        <span>Matrícula <strong>@Model.DataMatricula.Value.ToString("dd/MM/yyyy")</strong></span>
                     }
-                </p>
-            </div>
-            <div class="d-flex align-items-start gap-2 flex-wrap">
-                <span class="@StatusPillClass(Model.Status)">@Model.Status</span>
-                @if (Model.AlunoId.HasValue && canAlunosView)
-                {
-                    <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn btn-sm btn-outline-primary">Abrir aluno</a>
-                }
-                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Voltar</a>
+                </div>
             </div>
         </div>
 
-        <div class="row g-3 mt-1">
-            <div class="col-6 col-md-3">
-                <article class="admissoes-kpi-card admissoes-kpi-warning">
-                    <span class="admissoes-kpi-label">Checklist</span>
-                    <strong class="admissoes-kpi-value">@checklistConcluido/3</strong>
-                    <span class="admissoes-kpi-foot">Etapas concluídas</span>
-                </article>
-            </div>
-            <div class="col-6 col-md-3">
-                <article class="admissoes-kpi-card admissoes-kpi-info">
-                    <span class="admissoes-kpi-label">Vínculo aluno</span>
-                    <strong class="admissoes-kpi-value">@(Model.AlunoId.HasValue ? "Sim" : "Não")</strong>
-                    <span class="admissoes-kpi-foot">Matrícula associada</span>
-                </article>
-            </div>
-            <div class="col-6 col-md-3">
-                <article class="admissoes-kpi-card admissoes-kpi-success">
-                    <span class="admissoes-kpi-label">Status atual</span>
-                    <strong class="admissoes-kpi-value">@Model.Status</strong>
-                    <span class="admissoes-kpi-foot">Fase do processo</span>
-                </article>
-            </div>
-            <div class="col-6 col-md-3">
-                <article class="admissoes-kpi-card admissoes-kpi-highlight">
-                    <span class="admissoes-kpi-label">Processo</span>
-                    <strong class="admissoes-kpi-value">#@Model.Id</strong>
-                    <span class="admissoes-kpi-foot">Identificador interno</span>
-                </article>
-            </div>
+        <div class="admissoes-v2-hero-actions">
+            <span class="admissoes-v2-status-pill @StatusClasse(Model.Status)">
+                @StatusTexto(Model.Status)
+            </span>
+            @if (Model.AlunoId.HasValue && canAlunosView)
+            {
+                <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Abrir aluno</a>
+            }
+            <a asp-action="Index" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Voltar</a>
         </div>
     </section>
 
-    <div class="row g-3">
-        <div class="col-12 col-xl-7">
-            <div class="card admissoes-form-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="admissoes-section-title mb-1">Processo de admissão</h2>
-                        <p class="admissoes-section-subtitle mb-0">Atualize status e checklist para manter a equipe sincronizada.</p>
-                    </div>
+    <section class="admissoes-v2-kpi-grid mb-4" aria-label="Resumo da admissão">
+        <article class="admissoes-v2-kpi-card is-warning">
+            <div class="admissoes-v2-kpi-top">
+                <span>Checklist</span>
+                <b>@percentualChecklist%</b>
+            </div>
+            <strong>@checklistConcluido/3</strong>
+            <small>Etapas básicas concluídas.</small>
+        </article>
+
+        <article class="admissoes-v2-kpi-card @(Model.AlunoId.HasValue ? "is-success" : "is-danger")">
+            <div class="admissoes-v2-kpi-top">
+                <span>Vínculo aluno</span>
+                <b>Matrícula</b>
+            </div>
+            <strong>@(Model.AlunoId.HasValue ? "Sim" : "Não")</strong>
+            <small>@(Model.AlunoId.HasValue ? "Cadastro de aluno vinculado." : "Ainda precisa criar matrícula.")</small>
+        </article>
+
+        <article class="admissoes-v2-kpi-card">
+            <div class="admissoes-v2-kpi-top">
+                <span>Status atual</span>
+                <b>Fase</b>
+            </div>
+            <strong>@StatusTexto(Model.Status)</strong>
+            <small>Etapa operacional do processo.</small>
+        </article>
+
+        <article class="admissoes-v2-kpi-card">
+            <div class="admissoes-v2-kpi-top">
+                <span>Aula experimental</span>
+                <b>Data</b>
+            </div>
+            <strong>@Model.DataAulaExperimental.ToString("dd/MM")</strong>
+            <small>@Model.DataAulaExperimental.ToString("dd/MM/yyyy")</small>
+        </article>
+    </section>
+
+    <div class="admissoes-v2-details-grid">
+        <section class="admissoes-v2-form-panel">
+            <div class="admissoes-v2-panel-heading">
+                <div>
+                    <span class="admissoes-v2-eyebrow">Processo</span>
+                    <h2>Status e checklist</h2>
+                    <p>Atualize a situação da admissão e as etapas de contrato, pagamento e integração.</p>
                 </div>
-                <div class="card-body">
-                    @if (canAdmissoesEdit)
-                    {
-                        <form asp-action="AtualizarProcesso" method="post" class="row g-3">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            </div>
 
-                            <div class="col-12 col-md-6">
-                                <label class="admissoes-label" for="status">Status</label>
-                                <select id="status" name="status" class="form-select">
-                                    @foreach (var status in Enum.GetValues<StatusAdmissaoEnum>())
-                                    {
-                                        if (Model.Status == status)
-                                        {
-                                            <option value="@status" selected>@status</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@status">@status</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
+            <div class="admissoes-v2-form">
+                @if (canAdmissoesEdit)
+                {
+                    <form asp-action="AtualizarProcesso" method="post" class="admissoes-v2-inline-process-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
 
-                            <div class="col-12 col-md-6">
-                                <label class="admissoes-label">Checklist concluído</label>
-                                <div class="admissoes-checklist-box">
-                                    <div class="progress admissoes-checklist-progress mb-2" role="progressbar" aria-label="Progresso do checklist" aria-valuenow="@checklistConcluido" aria-valuemin="0" aria-valuemax="3">
-                                        <div class="progress-bar" style="width:@percentualChecklist%"></div>
+                        <section class="admissoes-v2-form-section">
+                            <div class="admissoes-v2-form-grid">
+                                <div class="admissoes-v2-field">
+                                    <label for="status">Status</label>
+                                    <select id="status" name="status" class="form-select admissoes-v2-control">
+                                        @foreach (var status in Enum.GetValues<StatusAdmissaoEnum>())
+                                        {
+                                            if (Model.Status == status)
+                                            {
+                                                <option value="@status" selected>@StatusTexto(status)</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@status">@StatusTexto(status)</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="admissoes-v2-checklist-summary">
+                                    <span>Checklist concluído</span>
+                                    <div class="admissoes-v2-progress" role="progressbar" aria-label="Progresso do checklist" aria-valuenow="@checklistConcluido" aria-valuemin="0" aria-valuemax="3">
+                                        <span style="width:@percentualChecklist%"></span>
                                     </div>
                                     <strong>@checklistConcluido/3 etapas</strong>
                                 </div>
                             </div>
+                        </section>
 
-                            <div class="col-12 col-md-4">
-                                <div class="form-check admissoes-check">
+                        <section class="admissoes-v2-form-section">
+                            <div class="admissoes-v2-check-grid">
+                                <label class="admissoes-v2-check-card">
                                     @if (Model.ContratoAssinado)
                                     {
-                                        <input class="form-check-input" type="checkbox" id="contratoAssinado" name="contratoAssinado" value="true" checked />
+                                        <input type="checkbox" name="contratoAssinado" value="true" checked />
                                     }
                                     else
                                     {
-                                        <input class="form-check-input" type="checkbox" id="contratoAssinado" name="contratoAssinado" value="true" />
+                                        <input type="checkbox" name="contratoAssinado" value="true" />
                                     }
-                                    <label class="form-check-label" for="contratoAssinado">Contrato assinado</label>
-                                </div>
-                            </div>
+                                    <span>
+                                        <strong>Contrato assinado</strong>
+                                        <small>Documento recebido ou assinatura confirmada.</small>
+                                    </span>
+                                </label>
 
-                            <div class="col-12 col-md-4">
-                                <div class="form-check admissoes-check">
+                                <label class="admissoes-v2-check-card">
                                     @if (Model.PagamentoInicialConfirmado)
                                     {
-                                        <input class="form-check-input" type="checkbox" id="pagamentoInicialConfirmado" name="pagamentoInicialConfirmado" value="true" checked />
+                                        <input type="checkbox" name="pagamentoInicialConfirmado" value="true" checked />
                                     }
                                     else
                                     {
-                                        <input class="form-check-input" type="checkbox" id="pagamentoInicialConfirmado" name="pagamentoInicialConfirmado" value="true" />
+                                        <input type="checkbox" name="pagamentoInicialConfirmado" value="true" />
                                     }
-                                    <label class="form-check-label" for="pagamentoInicialConfirmado">Pagamento inicial confirmado</label>
-                                </div>
-                            </div>
+                                    <span>
+                                        <strong>Pagamento inicial confirmado</strong>
+                                        <small>Entrada financeira validada pela equipe.</small>
+                                    </span>
+                                </label>
 
-                            <div class="col-12 col-md-4">
-                                <div class="form-check admissoes-check">
+                                <label class="admissoes-v2-check-card">
                                     @if (Model.IntegracaoConcluida)
                                     {
-                                        <input class="form-check-input" type="checkbox" id="integracaoConcluida" name="integracaoConcluida" value="true" checked />
+                                        <input type="checkbox" name="integracaoConcluida" value="true" checked />
                                     }
                                     else
                                     {
-                                        <input class="form-check-input" type="checkbox" id="integracaoConcluida" name="integracaoConcluida" value="true" />
+                                        <input type="checkbox" name="integracaoConcluida" value="true" />
                                     }
-                                    <label class="form-check-label" for="integracaoConcluida">Integração concluída</label>
-                                </div>
+                                    <span>
+                                        <strong>Integração concluída</strong>
+                                        <small>Boas-vindas, grupos, horários e orientações iniciais.</small>
+                                    </span>
+                                </label>
                             </div>
+                        </section>
 
-                            <div class="col-12">
-                                <label class="admissoes-label" for="checklistObservacoes">Observações</label>
-                                <textarea class="form-control" id="checklistObservacoes" name="checklistObservacoes" rows="4" placeholder="Contexto interno do processo, pendências e próximos passos.">@Model.ChecklistObservacoes</textarea>
+                        <section class="admissoes-v2-form-section">
+                            <div class="admissoes-v2-field">
+                                <label for="checklistObservacoes">Observações</label>
+                                <textarea class="form-control admissoes-v2-control"
+                                          id="checklistObservacoes"
+                                          name="checklistObservacoes"
+                                          rows="4"
+                                          placeholder="Contexto interno, pendências e próximos passos.">@Model.ChecklistObservacoes</textarea>
                             </div>
+                        </section>
 
-                            <div class="col-12 d-flex justify-content-end admissoes-form-actions">
-                                <button type="submit" class="btn btn-primary">Salvar processo</button>
-                            </div>
-                        </form>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning mb-0">Você não tem permissão para editar este processo.</div>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-xl-5">
-            <div class="card admissoes-side-card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="admissoes-section-title mb-1">Matrícula</h2>
-                        <p class="admissoes-section-subtitle mb-0">Converta a admissão em cadastro de aluno.</p>
-                    </div>
-                </div>
-                <div class="card-body">
-                    @if (Model.AlunoId.HasValue)
-                    {
-                        <div class="admissoes-concluded-box">
-                            <p class="mb-2">Matrícula já criada para esta admissão.</p>
-                            <p class="mb-3 text-muted">Aluno vinculado: <strong>@Model.AlunoNome</strong></p>
-                            @if (canAlunosView)
-                            {
-                                <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn btn-outline-primary btn-sm">Abrir perfil do aluno</a>
-                            }
+                        <div class="admissoes-v2-form-actions">
+                            <button type="submit" class="btn admissoes-v2-btn admissoes-v2-btn-primary">Salvar processo</button>
                         </div>
-                    }
-                    else
-                    {
-                        @if (canAdmissoesCreate)
-                        {
-                            <form asp-action="CriarMatricula" asp-route-id="@Model.Id" method="post" class="row g-3">
-                                @Html.AntiForgeryToken()
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    </form>
+                }
+                else
+                {
+                    <div class="admissoes-v2-alert-card">
+                        <strong>Sem permissão de edição</strong>
+                        <span>Você pode visualizar este processo, mas não pode alterar status ou checklist.</span>
+                    </div>
+                }
+            </div>
+        </section>
 
-                            <div class="col-12">
-                                <label asp-for="Matricula.CPF" class="admissoes-label">CPF</label>
-                                <input asp-for="Matricula.CPF" class="form-control" inputmode="numeric" placeholder="Somente números ou formatado" autocomplete="off" />
-                                <span asp-validation-for="Matricula.CPF" class="text-danger"></span>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Matricula.RG" class="admissoes-label">RG</label>
-                                <input asp-for="Matricula.RG" class="form-control" placeholder="Documento de identidade" autocomplete="off" />
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Matricula.DataNascimento" class="admissoes-label">Data de nascimento</label>
-                                <input asp-for="Matricula.DataNascimento" type="date" class="form-control" />
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Matricula.Celular" class="admissoes-label">Celular</label>
-                                <input asp-for="Matricula.Celular" class="form-control" inputmode="tel" placeholder="(11) 99999-9999" autocomplete="tel" />
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label asp-for="Matricula.Email" class="admissoes-label">E-mail</label>
-                                <input asp-for="Matricula.Email" type="email" class="form-control" placeholder="nome@email.com" autocomplete="email" />
-                            </div>
-                            <div class="col-12">
-                                <label asp-for="Matricula.Endereco" class="admissoes-label">Endereço</label>
-                                <input asp-for="Matricula.Endereco" class="form-control" placeholder="Rua, número, bairro e cidade" autocomplete="street-address" />
-                            </div>
-                            <div class="col-12">
-                                <label asp-for="Matricula.ContatoEmergencia" class="admissoes-label">Contato de emergência</label>
-                                <input asp-for="Matricula.ContatoEmergencia" class="form-control" placeholder="Nome e telefone do contato" autocomplete="off" />
-                            </div>
-                            <div class="col-12">
-                                <label asp-for="Matricula.TurmaId" class="admissoes-label">Turma inicial</label>
-                                <select asp-for="Matricula.TurmaId" class="form-select">
-                                    <option value="">Sem turma</option>
-                                    @foreach (var turma in Model.Turmas)
+        <aside class="admissoes-v2-side-stack">
+            <section class="admissoes-v2-side-card">
+                <span class="admissoes-v2-eyebrow">Matrícula</span>
+                <h2>Conversão em aluno</h2>
+
+                @if (Model.AlunoId.HasValue)
+                {
+                    <div class="admissoes-v2-concluded-box">
+                        <strong>Matrícula criada</strong>
+                        <span>Aluno vinculado: @(Model.AlunoNome ?? $"Aluno #{Model.AlunoId}")</span>
+                        @if (canAlunosView)
+                        {
+                            <a asp-controller="Alunos" asp-action="Details" asp-route-id="@Model.AlunoId" class="btn admissoes-v2-btn admissoes-v2-btn-ghost">Abrir perfil</a>
+                        }
+                    </div>
+                }
+                else if (canAdmissoesCreate)
+                {
+                    <form asp-action="CriarMatricula" asp-route-id="@Model.Id" method="post" class="admissoes-v2-matricula-form">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="admissoes-v2-validation-summary"></div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.CPF">CPF</label>
+                            <input asp-for="Matricula.CPF"
+                                   class="form-control admissoes-v2-control"
+                                   inputmode="numeric"
+                                   placeholder="000.000.000-00"
+                                   autocomplete="off"
+                                   maxlength="14" />
+                            <span asp-validation-for="Matricula.CPF" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.RG">RG</label>
+                            <input asp-for="Matricula.RG"
+                                   class="form-control admissoes-v2-control"
+                                   placeholder="Ex.: 12.345.678-9"
+                                   autocomplete="off"
+                                   maxlength="20" />
+                            <span asp-validation-for="Matricula.RG" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.DataNascimento">Data de nascimento</label>
+                            <input asp-for="Matricula.DataNascimento"
+                                   type="date"
+                                   class="form-control admissoes-v2-control" />
+                            <span asp-validation-for="Matricula.DataNascimento" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.Celular">Celular</label>
+                            <input asp-for="Matricula.Celular"
+                                   class="form-control admissoes-v2-control"
+                                   type="tel"
+                                   inputmode="tel"
+                                   placeholder="(11) 99999-9999"
+                                   autocomplete="tel-national"
+                                   maxlength="20" />
+                            <span asp-validation-for="Matricula.Celular" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.Email">E-mail</label>
+                            <input asp-for="Matricula.Email"
+                                   type="email"
+                                   class="form-control admissoes-v2-control"
+                                   placeholder="nome@email.com"
+                                   autocomplete="email"
+                                   maxlength="150" />
+                            <span asp-validation-for="Matricula.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.Endereco">Endereço</label>
+                            <input asp-for="Matricula.Endereco"
+                                   class="form-control admissoes-v2-control"
+                                   placeholder="Rua, número, bairro e cidade"
+                                   autocomplete="street-address"
+                                   maxlength="200" />
+                            <span asp-validation-for="Matricula.Endereco" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.ContatoEmergencia">Contato de emergência</label>
+                            <input asp-for="Matricula.ContatoEmergencia"
+                                   class="form-control admissoes-v2-control"
+                                   placeholder="Nome, parentesco e telefone"
+                                   autocomplete="off"
+                                   maxlength="150" />
+                            <span asp-validation-for="Matricula.ContatoEmergencia" class="text-danger"></span>
+                        </div>
+
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.TurmaId">Turma inicial</label>
+                            <select asp-for="Matricula.TurmaId" class="form-select admissoes-v2-control">
+                                <option value="">Sem turma definida</option>
+                                @foreach (var turma in Model.Turmas)
+                                {
+                                    if (Model.Matricula.TurmaId == turma.Id)
                                     {
-                                        if (Model.Matricula.TurmaId == turma.Id)
-                                        {
-                                            <option value="@turma.Id" selected>@turma.Nome</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@turma.Id">@turma.Nome</option>
-                                        }
+                                        <option value="@turma.Id" selected>@turma.Nome</option>
                                     }
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label asp-for="Matricula.ObservacoesAluno" class="admissoes-label">Observações do aluno</label>
-                                <textarea asp-for="Matricula.ObservacoesAluno" rows="3" class="form-control" placeholder="Informações úteis para o acompanhamento inicial."></textarea>
-                            </div>
-                                <div class="col-12 d-flex justify-content-end admissoes-form-actions">
-                                    <button type="submit" class="btn btn-success">Criar matrícula</button>
-                                </div>
-                            </form>
-                        }
-                        else
-                        {
-                            <div class="alert alert-warning mb-0">Você não tem permissão para criar matrícula.</div>
-                        }
-                    }
-                </div>
-            </div>
+                                    else
+                                    {
+                                        <option value="@turma.Id">@turma.Nome</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Matricula.TurmaId" class="text-danger"></span>
+                        </div>
 
-            <div class="card admissoes-side-card mt-3">
-                <div class="card-header">
-                    <h2 class="admissoes-section-title mb-0">Próximos passos</h2>
-                </div>
-                <div class="card-body">
-                    <ul class="admissoes-priority-list mb-0">
-                        <li>
-                            <strong>Status Matriculado</strong>
-                            <span>Defina somente após criar a matrícula e confirmar checklist básico.</span>
-                        </li>
-                        <li>
-                            <strong>Checklist visível</strong>
-                            <span>Evite avançar com pendências de contrato, pagamento inicial ou integração.</span>
-                        </li>
-                        <li>
-                            <strong>Registro de contexto</strong>
-                            <span>Use observações curtas e claras para facilitar handoff entre funcionários.</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                        <div class="admissoes-v2-field">
+                            <label asp-for="Matricula.ObservacoesAluno">Observações do aluno</label>
+                            <textarea asp-for="Matricula.ObservacoesAluno"
+                                      rows="3"
+                                      class="form-control admissoes-v2-control"
+                                      placeholder="Informações úteis para o acompanhamento inicial."></textarea>
+                            <span asp-validation-for="Matricula.ObservacoesAluno" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn admissoes-v2-btn admissoes-v2-btn-primary w-100">Criar matrícula</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="admissoes-v2-alert-card">
+                        <strong>Sem permissão</strong>
+                        <span>Você não possui permissão para criar matrícula.</span>
+                    </div>
+                }
+            </section>
+
+            <section class="admissoes-v2-assist-card admissoes-v2-assist-card-compact">
+                <span class="admissoes-v2-eyebrow">Próximos passos</span>
+                <h2>Critérios de avanço</h2>
+                <ul>
+                    <li>Use “Matriculado” apenas depois da criação do aluno.</li>
+                    <li>Evite avançar com pendências de contrato ou pagamento inicial.</li>
+                    <li>Registre contexto curto para facilitar handoff entre funcionários.</li>
+                </ul>
+            </section>
+        </aside>
     </div>
 </div>
 
