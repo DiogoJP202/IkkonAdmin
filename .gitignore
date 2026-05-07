@@ -55,3 +55,8 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+
+# Documentation
+
+USUARIOS_ACESSO.md
+USUARIOS_ACESSO.md
