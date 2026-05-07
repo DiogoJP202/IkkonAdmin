@@ -1,0 +1,116 @@
+@using IkkonAdmin.Web.Security
+@model GoogleAgendaEventoViewModel
+@{
+    ViewData["Title"] = "Detalhes do evento";
+    var canEdit = User.HasAnyPermission(AppPermissions.GoogleAgendaEdit, AppPermissions.GoogleAgendaManage);
+    var canDelete = User.HasAnyPermission(AppPermissions.GoogleAgendaDelete, AppPermissions.GoogleAgendaManage);
+}
+
+@functions {
+    private static string TipoLabel(GoogleAgendaTipoEventoEnum tipo)
+    {
+        return tipo switch
+        {
+            GoogleAgendaTipoEventoEnum.Apresentacao => "Apresentação",
+            GoogleAgendaTipoEventoEnum.EventoCultural => "Evento cultural",
+            GoogleAgendaTipoEventoEnum.Reuniao => "Reunião",
+            _ => tipo.ToString()
+        };
+    }
+
+    private static string TipoClass(GoogleAgendaTipoEventoEnum tipo)
+    {
+        return tipo switch
+        {
+            GoogleAgendaTipoEventoEnum.Aula => "aula",
+            GoogleAgendaTipoEventoEnum.Ensaio => "ensaio",
+            GoogleAgendaTipoEventoEnum.Apresentacao => "apresentacao",
+            GoogleAgendaTipoEventoEnum.EventoCultural => "evento-cultural",
+            GoogleAgendaTipoEventoEnum.Reuniao => "reuniao",
+            _ => "outro"
+        };
+    }
+
+    private static string StatusLabel(string? status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "confirmed" => "Confirmado",
+            "tentative" => "Tentativo",
+            "cancelled" => "Cancelado",
+            _ => string.IsNullOrWhiteSpace(status) ? "Sem status" : status
+        };
+    }
+}
+
+<div class="agenda-page agenda-details-page">
+    <section class="agenda-details-hero mb-4">
+        <div>
+            <span class="agenda-type agenda-type-@TipoClass(Model.Tipo)">@TipoLabel(Model.Tipo)</span>
+            <h1>@Model.Titulo</h1>
+            <p>@Model.Inicio.ToString("dd/MM/yyyy HH:mm") até @Model.Fim.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+        <div class="agenda-hero-actions">
+            <a asp-action="Index" class="btn agenda-btn agenda-btn-ghost">Voltar</a>
+            @if (!string.IsNullOrWhiteSpace(Model.HtmlLink))
+            {
+                <a href="@Model.HtmlLink" target="_blank" rel="noopener noreferrer" class="btn agenda-btn agenda-btn-outline">Abrir no Google</a>
+            }
+            @if (canEdit)
+            {
+                <a asp-action="Edit" asp-route-eventoId="@Model.Id" class="btn agenda-btn agenda-btn-primary">Editar</a>
+            }
+            @if (canDelete)
+            {
+                <form asp-action="Delete" asp-route-eventoId="@Model.Id" method="post" onsubmit="return confirm('Excluir este evento do Google Agenda?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn agenda-btn agenda-btn-danger">Excluir</button>
+                </form>
+            }
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <section class="agenda-detail-card mb-4">
+                <h2>Informações do evento</h2>
+                <div class="agenda-detail-grid">
+                    <div>
+                        <span>Início</span>
+                        <strong>@Model.Inicio.ToString("dd/MM/yyyy HH:mm")</strong>
+                    </div>
+                    <div>
+                        <span>Fim</span>
+                        <strong>@Model.Fim.ToString("dd/MM/yyyy HH:mm")</strong>
+                    </div>
+                    <div>
+                        <span>Local</span>
+                        <strong>@(Model.Local ?? "Sem local cadastrado")</strong>
+                    </div>
+                    <div>
+                        <span>Status</span>
+                        <strong>@StatusLabel(Model.Status)</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="agenda-detail-card">
+                <h2>Descrição</h2>
+                <p class="agenda-description-text">@(Model.Descricao ?? "Sem descrição cadastrada para este evento.")</p>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <aside class="agenda-assist-card">
+                <span class="agenda-eyebrow">Referência</span>
+                <h2>Dados técnicos</h2>
+                <dl class="agenda-tech-list">
+                    <dt>Google Event ID</dt>
+                    <dd>@Model.Id</dd>
+                    <dt>Dia inteiro</dt>
+                    <dd>@(Model.DiaInteiro ? "Sim" : "Não")</dd>
+                </dl>
+            </aside>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+@model GoogleAgendaEventoFormViewModel
+@{
+    var isEdit = !string.IsNullOrWhiteSpace(Model.Id);
+}
+
+<div class="agenda-page agenda-form-page">
+    <section class="agenda-form-hero mb-4">
+        <div>
+            <span class="agenda-eyebrow">@(isEdit ? "Edição de evento" : "Novo evento")</span>
+            <h1>@(isEdit ? "Editar evento da agenda" : "Cadastrar evento na agenda")</h1>
+            <p>Organize datas, responsáveis e contexto do compromisso antes de gravar no Google Agenda.</p>
+        </div>
+        <a asp-action="Index" class="btn agenda-btn agenda-btn-ghost">Voltar para agenda</a>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <section class="agenda-form-card">
+                <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-eventoId="@Model.Id" method="post" class="agenda-form">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="Id" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="agenda-validation-summary"></div>
+
+                    <section class="agenda-form-section">
+                        <div class="agenda-section-title">
+                            <span>01</span>
+                            <div>
+                                <h2>Identificação</h2>
+                                <p>Use um título claro para facilitar busca e leitura rápida no calendário.</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-lg-8">
+                                <label asp-for="Titulo" class="form-label agenda-label"></label>
+                                <input asp-for="Titulo" class="form-control agenda-control" placeholder="Ex.: Aula Taiko Iniciante A - Fundamentos" autocomplete="off" autofocus />
+                                <span asp-validation-for="Titulo" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 col-lg-4">
+                                <label asp-for="Tipo" class="form-label agenda-label"></label>
+                                <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<GoogleAgendaTipoEventoEnum>()" class="form-select agenda-control"></select>
+                                <span asp-validation-for="Tipo" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="agenda-form-section">
+                        <div class="agenda-section-title">
+                            <span>02</span>
+                            <div>
+                                <h2>Data e horário</h2>
+                                <p>O sistema bloqueia evento com fim anterior ou igual ao início.</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Inicio" class="form-label agenda-label"></label>
+                                <input asp-for="Inicio" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control agenda-control" />
+                                <span class="agenda-help-text">Informe data e horário de início.</span>
+                                <span asp-validation-for="Inicio" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="Fim" class="form-label agenda-label"></label>
+                                <input asp-for="Fim" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control agenda-control" />
+                                <span class="agenda-help-text">Informe data e horário de encerramento.</span>
+                                <span asp-validation-for="Fim" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="agenda-form-section">
+                        <div class="agenda-section-title">
+                            <span>03</span>
+                            <div>
+                                <h2>Detalhes operacionais</h2>
+                                <p>Inclua local e observações úteis para equipe, alunos ou organização do evento.</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label asp-for="Local" class="form-label agenda-label"></label>
+                                <input asp-for="Local" class="form-control agenda-control" placeholder="Ex.: Dojo principal, auditório, escola parceira ou endereço do evento" autocomplete="off" />
+                                <span asp-validation-for="Local" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Descricao" class="form-label agenda-label"></label>
+                                <textarea asp-for="Descricao" class="form-control agenda-control" rows="6" placeholder="Ex.: responsáveis, materiais necessários, observações da aula, chamada, montagem, repertório ou orientações para chegada."></textarea>
+                                <span asp-validation-for="Descricao" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="agenda-form-actions">
+                        <a asp-action="Index" class="btn agenda-btn agenda-btn-ghost">Cancelar</a>
+                        <button type="submit" class="btn agenda-btn agenda-btn-primary">Salvar no Google Agenda</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <aside class="agenda-assist-card">
+                <span class="agenda-eyebrow">Checklist</span>
+                <h2>Antes de salvar</h2>
+                <ul>
+                    <li>Confirme se a data não conflita com aulas regulares.</li>
+                    <li>Use o tipo correto para facilitar filtros no painel.</li>
+                    <li>Em apresentações, registre local e observações de montagem.</li>
+                    <li>Se for aula, inclua turma ou nível no título.</li>
+                </ul>
+            </aside>
+        </div>
+    </div>
+</div>

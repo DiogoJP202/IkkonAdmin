@@ -1,0 +1,303 @@
+﻿@using IkkonAdmin.Web.Enums
+@model InventarioFormViewModel
+@{
+    var isEdit = Model.Id.HasValue;
+}
+
+@functions {
+    private static string CategoriaTexto(InventarioCategoriaEnum categoria)
+    {
+        return categoria switch
+        {
+            InventarioCategoriaEnum.Taiko => "Taiko",
+            InventarioCategoriaEnum.Bachi => "Bachi",
+            InventarioCategoriaEnum.Outro => "Outro",
+            _ => categoria.ToString()
+        };
+    }
+
+    private static string StatusTexto(InventarioStatusEnum status)
+    {
+        return status switch
+        {
+            InventarioStatusEnum.Disponivel => "Disponível",
+            InventarioStatusEnum.EmUso => "Em uso",
+            InventarioStatusEnum.Manutencao => "Manutenção",
+            InventarioStatusEnum.Indisponivel => "Indisponível",
+            InventarioStatusEnum.Baixado => "Baixado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string EstadoTexto(InventarioEstadoConservacaoEnum estado)
+    {
+        return estado switch
+        {
+            InventarioEstadoConservacaoEnum.Novo => "Novo",
+            InventarioEstadoConservacaoEnum.Bom => "Bom",
+            InventarioEstadoConservacaoEnum.Regular => "Regular",
+            InventarioEstadoConservacaoEnum.Ruim => "Ruim",
+            InventarioEstadoConservacaoEnum.PrecisaManutencao => "Precisa manutenção",
+            _ => estado.ToString()
+        };
+    }
+}
+
+<div class="inventario-v2-page">
+    <section class="inventario-v2-form-hero mb-4">
+        <div>
+            <span class="inventario-v2-eyebrow">@(isEdit ? "Edição de item" : "Novo item")</span>
+            <h1>@(isEdit ? "Editar item do inventário" : "Cadastrar item no inventário")</h1>
+            <p>
+                Mantenha dados operacionais simples, pesquisáveis e úteis para aulas, eventos, manutenção e logística da escola.
+            </p>
+        </div>
+
+        <div class="inventario-v2-hero-actions">
+            <a asp-action="Index" class="btn inventario-v2-btn inventario-v2-btn-ghost">Voltar para lista</a>
+            @if (isEdit)
+            {
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn inventario-v2-btn inventario-v2-btn-ghost">Ver detalhes</a>
+            }
+        </div>
+    </section>
+
+    <div class="inventario-v2-form-layout">
+        <section class="inventario-v2-form-panel">
+            <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" class="inventario-v2-form">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <div asp-validation-summary="ModelOnly" class="inventario-v2-validation-summary"></div>
+
+                <section class="inventario-v2-form-section">
+                    <div class="inventario-v2-section-title">
+                        <span>01</span>
+                        <div>
+                            <h2>Identificação</h2>
+                            <p>Defina nome, código interno, categoria e tipo para facilitar busca e organização.</p>
+                        </div>
+                    </div>
+
+                    <div class="inventario-v2-form-grid">
+                        <div class="inventario-v2-field inventario-v2-field-span-2">
+                            <label asp-for="Nome">Nome</label>
+                            <input asp-for="Nome"
+                                   type="text"
+                                   class="form-control inventario-v2-control"
+                                   placeholder="Ex.: Nagado principal do dojo"
+                                   autocomplete="off"
+                                   maxlength="150" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="CodigoInterno">Código interno</label>
+                            <input asp-for="CodigoInterno"
+                                   type="text"
+                                   class="form-control inventario-v2-control"
+                                   placeholder="Ex.: TAIKO-NAGADO-001"
+                                   autocomplete="off"
+                                   maxlength="60" />
+                            <span asp-validation-for="CodigoInterno" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="Categoria">Categoria</label>
+                            <select asp-for="Categoria" class="form-select inventario-v2-control">
+                                @foreach (var categoria in Enum.GetValues<InventarioCategoriaEnum>())
+                                {
+                                    if (Model.Categoria == categoria)
+                                    {
+                                        <option value="@((int)categoria)" selected>@CategoriaTexto(categoria)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)categoria)">@CategoriaTexto(categoria)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Categoria" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="Tipo">Tipo</label>
+                            <input asp-for="Tipo"
+                                   type="text"
+                                   class="form-control inventario-v2-control"
+                                   list="tiposInventario"
+                                   placeholder="Ex.: Nagado, Shime, Bachi"
+                                   autocomplete="off"
+                                   maxlength="80" />
+                            <datalist id="tiposInventario">
+                                @foreach (var tipo in Model.TiposSugeridos)
+                                {
+                                    <option value="@tipo"></option>
+                                }
+                            </datalist>
+                            <span asp-validation-for="Tipo" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="Quantidade">Quantidade</label>
+                            <input asp-for="Quantidade"
+                                   type="number"
+                                   min="0"
+                                   max="9999"
+                                   class="form-control inventario-v2-control"
+                                   placeholder="1" />
+                            <span asp-validation-for="Quantidade" class="text-danger"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="inventario-v2-form-section">
+                    <div class="inventario-v2-section-title">
+                        <span>02</span>
+                        <div>
+                            <h2>Status e localização</h2>
+                            <p>Informe condição atual, localização e disponibilidade para uso diário.</p>
+                        </div>
+                    </div>
+
+                    <div class="inventario-v2-form-grid">
+                        <div class="inventario-v2-field">
+                            <label asp-for="Status">Status</label>
+                            <select asp-for="Status" class="form-select inventario-v2-control">
+                                @foreach (var status in Enum.GetValues<InventarioStatusEnum>())
+                                {
+                                    if (Model.Status == status)
+                                    {
+                                        <option value="@((int)status)" selected>@StatusTexto(status)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)status)">@StatusTexto(status)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="EstadoConservacao">Estado de conservação</label>
+                            <select asp-for="EstadoConservacao" class="form-select inventario-v2-control">
+                                @foreach (var estado in Enum.GetValues<InventarioEstadoConservacaoEnum>())
+                                {
+                                    if (Model.EstadoConservacao == estado)
+                                    {
+                                        <option value="@((int)estado)" selected>@EstadoTexto(estado)</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@((int)estado)">@EstadoTexto(estado)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="EstadoConservacao" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="Localizacao">Localização</label>
+                            <input asp-for="Localizacao"
+                                   type="text"
+                                   class="form-control inventario-v2-control"
+                                   placeholder="Ex.: Dojo - sala principal"
+                                   autocomplete="off"
+                                   maxlength="120" />
+                            <span asp-validation-for="Localizacao" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="inventario-v2-check-grid mt-3">
+                        <label class="inventario-v2-check-card">
+                            <input asp-for="DisponivelParaAula" class="form-check-input" />
+                            <span>
+                                <strong>Disponível para aulas</strong>
+                                <small>Permite uso em aulas, treinos e práticas internas.</small>
+                            </span>
+                        </label>
+
+                        <label class="inventario-v2-check-card">
+                            <input asp-for="DisponivelParaEvento" class="form-check-input" />
+                            <span>
+                                <strong>Disponível para eventos</strong>
+                                <small>Permite separar este item para apresentações e eventos externos.</small>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="inventario-v2-form-section">
+                    <div class="inventario-v2-section-title">
+                        <span>03</span>
+                        <div>
+                            <h2>Detalhes complementares</h2>
+                            <p>Registre aquisição, valor estimado, descrição e observações internas.</p>
+                        </div>
+                    </div>
+
+                    <div class="inventario-v2-form-grid">
+                        <div class="inventario-v2-field inventario-v2-field-span-3">
+                            <label asp-for="Descricao">Descrição</label>
+                            <textarea asp-for="Descricao"
+                                      rows="3"
+                                      class="form-control inventario-v2-control"
+                                      placeholder="Descrição curta do item, uso principal e características relevantes."></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="DataAquisicao">Data de aquisição</label>
+                            <input asp-for="DataAquisicao"
+                                   type="date"
+                                   class="form-control inventario-v2-control" />
+                            <span asp-validation-for="DataAquisicao" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-field">
+                            <label asp-for="ValorEstimado">Valor estimado</label>
+                            <input asp-for="ValorEstimado"
+                                   type="number"
+                                   min="0"
+                                   step="0.01"
+                                   class="form-control inventario-v2-control"
+                                   placeholder="0,00" />
+                            <span asp-validation-for="ValorEstimado" class="text-danger"></span>
+                        </div>
+
+                        <div class="inventario-v2-form-note">
+                            <span>Baixa segura</span>
+                            <strong>Não exclua fisicamente</strong>
+                            <small>Use baixa para preservar histórico e auditoria.</small>
+                        </div>
+
+                        <div class="inventario-v2-field inventario-v2-field-span-3">
+                            <label asp-for="Observacoes">Observações</label>
+                            <textarea asp-for="Observacoes"
+                                      rows="3"
+                                      class="form-control inventario-v2-control"
+                                      placeholder="Manutenção, cuidados, restrições ou informações internas."></textarea>
+                            <span asp-validation-for="Observacoes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="inventario-v2-form-actions">
+                    <a asp-action="Index" class="btn inventario-v2-btn inventario-v2-btn-ghost">Cancelar</a>
+                    <button type="submit" class="btn inventario-v2-btn inventario-v2-btn-primary">Salvar item</button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="inventario-v2-assist-card">
+            <span class="inventario-v2-eyebrow">Regras rápidas</span>
+            <h2>Como manter o inventário útil</h2>
+            <ul>
+                <li>Código interno deve ser único quando preenchido.</li>
+                <li>Use “Manutenção” quando o item não puder ser usado temporariamente.</li>
+                <li>Localização precisa evita perda de tempo antes de eventos.</li>
+                <li>Prefira baixar itens em vez de excluir fisicamente.</li>
+            </ul>
+        </aside>
+    </div>
+</div>

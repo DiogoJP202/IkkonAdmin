@@ -25,6 +25,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<RolePermissao> RolesPermissoes => Set<RolePermissao>();
     public DbSet<UsuarioPermissao> UsuariosPermissoes => Set<UsuarioPermissao>();
     public DbSet<AuditoriaLog> AuditoriaLogs => Set<AuditoriaLog>();
+    public DbSet<InventarioItem> InventarioItens => Set<InventarioItem>();
+    public DbSet<InventarioMovimentacao> InventarioMovimentacoes => Set<InventarioMovimentacao>();
+    public DbSet<GoogleAgendaConexao> GoogleAgendaConexoes => Set<GoogleAgendaConexao>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

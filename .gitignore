@@ -20,6 +20,9 @@ publish/
 *.log
 logs/
 
+# Runtime uploads
+IkkonAdmin.Web/wwwroot/uploads/
+
 # NuGet
 *.nupkg
 *.snupkg
@@ -34,6 +37,7 @@ appsettings.Development.json
 appsettings.Local.json
 appsettings.*.local.json
 secrets.json
+.secrets/
 
 # OS files
 .DS_Store

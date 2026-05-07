@@ -4,6 +4,7 @@ using IkkonAdmin.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IkkonAdmin.Web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260501192927_AddGoogleAgendaAndInventario")]
+    partial class AddGoogleAgendaAndInventario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -434,53 +437,6 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExamesGraduacao", (string)null);
-                });
-
-            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.GoogleAgendaConexao", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Ativa")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<DateTime?>("AtualizadoEmUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ConectadoPorUsuarioId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContaEmail")
-                        .HasMaxLength(180)
-                        .HasColumnType("nvarchar(180)");
-
-                    b.Property<DateTime>("CriadoEmUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Escopos")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("RefreshTokenProtegido")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Ativa");
-
-                    b.HasIndex("ConectadoPorUsuarioId");
-
-                    b.HasIndex("ContaEmail");
-
-                    b.ToTable("GoogleAgendaConexoes", (string)null);
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Graduacao", b =>
@@ -1159,16 +1115,6 @@ namespace IkkonAdmin.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Aluno");
-                });
-
-            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.GoogleAgendaConexao", b =>
-                {
-                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "ConectadoPorUsuario")
-                        .WithMany()
-                        .HasForeignKey("ConectadoPorUsuarioId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("ConectadoPorUsuario");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Graduacao", b =>

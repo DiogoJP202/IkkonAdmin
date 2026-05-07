@@ -1,0 +1,446 @@
+﻿@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@model InventarioIndexViewModel
+@{
+    ViewData["Title"] = "Inventário";
+
+    var canCreate = User.HasAnyPermission(AppPermissions.InventarioCreate, AppPermissions.InventarioManage);
+    var canEdit = User.HasAnyPermission(AppPermissions.InventarioEdit, AppPermissions.InventarioManage);
+    var canDelete = User.HasAnyPermission(AppPermissions.InventarioDelete, AppPermissions.InventarioManage);
+    var canAgendaView = User.HasAnyPermission(AppPermissions.GoogleAgendaView, AppPermissions.GoogleAgendaManage);
+    var itensEmUso = Model.Itens.Count(x => x.Status == InventarioStatusEnum.EmUso);
+    var itensParaEvento = Model.Itens.Count(x => x.DisponivelParaEvento);
+
+    var filtrosAtivos = new List<string>();
+    if (!string.IsNullOrWhiteSpace(Model.Filtro.Busca)) filtrosAtivos.Add($"Busca: {Model.Filtro.Busca}");
+    if (Model.Filtro.Categoria.HasValue) filtrosAtivos.Add($"Categoria: {CategoriaTexto(Model.Filtro.Categoria.Value)}");
+    if (!string.IsNullOrWhiteSpace(Model.Filtro.Tipo)) filtrosAtivos.Add($"Tipo: {Model.Filtro.Tipo}");
+    if (Model.Filtro.Status.HasValue) filtrosAtivos.Add($"Status: {StatusTexto(Model.Filtro.Status.Value)}");
+    if (Model.Filtro.EstadoConservacao.HasValue) filtrosAtivos.Add($"Estado: {EstadoTexto(Model.Filtro.EstadoConservacao.Value)}");
+    if (!string.IsNullOrWhiteSpace(Model.Filtro.Localizacao)) filtrosAtivos.Add($"Localização: {Model.Filtro.Localizacao}");
+}
+
+@functions {
+    private static string CategoriaTexto(InventarioCategoriaEnum categoria)
+    {
+        return categoria switch
+        {
+            InventarioCategoriaEnum.Taiko => "Taiko",
+            InventarioCategoriaEnum.Bachi => "Bachi",
+            InventarioCategoriaEnum.Outro => "Outro",
+            _ => categoria.ToString()
+        };
+    }
+
+    private static string StatusTexto(InventarioStatusEnum status)
+    {
+        return status switch
+        {
+            InventarioStatusEnum.Disponivel => "Disponível",
+            InventarioStatusEnum.EmUso => "Em uso",
+            InventarioStatusEnum.Manutencao => "Manutenção",
+            InventarioStatusEnum.Indisponivel => "Indisponível",
+            InventarioStatusEnum.Baixado => "Baixado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusClasse(InventarioStatusEnum status)
+    {
+        return status switch
+        {
+            InventarioStatusEnum.Disponivel => "is-success",
+            InventarioStatusEnum.EmUso => "is-info",
+            InventarioStatusEnum.Manutencao => "is-warning",
+            InventarioStatusEnum.Indisponivel => "is-danger",
+            InventarioStatusEnum.Baixado => "is-muted",
+            _ => "is-muted"
+        };
+    }
+
+    private static string EstadoTexto(InventarioEstadoConservacaoEnum estado)
+    {
+        return estado switch
+        {
+            InventarioEstadoConservacaoEnum.Novo => "Novo",
+            InventarioEstadoConservacaoEnum.Bom => "Bom",
+            InventarioEstadoConservacaoEnum.Regular => "Regular",
+            InventarioEstadoConservacaoEnum.Ruim => "Ruim",
+            InventarioEstadoConservacaoEnum.PrecisaManutencao => "Precisa manutenção",
+            _ => estado.ToString()
+        };
+    }
+
+    private static string InicialItem(string nome)
+    {
+        return string.IsNullOrWhiteSpace(nome)
+            ? "I"
+            : nome.Trim()[0].ToString().ToUpperInvariant();
+    }
+}
+
+<div class="inventario-v2-page">
+    <section class="inventario-v2-hero mb-4">
+        <div class="inventario-v2-hero-copy">
+            <span class="inventario-v2-eyebrow">Inventário interno</span>
+            <h1>Itens da escola e do grupo artístico</h1>
+            <p>
+                Controle taikos, bachis e equipamentos com status, localização, conservação e disponibilidade para aulas e eventos.
+            </p>
+            <div class="inventario-v2-meta">
+                <span><strong>@Model.TotalItens</strong> itens ativos</span>
+                <span><strong>@Model.ItensDisponiveis</strong> disponíveis</span>
+                <span><strong>@Model.ItensManutencao</strong> em manutenção</span>
+            </div>
+        </div>
+
+        <div class="inventario-v2-hero-actions">
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn inventario-v2-btn inventario-v2-btn-primary">Novo item</a>
+            }
+            @if (canAgendaView)
+            {
+                <a asp-controller="GoogleAgenda" asp-action="Index" class="btn inventario-v2-btn inventario-v2-btn-ghost">Agenda</a>
+            }
+        </div>
+    </section>
+
+    <section class="inventario-v2-kpi-grid mb-4" aria-label="Indicadores do inventário">
+        <article class="inventario-v2-kpi-card">
+            <div class="inventario-v2-kpi-top">
+                <span>Total</span>
+                <b>Ativos</b>
+            </div>
+            <strong>@Model.TotalItens</strong>
+            <small>Itens ativos cadastrados no inventário.</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card is-success">
+            <div class="inventario-v2-kpi-top">
+                <span>Disponíveis</span>
+                <b>Uso</b>
+            </div>
+            <strong>@Model.ItensDisponiveis</strong>
+            <small>Prontos para aula, evento ou reserva.</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card is-warning">
+            <div class="inventario-v2-kpi-top">
+                <span>Manutenção</span>
+                <b>Atenção</b>
+            </div>
+            <strong>@Model.ItensManutencao</strong>
+            <small>Itens que exigem acompanhamento.</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card is-danger">
+            <div class="inventario-v2-kpi-top">
+                <span>Indisponíveis</span>
+                <b>Bloqueados</b>
+            </div>
+            <strong>@Model.ItensIndisponiveis</strong>
+            <small>Não devem ser usados em aulas ou eventos.</small>
+        </article>
+    </section>
+
+    <section class="inventario-v2-filter-card mb-4">
+        <div class="inventario-v2-card-heading">
+            <div>
+                <span class="inventario-v2-eyebrow">Filtros</span>
+                <h2>Refinar inventário</h2>
+                <p>Busque por nome, código, tipo, localização, status e conservação.</p>
+            </div>
+        </div>
+
+        <form asp-action="Index" method="get" class="inventario-v2-filter-grid">
+            <div class="inventario-v2-field inventario-v2-field-search">
+                <label asp-for="Filtro.Busca">Busca</label>
+                <input asp-for="Filtro.Busca"
+                       name="Busca"
+                       type="search"
+                       class="form-control inventario-v2-control"
+                       placeholder="Nome, código, tipo ou descrição"
+                       autocomplete="off" />
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.Categoria">Categoria</label>
+                <select asp-for="Filtro.Categoria" name="Categoria" class="form-select inventario-v2-control">
+                    <option value="">Todas</option>
+                    @foreach (var categoria in Enum.GetValues<InventarioCategoriaEnum>())
+                    {
+                        if (Model.Filtro.Categoria == categoria)
+                        {
+                            <option value="@((int)categoria)" selected>@CategoriaTexto(categoria)</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)categoria)">@CategoriaTexto(categoria)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.Tipo">Tipo</label>
+                <select asp-for="Filtro.Tipo" name="Tipo" class="form-select inventario-v2-control">
+                    <option value="">Todos</option>
+                    @foreach (var tipo in Model.TiposDisponiveis)
+                    {
+                        if (Model.Filtro.Tipo == tipo)
+                        {
+                            <option value="@tipo" selected>@tipo</option>
+                        }
+                        else
+                        {
+                            <option value="@tipo">@tipo</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.Status">Status</label>
+                <select asp-for="Filtro.Status" name="Status" class="form-select inventario-v2-control">
+                    <option value="">Todos</option>
+                    @foreach (var status in Enum.GetValues<InventarioStatusEnum>())
+                    {
+                        if (Model.Filtro.Status == status)
+                        {
+                            <option value="@((int)status)" selected>@StatusTexto(status)</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)status)">@StatusTexto(status)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.EstadoConservacao">Conservação</label>
+                <select asp-for="Filtro.EstadoConservacao" name="EstadoConservacao" class="form-select inventario-v2-control">
+                    <option value="">Todas</option>
+                    @foreach (var estado in Enum.GetValues<InventarioEstadoConservacaoEnum>())
+                    {
+                        if (Model.Filtro.EstadoConservacao == estado)
+                        {
+                            <option value="@((int)estado)" selected>@EstadoTexto(estado)</option>
+                        }
+                        else
+                        {
+                            <option value="@((int)estado)">@EstadoTexto(estado)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.Localizacao">Localização</label>
+                <select asp-for="Filtro.Localizacao" name="Localizacao" class="form-select inventario-v2-control">
+                    <option value="">Todas</option>
+                    @foreach (var local in Model.LocalizacoesDisponiveis)
+                    {
+                        if (Model.Filtro.Localizacao == local)
+                        {
+                            <option value="@local" selected>@local</option>
+                        }
+                        else
+                        {
+                            <option value="@local">@local</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-field">
+                <label asp-for="Filtro.TamanhoPagina">Mostrar</label>
+                <select asp-for="Filtro.TamanhoPagina" name="TamanhoPagina" class="form-select inventario-v2-control">
+                    @foreach (var tamanho in new[] { 10, 20, 30 })
+                    {
+                        if (Model.Filtro.TamanhoPagina == tamanho)
+                        {
+                            <option value="@tamanho" selected>@tamanho</option>
+                        }
+                        else
+                        {
+                            <option value="@tamanho">@tamanho</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="inventario-v2-filter-actions">
+                <button type="submit" class="btn inventario-v2-btn inventario-v2-btn-primary">Aplicar filtros</button>
+                <a asp-action="Index" class="btn inventario-v2-btn inventario-v2-btn-ghost">Limpar</a>
+            </div>
+        </form>
+
+        @if (filtrosAtivos.Count > 0)
+        {
+            <div class="inventario-v2-active-filters">
+                @foreach (var filtro in filtrosAtivos)
+                {
+                    <span>@filtro</span>
+                }
+            </div>
+        }
+    </section>
+
+    <div class="inventario-v2-main-grid">
+        <section class="inventario-v2-table-panel">
+            <div class="inventario-v2-panel-heading">
+                <div>
+                    <span class="inventario-v2-eyebrow">Catálogo</span>
+                    <h2>Itens cadastrados</h2>
+                    <p>@Model.TotalRegistros registro(s) encontrado(s). Página @Model.PaginaAtual de @Model.TotalPaginas.</p>
+                </div>
+                @if (canCreate)
+                {
+                    <a asp-action="Create" class="btn inventario-v2-btn inventario-v2-btn-primary">Novo item</a>
+                }
+            </div>
+
+            <div class="table-responsive">
+                <table class="table inventario-v2-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Categoria</th>
+                            <th>Tipo</th>
+                            <th>Qtd.</th>
+                            <th>Status</th>
+                            <th>Estado</th>
+                            <th>Localização</th>
+                            <th>Disponibilidade</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Itens.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="9">
+                                    <div class="inventario-v2-empty-state">
+                                        <strong>Nenhum item encontrado</strong>
+                                        <span>Ajuste os filtros ou cadastre um novo item no inventário.</span>
+                                        @if (canCreate)
+                                        {
+                                            <a asp-action="Create" class="btn inventario-v2-btn inventario-v2-btn-primary">Novo item</a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.Itens)
+                            {
+                                var requerAtencao = item.Status is InventarioStatusEnum.Manutencao or InventarioStatusEnum.Indisponivel || item.EstadoConservacao is InventarioEstadoConservacaoEnum.Ruim or InventarioEstadoConservacaoEnum.PrecisaManutencao;
+
+                                <tr class="@(requerAtencao ? "is-attention" : string.Empty)">
+                                    <td>
+                                        <div class="inventario-v2-item-cell">
+                                            <span>@InicialItem(item.Nome)</span>
+                                            <div>
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="inventario-v2-link">@item.Nome</a>
+                                                <small>@(item.CodigoInterno ?? "Sem código interno")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@CategoriaTexto(item.Categoria)</td>
+                                    <td>@(item.Tipo ?? "-")</td>
+                                    <td>@item.Quantidade</td>
+                                    <td><span class="inventario-v2-status-pill @StatusClasse(item.Status)">@StatusTexto(item.Status)</span></td>
+                                    <td>@EstadoTexto(item.EstadoConservacao)</td>
+                                    <td>@(item.Localizacao ?? "-")</td>
+                                    <td>
+                                        <div class="inventario-v2-mini-checks">
+                                            <span class="@(item.DisponivelParaAula ? "is-ok" : "is-pending")">Aula</span>
+                                            <span class="@(item.DisponivelParaEvento ? "is-ok" : "is-pending")">Evento</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="inventario-v2-row-actions">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn inventario-v2-btn-table inventario-v2-btn-table-primary">Detalhes</a>
+                                            @if (canEdit)
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn inventario-v2-btn-table">Editar</a>
+                                            }
+                                            @if (canDelete)
+                                            {
+                                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Baixar este item do inventário?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn inventario-v2-btn-table inventario-v2-btn-table-danger">Baixar</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="inventario-v2-pagination-bar">
+                <span>Página @Model.PaginaAtual de @Model.TotalPaginas</span>
+                <div class="inventario-v2-pagination">
+                    <a asp-action="Index"
+                       asp-route-Busca="@Model.Filtro.Busca"
+                       asp-route-Categoria="@Model.Filtro.Categoria"
+                       asp-route-Tipo="@Model.Filtro.Tipo"
+                       asp-route-Status="@Model.Filtro.Status"
+                       asp-route-EstadoConservacao="@Model.Filtro.EstadoConservacao"
+                       asp-route-Localizacao="@Model.Filtro.Localizacao"
+                       asp-route-TamanhoPagina="@Model.TamanhoPagina"
+                       asp-route-PaginaAtual="@(Model.PaginaAtual - 1)"
+                       class="btn inventario-v2-btn-table @(Model.PaginaAtual <= 1 ? "disabled" : string.Empty)">Anterior</a>
+                    <a asp-action="Index"
+                       asp-route-Busca="@Model.Filtro.Busca"
+                       asp-route-Categoria="@Model.Filtro.Categoria"
+                       asp-route-Tipo="@Model.Filtro.Tipo"
+                       asp-route-Status="@Model.Filtro.Status"
+                       asp-route-EstadoConservacao="@Model.Filtro.EstadoConservacao"
+                       asp-route-Localizacao="@Model.Filtro.Localizacao"
+                       asp-route-TamanhoPagina="@Model.TamanhoPagina"
+                       asp-route-PaginaAtual="@(Model.PaginaAtual + 1)"
+                       class="btn inventario-v2-btn-table @(Model.PaginaAtual >= Model.TotalPaginas ? "disabled" : string.Empty)">Próxima</a>
+                </div>
+            </div>
+        </section>
+
+        <aside class="inventario-v2-side-stack">
+            <section class="inventario-v2-side-card">
+                <span class="inventario-v2-eyebrow">Resumo rápido</span>
+                <h2>Uso operacional</h2>
+                <div class="inventario-v2-detail-list">
+                    <div>
+                        <span>Em uso nesta página</span>
+                        <strong>@itensEmUso</strong>
+                    </div>
+                    <div>
+                        <span>Disponíveis para evento</span>
+                        <strong>@itensParaEvento</strong>
+                    </div>
+                    <div>
+                        <span>Tipos cadastrados</span>
+                        <strong>@Model.TiposDisponiveis.Count</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="inventario-v2-assist-card inventario-v2-assist-card-compact">
+                <span class="inventario-v2-eyebrow">Boas práticas</span>
+                <h2>Controle consistente</h2>
+                <ul>
+                    <li>Use código interno único para itens físicos importantes.</li>
+                    <li>Marque manutenção quando o item não puder ser usado com segurança.</li>
+                    <li>Baixar item preserva histórico sem excluir fisicamente.</li>
+                    <li>Localização clara reduz perda de tempo antes de aulas e eventos.</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+</div>

@@ -45,6 +45,18 @@ public static class AppPermissions
     public const string ConfiguracoesView = "CONFIGURACOES_VIEW";
     public const string ConfiguracoesEdit = "CONFIGURACOES_EDIT";
 
+    public const string GoogleAgendaView = "GOOGLE_AGENDA_VIEW";
+    public const string GoogleAgendaCreate = "GOOGLE_AGENDA_CREATE";
+    public const string GoogleAgendaEdit = "GOOGLE_AGENDA_EDIT";
+    public const string GoogleAgendaDelete = "GOOGLE_AGENDA_DELETE";
+    public const string GoogleAgendaManage = "GOOGLE_AGENDA_MANAGE";
+
+    public const string InventarioView = "INVENTARIO_VIEW";
+    public const string InventarioCreate = "INVENTARIO_CREATE";
+    public const string InventarioEdit = "INVENTARIO_EDIT";
+    public const string InventarioDelete = "INVENTARIO_DELETE";
+    public const string InventarioManage = "INVENTARIO_MANAGE";
+
     public static IReadOnlyList<AppPermissionDefinition> Definicoes { get; } = new[]
     {
         new AppPermissionDefinition(GerenciarUsuarios, "Gerenciar usuarios", "Permite criar, editar, ativar e excluir usuarios do sistema.", "Administracao"),
@@ -86,7 +98,19 @@ public static class AppPermissions
         new AppPermissionDefinition(GraduacoesDelete, "Excluir graduacoes", "Permite excluir registros de graduacao.", "Graduacoes"),
 
         new AppPermissionDefinition(ConfiguracoesView, "Visualizar configuracoes", "Permite acesso a area de configuracoes da conta.", "Configuracoes"),
-        new AppPermissionDefinition(ConfiguracoesEdit, "Editar configuracoes", "Permite atualizar dados e preferencias da conta.", "Configuracoes")
+        new AppPermissionDefinition(ConfiguracoesEdit, "Editar configuracoes", "Permite atualizar dados e preferencias da conta.", "Configuracoes"),
+
+        new AppPermissionDefinition(GoogleAgendaView, "Visualizar Google Agenda", "Permite visualizar eventos sincronizados com o Google Agenda.", "Google Agenda"),
+        new AppPermissionDefinition(GoogleAgendaCreate, "Criar eventos no Google Agenda", "Permite criar eventos no Google Agenda.", "Google Agenda"),
+        new AppPermissionDefinition(GoogleAgendaEdit, "Editar eventos no Google Agenda", "Permite editar eventos existentes no Google Agenda.", "Google Agenda"),
+        new AppPermissionDefinition(GoogleAgendaDelete, "Excluir eventos no Google Agenda", "Permite excluir ou cancelar eventos do Google Agenda.", "Google Agenda"),
+        new AppPermissionDefinition(GoogleAgendaManage, "Gerenciar Google Agenda", "Permite executar todas as acoes da integracao com Google Agenda.", "Google Agenda"),
+
+        new AppPermissionDefinition(InventarioView, "Visualizar inventario", "Permite visualizar itens do inventario.", "Inventario"),
+        new AppPermissionDefinition(InventarioCreate, "Criar itens de inventario", "Permite cadastrar novos itens no inventario.", "Inventario"),
+        new AppPermissionDefinition(InventarioEdit, "Editar itens de inventario", "Permite editar itens do inventario.", "Inventario"),
+        new AppPermissionDefinition(InventarioDelete, "Excluir itens de inventario", "Permite baixar ou inativar itens do inventario.", "Inventario"),
+        new AppPermissionDefinition(InventarioManage, "Gerenciar inventario", "Permite executar todas as acoes do inventario.", "Inventario")
     };
 
     public static IReadOnlyCollection<string> Todas { get; } = Definicoes

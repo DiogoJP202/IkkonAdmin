@@ -41,6 +41,18 @@ public static class AuthorizationPolicies
     public const string ConfiguracoesView = "POLICY_CONFIGURACOES_VIEW";
     public const string ConfiguracoesEdit = "POLICY_CONFIGURACOES_EDIT";
 
+    public const string GoogleAgendaView = "POLICY_GOOGLE_AGENDA_VIEW";
+    public const string GoogleAgendaCreate = "POLICY_GOOGLE_AGENDA_CREATE";
+    public const string GoogleAgendaEdit = "POLICY_GOOGLE_AGENDA_EDIT";
+    public const string GoogleAgendaDelete = "POLICY_GOOGLE_AGENDA_DELETE";
+    public const string GoogleAgendaManage = "POLICY_GOOGLE_AGENDA_MANAGE";
+
+    public const string InventarioView = "POLICY_INVENTARIO_VIEW";
+    public const string InventarioCreate = "POLICY_INVENTARIO_CREATE";
+    public const string InventarioEdit = "POLICY_INVENTARIO_EDIT";
+    public const string InventarioDelete = "POLICY_INVENTARIO_DELETE";
+    public const string InventarioManage = "POLICY_INVENTARIO_MANAGE";
+
     public const string AdminGerenciarUsuarios = "POLICY_ADMIN_GERENCIAR_USUARIOS";
     public const string AdminGerenciarCargos = "POLICY_ADMIN_GERENCIAR_CARGOS";
     public const string AdminEditarPermissoes = "POLICY_ADMIN_EDITAR_PERMISSOES";

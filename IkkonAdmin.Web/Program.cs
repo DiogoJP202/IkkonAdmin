@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddDataProtection();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options
@@ -35,7 +36,7 @@ builder.Services
 
 builder.Services.AddAuthorization(options =>
 {
-    static void AddFuncionarioPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, string permissao)
+    static void AddFuncionarioPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, params string[] permissoes)
     {
         options.AddPolicy(
             policyName,
@@ -43,7 +44,8 @@ builder.Services.AddAuthorization(options =>
                 .RequireAuthenticatedUser()
                 .RequireAssertion(context =>
                     context.User.IsInRole(AppRoles.Admin) ||
-                    (context.User.IsInRole(AppRoles.Funcionario) && context.User.HasClaim(AppClaimTypes.Permissao, permissao))));
+                    (context.User.IsInRole(AppRoles.Funcionario) &&
+                     permissoes.Any(permissao => context.User.HasClaim(AppClaimTypes.Permissao, permissao)))));
     }
 
     static void AddAuthenticatedPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, string permissao)
@@ -112,6 +114,18 @@ builder.Services.AddAuthorization(options =>
     AddAuthenticatedPermissionPolicy(options, AuthorizationPolicies.ConfiguracoesView, AppPermissions.ConfiguracoesView);
     AddAuthenticatedPermissionPolicy(options, AuthorizationPolicies.ConfiguracoesEdit, AppPermissions.ConfiguracoesEdit);
 
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaView, AppPermissions.GoogleAgendaView, AppPermissions.GoogleAgendaManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaCreate, AppPermissions.GoogleAgendaCreate, AppPermissions.GoogleAgendaManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaEdit, AppPermissions.GoogleAgendaEdit, AppPermissions.GoogleAgendaManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaDelete, AppPermissions.GoogleAgendaDelete, AppPermissions.GoogleAgendaManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaManage, AppPermissions.GoogleAgendaManage);
+
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioView, AppPermissions.InventarioView, AppPermissions.InventarioManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioCreate, AppPermissions.InventarioCreate, AppPermissions.InventarioManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioEdit, AppPermissions.InventarioEdit, AppPermissions.InventarioManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioDelete, AppPermissions.InventarioDelete, AppPermissions.InventarioManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioManage, AppPermissions.InventarioManage);
+
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarUsuarios, AppPermissions.GerenciarUsuarios);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarCargos, AppPermissions.GerenciarCargos);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminEditarPermissoes, AppPermissions.EditarPermissoes);
@@ -131,6 +145,9 @@ builder.Services.AddScoped<IAdminPainelService, AdminPainelService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAreaAlunoService, AreaAlunoService>();
+builder.Services.AddScoped<IInventarioService, InventarioService>();
+builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection("GoogleAgenda"));
+builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
 
 var app = builder.Build();

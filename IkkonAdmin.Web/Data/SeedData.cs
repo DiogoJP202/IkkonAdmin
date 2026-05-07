@@ -34,6 +34,7 @@ public static class SeedData
 
         if (context.Alunos.Any())
         {
+            SeedInventario(context);
             SeedUsuariosSistema(context);
             return;
         }
@@ -332,7 +333,70 @@ public static class SeedData
 
         context.SaveChanges();
 
+        SeedInventario(context);
         SeedUsuariosSistema(context);
+    }
+
+    private static void SeedInventario(ApplicationDbContext context)
+    {
+        if (context.InventarioItens.Any())
+        {
+            return;
+        }
+
+        context.InventarioItens.AddRange(
+            new InventarioItem
+            {
+                Nome = "Nagado principal do dojo",
+                CodigoInterno = "TAIKO-NAGADO-001",
+                Categoria = InventarioCategoriaEnum.Taiko,
+                Tipo = "Nagado",
+                Descricao = "Taiko principal usado em aulas e apresentações.",
+                Quantidade = 1,
+                Status = InventarioStatusEnum.Disponivel,
+                EstadoConservacao = InventarioEstadoConservacaoEnum.Bom,
+                Localizacao = "Dojo - sala principal",
+                DisponivelParaAula = true,
+                DisponivelParaEvento = true,
+                DataAquisicao = DateOnly.FromDateTime(DateTime.Today.AddYears(-4)),
+                ValorEstimado = 4500m,
+                Observacoes = "Revisar cordas antes de eventos externos.",
+                CriadoEmUtc = DateTime.UtcNow,
+                Ativo = true
+            },
+            new InventarioItem
+            {
+                Nome = "Par de bachis reserva",
+                CodigoInterno = "BACHI-RES-001",
+                Categoria = InventarioCategoriaEnum.Bachi,
+                Tipo = "Bachi",
+                Quantidade = 6,
+                Status = InventarioStatusEnum.Disponivel,
+                EstadoConservacao = InventarioEstadoConservacaoEnum.Bom,
+                Localizacao = "Armário de materiais",
+                DisponivelParaAula = true,
+                DisponivelParaEvento = true,
+                CriadoEmUtc = DateTime.UtcNow,
+                Ativo = true
+            },
+            new InventarioItem
+            {
+                Nome = "Shime em manutenção",
+                CodigoInterno = "TAIKO-SHIME-002",
+                Categoria = InventarioCategoriaEnum.Taiko,
+                Tipo = "Shime",
+                Quantidade = 1,
+                Status = InventarioStatusEnum.Manutencao,
+                EstadoConservacao = InventarioEstadoConservacaoEnum.PrecisaManutencao,
+                Localizacao = "Manutenção",
+                DisponivelParaAula = false,
+                DisponivelParaEvento = false,
+                Observacoes = "Pele precisa de revisão antes de voltar para uso.",
+                CriadoEmUtc = DateTime.UtcNow,
+                Ativo = true
+            });
+
+        context.SaveChanges();
     }
 
     private static void SeedUsuariosSistema(ApplicationDbContext context)

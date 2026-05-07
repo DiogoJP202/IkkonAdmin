@@ -1,0 +1,279 @@
+@using IkkonAdmin.Web.Security
+@model GoogleAgendaIndexViewModel
+@{
+    ViewData["Title"] = "Google Agenda";
+    var canCreate = User.HasAnyPermission(AppPermissions.GoogleAgendaCreate, AppPermissions.GoogleAgendaManage);
+    var canEdit = User.HasAnyPermission(AppPermissions.GoogleAgendaEdit, AppPermissions.GoogleAgendaManage);
+    var canDelete = User.HasAnyPermission(AppPermissions.GoogleAgendaDelete, AppPermissions.GoogleAgendaManage);
+    var canManage = User.HasPermission(AppPermissions.GoogleAgendaManage);
+
+    var agora = DateTime.Now;
+    var limiteProximosDias = agora.AddDays(7);
+    var totalEventos = Model.Eventos.Count;
+    var proximosSeteDias = Model.Eventos.Count(x => x.Inicio >= agora && x.Inicio <= limiteProximosDias);
+    var aulasEnsaios = Model.Eventos.Count(x => x.Tipo is GoogleAgendaTipoEventoEnum.Aula or GoogleAgendaTipoEventoEnum.Ensaio);
+    var eventosExternos = Model.Eventos.Count(x => x.Tipo is GoogleAgendaTipoEventoEnum.Apresentacao or GoogleAgendaTipoEventoEnum.EventoCultural);
+}
+
+@functions {
+    private static string TipoLabel(GoogleAgendaTipoEventoEnum tipo)
+    {
+        return tipo switch
+        {
+            GoogleAgendaTipoEventoEnum.Apresentacao => "Apresentação",
+            GoogleAgendaTipoEventoEnum.EventoCultural => "Evento cultural",
+            GoogleAgendaTipoEventoEnum.Reuniao => "Reunião",
+            _ => tipo.ToString()
+        };
+    }
+
+    private static string TipoClass(GoogleAgendaTipoEventoEnum tipo)
+    {
+        return tipo switch
+        {
+            GoogleAgendaTipoEventoEnum.Aula => "aula",
+            GoogleAgendaTipoEventoEnum.Ensaio => "ensaio",
+            GoogleAgendaTipoEventoEnum.Apresentacao => "apresentacao",
+            GoogleAgendaTipoEventoEnum.EventoCultural => "evento-cultural",
+            GoogleAgendaTipoEventoEnum.Reuniao => "reuniao",
+            _ => "outro"
+        };
+    }
+
+    private static string StatusLabel(string? status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "confirmed" => "Confirmado",
+            "tentative" => "Tentativo",
+            "cancelled" => "Cancelado",
+            _ => string.IsNullOrWhiteSpace(status) ? "Sem status" : status
+        };
+    }
+
+    private static string StatusClass(string? status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "confirmed" => "confirmed",
+            "tentative" => "tentative",
+            "cancelled" => "cancelled",
+            _ => "default"
+        };
+    }
+
+    private static string FormatarDuracao(DateTime inicio, DateTime fim)
+    {
+        var duracao = fim - inicio;
+        if (duracao.TotalMinutes <= 0)
+        {
+            return "Duração não informada";
+        }
+
+        if (duracao.TotalHours >= 24)
+        {
+            return $"{Math.Round(duracao.TotalDays, 1)} dia(s)";
+        }
+
+        var horas = (int)duracao.TotalHours;
+        var minutos = duracao.Minutes;
+        return horas == 0 ? $"{minutos} min" : $"{horas}h{minutos:00}";
+    }
+}
+
+<div class="agenda-page agenda-dashboard">
+    <section class="agenda-hero-panel mb-4">
+        <div class="agenda-hero-content">
+            <span class="agenda-eyebrow">Google Agenda</span>
+            <h1>Agenda operacional do IKKON</h1>
+            <p>Centralize aulas, ensaios, apresentações, reuniões e eventos culturais em uma visão rápida para a equipe.</p>
+            <div class="agenda-hero-meta">
+                <span class="agenda-connection-pill @(Model.OAuthConectado ? "is-connected" : "is-disconnected")">
+                    @(Model.OAuthConectado ? "Google conectado" : "Google não conectado")
+                </span>
+                <span>Calendário: @(Model.CalendarId ?? "não configurado")</span>
+                <span>@Model.Filtro.Inicio.ToString("dd/MM/yyyy") até @Model.Filtro.Fim.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+        <div class="agenda-hero-actions">
+            @if (canManage)
+            {
+                if (Model.OAuthConectado)
+                {
+                    <form asp-action="Disconnect" method="post" onsubmit="return confirm('Remover conexão OAuth com Google Agenda?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn agenda-btn agenda-btn-ghost">Desconectar Google</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-action="Connect" class="btn agenda-btn agenda-btn-outline">Conectar Google Agenda</a>
+                }
+            }
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Novo evento</a>
+            }
+        </div>
+    </section>
+
+    @if (Model.ConfiguracaoPendente)
+    {
+        <div class="agenda-config-alert mb-4">
+            <strong>Integração pendente</strong>
+            <span>@Model.MensagemConfiguracao</span>
+        </div>
+    }
+
+    <section class="agenda-kpi-grid mb-4">
+        <article class="agenda-kpi-card">
+            <span>Total no período</span>
+            <strong>@totalEventos</strong>
+            <small>Eventos retornados nos filtros</small>
+        </article>
+        <article class="agenda-kpi-card agenda-kpi-accent">
+            <span>Próximos 7 dias</span>
+            <strong>@proximosSeteDias</strong>
+            <small>Demandam atenção imediata</small>
+        </article>
+        <article class="agenda-kpi-card">
+            <span>Aulas e ensaios</span>
+            <strong>@aulasEnsaios</strong>
+            <small>Rotina pedagógica e prática</small>
+        </article>
+        <article class="agenda-kpi-card">
+            <span>Eventos externos</span>
+            <strong>@eventosExternos</strong>
+            <small>Apresentações e cultura</small>
+        </article>
+    </section>
+
+    <section class="agenda-filter-card mb-4">
+        <div class="agenda-card-heading">
+            <div>
+                <h2>Filtros da agenda</h2>
+                <p>Defina período e tipo de evento para reduzir ruído operacional.</p>
+            </div>
+            <a asp-action="Index" class="btn agenda-btn agenda-btn-ghost">Limpar filtros</a>
+        </div>
+
+        <form asp-action="Index" method="get" class="agenda-filter-grid">
+            <div class="agenda-field">
+                <label asp-for="Filtro.Inicio">Data inicial</label>
+                <input asp-for="Filtro.Inicio" name="Inicio" type="date" class="form-control agenda-control" aria-label="Data inicial do filtro" />
+                <span asp-validation-for="Filtro.Inicio" class="text-danger"></span>
+            </div>
+            <div class="agenda-field">
+                <label asp-for="Filtro.Fim">Data final</label>
+                <input asp-for="Filtro.Fim" name="Fim" type="date" class="form-control agenda-control" aria-label="Data final do filtro" />
+                <span asp-validation-for="Filtro.Fim" class="text-danger"></span>
+            </div>
+            <div class="agenda-field">
+                <label asp-for="Filtro.Tipo">Tipo de evento</label>
+                <select asp-for="Filtro.Tipo" name="Tipo" asp-items="Html.GetEnumSelectList<GoogleAgendaTipoEventoEnum>()" class="form-select agenda-control">
+                    <option value="">Todos os tipos</option>
+                </select>
+            </div>
+            <div class="agenda-filter-actions">
+                <button type="submit" class="btn agenda-btn agenda-btn-primary">Aplicar filtros</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="agenda-list-card">
+        <div class="agenda-card-heading">
+            <div>
+                <h2>Eventos no período</h2>
+                <p>@totalEventos evento(s) encontrado(s). Use as ações por linha para consultar, editar ou excluir.</p>
+            </div>
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Novo evento</a>
+            }
+        </div>
+
+        @if (Model.Eventos.Count == 0)
+        {
+            <div class="agenda-empty-state">
+                <div class="agenda-empty-mark">AG</div>
+                <h3>Nenhum evento encontrado</h3>
+                <p>@(Model.ConfiguracaoPendente ? "Finalize a conexão com o Google Agenda para carregar eventos." : "Tente ampliar o período, remover filtros ou criar um novo evento.")</p>
+                @if (canCreate)
+                {
+                    <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Criar primeiro evento</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 agenda-table">
+                    <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th>Tipo</th>
+                            <th>Início</th>
+                            <th>Fim</th>
+                            <th>Local</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var evento in Model.Eventos)
+                        {
+                            <tr>
+                                <td class="agenda-event-cell">
+                                    <span class="agenda-event-marker agenda-event-marker-@TipoClass(evento.Tipo)"></span>
+                                    <div>
+                                        <strong>@evento.Titulo</strong>
+                                        <small>@(string.IsNullOrWhiteSpace(evento.Descricao) ? "Sem descrição cadastrada." : evento.Descricao)</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="agenda-type agenda-type-@TipoClass(evento.Tipo)">@TipoLabel(evento.Tipo)</span>
+                                </td>
+                                <td>
+                                    <div class="agenda-date-cell">
+                                        <strong>@evento.Inicio.ToString("dd/MM")</strong>
+                                        <span>@evento.Inicio.ToString("HH:mm")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="agenda-date-cell">
+                                        <strong>@evento.Fim.ToString("dd/MM")</strong>
+                                        <span>@evento.Fim.ToString("HH:mm") · @FormatarDuracao(evento.Inicio, evento.Fim)</span>
+                                    </div>
+                                </td>
+                                <td>@(evento.Local ?? "Sem local")</td>
+                                <td>
+                                    <span class="agenda-status agenda-status-@StatusClass(evento.Status)">@StatusLabel(evento.Status)</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="agenda-row-actions">
+                                        <a asp-action="Details" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Detalhes</a>
+                                        @if (canEdit)
+                                        {
+                                            <a asp-action="Edit" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Editar</a>
+                                        }
+                                        @if (canDelete)
+                                        {
+                                            <form asp-action="Delete" asp-route-eventoId="@evento.Id" method="post" onsubmit="return confirm('Excluir este evento do Google Agenda?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn agenda-btn agenda-btn-table-danger">Excluir</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

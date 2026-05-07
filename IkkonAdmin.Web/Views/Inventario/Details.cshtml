@@ -1,0 +1,287 @@
+﻿@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@model InventarioDetalhesViewModel
+@{
+    ViewData["Title"] = "Detalhes do item";
+
+    var canEdit = User.HasAnyPermission(AppPermissions.InventarioEdit, AppPermissions.InventarioManage);
+    var canDelete = User.HasAnyPermission(AppPermissions.InventarioDelete, AppPermissions.InventarioManage);
+    var disponibilidadeCompleta = Model.DisponivelParaAula && Model.DisponivelParaEvento;
+    var requerAtencao = Model.Status is InventarioStatusEnum.Manutencao or InventarioStatusEnum.Indisponivel || Model.EstadoConservacao is InventarioEstadoConservacaoEnum.Ruim or InventarioEstadoConservacaoEnum.PrecisaManutencao;
+    var inicialItem = string.IsNullOrWhiteSpace(Model.Nome) ? "I" : Model.Nome.Trim()[0].ToString().ToUpperInvariant();
+}
+
+@functions {
+    private static string CategoriaTexto(InventarioCategoriaEnum categoria)
+    {
+        return categoria switch
+        {
+            InventarioCategoriaEnum.Taiko => "Taiko",
+            InventarioCategoriaEnum.Bachi => "Bachi",
+            InventarioCategoriaEnum.Outro => "Outro",
+            _ => categoria.ToString()
+        };
+    }
+
+    private static string StatusTexto(InventarioStatusEnum status)
+    {
+        return status switch
+        {
+            InventarioStatusEnum.Disponivel => "Disponível",
+            InventarioStatusEnum.EmUso => "Em uso",
+            InventarioStatusEnum.Manutencao => "Manutenção",
+            InventarioStatusEnum.Indisponivel => "Indisponível",
+            InventarioStatusEnum.Baixado => "Baixado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusClasse(InventarioStatusEnum status)
+    {
+        return status switch
+        {
+            InventarioStatusEnum.Disponivel => "is-success",
+            InventarioStatusEnum.EmUso => "is-info",
+            InventarioStatusEnum.Manutencao => "is-warning",
+            InventarioStatusEnum.Indisponivel => "is-danger",
+            InventarioStatusEnum.Baixado => "is-muted",
+            _ => "is-muted"
+        };
+    }
+
+    private static string EstadoTexto(InventarioEstadoConservacaoEnum estado)
+    {
+        return estado switch
+        {
+            InventarioEstadoConservacaoEnum.Novo => "Novo",
+            InventarioEstadoConservacaoEnum.Bom => "Bom",
+            InventarioEstadoConservacaoEnum.Regular => "Regular",
+            InventarioEstadoConservacaoEnum.Ruim => "Ruim",
+            InventarioEstadoConservacaoEnum.PrecisaManutencao => "Precisa manutenção",
+            _ => estado.ToString()
+        };
+    }
+
+    private static string MovimentacaoTexto(InventarioTipoMovimentacaoEnum tipo)
+    {
+        return tipo switch
+        {
+            InventarioTipoMovimentacaoEnum.Reserva => "Reserva",
+            InventarioTipoMovimentacaoEnum.UsoEmAula => "Uso em aula",
+            InventarioTipoMovimentacaoEnum.UsoEmEvento => "Uso em evento",
+            InventarioTipoMovimentacaoEnum.Manutencao => "Manutenção",
+            InventarioTipoMovimentacaoEnum.Retorno => "Retorno",
+            InventarioTipoMovimentacaoEnum.Baixa => "Baixa",
+            _ => tipo.ToString()
+        };
+    }
+}
+
+<div class="inventario-v2-page">
+    <section class="inventario-v2-profile-hero mb-4">
+        <div class="inventario-v2-profile-title">
+            <div class="inventario-v2-avatar">@inicialItem</div>
+            <div>
+                <span class="inventario-v2-eyebrow">Item #@Model.Id</span>
+                <h1>@Model.Nome</h1>
+                <div class="inventario-v2-meta">
+                    <span>Categoria <strong>@CategoriaTexto(Model.Categoria)</strong></span>
+                    <span>Tipo <strong>@(Model.Tipo ?? "Sem tipo")</strong></span>
+                    <span>Código <strong>@(Model.CodigoInterno ?? "Sem código")</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="inventario-v2-hero-actions">
+            <span class="inventario-v2-status-pill @StatusClasse(Model.Status)">@StatusTexto(Model.Status)</span>
+            <a asp-action="Index" class="btn inventario-v2-btn inventario-v2-btn-ghost">Voltar</a>
+            @if (canEdit)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn inventario-v2-btn inventario-v2-btn-primary">Editar</a>
+            }
+            @if (canDelete)
+            {
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Baixar este item do inventário?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn inventario-v2-btn inventario-v2-btn-danger">Baixar</button>
+                </form>
+            }
+        </div>
+    </section>
+
+    <section class="inventario-v2-kpi-grid mb-4" aria-label="Resumo do item">
+        <article class="inventario-v2-kpi-card @StatusClasse(Model.Status)">
+            <div class="inventario-v2-kpi-top">
+                <span>Status</span>
+                <b>Operação</b>
+            </div>
+            <strong>@StatusTexto(Model.Status)</strong>
+            <small>Status atual do item.</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card @(requerAtencao ? "is-warning" : "is-success")">
+            <div class="inventario-v2-kpi-top">
+                <span>Conservação</span>
+                <b>Estado</b>
+            </div>
+            <strong>@EstadoTexto(Model.EstadoConservacao)</strong>
+            <small>@(requerAtencao ? "Requer acompanhamento." : "Sem alerta crítico.")</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card">
+            <div class="inventario-v2-kpi-top">
+                <span>Quantidade</span>
+                <b>Estoque</b>
+            </div>
+            <strong>@Model.Quantidade</strong>
+            <small>Quantidade registrada para o item.</small>
+        </article>
+
+        <article class="inventario-v2-kpi-card @(disponibilidadeCompleta ? "is-success" : "is-warning")">
+            <div class="inventario-v2-kpi-top">
+                <span>Disponibilidade</span>
+                <b>Uso</b>
+            </div>
+            <strong>@(disponibilidadeCompleta ? "Aula/evento" : "Restrita")</strong>
+            <small>Aulas: @(Model.DisponivelParaAula ? "sim" : "não") · Eventos: @(Model.DisponivelParaEvento ? "sim" : "não")</small>
+        </article>
+    </section>
+
+    <div class="inventario-v2-details-grid mb-4">
+        <section class="inventario-v2-form-panel">
+            <div class="inventario-v2-panel-heading">
+                <div>
+                    <span class="inventario-v2-eyebrow">Dados principais</span>
+                    <h2>Informações do item</h2>
+                    <p>Resumo físico, financeiro e operacional para aulas e eventos.</p>
+                </div>
+            </div>
+
+            <div class="inventario-v2-detail-body">
+                <div class="inventario-v2-detail-grid">
+                    <article>
+                        <span>Localização</span>
+                        <strong>@(Model.Localizacao ?? "-")</strong>
+                    </article>
+                    <article>
+                        <span>Data de aquisição</span>
+                        <strong>@(Model.DataAquisicao?.ToString("dd/MM/yyyy") ?? "-")</strong>
+                    </article>
+                    <article>
+                        <span>Valor estimado</span>
+                        <strong>@(Model.ValorEstimado?.ToString("C") ?? "-")</strong>
+                    </article>
+                    <article>
+                        <span>Aulas</span>
+                        <strong>@(Model.DisponivelParaAula ? "Disponível" : "Indisponível")</strong>
+                    </article>
+                    <article>
+                        <span>Eventos</span>
+                        <strong>@(Model.DisponivelParaEvento ? "Disponível" : "Indisponível")</strong>
+                    </article>
+                    <article>
+                        <span>Ativo</span>
+                        <strong>@(Model.Ativo ? "Sim" : "Não")</strong>
+                    </article>
+                </div>
+
+                <div class="inventario-v2-note-box">
+                    <span>Descrição</span>
+                    <p>@(string.IsNullOrWhiteSpace(Model.Descricao) ? "Sem descrição cadastrada." : Model.Descricao)</p>
+                </div>
+
+                <div class="inventario-v2-note-box">
+                    <span>Observações internas</span>
+                    <p>@(string.IsNullOrWhiteSpace(Model.Observacoes) ? "Sem observações internas." : Model.Observacoes)</p>
+                </div>
+            </div>
+        </section>
+
+        <aside class="inventario-v2-side-stack">
+            <section class="inventario-v2-side-card">
+                <span class="inventario-v2-eyebrow">Auditoria</span>
+                <h2>Registro interno</h2>
+                <div class="inventario-v2-detail-list">
+                    <div>
+                        <span>Criado em</span>
+                        <strong>@Model.CriadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong>
+                    </div>
+                    <div>
+                        <span>Criado por</span>
+                        <strong>@(Model.CriadoPorNome ?? "-")</strong>
+                    </div>
+                    <div>
+                        <span>Atualizado em</span>
+                        <strong>@(Model.AtualizadoEmUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</strong>
+                    </div>
+                    <div>
+                        <span>Atualizado por</span>
+                        <strong>@(Model.AtualizadoPorNome ?? "-")</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="inventario-v2-assist-card inventario-v2-assist-card-compact">
+                <span class="inventario-v2-eyebrow">Atenção</span>
+                <h2>Cuidados operacionais</h2>
+                <ul>
+                    <li>Confirme localização antes de separar o item para aula ou evento.</li>
+                    <li>Atualize manutenção imediatamente quando houver avaria.</li>
+                    <li>Use baixa apenas quando o item não deve voltar ao inventário ativo.</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+
+    <section class="inventario-v2-table-panel">
+        <div class="inventario-v2-panel-heading">
+            <div>
+                <span class="inventario-v2-eyebrow">Movimentações</span>
+                <h2>Movimentações recentes</h2>
+                <p>Histórico preparado para futuras reservas e vínculo com eventos da agenda.</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table inventario-v2-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Quantidade</th>
+                        <th>Responsável</th>
+                        <th>Evento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.MovimentacoesRecentes.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="inventario-v2-empty-state">
+                                    <strong>Nenhuma movimentação registrada</strong>
+                                    <span>Este item ainda não possui reservas, uso em aula/evento ou manutenção registrada.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var mov in Model.MovimentacoesRecentes)
+                        {
+                            <tr>
+                                <td>@MovimentacaoTexto(mov.TipoMovimentacao)</td>
+                                <td>@mov.DataInicioUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(mov.DataFimUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                                <td>@mov.Quantidade</td>
+                                <td>@(mov.ResponsavelNome ?? "-")</td>
+                                <td>@(string.IsNullOrWhiteSpace(mov.GoogleEventId) ? "-" : mov.GoogleEventId)</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
