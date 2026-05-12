@@ -1,4 +1,4 @@
-@using IkkonAdmin.Web.Security
+﻿@using IkkonAdmin.Web.Security
 @model GoogleAgendaIndexViewModel
 @{
     ViewData["Title"] = "Google Agenda";
@@ -13,6 +13,17 @@
     var proximosSeteDias = Model.Eventos.Count(x => x.Inicio >= agora && x.Inicio <= limiteProximosDias);
     var aulasEnsaios = Model.Eventos.Count(x => x.Tipo is GoogleAgendaTipoEventoEnum.Aula or GoogleAgendaTipoEventoEnum.Ensaio);
     var eventosExternos = Model.Eventos.Count(x => x.Tipo is GoogleAgendaTipoEventoEnum.Apresentacao or GoogleAgendaTipoEventoEnum.EventoCultural);
+    var visualizacaoCalendario = Model.Filtro.Visualizacao == GoogleAgendaVisualizacaoEnum.CalendarioAnual;
+    var culturaPtBr = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+    var eventosAno = Model.Eventos
+        .Where(x => x.Inicio.Year == Model.Filtro.Ano)
+        .OrderBy(x => x.Inicio)
+        .ToList();
+    var eventosPorMes = eventosAno
+        .GroupBy(x => x.Inicio.Month)
+        .ToDictionary(x => x.Key, x => x.OrderBy(e => e.Inicio).ToList());
+    var diasComEvento = eventosAno.Select(x => x.Inicio.Date).Distinct().Count();
+    var quantidadeMesMaisMovimentado = eventosPorMes.Count == 0 ? 0 : eventosPorMes.Max(x => x.Value.Count);
 }
 
 @functions {
@@ -148,130 +159,292 @@
         </article>
     </section>
 
+    <section class="agenda-view-shell mb-4">
+        <div class="agenda-view-tabs" role="tablist" aria-label="Modo de visualização da agenda">
+            <a asp-action="Index"
+               asp-route-Visualizacao="@((int)GoogleAgendaVisualizacaoEnum.Lista)"
+               asp-route-Inicio="@Model.Filtro.Inicio.ToString("yyyy-MM-dd")"
+               asp-route-Fim="@Model.Filtro.Fim.ToString("yyyy-MM-dd")"
+               asp-route-Tipo="@(Model.Filtro.Tipo?.ToString())"
+               class="agenda-view-tab @(visualizacaoCalendario ? string.Empty : "is-active")">
+                <span>Lista</span>
+                <small>Operação detalhada</small>
+            </a>
+            <a asp-action="Index"
+               asp-route-Visualizacao="@((int)GoogleAgendaVisualizacaoEnum.CalendarioAnual)"
+               asp-route-Ano="@Model.Filtro.Ano"
+               asp-route-Tipo="@(Model.Filtro.Tipo?.ToString())"
+               class="agenda-view-tab @(visualizacaoCalendario ? "is-active" : string.Empty)">
+                <span>Calendário anual</span>
+                <small>Visão horizontal do ano</small>
+            </a>
+        </div>
+    </section>
+
     <section class="agenda-filter-card mb-4">
         <div class="agenda-card-heading">
             <div>
                 <h2>Filtros da agenda</h2>
-                <p>Defina período e tipo de evento para reduzir ruído operacional.</p>
+                <p>@(visualizacaoCalendario ? "Selecione o ano e o tipo para montar a visão anual." : "Defina período e tipo de evento para reduzir ruído operacional.")</p>
             </div>
-            <a asp-action="Index" class="btn agenda-btn agenda-btn-ghost">Limpar filtros</a>
+            <a asp-action="Index" asp-route-Visualizacao="@(visualizacaoCalendario ? (int)GoogleAgendaVisualizacaoEnum.CalendarioAnual : (int)GoogleAgendaVisualizacaoEnum.Lista)" class="btn agenda-btn agenda-btn-ghost">Limpar filtros</a>
         </div>
 
-        <form asp-action="Index" method="get" class="agenda-filter-grid">
-            <div class="agenda-field">
-                <label asp-for="Filtro.Inicio">Data inicial</label>
-                <input asp-for="Filtro.Inicio" name="Inicio" type="date" class="form-control agenda-control" aria-label="Data inicial do filtro" />
-                <span asp-validation-for="Filtro.Inicio" class="text-danger"></span>
-            </div>
-            <div class="agenda-field">
-                <label asp-for="Filtro.Fim">Data final</label>
-                <input asp-for="Filtro.Fim" name="Fim" type="date" class="form-control agenda-control" aria-label="Data final do filtro" />
-                <span asp-validation-for="Filtro.Fim" class="text-danger"></span>
-            </div>
-            <div class="agenda-field">
-                <label asp-for="Filtro.Tipo">Tipo de evento</label>
-                <select asp-for="Filtro.Tipo" name="Tipo" asp-items="Html.GetEnumSelectList<GoogleAgendaTipoEventoEnum>()" class="form-select agenda-control">
-                    <option value="">Todos os tipos</option>
-                </select>
-            </div>
-            <div class="agenda-filter-actions">
-                <button type="submit" class="btn agenda-btn agenda-btn-primary">Aplicar filtros</button>
-            </div>
-        </form>
-    </section>
-
-    <section class="agenda-list-card">
-        <div class="agenda-card-heading">
-            <div>
-                <h2>Eventos no período</h2>
-                <p>@totalEventos evento(s) encontrado(s). Use as ações por linha para consultar, editar ou excluir.</p>
-            </div>
-            @if (canCreate)
-            {
-                <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Novo evento</a>
-            }
-        </div>
-
-        @if (Model.Eventos.Count == 0)
+        @if (visualizacaoCalendario)
         {
-            <div class="agenda-empty-state">
-                <div class="agenda-empty-mark">AG</div>
-                <h3>Nenhum evento encontrado</h3>
-                <p>@(Model.ConfiguracaoPendente ? "Finalize a conexão com o Google Agenda para carregar eventos." : "Tente ampliar o período, remover filtros ou criar um novo evento.")</p>
-                @if (canCreate)
-                {
-                    <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Criar primeiro evento</a>
-                }
-            </div>
+            <form asp-action="Index" method="get" class="agenda-filter-grid agenda-filter-grid-year">
+                <input type="hidden" name="Visualizacao" value="@((int)GoogleAgendaVisualizacaoEnum.CalendarioAnual)" />
+                <div class="agenda-field">
+                    <label for="agendaAnoFiltro">Ano</label>
+                    <input id="agendaAnoFiltro" name="Ano" value="@Model.Filtro.Ano" type="number" min="2000" max="2100" class="form-control agenda-control" placeholder="Ex.: @DateTime.Today.Year" />
+                </div>
+                <div class="agenda-field">
+                    <label for="agendaTipoFiltroCalendario">Tipo de evento</label>
+                    <select id="agendaTipoFiltroCalendario" name="Tipo" class="form-select agenda-control">
+                        <option value="">Todos os tipos</option>
+                        @foreach (var tipo in Enum.GetValues<GoogleAgendaTipoEventoEnum>())
+                        {
+                            <option value="@tipo" selected="@(Model.Filtro.Tipo == tipo ? "selected" : null)">@TipoLabel(tipo)</option>
+                        }
+                    </select>
+                </div>
+                <div class="agenda-filter-actions">
+                    <button type="submit" class="btn agenda-btn agenda-btn-primary">Atualizar calendário</button>
+                </div>
+            </form>
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table align-middle mb-0 agenda-table">
-                    <thead>
-                        <tr>
-                            <th>Evento</th>
-                            <th>Tipo</th>
-                            <th>Início</th>
-                            <th>Fim</th>
-                            <th>Local</th>
-                            <th>Status</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var evento in Model.Eventos)
+            <form asp-action="Index" method="get" class="agenda-filter-grid">
+                <input type="hidden" name="Visualizacao" value="@((int)GoogleAgendaVisualizacaoEnum.Lista)" />
+                <input type="hidden" name="Ano" value="@Model.Filtro.Ano" />
+                <div class="agenda-field">
+                    <label for="agendaInicioFiltro">Data inicial</label>
+                    <input id="agendaInicioFiltro" name="Inicio" value="@Model.Filtro.Inicio.ToString("yyyy-MM-dd")" type="date" class="form-control agenda-control" aria-label="Data inicial do filtro" />
+                </div>
+                <div class="agenda-field">
+                    <label for="agendaFimFiltro">Data final</label>
+                    <input id="agendaFimFiltro" name="Fim" value="@Model.Filtro.Fim.ToString("yyyy-MM-dd")" type="date" class="form-control agenda-control" aria-label="Data final do filtro" />
+                </div>
+                <div class="agenda-field">
+                    <label for="agendaTipoFiltroLista">Tipo de evento</label>
+                    <select id="agendaTipoFiltroLista" name="Tipo" class="form-select agenda-control">
+                        <option value="">Todos os tipos</option>
+                        @foreach (var tipo in Enum.GetValues<GoogleAgendaTipoEventoEnum>())
                         {
-                            <tr>
-                                <td class="agenda-event-cell">
-                                    <span class="agenda-event-marker agenda-event-marker-@TipoClass(evento.Tipo)"></span>
-                                    <div>
-                                        <strong>@evento.Titulo</strong>
-                                        <small>@(string.IsNullOrWhiteSpace(evento.Descricao) ? "Sem descrição cadastrada." : evento.Descricao)</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="agenda-type agenda-type-@TipoClass(evento.Tipo)">@TipoLabel(evento.Tipo)</span>
-                                </td>
-                                <td>
-                                    <div class="agenda-date-cell">
-                                        <strong>@evento.Inicio.ToString("dd/MM")</strong>
-                                        <span>@evento.Inicio.ToString("HH:mm")</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="agenda-date-cell">
-                                        <strong>@evento.Fim.ToString("dd/MM")</strong>
-                                        <span>@evento.Fim.ToString("HH:mm") · @FormatarDuracao(evento.Inicio, evento.Fim)</span>
-                                    </div>
-                                </td>
-                                <td>@(evento.Local ?? "Sem local")</td>
-                                <td>
-                                    <span class="agenda-status agenda-status-@StatusClass(evento.Status)">@StatusLabel(evento.Status)</span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="agenda-row-actions">
-                                        <a asp-action="Details" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Detalhes</a>
-                                        @if (canEdit)
-                                        {
-                                            <a asp-action="Edit" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Editar</a>
-                                        }
-                                        @if (canDelete)
-                                        {
-                                            <form asp-action="Delete" asp-route-eventoId="@evento.Id" method="post" onsubmit="return confirm('Excluir este evento do Google Agenda?');">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn agenda-btn agenda-btn-table-danger">Excluir</button>
-                                            </form>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
+                            <option value="@tipo" selected="@(Model.Filtro.Tipo == tipo ? "selected" : null)">@TipoLabel(tipo)</option>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    </select>
+                </div>
+                <div class="agenda-filter-actions">
+                    <button type="submit" class="btn agenda-btn agenda-btn-primary">Aplicar filtros</button>
+                </div>
+            </form>
         }
     </section>
+
+    @if (visualizacaoCalendario)
+    {
+        <section class="agenda-year-card">
+            <div class="agenda-card-heading agenda-year-heading">
+                <div>
+                    <span class="agenda-eyebrow">Calendário horizontal</span>
+                    <h2>@Model.Filtro.Ano em perspectiva</h2>
+                    <p>Arraste horizontalmente para navegar pelos meses e identificar concentração de aulas, ensaios e apresentações.</p>
+                </div>
+                <div class="agenda-year-summary">
+                    <span><strong>@eventosAno.Count</strong> eventos no ano</span>
+                    <span><strong>@diasComEvento</strong> dias com agenda</span>
+                    <span><strong>@quantidadeMesMaisMovimentado</strong> no mês mais cheio</span>
+                </div>
+            </div>
+
+            @if (eventosAno.Count == 0)
+            {
+                <div class="agenda-empty-state">
+                    <div class="agenda-empty-mark">AN</div>
+                    <h3>Nenhum evento encontrado para @Model.Filtro.Ano</h3>
+                    <p>@(Model.ConfiguracaoPendente ? "Finalize a conexão com o Google Agenda para carregar eventos." : "Tente outro ano, remova o filtro de tipo ou crie novos eventos.")</p>
+                    @if (canCreate)
+                    {
+                        <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Criar evento</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="agenda-year-legend" aria-label="Legenda dos tipos de evento">
+                    @foreach (var tipo in Enum.GetValues<GoogleAgendaTipoEventoEnum>())
+                    {
+                        <span><i class="agenda-year-dot agenda-year-dot-@TipoClass(tipo)"></i>@TipoLabel(tipo)</span>
+                    }
+                </div>
+
+                <div class="agenda-year-scroll" tabindex="0" aria-label="Calendário anual com rolagem horizontal">
+                    <div class="agenda-year-track">
+                        @for (var mes = 1; mes <= 12; mes++)
+                        {
+                            var inicioMes = new DateTime(Model.Filtro.Ano, mes, 1);
+                            var diasNoMes = DateTime.DaysInMonth(Model.Filtro.Ano, mes);
+                            var primeiroDiaSemana = ((int)inicioMes.DayOfWeek + 6) % 7;
+                            var eventosMes = eventosPorMes.TryGetValue(mes, out var encontrados) ? encontrados : new List<GoogleAgendaEventoViewModel>();
+                            var diasMarcados = eventosMes.GroupBy(x => x.Inicio.Date).ToDictionary(x => x.Key, x => x.ToList());
+                            var nomeMes = culturaPtBr.TextInfo.ToTitleCase(inicioMes.ToString("MMMM", culturaPtBr));
+
+                            <article class="agenda-month-card @(eventosMes.Count > 0 ? "has-events" : string.Empty)">
+                                <header class="agenda-month-header">
+                                    <div>
+                                        <strong>@nomeMes</strong>
+                                        <span>@eventosMes.Count evento(s)</span>
+                                    </div>
+                                    <b>@mes.ToString("00")</b>
+                                </header>
+
+                                <div class="agenda-month-weekdays" aria-hidden="true">
+                                    <span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span>
+                                </div>
+
+                                <div class="agenda-month-grid">
+                                    @for (var vazio = 0; vazio < primeiroDiaSemana; vazio++)
+                                    {
+                                        <span class="agenda-month-day is-empty"></span>
+                                    }
+
+                                    @for (var dia = 1; dia <= diasNoMes; dia++)
+                                    {
+                                        var dataDia = new DateTime(Model.Filtro.Ano, mes, dia);
+                                        var eventosDia = diasMarcados.TryGetValue(dataDia.Date, out var doDia) ? doDia : new List<GoogleAgendaEventoViewModel>();
+                                        var temEvento = eventosDia.Count > 0;
+                                        var tipoPrincipal = temEvento ? TipoClass(eventosDia.First().Tipo) : string.Empty;
+                                        var classeHoje = dataDia.Date == DateTime.Today ? "is-today" : string.Empty;
+
+                                        <span class="agenda-month-day @(temEvento ? "has-event" : string.Empty) @classeHoje @(temEvento ? $"agenda-month-day-{tipoPrincipal}" : string.Empty)" title="@(temEvento ? string.Join(" | ", eventosDia.Select(x => x.Titulo)) : dataDia.ToString("dd/MM/yyyy"))">
+                                            <span>@dia</span>
+                                            @if (temEvento)
+                                            {
+                                                <small>@eventosDia.Count</small>
+                                            }
+                                        </span>
+                                    }
+                                </div>
+
+                                <div class="agenda-year-event-stack">
+                                    @foreach (var evento in eventosMes.Take(4))
+                                    {
+                                        <a asp-action="Details" asp-route-eventoId="@evento.Id" class="agenda-year-event agenda-year-event-@TipoClass(evento.Tipo)">
+                                            <span>@evento.Inicio.ToString("dd/MM")</span>
+                                            <strong>@evento.Titulo</strong>
+                                            <small>@evento.Inicio.ToString("HH:mm") · @TipoLabel(evento.Tipo)</small>
+                                        </a>
+                                    }
+
+                                    @if (eventosMes.Count > 4)
+                                    {
+                                        <small class="agenda-year-more">+ @(eventosMes.Count - 4) evento(s) neste mês</small>
+                                    }
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
+            }
+        </section>
+    }
+    else
+    {
+        <section class="agenda-list-card">
+            <div class="agenda-card-heading">
+                <div>
+                    <h2>Eventos no período</h2>
+                    <p>@totalEventos evento(s) encontrado(s). Use as ações por linha para consultar, editar ou excluir.</p>
+                </div>
+                @if (canCreate)
+                {
+                    <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Novo evento</a>
+                }
+            </div>
+
+            @if (Model.Eventos.Count == 0)
+            {
+                <div class="agenda-empty-state">
+                    <div class="agenda-empty-mark">AG</div>
+                    <h3>Nenhum evento encontrado</h3>
+                    <p>@(Model.ConfiguracaoPendente ? "Finalize a conexão com o Google Agenda para carregar eventos." : "Tente ampliar o período, remover filtros ou criar um novo evento.")</p>
+                    @if (canCreate)
+                    {
+                        <a asp-action="Create" class="btn agenda-btn agenda-btn-primary">Criar primeiro evento</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 agenda-table">
+                        <thead>
+                            <tr>
+                                <th>Evento</th>
+                                <th>Tipo</th>
+                                <th>Início</th>
+                                <th>Fim</th>
+                                <th>Local</th>
+                                <th>Status</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var evento in Model.Eventos)
+                            {
+                                <tr>
+                                    <td class="agenda-event-cell">
+                                        <span class="agenda-event-marker agenda-event-marker-@TipoClass(evento.Tipo)"></span>
+                                        <div>
+                                            <strong>@evento.Titulo</strong>
+                                            <small>@(string.IsNullOrWhiteSpace(evento.Descricao) ? "Sem descrição cadastrada." : evento.Descricao)</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="agenda-type agenda-type-@TipoClass(evento.Tipo)">@TipoLabel(evento.Tipo)</span>
+                                    </td>
+                                    <td>
+                                        <div class="agenda-date-cell">
+                                            <strong>@evento.Inicio.ToString("dd/MM")</strong>
+                                            <span>@evento.Inicio.ToString("HH:mm")</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="agenda-date-cell">
+                                            <strong>@evento.Fim.ToString("dd/MM")</strong>
+                                            <span>@evento.Fim.ToString("HH:mm") · @FormatarDuracao(evento.Inicio, evento.Fim)</span>
+                                        </div>
+                                    </td>
+                                    <td>@(evento.Local ?? "Sem local")</td>
+                                    <td>
+                                        <span class="agenda-status agenda-status-@StatusClass(evento.Status)">@StatusLabel(evento.Status)</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="agenda-row-actions">
+                                            <a asp-action="Details" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Detalhes</a>
+                                            @if (canEdit)
+                                            {
+                                                <a asp-action="Edit" asp-route-eventoId="@evento.Id" class="btn agenda-btn agenda-btn-table">Editar</a>
+                                            }
+                                            @if (canDelete)
+                                            {
+                                                <form asp-action="Delete" asp-route-eventoId="@evento.Id" method="post" onsubmit="return confirm('Excluir este evento do Google Agenda?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn agenda-btn agenda-btn-table-danger">Excluir</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
 </div>
 
 @section Scripts {

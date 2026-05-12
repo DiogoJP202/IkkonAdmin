@@ -1,4 +1,4 @@
-@using IkkonAdmin.Web.Security
+﻿@using IkkonAdmin.Web.Security
 @{
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
 
@@ -15,29 +15,40 @@
     var canSistema = User.HasPermission(AppPermissions.GerenciarSistema);
 }
 
-<nav class="admin-panel-nav card border-0 shadow-sm mb-3">
-    <div class="card-body py-2">
-        <div class="d-flex flex-wrap gap-2">
-            @if (canVisualizar)
-            {
-                <a class="btn btn-sm @(isVisaoGeral ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel">Visao geral</a>
-            }
-            @if (canUsuarios)
-            {
-                <a class="btn btn-sm @(isUsuarios ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Usuarios">Usuarios</a>
-            }
-            @if (canCargos)
-            {
-                <a class="btn btn-sm @(isCargos ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Cargos">Cargos</a>
-            }
-            @if (canLogs)
-            {
-                <a class="btn btn-sm @(isLogs ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Logs">Logs</a>
-            }
-            @if (canSistema)
-            {
-                <a class="btn btn-sm @(isSistema ? "btn-danger" : "btn-outline-secondary")" href="/admin/painel/Sistema">Sistema</a>
-            }
-        </div>
-    </div>
+<nav class="admin-panel-nav" aria-label="Navegação do painel administrativo">
+    @if (canVisualizar)
+    {
+        <a class="admin-panel-nav-link @(isVisaoGeral ? "is-active" : null)" href="/admin/painel">
+            <strong>Visão geral</strong>
+            <small>Indicadores e atalhos</small>
+        </a>
+    }
+    @if (canUsuarios)
+    {
+        <a class="admin-panel-nav-link @(isUsuarios ? "is-active" : null)" href="/admin/painel/Usuarios">
+            <strong>Usuários</strong>
+            <small>Contas e status</small>
+        </a>
+    }
+    @if (canCargos)
+    {
+        <a class="admin-panel-nav-link @(isCargos ? "is-active" : null)" href="/admin/painel/Cargos">
+            <strong>Cargos</strong>
+            <small>Perfis e permissões</small>
+        </a>
+    }
+    @if (canLogs)
+    {
+        <a class="admin-panel-nav-link @(isLogs ? "is-active" : null)" href="/admin/painel/Logs">
+            <strong>Logs</strong>
+            <small>Auditoria</small>
+        </a>
+    }
+    @if (canSistema)
+    {
+        <a class="admin-panel-nav-link @(isSistema ? "is-active" : null)" href="/admin/painel/Sistema">
+            <strong>Sistema</strong>
+            <small>Parâmetros globais</small>
+        </a>
+    }
 </nav>

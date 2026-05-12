@@ -1,47 +1,61 @@
-@model AdminUsuarioFormViewModel
+﻿@model AdminUsuarioFormViewModel
 @{
-    ViewData["Title"] = "Editar Usuario";
+    ViewData["Title"] = "Editar Usuário";
 }
 
-<div class="admin-panel-page d-grid gap-3">
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Conta existente</span>
+            <h1 class="admin-panel-title">Editar usuário</h1>
+            <p class="admin-panel-subtitle">Atualize dados de contato, cargo e status da conta sem alterar regras globais de permissão.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a href="/admin/painel/Usuarios" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar</a>
+        </div>
+    </section>
+
     <partial name="_AdminNav" />
 
-    <section class="card admin-panel-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Editar usuario</h2>
-            <a href="/admin/painel/Usuarios" class="btn btn-sm btn-outline-secondary">Voltar</a>
+    <section class="admin-panel-card admin-panel-card-v2">
+        <div class="admin-panel-card-header">
+            <div>
+                <span class="admin-panel-eyebrow">Dados do usuário</span>
+                <h2>Informações de acesso</h2>
+                <p>O cargo selecionado define o conjunto principal de permissões herdadas.</p>
+            </div>
         </div>
-        <div class="card-body">
-            <form asp-action="EditarUsuario" asp-route-id="@Model.Id" method="post" class="row g-3" novalidate>
-                @Html.AntiForgeryToken()
-                <input asp-for="Id" type="hidden" />
-                <input asp-for="TipoAcesso" type="hidden" />
-                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+        <form asp-action="EditarUsuario" asp-route-id="@Model.Id" method="post" class="admin-panel-form-stack" novalidate>
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="TipoAcesso" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="admin-panel-validation text-danger small"></div>
 
-                <div class="col-12 col-md-6">
-                    <label asp-for="NomeExibicao" class="form-label"></label>
-                    <input asp-for="NomeExibicao" class="form-control" />
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field">
+                    <label asp-for="NomeExibicao"></label>
+                    <input asp-for="NomeExibicao" class="form-control admin-panel-control" placeholder="Nome completo" autocomplete="name" />
                     <span asp-validation-for="NomeExibicao" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="Login" class="form-label"></label>
-                    <input asp-for="Login" class="form-control" />
+                <div class="admin-panel-field">
+                    <label asp-for="Login"></label>
+                    <input asp-for="Login" class="form-control admin-panel-control" placeholder="login.usuario" autocomplete="username" />
                     <span asp-validation-for="Login" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" />
+                <div class="admin-panel-field">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" type="email" class="form-control admin-panel-control" placeholder="email@dominio.com" autocomplete="email" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="Telefone" class="form-label"></label>
-                    <input asp-for="Telefone" class="form-control" />
+                <div class="admin-panel-field">
+                    <label asp-for="Telefone"></label>
+                    <input asp-for="Telefone" type="tel" class="form-control admin-panel-control" placeholder="(11) 90000-0000" autocomplete="tel" />
                     <span asp-validation-for="Telefone" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="RoleId" class="form-label"></label>
-                    <select asp-for="RoleId" class="form-select" id="RoleId">
-                        <option value="">Selecione...</option>
+                <div class="admin-panel-field">
+                    <label asp-for="RoleId"></label>
+                    <select asp-for="RoleId" class="form-select admin-panel-control" id="RoleId">
+                        <option value="">Selecione um cargo</option>
                         @foreach (var role in Model.RolesDisponiveis)
                         {
                             <option value="@role.Id" data-tipo="@role.TipoAcesso">@role.Nome (@role.Codigo)</option>
@@ -49,22 +63,21 @@
                     </select>
                     <span asp-validation-for="RoleId" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6 d-flex flex-column justify-content-end gap-2">
-                    <div>
-                        <label class="form-label" for="tipoContaInfo">Tipo de conta do cargo</label>
-                        <input id="tipoContaInfo" class="form-control" value="@Model.TipoAcesso" readonly />
-                    </div>
-                    <div class="form-check">
-                        <input asp-for="Ativo" class="form-check-input" />
-                        <label asp-for="Ativo" class="form-check-label"></label>
-                    </div>
+                <div class="admin-panel-field">
+                    <label for="tipoContaInfo">Tipo de conta do cargo</label>
+                    <input id="tipoContaInfo" class="form-control admin-panel-control" value="@Model.TipoAcesso" readonly />
                 </div>
-                <div class="col-12 d-flex gap-2 justify-content-end">
-                    <a href="/admin/painel/Usuarios" class="btn btn-outline-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-danger">Salvar alteracoes</button>
-                </div>
-            </form>
-        </div>
+                <label class="admin-panel-check-card is-form-check">
+                    <input asp-for="Ativo" class="form-check-input" />
+                    <span>Conta ativa</span>
+                </label>
+            </div>
+
+            <div class="admin-panel-form-actions">
+                <a href="/admin/painel/Usuarios" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar alterações</button>
+            </div>
+        </form>
     </section>
 </div>
 

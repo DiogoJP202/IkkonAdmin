@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
@@ -21,7 +21,7 @@
 
             <nav class="aluno-portal-nav" aria-label="Navegação da Área do Aluno">
                 <a class="@(Context.Request.Path.Value?.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno">Início</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">Meu Perfil</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">Meu perfil</a>
                 <a class="@(Context.Request.Path.Value?.Contains("/financeiro", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/financeiro">Financeiro</a>
                 <a class="@(Context.Request.Path.Value?.Contains("/turmas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/turmas">Turmas</a>
             </nav>

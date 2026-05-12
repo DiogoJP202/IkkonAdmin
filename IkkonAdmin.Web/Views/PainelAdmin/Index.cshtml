@@ -1,139 +1,155 @@
-@using IkkonAdmin.Web.Security
+﻿@using IkkonAdmin.Web.Security
 @model AdminPainelViewModel
 @{
-    ViewData["Title"] = "Administracao";
+    ViewData["Title"] = "Administração";
 
     var canGerenciarUsuarios = User.HasPermission(AppPermissions.GerenciarUsuarios);
     var canGerenciarCargos = User.HasPermission(AppPermissions.GerenciarCargos);
     var canGerenciarSistema = User.HasPermission(AppPermissions.GerenciarSistema);
 }
 
-<div class="admin-panel-page d-grid gap-3">
-    <section class="admin-panel-hero rounded-3 p-3 p-lg-4">
-        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-end">
-            <div>
-                <p class="admin-panel-eyebrow mb-2">Governanca e controle</p>
-                <h1 class="admin-panel-title mb-2">Painel administrativo</h1>
-                <p class="admin-panel-subtitle mb-0">Gerencie usuarios, cargos, permissoes, auditoria e parametros internos com controle centralizado.</p>
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Governança e controle</span>
+            <h1 class="admin-panel-title">Painel administrativo</h1>
+            <p class="admin-panel-subtitle">Centralize usuários, cargos, permissões, auditoria e parâmetros internos em uma visão rápida e segura.</p>
+            <div class="admin-panel-meta">
+                <span>Usuários <strong>@Model.TotalUsuarios</strong></span>
+                <span>Ativos <strong>@Model.UsuariosAtivos</strong></span>
+                <span>Logs 24h <strong>@Model.LogsUltimas24h</strong></span>
             </div>
-            <div class="d-flex flex-wrap gap-2">
-                @if (canGerenciarUsuarios)
-                {
-                    <a href="/admin/painel/NovoUsuario" class="btn btn-danger">Novo usuario</a>
-                }
-                @if (canGerenciarCargos)
-                {
-                    <a href="/admin/painel/NovoCargo" class="btn btn-outline-secondary">Novo cargo</a>
-                }
-            </div>
+        </div>
+        <div class="admin-panel-hero-actions">
+            @if (canGerenciarUsuarios)
+            {
+                <a href="/admin/painel/NovoUsuario" class="btn admin-panel-btn admin-panel-btn-primary">Novo usuário</a>
+            }
+            @if (canGerenciarCargos)
+            {
+                <a href="/admin/painel/NovoCargo" class="btn admin-panel-btn admin-panel-btn-ghost">Novo cargo</a>
+            }
         </div>
     </section>
 
     <partial name="_AdminNav" />
 
-    <section class="row g-3">
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="card admin-kpi-card admin-kpi-card-primary h-100">
-                <div class="card-body">
-                    <p class="admin-kpi-label mb-1">Usuarios cadastrados</p>
-                    <h2 class="admin-kpi-value mb-0">@Model.TotalUsuarios</h2>
-                </div>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="card admin-kpi-card admin-kpi-card-success h-100">
-                <div class="card-body">
-                    <p class="admin-kpi-label mb-1">Usuarios ativos</p>
-                    <h2 class="admin-kpi-value mb-0">@Model.UsuariosAtivos</h2>
-                </div>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="card admin-kpi-card admin-kpi-card-warning h-100">
-                <div class="card-body">
-                    <p class="admin-kpi-label mb-1">Administradores</p>
-                    <h2 class="admin-kpi-value mb-0">@Model.UsuariosAdmins</h2>
-                </div>
-            </article>
-        </div>
-        <div class="col-12 col-md-6 col-xl-3">
-            <article class="card admin-kpi-card admin-kpi-card-info h-100">
-                <div class="card-body">
-                    <p class="admin-kpi-label mb-1">Cargos ativos</p>
-                    <h2 class="admin-kpi-value mb-0">@Model.TotalCargosAtivos</h2>
-                </div>
-            </article>
-        </div>
+    <section class="admin-panel-kpi-grid" aria-label="Indicadores administrativos">
+        <article class="admin-kpi-card is-primary">
+            <div class="admin-kpi-top"><span>Base</span><b>Usuários</b></div>
+            <strong>@Model.TotalUsuarios</strong>
+            <small>Total de contas cadastradas no sistema.</small>
+        </article>
+        <article class="admin-kpi-card is-success">
+            <div class="admin-kpi-top"><span>Status</span><b>Ativos</b></div>
+            <strong>@Model.UsuariosAtivos</strong>
+            <small>Contas liberadas para acesso interno ou área do aluno.</small>
+        </article>
+        <article class="admin-kpi-card is-warning">
+            <div class="admin-kpi-top"><span>Acesso</span><b>Admins</b></div>
+            <strong>@Model.UsuariosAdmins</strong>
+            <small>Usuários com perfil administrativo completo.</small>
+        </article>
+        <article class="admin-kpi-card is-info">
+            <div class="admin-kpi-top"><span>Permissões</span><b>Cargos</b></div>
+            <strong>@Model.TotalCargosAtivos</strong>
+            <small>Cargos ativos disponíveis para governança de acesso.</small>
+        </article>
     </section>
 
-    <section class="row g-3">
-        <div class="col-12 col-lg-6">
-            <article class="card admin-panel-card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Distribuicao de tipos de conta</h3>
-                    @if (canGerenciarUsuarios)
-                    {
-                        <a href="/admin/painel/Usuarios" class="btn btn-sm btn-outline-secondary">Gerenciar</a>
-                    }
+    <section class="admin-panel-grid admin-panel-grid-two">
+        <article class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Distribuição</span>
+                    <h2>Tipos de conta</h2>
+                    <p>Entenda rapidamente como os acessos estão distribuídos entre equipe, alunos e administração.</p>
                 </div>
-                <div class="card-body">
-                    <div class="admin-stat-list">
-                        <div class="admin-stat-row"><span>Funcionarios</span><strong>@Model.UsuariosFuncionarios</strong></div>
-                        <div class="admin-stat-row"><span>Alunos</span><strong>@Model.UsuariosAlunos</strong></div>
-                        <div class="admin-stat-row"><span>Administradores</span><strong>@Model.UsuariosAdmins</strong></div>
-                    </div>
+                @if (canGerenciarUsuarios)
+                {
+                    <a href="/admin/painel/Usuarios" class="btn admin-panel-btn admin-panel-btn-ghost">Gerenciar</a>
+                }
+            </div>
+            <div class="admin-stat-list">
+                <div class="admin-stat-row"><span>Funcionários</span><strong>@Model.UsuariosFuncionarios</strong></div>
+                <div class="admin-stat-row"><span>Alunos</span><strong>@Model.UsuariosAlunos</strong></div>
+                <div class="admin-stat-row"><span>Administradores</span><strong>@Model.UsuariosAdmins</strong></div>
+            </div>
+        </article>
+
+        <article class="admin-panel-card admin-panel-card-v2 admin-panel-priority-card">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Atalhos</span>
+                    <h2>Ações rápidas</h2>
+                    <p>Acesse os pontos críticos de administração sem navegar por menus longos.</p>
                 </div>
-            </article>
-        </div>
-        <div class="col-12 col-lg-6">
-            <article class="card admin-panel-card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="h6 mb-0">Acoes rapidas</h3>
-                </div>
-                <div class="card-body d-grid gap-2">
-                    @if (canGerenciarUsuarios)
-                    {
-                        <a href="/admin/painel/Usuarios" class="btn btn-outline-secondary text-start">Gestao de usuarios</a>
-                    }
-                    @if (canGerenciarCargos)
-                    {
-                        <a href="/admin/painel/Cargos" class="btn btn-outline-secondary text-start">Gestao de cargos</a>
-                    }
-                    @if (canGerenciarSistema)
-                    {
-                        <a href="/admin/painel/Logs" class="btn btn-outline-secondary text-start">Logs e auditoria</a>
-                        <a href="/admin/painel/Sistema" class="btn btn-outline-secondary text-start">Configuracoes do sistema</a>
-                    }
-                </div>
-            </article>
-        </div>
+            </div>
+            <div class="admin-panel-action-list">
+                @if (canGerenciarUsuarios)
+                {
+                    <a href="/admin/painel/Usuarios" class="admin-panel-action-card">
+                        <span>01</span>
+                        <strong>Gestão de usuários</strong>
+                        <small>Editar contas, status, cargos e acessos.</small>
+                    </a>
+                }
+                @if (canGerenciarCargos)
+                {
+                    <a href="/admin/painel/Cargos" class="admin-panel-action-card">
+                        <span>02</span>
+                        <strong>Gestão de cargos</strong>
+                        <small>Definir perfis e permissões por função.</small>
+                    </a>
+                }
+                @if (canGerenciarSistema)
+                {
+                    <a href="/admin/painel/Logs" class="admin-panel-action-card">
+                        <span>03</span>
+                        <strong>Logs e auditoria</strong>
+                        <small>Rastrear ações administrativas recentes.</small>
+                    </a>
+                    <a href="/admin/painel/Sistema" class="admin-panel-action-card">
+                        <span>04</span>
+                        <strong>Configurações do sistema</strong>
+                        <small>Ajustar parâmetros globais da operação.</small>
+                    </a>
+                }
+            </div>
+        </article>
     </section>
 
-    <section class="card admin-panel-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="h6 mb-0">Atividades recentes</h3>
+    <section class="admin-panel-card admin-panel-card-v2">
+        <div class="admin-panel-card-header">
+            <div>
+                <span class="admin-panel-eyebrow">Auditoria</span>
+                <h2>Atividades recentes</h2>
+                <p>Últimos eventos registrados no painel administrativo.</p>
+            </div>
             @if (canGerenciarSistema)
             {
-                <a href="/admin/painel/Logs" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+                <a href="/admin/painel/Logs" class="btn admin-panel-btn admin-panel-btn-ghost">Ver todos</a>
             }
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+        <div class="table-responsive admin-panel-table-wrap">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Acao</th>
+                        <th>Ação</th>
                         <th>Entidade</th>
-                        <th>Responsavel</th>
+                        <th>Responsável</th>
                         <th>Afetado</th>
-                        <th>Descricao</th>
+                        <th>Descrição</th>
                     </tr>
                 </thead>
                 <tbody>
                 @if (Model.AtividadesRecentes.Count == 0)
                 {
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Sem atividades registradas.</td>
+                        <td colspan="6">
+                            <div class="admin-panel-empty">Sem atividades registradas.</div>
+                        </td>
                     </tr>
                 }
                 else
@@ -141,8 +157,8 @@
                     @foreach (var item in Model.AtividadesRecentes)
                     {
                         <tr>
-                            <td>@item.DataEventoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@item.Acao</td>
+                            <td><strong>@item.DataEventoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong></td>
+                            <td><span class="admin-panel-badge is-neutral">@item.Acao</span></td>
                             <td>@item.Entidade</td>
                             <td>@(item.ResponsavelNome ?? "-")</td>
                             <td>@(item.AfetadoNome ?? "-")</td>

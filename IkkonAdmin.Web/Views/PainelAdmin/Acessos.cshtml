@@ -1,27 +1,46 @@
-@model AdminAcessosViewModel
+﻿@model AdminAcessosViewModel
 @{
-    ViewData["Title"] = "Permissoes e Acessos";
+    ViewData["Title"] = "Permissões e Acessos";
+    var totalDiretas = Model.PermissoesDisponiveis.Count(x => x.Concedida && !x.HerdadaDaRole);
+    var totalHerdadas = Model.PermissoesDisponiveis.Count(x => x.HerdadaDaRole);
 }
 
-<div class="admin-panel-page d-grid gap-3">
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Permissões individuais</span>
+            <h1 class="admin-panel-title">Acessos de @Model.NomeUsuario</h1>
+            <p class="admin-panel-subtitle">Revise o cargo principal e adicione permissões diretas somente quando o perfil padrão não for suficiente.</p>
+            <div class="admin-panel-meta">
+                <span>E-mail <strong>@Model.EmailUsuario</strong></span>
+                <span>Tipo <strong>@Model.TipoAcesso</strong></span>
+                <span>Diretas <strong>@totalDiretas</strong></span>
+                <span>Herdadas <strong>@totalHerdadas</strong></span>
+            </div>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a href="/admin/painel/Usuarios" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar</a>
+        </div>
+    </section>
+
     <partial name="_AdminNav" />
 
-    <section class="card admin-panel-card">
-        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div>
-                <h2 class="h6 mb-0">Permissoes do usuario</h2>
-                <small class="text-muted">@Model.NomeUsuario - @Model.EmailUsuario</small>
-            </div>
-            <a href="/admin/painel/Usuarios" class="btn btn-sm btn-outline-secondary">Voltar</a>
-        </div>
-        <div class="card-body">
-            <form asp-action="Acessos" method="post" class="row g-3">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="UsuarioId" value="@Model.UsuarioId" />
+    <form asp-action="Acessos" method="post" class="admin-panel-form-stack">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="UsuarioId" value="@Model.UsuarioId" />
 
-                <div class="col-12 col-lg-4">
-                    <label class="form-label" for="RoleId">Cargo principal</label>
-                    <select class="form-select" id="RoleId" name="RoleId" required>
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Cargo</span>
+                    <h2>Cargo principal</h2>
+                    <p>O cargo define a base de permissões herdadas pelo usuário.</p>
+                </div>
+            </div>
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field admin-panel-field-wide">
+                    <label for="RoleId">Cargo principal</label>
+                    <select class="form-select admin-panel-control" id="RoleId" name="RoleId" required>
                         @foreach (var role in Model.RolesDisponiveis)
                         {
                             if (role.Id == Model.RoleSelecionadaId)
@@ -35,54 +54,59 @@
                         }
                     </select>
                 </div>
+            </div>
+        </section>
 
-                <div class="col-12">
-                    <h3 class="h6 mb-2">Permissoes diretas</h3>
-                    <p class="text-muted small mb-3">Permissoes herdadas pelo cargo aparecem destacadas. As diretas ampliam o acesso individual.</p>
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Matriz de acesso</span>
+                    <h2>Permissões diretas</h2>
+                    <p>Permissões herdadas pelo cargo aparecem bloqueadas. Permissões diretas ampliam o acesso individual.</p>
+                </div>
+            </div>
 
-                    @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
-                    {
-                        <div class="mb-3">
-                            <h4 class="h6 mb-2">@grupo.Key</h4>
-                            <div class="row g-2">
-                                @foreach (var permissao in grupo)
-                                {
-                                    var checkedItem = permissao.Concedida || permissao.HerdadaDaRole;
-                                    <div class="col-12 col-md-6">
-                                        <label class="admin-permission-item form-check">
-                                            @if (permissao.HerdadaDaRole)
-                                            {
-                                                <input class="form-check-input" type="checkbox" checked="@checkedItem" disabled />
-                                            }
-                                            else
-                                            {
-                                                <input class="form-check-input" type="checkbox" name="PermissoesDiretas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
-                                            }
-                                            <span class="form-check-label">
-                                                <strong>@permissao.Nome</strong>
-                                                <small class="d-block text-muted">@permissao.Codigo</small>
-                                                @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
-                                                {
-                                                    <small class="d-block text-muted">@permissao.Descricao</small>
-                                                }
-                                                @if (permissao.HerdadaDaRole)
-                                                {
-                                                    <small class="badge text-bg-secondary mt-1">Herdada pelo cargo</small>
-                                                }
-                                            </span>
-                                        </label>
-                                    </div>
-                                }
-                            </div>
+            <div class="admin-panel-permission-groups">
+                @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
+                {
+                    <div class="admin-panel-permission-group">
+                        <h3>@grupo.Key</h3>
+                        <div class="admin-panel-permission-grid">
+                            @foreach (var permissao in grupo)
+                            {
+                                var checkedItem = permissao.Concedida || permissao.HerdadaDaRole;
+                                <label class="admin-permission-item @(permissao.HerdadaDaRole ? "is-inherited" : null)">
+                                    @if (permissao.HerdadaDaRole)
+                                    {
+                                        <input class="form-check-input" type="checkbox" checked disabled />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input" type="checkbox" name="PermissoesDiretas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
+                                    }
+                                    <span>
+                                        <strong>@permissao.Nome</strong>
+                                        <small>@permissao.Codigo</small>
+                                        @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
+                                        {
+                                            <small>@permissao.Descricao</small>
+                                        }
+                                        @if (permissao.HerdadaDaRole)
+                                        {
+                                            <em>Herdada pelo cargo</em>
+                                        }
+                                    </span>
+                                </label>
+                            }
                         </div>
-                    }
-                </div>
+                    </div>
+                }
+            </div>
 
-                <div class="col-12 d-flex justify-content-end gap-2">
-                    <a href="/admin/painel/Usuarios" class="btn btn-outline-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-danger">Salvar acessos</button>
-                </div>
-            </form>
-        </div>
-    </section>
+            <div class="admin-panel-form-actions">
+                <a href="/admin/painel/Usuarios" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar acessos</button>
+            </div>
+        </section>
+    </form>
 </div>

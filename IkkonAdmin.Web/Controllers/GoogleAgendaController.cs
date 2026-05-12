@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -16,6 +17,7 @@ public class GoogleAgendaController(IGoogleAgendaService googleAgendaService) : 
     public async Task<IActionResult> Index([FromQuery] GoogleAgendaFiltroViewModel filtro, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Google Agenda";
+        AplicarIntervaloDaVisualizacao(filtro);
 
         if (!ModelState.IsValid)
         {
@@ -238,5 +240,16 @@ public class GoogleAgendaController(IGoogleAgendaService googleAgendaService) : 
     {
         var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out var userId) ? userId : null;
+    }
+
+    private static void AplicarIntervaloDaVisualizacao(GoogleAgendaFiltroViewModel filtro)
+    {
+        if (filtro.Visualizacao != GoogleAgendaVisualizacaoEnum.CalendarioAnual)
+        {
+            return;
+        }
+
+        filtro.Inicio = new DateOnly(filtro.Ano, 1, 1);
+        filtro.Fim = new DateOnly(filtro.Ano, 12, 31);
     }
 }

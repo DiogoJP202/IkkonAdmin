@@ -48,19 +48,19 @@ public class AdminUsuarioFormViewModel
     public int? Id { get; set; }
 
     [Display(Name = "Nome")]
-    [Required(ErrorMessage = "Informe o nome do usuario.")]
-    [StringLength(200, ErrorMessage = "Nome deve ter no maximo 200 caracteres.")]
+    [Required(ErrorMessage = "Informe o nome do usuário.")]
+    [StringLength(200, ErrorMessage = "Nome deve ter no máximo 200 caracteres.")]
     public string NomeExibicao { get; set; } = string.Empty;
 
     [Display(Name = "Login")]
-    [Required(ErrorMessage = "Informe o login do usuario.")]
-    [StringLength(80, ErrorMessage = "Login deve ter no maximo 80 caracteres.")]
+    [Required(ErrorMessage = "Informe o login do usuário.")]
+    [StringLength(80, ErrorMessage = "Login deve ter no máximo 80 caracteres.")]
     public string Login { get; set; } = string.Empty;
 
     [Display(Name = "E-mail")]
-    [Required(ErrorMessage = "Informe o e-mail do usuario.")]
-    [EmailAddress(ErrorMessage = "Informe um e-mail valido.")]
-    [StringLength(150, ErrorMessage = "E-mail deve ter no maximo 150 caracteres.")]
+    [Required(ErrorMessage = "Informe o e-mail do usuário.")]
+    [EmailAddress(ErrorMessage = "Informe um e-mail válido.")]
+    [StringLength(150, ErrorMessage = "E-mail deve ter no máximo 150 caracteres.")]
     public string Email { get; set; } = string.Empty;
 
     [Display(Name = "Telefone")]
@@ -69,11 +69,11 @@ public class AdminUsuarioFormViewModel
 
     [Display(Name = "Tipo de conta")]
     [Required(ErrorMessage = "Selecione o tipo de conta.")]
-    [EnumDataType(typeof(TipoAcessoEnum), ErrorMessage = "Tipo de conta invalido.")]
+    [EnumDataType(typeof(TipoAcessoEnum), ErrorMessage = "Tipo de conta inválido.")]
     public TipoAcessoEnum TipoAcesso { get; set; } = TipoAcessoEnum.Funcionario;
 
     [Display(Name = "Cargo")]
-    [Required(ErrorMessage = "Selecione um cargo para o usuario.")]
+    [Required(ErrorMessage = "Selecione um cargo para o usuário.")]
     public int RoleId { get; set; }
 
     public List<AdminRoleSelectItemViewModel> RolesDisponiveis { get; set; } = new();
@@ -123,7 +123,7 @@ public class AdminAcessosUpdateRequest
     [Required]
     public int UsuarioId { get; set; }
 
-    [Required(ErrorMessage = "Selecione uma role.")]
+    [Required(ErrorMessage = "Selecione um cargo.")]
     public int RoleId { get; set; }
 
     public List<int> PermissoesDiretas { get; set; } = new();
@@ -163,17 +163,17 @@ public class AdminRoleFormViewModel
     [StringLength(100, ErrorMessage = "Nome deve ter no maximo 100 caracteres.")]
     public string Nome { get; set; } = string.Empty;
 
-    [Display(Name = "Codigo interno")]
-    [StringLength(60, ErrorMessage = "Codigo deve ter no maximo 60 caracteres.")]
+    [Display(Name = "Código interno")]
+    [StringLength(60, ErrorMessage = "Código deve ter no máximo 60 caracteres.")]
     public string? Codigo { get; set; }
 
-    [Display(Name = "Descricao")]
-    [StringLength(300, ErrorMessage = "Descricao deve ter no maximo 300 caracteres.")]
+    [Display(Name = "Descrição")]
+    [StringLength(300, ErrorMessage = "Descrição deve ter no máximo 300 caracteres.")]
     public string? Descricao { get; set; }
 
     [Display(Name = "Tipo de conta")]
     [Required(ErrorMessage = "Selecione o tipo de conta do cargo.")]
-    [EnumDataType(typeof(TipoAcessoEnum), ErrorMessage = "Tipo de conta invalido.")]
+    [EnumDataType(typeof(TipoAcessoEnum), ErrorMessage = "Tipo de conta inválido.")]
     public TipoAcessoEnum TipoAcesso { get; set; } = TipoAcessoEnum.Funcionario;
 
     [Display(Name = "Cargo ativo")]

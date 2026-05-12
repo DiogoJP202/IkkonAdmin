@@ -1,132 +1,158 @@
-@model ConfiguracoesIndexViewModel
+﻿@model ConfiguracoesIndexViewModel
 @{
     ViewData["Title"] = "Configurações do Sistema";
+    var ultimaAtualizacao = Model.Form.UltimaAtualizacaoUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sem registro";
 }
 
-<div class="admin-panel-page d-grid gap-3">
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Parâmetros globais</span>
+            <h1 class="admin-panel-title">Configurações do sistema</h1>
+            <p class="admin-panel-subtitle">Ajuste regras financeiras, mensagens padrão e comportamentos operacionais usados pelos módulos internos.</p>
+            <div class="admin-panel-meta">
+                <span>Última atualização <strong>@ultimaAtualizacao</strong></span>
+            </div>
+        </div>
+    </section>
+
     <partial name="_AdminNav" />
 
-    <section class="row g-3">
-        <div class="col-12 col-lg-8">
-            <article class="card admin-panel-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h6 mb-0">Parâmetros globais</h2>
-                    <small class="text-muted">Última atualização: @(Model.Form.UltimaAtualizacaoUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</small>
+    <section class="admin-panel-grid admin-panel-grid-aside">
+        <article class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Configuração</span>
+                    <h2>Parâmetros globais</h2>
+                    <p>Valores aplicados como padrão em cobranças, admissões, desligamentos e graduação.</p>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Sistema" method="post" class="row g-3">
-                        @Html.AntiForgeryToken()
-                        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+            </div>
+            <form asp-action="Sistema" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="admin-panel-validation text-danger small"></div>
 
-                        <div class="col-12 col-md-6">
-                            <label asp-for="Form.NomeEscola" class="form-label"></label>
-                            <input asp-for="Form.NomeEscola" class="form-control" />
+                <div class="admin-panel-subsection">
+                    <h3>Dados institucionais</h3>
+                    <div class="admin-panel-form-grid">
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.NomeEscola">Nome da escola</label>
+                            <input asp-for="Form.NomeEscola" class="form-control admin-panel-control" placeholder="IKKON SPTD | Escola de Taiko" />
                             <span asp-validation-for="Form.NomeEscola" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label asp-for="Form.EmailFinanceiro" class="form-label"></label>
-                            <input asp-for="Form.EmailFinanceiro" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.EmailFinanceiro">E-mail financeiro</label>
+                            <input asp-for="Form.EmailFinanceiro" type="email" class="form-control admin-panel-control" placeholder="financeiro@dominio.com" />
                             <span asp-validation-for="Form.EmailFinanceiro" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label asp-for="Form.TelefoneContato" class="form-label"></label>
-                            <input asp-for="Form.TelefoneContato" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.TelefoneContato">Telefone de contato</label>
+                            <input asp-for="Form.TelefoneContato" type="tel" class="form-control admin-panel-control" placeholder="(11) 90000-0000" />
                             <span asp-validation-for="Form.TelefoneContato" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.ValorMensalidadePadrao" class="form-label"></label>
-                            <input asp-for="Form.ValorMensalidadePadrao" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="admin-panel-subsection">
+                    <h3>Regras financeiras</h3>
+                    <div class="admin-panel-form-grid">
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.ValorMensalidadePadrao">Mensalidade padrão</label>
+                            <input asp-for="Form.ValorMensalidadePadrao" type="number" step="0.01" min="0" class="form-control admin-panel-control" placeholder="260,00" />
                             <span asp-validation-for="Form.ValorMensalidadePadrao" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.DiaVencimentoPadrao" class="form-label"></label>
-                            <input asp-for="Form.DiaVencimentoPadrao" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.DiaVencimentoPadrao">Dia de vencimento</label>
+                            <input asp-for="Form.DiaVencimentoPadrao" type="number" min="1" max="28" class="form-control admin-panel-control" placeholder="10" />
                             <span asp-validation-for="Form.DiaVencimentoPadrao" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.DiasToleranciaAtraso" class="form-label"></label>
-                            <input asp-for="Form.DiasToleranciaAtraso" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.DiasToleranciaAtraso">Dias de tolerância</label>
+                            <input asp-for="Form.DiasToleranciaAtraso" type="number" min="0" max="15" class="form-control admin-panel-control" placeholder="0" />
                             <span asp-validation-for="Form.DiasToleranciaAtraso" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.PercentualMultaAtraso" class="form-label"></label>
-                            <input asp-for="Form.PercentualMultaAtraso" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.PercentualMultaAtraso">Multa por atraso (%)</label>
+                            <input asp-for="Form.PercentualMultaAtraso" type="number" step="0.01" min="0" class="form-control admin-panel-control" placeholder="2,00" />
                             <span asp-validation-for="Form.PercentualMultaAtraso" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.PercentualJurosMes" class="form-label"></label>
-                            <input asp-for="Form.PercentualJurosMes" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.PercentualJurosMes">Juros ao mês (%)</label>
+                            <input asp-for="Form.PercentualJurosMes" type="number" step="0.01" min="0" class="form-control admin-panel-control" placeholder="1,00" />
                             <span asp-validation-for="Form.PercentualJurosMes" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <label asp-for="Form.DiasAntecedenciaLembrete" class="form-label"></label>
-                            <input asp-for="Form.DiasAntecedenciaLembrete" class="form-control" />
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.DiasAntecedenciaLembrete">Antecedência do lembrete</label>
+                            <input asp-for="Form.DiasAntecedenciaLembrete" type="number" min="0" max="30" class="form-control admin-panel-control" placeholder="3" />
                             <span asp-validation-for="Form.DiasAntecedenciaLembrete" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label asp-for="Form.MensagemBoasVindasPadrao" class="form-label"></label>
-                            <textarea asp-for="Form.MensagemBoasVindasPadrao" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="admin-panel-subsection">
+                    <h3>Mensagens e checklists</h3>
+                    <div class="admin-panel-form-grid">
+                        <div class="admin-panel-field admin-panel-field-full">
+                            <label asp-for="Form.MensagemBoasVindasPadrao">Mensagem de boas-vindas</label>
+                            <textarea asp-for="Form.MensagemBoasVindasPadrao" class="form-control admin-panel-control" rows="4" placeholder="Mensagem padrão enviada no processo de admissão"></textarea>
                             <span asp-validation-for="Form.MensagemBoasVindasPadrao" class="text-danger small"></span>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <label asp-for="Form.ChecklistAdmissaoPadrao" class="form-label"></label>
-                            <textarea asp-for="Form.ChecklistAdmissaoPadrao" class="form-control" rows="3"></textarea>
+                        <div class="admin-panel-field admin-panel-field-full">
+                            <label asp-for="Form.ChecklistAdmissaoPadrao">Checklist de admissão</label>
+                            <textarea asp-for="Form.ChecklistAdmissaoPadrao" class="form-control admin-panel-control" rows="4" placeholder="Itens padrão para integração do aluno"></textarea>
                             <span asp-validation-for="Form.ChecklistAdmissaoPadrao" class="text-danger small"></span>
                         </div>
-
-                        <div class="col-12 col-md-6">
-                            <div class="form-check">
-                                <input asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-input" />
-                                <label asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-label"></label>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-input" />
-                                <label asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-label"></label>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input asp-for="Form.EnviarLembreteCobranca" class="form-check-input" />
-                                <label asp-for="Form.EnviarLembreteCobranca" class="form-check-label"></label>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-check">
-                                <input asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-input" />
-                                <label asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-label"></label>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-input" />
-                                <label asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-label"></label>
-                            </div>
-                        </div>
-
-                        <div class="col-12 d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-danger">Salvar configurações</button>
-                        </div>
-                    </form>
-                </div>
-            </article>
-        </div>
-        <div class="col-12 col-lg-4">
-            <article class="card admin-panel-card h-100">
-                <div class="card-header">
-                    <h2 class="h6 mb-0">Resumo operacional</h2>
-                </div>
-                <div class="card-body">
-                    <div class="admin-stat-list">
-                        <div class="admin-stat-row"><span>Alunos ativos</span><strong>@Model.Resumo.AlunosAtivos</strong></div>
-                        <div class="admin-stat-row"><span>Turmas ativas</span><strong>@Model.Resumo.TurmasAtivas</strong></div>
-                        <div class="admin-stat-row"><span>Mensalidades atrasadas</span><strong>@Model.Resumo.MensalidadesAtrasadas</strong></div>
-                        <div class="admin-stat-row"><span>Desligamentos em aberto</span><strong>@Model.Resumo.DesligamentosEmAberto</strong></div>
-                        <div class="admin-stat-row"><span>Exames próximos (30 dias)</span><strong>@Model.Resumo.ExamesProximos30Dias</strong></div>
                     </div>
-                    <hr />
-                    <form asp-action="RestaurarSistema" method="post" onsubmit="return confirm('Restaurar configurações padrão do sistema?');">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-danger w-100">Restaurar padrão</button>
-                    </form>
+                </div>
+
+                <div class="admin-panel-subsection">
+                    <h3>Automação e regras operacionais</h3>
+                    <div class="admin-panel-check-grid">
+                        <label class="admin-panel-check-card"><input asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-input" /><span>Aplicar multa e juros automaticamente</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-input" /><span>Gerar mensalidades automaticamente</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.EnviarLembreteCobranca" class="form-check-input" /><span>Enviar lembrete de cobrança</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-input" /><span>Permitir desligamento com pendência</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-input" /><span>Atualizar nível automaticamente na graduação</span></label>
+                    </div>
+                </div>
+
+                <div class="admin-panel-form-actions">
+                    <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar configurações</button>
+                </div>
+            </form>
+        </article>
+
+        <aside class="admin-panel-side-stack">
+            <article class="admin-panel-card admin-panel-card-v2">
+                <div class="admin-panel-card-header">
+                    <div>
+                        <span class="admin-panel-eyebrow">Resumo</span>
+                        <h2>Operação atual</h2>
+                        <p>Indicadores rápidos para avaliar impactos antes de mudar regras globais.</p>
+                    </div>
+                </div>
+                <div class="admin-stat-list">
+                    <div class="admin-stat-row"><span>Alunos ativos</span><strong>@Model.Resumo.AlunosAtivos</strong></div>
+                    <div class="admin-stat-row"><span>Turmas ativas</span><strong>@Model.Resumo.TurmasAtivas</strong></div>
+                    <div class="admin-stat-row"><span>Mensalidades atrasadas</span><strong>@Model.Resumo.MensalidadesAtrasadas</strong></div>
+                    <div class="admin-stat-row"><span>Desligamentos em aberto</span><strong>@Model.Resumo.DesligamentosEmAberto</strong></div>
+                    <div class="admin-stat-row"><span>Exames próximos (30 dias)</span><strong>@Model.Resumo.ExamesProximos30Dias</strong></div>
                 </div>
             </article>
-        </div>
+
+            <article class="admin-panel-card admin-panel-card-v2 admin-panel-danger-zone">
+                <div class="admin-panel-card-header">
+                    <div>
+                        <span class="admin-panel-eyebrow">Atenção</span>
+                        <h2>Restaurar padrões</h2>
+                        <p>Use somente quando precisar voltar os parâmetros principais para os valores iniciais.</p>
+                    </div>
+                </div>
+                <form asp-action="RestaurarSistema" method="post" onsubmit="return confirm('Restaurar configurações padrão do sistema?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn admin-panel-btn admin-panel-btn-danger w-100">Restaurar padrão</button>
+                </form>
+            </article>
+        </aside>
     </section>
 </div>
 

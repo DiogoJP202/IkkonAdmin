@@ -5,6 +5,13 @@ namespace IkkonAdmin.Web.Models.ViewModels;
 
 public class GoogleAgendaFiltroViewModel : IValidatableObject
 {
+    [Display(Name = "Visualização")]
+    public GoogleAgendaVisualizacaoEnum Visualizacao { get; set; } = GoogleAgendaVisualizacaoEnum.Lista;
+
+    [Display(Name = "Ano")]
+    [Range(2000, 2100, ErrorMessage = "Informe um ano entre 2000 e 2100.")]
+    public int Ano { get; set; } = DateTime.Today.Year;
+
     [Display(Name = "Início")]
     [DataType(DataType.Date)]
     public DateOnly Inicio { get; set; } = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));

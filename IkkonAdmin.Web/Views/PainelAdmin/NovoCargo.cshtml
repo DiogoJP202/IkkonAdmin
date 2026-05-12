@@ -1,89 +1,106 @@
-@using IkkonAdmin.Web.Enums
+﻿@using IkkonAdmin.Web.Enums
 @model AdminRoleFormViewModel
 @{
     ViewData["Title"] = "Novo Cargo";
 }
 
-<div class="admin-panel-page d-grid gap-3">
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Novo perfil</span>
+            <h1 class="admin-panel-title">Criar cargo</h1>
+            <p class="admin-panel-subtitle">Monte um perfil de acesso reutilizável para equipe interna, administradores ou área do aluno.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a href="/admin/painel/Cargos" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar</a>
+        </div>
+    </section>
+
     <partial name="_AdminNav" />
 
-    <section class="card admin-panel-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Criar cargo</h2>
-            <a href="/admin/painel/Cargos" class="btn btn-sm btn-outline-secondary">Voltar</a>
-        </div>
-        <div class="card-body">
-            <form asp-action="NovoCargo" method="post" class="row g-3" novalidate>
-                @Html.AntiForgeryToken()
-                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+    <form asp-action="NovoCargo" method="post" class="admin-panel-form-stack" novalidate>
+        @Html.AntiForgeryToken()
 
-                <div class="col-12 col-md-6">
-                    <label asp-for="Nome" class="form-label"></label>
-                    <input asp-for="Nome" class="form-control" placeholder="Ex.: Financeiro Senior" />
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Identidade</span>
+                    <h2>Dados do cargo</h2>
+                    <p>Use nomes objetivos e códigos consistentes para facilitar manutenção futura.</p>
+                </div>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="admin-panel-validation text-danger small"></div>
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field">
+                    <label asp-for="Nome"></label>
+                    <input asp-for="Nome" class="form-control admin-panel-control" placeholder="Ex.: Financeiro Sênior" />
                     <span asp-validation-for="Nome" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="Codigo" class="form-label"></label>
-                    <input asp-for="Codigo" class="form-control" placeholder="Opcional. Ex.: ROLE_FINANCEIRO_SENIOR" />
+                <div class="admin-panel-field">
+                    <label asp-for="Codigo"></label>
+                    <input asp-for="Codigo" class="form-control admin-panel-control" placeholder="Opcional. Ex.: ROLE_FINANCEIRO_SENIOR" />
                     <span asp-validation-for="Codigo" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="TipoAcesso" class="form-label"></label>
-                    <select asp-for="TipoAcesso" class="form-select">
+                <div class="admin-panel-field">
+                    <label asp-for="TipoAcesso"></label>
+                    <select asp-for="TipoAcesso" class="form-select admin-panel-control">
                         <option value="@TipoAcessoEnum.Admin">Admin</option>
-                        <option value="@TipoAcessoEnum.Funcionario">Funcionario</option>
+                        <option value="@TipoAcessoEnum.Funcionario">Funcionário</option>
                         <option value="@TipoAcessoEnum.Aluno">Aluno</option>
                     </select>
                     <span asp-validation-for="TipoAcesso" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6 d-flex align-items-end">
-                    <div class="form-check mb-2">
-                        <input asp-for="Ativo" class="form-check-input" />
-                        <label asp-for="Ativo" class="form-check-label"></label>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <label asp-for="Descricao" class="form-label"></label>
-                    <textarea asp-for="Descricao" class="form-control" rows="2" placeholder="Descricao resumida do cargo"></textarea>
+                <label class="admin-panel-check-card is-form-check">
+                    <input asp-for="Ativo" class="form-check-input" />
+                    <span>Cargo ativo</span>
+                </label>
+                <div class="admin-panel-field admin-panel-field-full">
+                    <label asp-for="Descricao"></label>
+                    <textarea asp-for="Descricao" class="form-control admin-panel-control" rows="3" placeholder="Descrição resumida do cargo"></textarea>
                     <span asp-validation-for="Descricao" class="text-danger small"></span>
                 </div>
+            </div>
+        </section>
 
-                <div class="col-12">
-                    <h3 class="h6 mb-2">Permissoes do cargo</h3>
-                    @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
-                    {
-                        <div class="mb-3">
-                            <h4 class="h6 mb-2">@grupo.Key</h4>
-                            <div class="row g-2">
-                                @foreach (var permissao in grupo)
-                                {
-                                    var checkedItem = permissao.Concedida || Model.PermissoesSelecionadas.Contains(permissao.Id);
-                                    <div class="col-12 col-md-6">
-                                        <label class="admin-permission-item form-check">
-                                            <input class="form-check-input" type="checkbox" name="PermissoesSelecionadas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
-                                            <span class="form-check-label">
-                                                <strong>@permissao.Nome</strong>
-                                                <small class="d-block text-muted">@permissao.Codigo</small>
-                                                @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
-                                                {
-                                                    <small class="d-block text-muted">@permissao.Descricao</small>
-                                                }
-                                            </span>
-                                        </label>
-                                    </div>
-                                }
-                            </div>
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Permissões</span>
+                    <h2>Permissões do cargo</h2>
+                    <p>Selecione as capacidades que todos os usuários deste cargo devem herdar.</p>
+                </div>
+            </div>
+            <div class="admin-panel-permission-groups">
+                @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
+                {
+                    <div class="admin-panel-permission-group">
+                        <h3>@grupo.Key</h3>
+                        <div class="admin-panel-permission-grid">
+                            @foreach (var permissao in grupo)
+                            {
+                                var checkedItem = permissao.Concedida || Model.PermissoesSelecionadas.Contains(permissao.Id);
+                                <label class="admin-permission-item">
+                                    <input class="form-check-input" type="checkbox" name="PermissoesSelecionadas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
+                                    <span>
+                                        <strong>@permissao.Nome</strong>
+                                        <small>@permissao.Codigo</small>
+                                        @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
+                                        {
+                                            <small>@permissao.Descricao</small>
+                                        }
+                                    </span>
+                                </label>
+                            }
                         </div>
-                    }
-                </div>
-
-                <div class="col-12 d-flex gap-2 justify-content-end">
-                    <a href="/admin/painel/Cargos" class="btn btn-outline-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-danger">Criar cargo</button>
-                </div>
-            </form>
-        </div>
-    </section>
+                    </div>
+                }
+            </div>
+            <div class="admin-panel-form-actions">
+                <a href="/admin/painel/Cargos" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Criar cargo</button>
+            </div>
+        </section>
+    </form>
 </div>
 
 @section Scripts {

@@ -2,15 +2,29 @@ using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+var culturaPadrao = CultureInfo.GetCultureInfo("pt-BR");
+
+CultureInfo.DefaultThreadCurrentCulture = culturaPadrao;
+CultureInfo.DefaultThreadCurrentUICulture = culturaPadrao;
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDataProtection();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var culturasSuportadas = new[] { culturaPadrao };
+
+    options.DefaultRequestCulture = new RequestCulture(culturaPadrao);
+    options.SupportedCultures = culturasSuportadas;
+    options.SupportedUICultures = culturasSuportadas;
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options
@@ -166,6 +180,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

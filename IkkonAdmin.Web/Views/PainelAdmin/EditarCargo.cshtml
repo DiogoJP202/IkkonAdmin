@@ -1,4 +1,4 @@
-@using IkkonAdmin.Web.Enums
+﻿@using IkkonAdmin.Web.Enums
 @using IkkonAdmin.Web.Security
 @model AdminRoleFormViewModel
 @{
@@ -6,138 +6,148 @@
     var isAdminRole = string.Equals(Model.Codigo, AppRoles.Admin, StringComparison.OrdinalIgnoreCase);
 }
 
-<div class="admin-panel-page d-grid gap-3">
+<div class="admin-panel-page admin-panel-v2-page">
+    <section class="admin-panel-hero admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Perfil existente</span>
+            <h1 class="admin-panel-title">Editar cargo</h1>
+            <p class="admin-panel-subtitle">Revise identidade, status e permissões herdadas pelos usuários vinculados a este cargo.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a href="/admin/painel/Cargos" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar</a>
+        </div>
+    </section>
+
     <partial name="_AdminNav" />
 
-    <section class="card admin-panel-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Editar cargo</h2>
-            <a href="/admin/painel/Cargos" class="btn btn-sm btn-outline-secondary">Voltar</a>
-        </div>
-        <div class="card-body">
-            <form asp-action="EditarCargo" asp-route-id="@Model.Id" method="post" class="row g-3" novalidate>
-                @Html.AntiForgeryToken()
-                <input asp-for="Id" type="hidden" />
-                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+    <form asp-action="EditarCargo" asp-route-id="@Model.Id" method="post" class="admin-panel-form-stack" novalidate>
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
 
-                <div class="col-12 col-md-6">
-                    <label asp-for="Nome" class="form-label"></label>
-                    <input asp-for="Nome" class="form-control" />
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Identidade</span>
+                    <h2>Dados do cargo</h2>
+                    <p>Cargos de sistema preservam campos críticos bloqueados para evitar inconsistências.</p>
+                </div>
+                @if (Model.IsSistema)
+                {
+                    <span class="admin-panel-badge is-dark">Cargo de sistema</span>
+                }
+            </div>
+            <div asp-validation-summary="ModelOnly" class="admin-panel-validation text-danger small"></div>
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field">
+                    <label asp-for="Nome"></label>
+                    <input asp-for="Nome" class="form-control admin-panel-control" placeholder="Nome do cargo" />
                     <span asp-validation-for="Nome" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="Codigo" class="form-label"></label>
+                <div class="admin-panel-field">
+                    <label asp-for="Codigo"></label>
                     @if (Model.IsSistema)
                     {
-                        <input asp-for="Codigo" class="form-control" readonly />
+                        <input asp-for="Codigo" class="form-control admin-panel-control" readonly />
+                        <small class="admin-panel-help">Código de cargo de sistema não pode ser alterado.</small>
                     }
                     else
                     {
-                        <input asp-for="Codigo" class="form-control" />
-                    }
-                    @if (Model.IsSistema)
-                    {
-                        <small class="text-muted">Codigo de cargo de sistema nao pode ser alterado.</small>
+                        <input asp-for="Codigo" class="form-control admin-panel-control" placeholder="ROLE_EXEMPLO" />
                     }
                     <span asp-validation-for="Codigo" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label asp-for="TipoAcesso" class="form-label"></label>
+                <div class="admin-panel-field">
+                    <label asp-for="TipoAcesso"></label>
                     @if (Model.IsSistema)
                     {
-                        <select asp-for="TipoAcesso" class="form-select" disabled>
+                        <select asp-for="TipoAcesso" class="form-select admin-panel-control" disabled>
                             <option value="@TipoAcessoEnum.Admin">Admin</option>
-                            <option value="@TipoAcessoEnum.Funcionario">Funcionario</option>
+                            <option value="@TipoAcessoEnum.Funcionario">Funcionário</option>
                             <option value="@TipoAcessoEnum.Aluno">Aluno</option>
                         </select>
+                        <input asp-for="TipoAcesso" type="hidden" />
+                        <small class="admin-panel-help">Tipo de conta de cargo de sistema não pode ser alterado.</small>
                     }
                     else
                     {
-                        <select asp-for="TipoAcesso" class="form-select">
+                        <select asp-for="TipoAcesso" class="form-select admin-panel-control">
                             <option value="@TipoAcessoEnum.Admin">Admin</option>
-                            <option value="@TipoAcessoEnum.Funcionario">Funcionario</option>
+                            <option value="@TipoAcessoEnum.Funcionario">Funcionário</option>
                             <option value="@TipoAcessoEnum.Aluno">Aluno</option>
                         </select>
                     }
-                    @if (Model.IsSistema)
-                    {
-                        <input asp-for="TipoAcesso" type="hidden" />
-                        <small class="text-muted">Tipo de conta de cargo de sistema nao pode ser alterado.</small>
-                    }
                     <span asp-validation-for="TipoAcesso" class="text-danger small"></span>
                 </div>
-                <div class="col-12 col-md-6 d-flex align-items-end">
-                    <div class="form-check mb-2">
-                        @if (Model.IsSistema)
-                        {
-                            <input asp-for="Ativo" class="form-check-input" disabled />
-                        }
-                        else
-                        {
-                            <input asp-for="Ativo" class="form-check-input" />
-                        }
-                        @if (Model.IsSistema)
-                        {
-                            <input asp-for="Ativo" type="hidden" />
-                        }
-                        <label asp-for="Ativo" class="form-check-label"></label>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <label asp-for="Descricao" class="form-label"></label>
-                    <textarea asp-for="Descricao" class="form-control" rows="2"></textarea>
+                <label class="admin-panel-check-card is-form-check">
+                    @if (Model.IsSistema)
+                    {
+                        <input asp-for="Ativo" class="form-check-input" disabled />
+                        <input asp-for="Ativo" type="hidden" />
+                    }
+                    else
+                    {
+                        <input asp-for="Ativo" class="form-check-input" />
+                    }
+                    <span>Cargo ativo</span>
+                </label>
+                <div class="admin-panel-field admin-panel-field-full">
+                    <label asp-for="Descricao"></label>
+                    <textarea asp-for="Descricao" class="form-control admin-panel-control" rows="3" placeholder="Descrição resumida do cargo"></textarea>
                     <span asp-validation-for="Descricao" class="text-danger small"></span>
                 </div>
+            </div>
+        </section>
 
-                <div class="col-12">
-                    <h3 class="h6 mb-2">Permissoes do cargo</h3>
-                    @if (isAdminRole)
-                    {
-                        <div class="alert alert-info py-2 mb-3">
-                            O cargo Administrador possui todas as permissões habilitadas automaticamente.
-                        </div>
-                    }
-                    @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
-                    {
-                        <div class="mb-3">
-                            <h4 class="h6 mb-2">@grupo.Key</h4>
-                            <div class="row g-2">
-                                @foreach (var permissao in grupo)
-                                {
-                                    var checkedItem = permissao.Concedida || Model.PermissoesSelecionadas.Contains(permissao.Id);
-                                    <div class="col-12 col-md-6">
-                                        <label class="admin-permission-item form-check">
-                                            @if (isAdminRole)
-                                            {
-                                                <input class="form-check-input" type="checkbox" checked disabled />
-                                            }
-                                            else
-                                            {
-                                                <input class="form-check-input" type="checkbox" name="PermissoesSelecionadas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
-                                            }
-                                            <span class="form-check-label">
-                                                <strong>@permissao.Nome</strong>
-                                                <small class="d-block text-muted">@permissao.Codigo</small>
-                                                @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
-                                                {
-                                                    <small class="d-block text-muted">@permissao.Descricao</small>
-                                                }
-                                            </span>
-                                        </label>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
+        <section class="admin-panel-card admin-panel-card-v2">
+            <div class="admin-panel-card-header">
+                <div>
+                    <span class="admin-panel-eyebrow">Permissões</span>
+                    <h2>Permissões do cargo</h2>
+                    <p>O cargo Administrador recebe todas as permissões automaticamente no backend.</p>
                 </div>
-
-                <div class="col-12 d-flex gap-2 justify-content-end">
-                    <a href="/admin/painel/Cargos" class="btn btn-outline-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-danger">Salvar alteracoes</button>
-                </div>
-            </form>
-        </div>
-    </section>
+            </div>
+            @if (isAdminRole)
+            {
+                <div class="admin-panel-alert is-info">O cargo Administrador possui todas as permissões habilitadas automaticamente.</div>
+            }
+            <div class="admin-panel-permission-groups">
+                @foreach (var grupo in Model.PermissoesDisponiveis.GroupBy(x => x.Modulo).OrderBy(x => x.Key))
+                {
+                    <div class="admin-panel-permission-group">
+                        <h3>@grupo.Key</h3>
+                        <div class="admin-panel-permission-grid">
+                            @foreach (var permissao in grupo)
+                            {
+                                var checkedItem = permissao.Concedida || Model.PermissoesSelecionadas.Contains(permissao.Id);
+                                <label class="admin-permission-item @(isAdminRole ? "is-inherited" : null)">
+                                    @if (isAdminRole)
+                                    {
+                                        <input class="form-check-input" type="checkbox" checked disabled />
+                                    }
+                                    else
+                                    {
+                                        <input class="form-check-input" type="checkbox" name="PermissoesSelecionadas" value="@permissao.Id" @(checkedItem ? "checked" : null) />
+                                    }
+                                    <span>
+                                        <strong>@permissao.Nome</strong>
+                                        <small>@permissao.Codigo</small>
+                                        @if (!string.IsNullOrWhiteSpace(permissao.Descricao))
+                                        {
+                                            <small>@permissao.Descricao</small>
+                                        }
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="admin-panel-form-actions">
+                <a href="/admin/painel/Cargos" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar alterações</button>
+            </div>
+        </section>
+    </form>
 </div>
 
 @section Scripts {
