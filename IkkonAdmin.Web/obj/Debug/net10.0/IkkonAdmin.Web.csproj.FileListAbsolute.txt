@@ -217,9 +217,7 @@ C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\re
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.pdb
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.genruntimeconfig.cache
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\ref\IkkonAdmin.Web.dll
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-u2su4jbucb-u2su4jbucb.gz
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\3683xvfcmr-{0}-6itv138fo7-6itv138fo7.gz
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-uhfyohinsl-uhfyohinsl.gz
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\appsettings.Development.json
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\appsettings.json
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\IkkonAdmin.Web.staticwebassets.runtime.json
@@ -354,9 +352,7 @@ C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-bui
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\appsettings.Development.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\appsettings.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\IkkonAdmin.Web.deps.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\IkkonAdmin.Web.runtimeconfig.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\IkkonAdmin.Web.staticwebassets.endpoints.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\artifacts\verify-build\IkkonAdmin.Web.staticwebassets.runtime.json
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\appsettings.Development.example.json
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.sourcelink.json
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-wefh63ra5x-wefh63ra5x.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-7d1y4yfhd5-7d1y4yfhd5.gz

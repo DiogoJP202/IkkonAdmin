@@ -280,68 +280,104 @@
                     }
                 </div>
 
-                <div class="agenda-year-scroll" tabindex="0" aria-label="Calendário anual com rolagem horizontal">
-                    <div class="agenda-year-track">
+                <div class="agenda-linear-scroll" tabindex="0" aria-label="Calendário linear anual com rolagem horizontal">
+                    <div class="agenda-linear-board">
+                        <div class="agenda-linear-header" aria-hidden="true">
+                            <span class="agenda-linear-month-title">Mês</span>
+                            <div class="agenda-linear-days">
+                                @for (var dia = 1; dia <= 31; dia++)
+                                {
+                                    <span>@dia.ToString("00")</span>
+                                }
+                            </div>
+                            <span class="agenda-linear-month-title agenda-linear-month-title-end">Ações</span>
+                        </div>
+
                         @for (var mes = 1; mes <= 12; mes++)
                         {
                             var inicioMes = new DateTime(Model.Filtro.Ano, mes, 1);
                             var diasNoMes = DateTime.DaysInMonth(Model.Filtro.Ano, mes);
-                            var primeiroDiaSemana = ((int)inicioMes.DayOfWeek + 6) % 7;
                             var eventosMes = eventosPorMes.TryGetValue(mes, out var encontrados) ? encontrados : new List<GoogleAgendaEventoViewModel>();
                             var diasMarcados = eventosMes.GroupBy(x => x.Inicio.Date).ToDictionary(x => x.Key, x => x.ToList());
                             var nomeMes = culturaPtBr.TextInfo.ToTitleCase(inicioMes.ToString("MMMM", culturaPtBr));
 
-                            <article class="agenda-month-card @(eventosMes.Count > 0 ? "has-events" : string.Empty)">
-                                <header class="agenda-month-header">
-                                    <div>
-                                        <strong>@nomeMes</strong>
-                                        <span>@eventosMes.Count evento(s)</span>
-                                    </div>
-                                    <b>@mes.ToString("00")</b>
-                                </header>
-
-                                <div class="agenda-month-weekdays" aria-hidden="true">
-                                    <span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span>
+                            <article class="agenda-linear-row @(eventosMes.Count > 0 ? "has-events" : string.Empty)">
+                                <div class="agenda-linear-month">
+                                    <strong>@nomeMes</strong>
+                                    <span>@mes.ToString("00") · @eventosMes.Count evento(s)</span>
                                 </div>
 
-                                <div class="agenda-month-grid">
-                                    @for (var vazio = 0; vazio < primeiroDiaSemana; vazio++)
+                                <div class="agenda-linear-days">
+                                    @for (var dia = 1; dia <= 31; dia++)
                                     {
-                                        <span class="agenda-month-day is-empty"></span>
-                                    }
+                                        if (dia > diasNoMes)
+                                        {
+                                            <span class="agenda-linear-day is-empty"></span>
+                                        }
+                                        else
+                                        {
+                                            var dataDia = new DateTime(Model.Filtro.Ano, mes, dia);
+                                            var eventosDia = diasMarcados.TryGetValue(dataDia.Date, out var doDia) ? doDia : new List<GoogleAgendaEventoViewModel>();
+                                            var temEvento = eventosDia.Count > 0;
+                                            var tipoPrincipal = temEvento ? TipoClass(eventosDia.First().Tipo) : string.Empty;
+                                            var classeHoje = dataDia.Date == DateTime.Today ? "is-today" : string.Empty;
+                                            var diaSemana = culturaPtBr.TextInfo.ToTitleCase(dataDia.ToString("ddd", culturaPtBr).Replace(".", string.Empty));
 
-                                    @for (var dia = 1; dia <= diasNoMes; dia++)
-                                    {
-                                        var dataDia = new DateTime(Model.Filtro.Ano, mes, dia);
-                                        var eventosDia = diasMarcados.TryGetValue(dataDia.Date, out var doDia) ? doDia : new List<GoogleAgendaEventoViewModel>();
-                                        var temEvento = eventosDia.Count > 0;
-                                        var tipoPrincipal = temEvento ? TipoClass(eventosDia.First().Tipo) : string.Empty;
-                                        var classeHoje = dataDia.Date == DateTime.Today ? "is-today" : string.Empty;
-
-                                        <span class="agenda-month-day @(temEvento ? "has-event" : string.Empty) @classeHoje @(temEvento ? $"agenda-month-day-{tipoPrincipal}" : string.Empty)" title="@(temEvento ? string.Join(" | ", eventosDia.Select(x => x.Titulo)) : dataDia.ToString("dd/MM/yyyy"))">
-                                            <span>@dia</span>
-                                            @if (temEvento)
+                                            if (temEvento)
                                             {
-                                                <small>@eventosDia.Count</small>
+                                                <div class="agenda-linear-day has-event @classeHoje agenda-linear-day-@tipoPrincipal"
+                                                     tabindex="0"
+                                                     role="button"
+                                                     aria-haspopup="dialog"
+                                                     aria-label="@($"{dataDia:dd/MM/yyyy}: {eventosDia.Count} evento(s). Clique para escolher um evento.")">
+                                                    <span>@dia.ToString("00")</span>
+                                                    <small>@diaSemana</small>
+                                                    <b>@eventosDia.Count</b>
+                                                    <div class="agenda-day-popover" role="dialog" aria-label="@($"Eventos do dia {dataDia:dd/MM/yyyy}")">
+                                                        <strong>@dataDia.ToString("dd/MM/yyyy")</strong>
+                                                        <small class="agenda-day-popover-hint">Escolha qual evento deseja abrir</small>
+                                                        @foreach (var eventoDia in eventosDia.Take(5))
+                                                        {
+                                                            <a asp-action="Details"
+                                                               asp-route-eventoId="@eventoDia.Id"
+                                                               class="agenda-day-popover-event agenda-day-popover-event-@TipoClass(eventoDia.Tipo)">
+                                                                <em>@eventoDia.Inicio.ToString("HH:mm")</em>
+                                                                <span>
+                                                                    <b>@eventoDia.Titulo</b>
+                                                                    <small>@TipoLabel(eventoDia.Tipo)@(string.IsNullOrWhiteSpace(eventoDia.Local) ? string.Empty : $" · {eventoDia.Local}")</small>
+                                                                </span>
+                                                            </a>
+                                                        }
+                                                        @if (eventosDia.Count > 5)
+                                                        {
+                                                            <small class="agenda-day-popover-more">+ @(eventosDia.Count - 5) outro(s) evento(s)</small>
+                                                        }
+                                                    </div>
+                                                </div>
                                             }
-                                        </span>
+                                            else
+                                            {
+                                                <span class="agenda-linear-day @classeHoje" title="@dataDia.ToString("dd/MM/yyyy")">
+                                                    <span>@dia.ToString("00")</span>
+                                                    <small>@diaSemana</small>
+                                                </span>
+                                            }
+                                        }
                                     }
                                 </div>
 
-                                <div class="agenda-year-event-stack">
-                                    @foreach (var evento in eventosMes.Take(4))
-                                    {
-                                        <a asp-action="Details" asp-route-eventoId="@evento.Id" class="agenda-year-event agenda-year-event-@TipoClass(evento.Tipo)">
-                                            <span>@evento.Inicio.ToString("dd/MM")</span>
-                                            <strong>@evento.Titulo</strong>
-                                            <small>@evento.Inicio.ToString("HH:mm") · @TipoLabel(evento.Tipo)</small>
-                                        </a>
-                                    }
-
-                                    @if (eventosMes.Count > 4)
-                                    {
-                                        <small class="agenda-year-more">+ @(eventosMes.Count - 4) evento(s) neste mês</small>
-                                    }
+                                <div class="agenda-linear-events agenda-linear-month-actions">
+                                    <a asp-action="Index"
+                                       asp-route-Visualizacao="@((int)GoogleAgendaVisualizacaoEnum.Lista)"
+                                       asp-route-Inicio="@inicioMes.ToString("yyyy-MM-dd")"
+                                       asp-route-Fim="@(new DateTime(Model.Filtro.Ano, mes, diasNoMes).ToString("yyyy-MM-dd"))"
+                                       asp-route-Tipo="@(Model.Filtro.Tipo?.ToString())"
+                                       class="agenda-linear-month-action @(eventosMes.Count == 0 ? "is-empty" : string.Empty)"
+                                       aria-label="@($"Abrir eventos de {nomeMes}")">
+                                        <span>Eventos de @nomeMes</span>
+                                        <strong>@eventosMes.Count evento(s)</strong>
+                                        <small>@(eventosMes.Count == 0 ? "Ver mês na lista" : "Abrir lista do mês")</small>
+                                    </a>
                                 </div>
                             </article>
                         }

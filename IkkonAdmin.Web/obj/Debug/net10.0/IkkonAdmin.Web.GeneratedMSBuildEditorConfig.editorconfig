@@ -138,6 +138,26 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluYW5jZWlyb1xSZWdpc3RyYXJQYWdhbWVudG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/_GoogleAgendaForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXF9Hb29nbGVBZ2VuZGFGb3JtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZHVhY29lc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -168,6 +188,26 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/_InventarioForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xfSW52ZW50YXJpb0Zvcm0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Acessos.cshtml]
