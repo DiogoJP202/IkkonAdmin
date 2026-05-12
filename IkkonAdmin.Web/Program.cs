@@ -187,7 +187,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-app.MapGet("/health", () => Results.Ok(new
+app.MapMethods("/health", new[] { "GET", "HEAD" }, () => Results.Ok(new
 {
     status = "ok",
     application = "IkkonAdmin",
