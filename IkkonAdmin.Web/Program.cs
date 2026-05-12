@@ -172,6 +172,14 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "ok",
+    application = "IkkonAdmin",
+    checkedAtUtc = DateTimeOffset.UtcNow
+}))
+.AllowAnonymous();
+
 app.MapControllerRoute(
     name: "landing",
     pattern: "",

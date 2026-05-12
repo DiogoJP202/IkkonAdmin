@@ -1,0 +1,24 @@
+﻿services:
+  - type: web
+    name: ikkonadmin-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: GoogleAgenda__ApplicationName
+        value: IkkonAdmin
+      - key: GoogleAgenda__CalendarId
+        value: primary
+      - key: GoogleAgenda__CredentialsPath
+        value: ""
+      - key: GoogleAgenda__OAuthClientSecretsPath
+        sync: false
+      - key: GoogleAgenda__RedirectUri
+        sync: false
+      - key: GoogleAgenda__TimeZone
+        value: America/Sao_Paulo

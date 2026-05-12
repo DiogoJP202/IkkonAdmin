@@ -1,0 +1,29 @@
+﻿# Build output
+**/bin/
+**/obj/
+artifacts/
+out/
+publish/
+
+# Git and local tooling
+.git/
+.gitignore
+.dotnet/
+.vs/
+.vscode/
+.idea/
+
+# Local secrets and uploads
+.secrets/
+secrets/
+secrets.json
+appsettings.Development.json
+appsettings.Local.json
+IkkonAdmin.Web/wwwroot/uploads/
+
+# OS / temp
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*.log
