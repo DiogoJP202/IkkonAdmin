@@ -28,7 +28,15 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options
-        .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        .UseSqlServer(
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                    errorNumbersToAdd: null);
+            })
         .ConfigureWarnings(warnings =>
             warnings
                 .Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning)
@@ -140,6 +148,16 @@ builder.Services.AddAuthorization(options =>
     AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioDelete, AppPermissions.InventarioDelete, AppPermissions.InventarioManage);
     AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioManage, AppPermissions.InventarioManage);
 
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogView, AppPermissions.BlogView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogCreate, AppPermissions.BlogCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogEdit, AppPermissions.BlogEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogPublish, AppPermissions.BlogPublish);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogArchive, AppPermissions.BlogArchive);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogDelete, AppPermissions.BlogDelete);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogFeature, AppPermissions.BlogFeature);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogCategoryManage, AppPermissions.BlogCategoryManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogTagManage, AppPermissions.BlogTagManage);
+
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarUsuarios, AppPermissions.GerenciarUsuarios);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarCargos, AppPermissions.GerenciarCargos);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminEditarPermissoes, AppPermissions.EditarPermissoes);
@@ -160,16 +178,25 @@ builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAreaAlunoService, AreaAlunoService>();
 builder.Services.AddScoped<IInventarioService, InventarioService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IBlogCategoriaService, BlogCategoriaService>();
+builder.Services.AddScoped<IBlogMediaService, BlogMediaService>();
 builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection("GoogleAgenda"));
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     DatabaseBootstrap.EnsureDatabaseReady(dbContext);
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "Erro ao executar DatabaseBootstrap.EnsureDatabaseReady no startup.");
 }
 
 if (!app.Environment.IsDevelopment())

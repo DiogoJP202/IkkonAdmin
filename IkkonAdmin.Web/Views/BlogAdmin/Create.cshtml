@@ -1,0 +1,60 @@
+@model BlogPostFormViewModel
+@{
+    ViewData["Title"] = "Novo post";
+}
+
+<partial name="_BlogPostForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const form = document.getElementById("blogPostForm");
+            if (!form) return;
+
+            const titleInput = document.getElementById("Title");
+            const slugInput = document.getElementById("Slug");
+            const actionInput = document.getElementById("SubmissionAction");
+            const coverInput = document.getElementById("CoverImage");
+            const coverPreview = document.getElementById("blogCoverPreview");
+            let slugTouched = !!(slugInput && slugInput.value.trim());
+
+            const slugify = function (value) {
+                return (value || "")
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "");
+            };
+
+            slugInput && slugInput.addEventListener("input", function () {
+                slugTouched = slugInput.value.trim().length > 0;
+            });
+
+            titleInput && titleInput.addEventListener("input", function () {
+                if (!slugInput || slugTouched) return;
+                slugInput.value = slugify(titleInput.value);
+            });
+
+            form.querySelectorAll("[data-blog-submit]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    if (actionInput) {
+                        actionInput.value = button.getAttribute("data-blog-submit") || "Draft";
+                    }
+                    form.requestSubmit();
+                });
+            });
+
+            coverInput && coverInput.addEventListener("change", function () {
+                const file = coverInput.files && coverInput.files[0];
+                if (!file || !coverPreview) return;
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    coverPreview.src = event.target && event.target.result ? event.target.result : coverPreview.src;
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
+    </script>
+}

@@ -12,6 +12,7 @@
     var canGraduacoes = User.HasPermission(AppPermissions.GraduacoesView);
     var canAgenda = User.HasAnyPermission(AppPermissions.GoogleAgendaView, AppPermissions.GoogleAgendaManage);
     var canInventario = User.HasAnyPermission(AppPermissions.InventarioView, AppPermissions.InventarioManage);
+    var canBlog = User.HasPermission(AppPermissions.BlogView);
     var canConfiguracoes = User.HasPermission(AppPermissions.ConfiguracoesView);
 
     var canAdminPanel = User.IsInRole(AppRoles.Admin) && User.HasAnyPermission(
@@ -75,6 +76,10 @@
         @if (canAdminPanel)
         {
             <a href="/admin/painel" class="nav-link @IsActive("PainelAdmin")">Administração</a>
+        }
+        @if (canBlog)
+        {
+            <a href="/admin/blog" class="nav-link @(currentController is "blogadmin" or "blogcategorias" ? "active" : string.Empty)">Blog</a>
         }
     </nav>
 </aside>

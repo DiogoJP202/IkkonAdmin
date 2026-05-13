@@ -90,6 +90,42 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Preview.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXFByZXZpZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXF9CbG9nUG9zdEZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/_BlogCategoryForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcX0Jsb2dDYXRlZ29yeUZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diogo/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

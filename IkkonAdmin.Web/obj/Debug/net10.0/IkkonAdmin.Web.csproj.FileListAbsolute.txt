@@ -354,5 +354,5 @@ C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-bui
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-build\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\appsettings.Development.example.json
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.sourcelink.json
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-wefh63ra5x-wefh63ra5x.gz
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-7d1y4yfhd5-7d1y4yfhd5.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-zjshd9elts-zjshd9elts.gz

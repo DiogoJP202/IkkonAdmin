@@ -53,6 +53,16 @@ public static class AuthorizationPolicies
     public const string InventarioDelete = "POLICY_INVENTARIO_DELETE";
     public const string InventarioManage = "POLICY_INVENTARIO_MANAGE";
 
+    public const string BlogView = "POLICY_BLOG_VIEW";
+    public const string BlogCreate = "POLICY_BLOG_CREATE";
+    public const string BlogEdit = "POLICY_BLOG_EDIT";
+    public const string BlogPublish = "POLICY_BLOG_PUBLISH";
+    public const string BlogArchive = "POLICY_BLOG_ARCHIVE";
+    public const string BlogDelete = "POLICY_BLOG_DELETE";
+    public const string BlogFeature = "POLICY_BLOG_FEATURE";
+    public const string BlogCategoryManage = "POLICY_BLOG_CATEGORY_MANAGE";
+    public const string BlogTagManage = "POLICY_BLOG_TAG_MANAGE";
+
     public const string AdminGerenciarUsuarios = "POLICY_ADMIN_GERENCIAR_USUARIOS";
     public const string AdminGerenciarCargos = "POLICY_ADMIN_GERENCIAR_CARGOS";
     public const string AdminEditarPermissoes = "POLICY_ADMIN_EDITAR_PERMISSOES";

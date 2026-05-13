@@ -1,0 +1,81 @@
+@model BlogCategoryFormViewModel
+@{
+    var isEdit = Model.Id.HasValue;
+}
+
+<div class="admin-panel-v2-page blog-admin-page">
+    <section class="admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de categoria" : "Nova categoria")</span>
+            <h1 class="admin-panel-title">@(isEdit ? "Editar categoria do Blog" : "Criar categoria do Blog")</h1>
+            <p class="admin-panel-subtitle">Categorias organizam filtros, cards e navegacao do Blog publico nas proximas fases.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar para categorias</a>
+        </div>
+    </section>
+
+    <div class="admin-panel-grid admin-panel-grid-aside">
+        <section class="admin-panel-card-v2">
+            <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger admin-panel-validation"></div>
+
+                <div class="admin-panel-card-header">
+                    <div>
+                        <h2>Dados da categoria</h2>
+                        <p>Nome, slug e descricao usados no fluxo editorial.</p>
+                    </div>
+                </div>
+
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field admin-panel-field-wide">
+                        <label asp-for="Name">Nome</label>
+                        <input asp-for="Name" class="form-control admin-panel-control" maxlength="120" autocomplete="off" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-wide">
+                        <label asp-for="Slug">Slug</label>
+                        <input asp-for="Slug" class="form-control admin-panel-control" maxlength="140" autocomplete="off" />
+                        <span asp-validation-for="Slug" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="Description">Descricao</label>
+                        <textarea asp-for="Description" class="form-control admin-panel-control" rows="4" maxlength="400"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <label class="admin-panel-check-card is-form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <span>Categoria ativa</span>
+                    </label>
+
+                    <div class="admin-panel-form-actions">
+                        <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                        <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar categoria</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <aside class="admin-panel-form-stack">
+            <section class="admin-panel-card-v2">
+                <div class="admin-panel-card-header">
+                    <div>
+                        <h2>Boas praticas</h2>
+                        <p>Padronizacoes uteis para o Blog.</p>
+                    </div>
+                </div>
+                <div class="admin-stat-list">
+                    <div class="admin-stat-row"><span>Nomes</span><strong>Claros e curtos</strong></div>
+                    <div class="admin-stat-row"><span>Slug</span><strong>URL amigavel</strong></div>
+                    <div class="admin-stat-row"><span>Status</span><strong>Prefira desativar</strong></div>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>

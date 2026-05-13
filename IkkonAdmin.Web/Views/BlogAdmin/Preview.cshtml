@@ -1,0 +1,88 @@
+@model BlogPreviewViewModel
+@{
+    ViewData["Title"] = "Preview do post";
+}
+
+@functions {
+    private static string StatusTexto(BlogPostStatusEnum status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "Rascunho",
+            BlogPostStatusEnum.Scheduled => "Agendado",
+            BlogPostStatusEnum.Published => "Publicado",
+            BlogPostStatusEnum.Archived => "Arquivado",
+            _ => status.ToString()
+        };
+    }
+}
+
+<div class="admin-panel-v2-page blog-admin-page">
+    <section class="admin-panel-v2-hero is-compact">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Preview administrativo</span>
+            <h1 class="admin-panel-title">@Model.Title</h1>
+            <p class="admin-panel-subtitle">Visualizacao interna do post antes da camada publica do Blog.</p>
+            <div class="admin-panel-meta">
+                <span>Status <strong>@StatusTexto(Model.Status)</strong></span>
+                <span>Slug <strong>@Model.Slug</strong></span>
+                <span>Autor <strong>@(Model.AuthorName ?? "-")</strong></span>
+            </div>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn admin-panel-btn admin-panel-btn-primary">Editar post</a>
+            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar para lista</a>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2 blog-admin-preview-shell">
+        <article class="blog-admin-preview-article">
+            @if (!string.IsNullOrWhiteSpace(Model.CoverImageUrl))
+            {
+                <img src="@Model.CoverImageUrl" alt="Capa do post" class="blog-admin-preview-cover" />
+            }
+
+            <div class="blog-admin-preview-head">
+                @if (!string.IsNullOrWhiteSpace(Model.CategoryName))
+                {
+                    <span class="admin-panel-badge is-neutral">@Model.CategoryName</span>
+                }
+                @if (Model.IsFeatured)
+                {
+                    <span class="admin-panel-badge is-warning">Destaque</span>
+                }
+                @if (Model.IsWeeklyHighlight)
+                {
+                    <span class="admin-panel-badge is-success">Blog da semana</span>
+                }
+                <h2>@Model.Title</h2>
+                @if (!string.IsNullOrWhiteSpace(Model.Summary))
+                {
+                    <p>@Model.Summary</p>
+                }
+                <div class="blog-admin-preview-meta">
+                    <span>Autor: <strong>@(Model.AuthorName ?? "Equipe Ikkon")</strong></span>
+                    <span>Criado em: <strong>@Model.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong></span>
+                    @if (Model.PublishedAtUtc.HasValue)
+                    {
+                        <span>Publicado em: <strong>@Model.PublishedAtUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong></span>
+                    }
+                </div>
+            </div>
+
+            <div class="blog-admin-preview-content">
+                @Html.Raw(Model.ContentHtml)
+            </div>
+
+            @if (Model.Tags.Count > 0)
+            {
+                <div class="blog-admin-preview-tags">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <span class="admin-panel-badge is-neutral">@tag</span>
+                    }
+                </div>
+            }
+        </article>
+    </section>
+</div>

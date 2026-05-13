@@ -244,6 +244,213 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.ToTable("AuditoriaLogs", (string)null);
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("nvarchar(140)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("BlogCategories", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ArchivedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AuthorDisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("AuthorUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContentHtml")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContentText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverImageUrl")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsFeatured")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWeeklyHighlight")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("PublishedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReadingTimeMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("ScheduledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SeoDescription")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("SeoTitle")
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("IsFeatured", "PublishedAtUtc");
+
+                    b.HasIndex("IsWeeklyHighlight", "PublishedAtUtc");
+
+                    b.HasIndex("Status", "PublishedAtUtc", "DeletedAtUtc");
+
+                    b.ToTable("BlogPosts", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPostTag", b =>
+                {
+                    b.Property<int>("BlogPostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BlogTagId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BlogPostId", "BlogTagId");
+
+                    b.HasIndex("BlogTagId");
+
+                    b.ToTable("BlogPostTags", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("BlogTags", (string)null);
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ConfiguracaoSistema", b =>
                 {
                     b.Property<int>("Id")
@@ -1139,6 +1346,42 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("UsuarioResponsavel");
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPost", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "AuthorUser")
+                        .WithMany()
+                        .HasForeignKey("AuthorUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.BlogCategory", "Category")
+                        .WithMany("Posts")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AuthorUser");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPostTag", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.BlogPost", "BlogPost")
+                        .WithMany("PostTags")
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.BlogTag", "BlogTag")
+                        .WithMany("PostTags")
+                        .HasForeignKey("BlogTagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlogPost");
+
+                    b.Navigation("BlogTag");
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Desconto", b =>
                 {
                     b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
@@ -1351,6 +1594,21 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("Mensalidades");
 
                     b.Navigation("Pagamentos");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogCategory", b =>
+                {
+                    b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPost", b =>
+                {
+                    b.Navigation("PostTags");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogTag", b =>
+                {
+                    b.Navigation("PostTags");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ExameGraduacao", b =>

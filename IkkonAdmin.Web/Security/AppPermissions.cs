@@ -57,6 +57,16 @@ public static class AppPermissions
     public const string InventarioDelete = "INVENTARIO_DELETE";
     public const string InventarioManage = "INVENTARIO_MANAGE";
 
+    public const string BlogView = "BLOG_VIEW";
+    public const string BlogCreate = "BLOG_CREATE";
+    public const string BlogEdit = "BLOG_EDIT";
+    public const string BlogPublish = "BLOG_PUBLISH";
+    public const string BlogArchive = "BLOG_ARCHIVE";
+    public const string BlogDelete = "BLOG_DELETE";
+    public const string BlogFeature = "BLOG_FEATURE";
+    public const string BlogCategoryManage = "BLOG_CATEGORY_MANAGE";
+    public const string BlogTagManage = "BLOG_TAG_MANAGE";
+
     public static IReadOnlyList<AppPermissionDefinition> Definicoes { get; } = new[]
     {
         new AppPermissionDefinition(GerenciarUsuarios, "Gerenciar usuarios", "Permite criar, editar, ativar e excluir usuarios do sistema.", "Administracao"),
@@ -110,7 +120,17 @@ public static class AppPermissions
         new AppPermissionDefinition(InventarioCreate, "Criar itens de inventario", "Permite cadastrar novos itens no inventario.", "Inventario"),
         new AppPermissionDefinition(InventarioEdit, "Editar itens de inventario", "Permite editar itens do inventario.", "Inventario"),
         new AppPermissionDefinition(InventarioDelete, "Excluir itens de inventario", "Permite baixar ou inativar itens do inventario.", "Inventario"),
-        new AppPermissionDefinition(InventarioManage, "Gerenciar inventario", "Permite executar todas as acoes do inventario.", "Inventario")
+        new AppPermissionDefinition(InventarioManage, "Gerenciar inventario", "Permite executar todas as acoes do inventario.", "Inventario"),
+
+        new AppPermissionDefinition(BlogView, "Visualizar blog", "Permite listar e consultar posts do blog no painel.", "Blog"),
+        new AppPermissionDefinition(BlogCreate, "Criar posts do blog", "Permite criar novos posts do blog.", "Blog"),
+        new AppPermissionDefinition(BlogEdit, "Editar posts do blog", "Permite editar posts existentes do blog.", "Blog"),
+        new AppPermissionDefinition(BlogPublish, "Publicar posts do blog", "Permite publicar e agendar posts do blog.", "Blog"),
+        new AppPermissionDefinition(BlogArchive, "Arquivar posts do blog", "Permite arquivar posts do blog.", "Blog"),
+        new AppPermissionDefinition(BlogDelete, "Excluir posts do blog", "Permite excluir posts do blog com exclusao logica.", "Blog"),
+        new AppPermissionDefinition(BlogFeature, "Destacar posts do blog", "Permite marcar posts como destaque e blog da semana.", "Blog"),
+        new AppPermissionDefinition(BlogCategoryManage, "Gerenciar categorias do blog", "Permite criar, editar e ativar categorias do blog.", "Blog"),
+        new AppPermissionDefinition(BlogTagManage, "Gerenciar tags do blog", "Permite criar e associar tags no modulo de blog.", "Blog")
     };
 
     public static IReadOnlyCollection<string> Todas { get; } = Definicoes

@@ -1,0 +1,258 @@
+@using IkkonAdmin.Web.Security
+@model BlogPostFormViewModel
+@{
+    var isEdit = Model.Id.HasValue;
+    var canFeature = User.HasPermission(AppPermissions.BlogFeature);
+}
+
+@functions {
+    private static string StatusTexto(BlogPostStatusEnum status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "Rascunho",
+            BlogPostStatusEnum.Scheduled => "Agendado",
+            BlogPostStatusEnum.Published => "Publicado",
+            BlogPostStatusEnum.Archived => "Arquivado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusClasse(BlogPostStatusEnum status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "is-muted",
+            BlogPostStatusEnum.Scheduled => "is-warning",
+            BlogPostStatusEnum.Published => "is-success",
+            BlogPostStatusEnum.Archived => "is-dark",
+            _ => "is-muted"
+        };
+    }
+}
+
+<div class="admin-panel-v2-page blog-admin-page">
+    <section class="admin-panel-v2-hero">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de post" : "Novo post")</span>
+            <h1 class="admin-panel-title">@(isEdit ? "Editar post do Blog" : "Criar post do Blog")</h1>
+            <p class="admin-panel-subtitle">
+                Nesta fase o conteudo e salvo em texto livre com renderizacao HTML segura basica. O editor rico entra na proxima fase.
+            </p>
+            <div class="admin-panel-meta">
+                <span>Status <strong>@StatusTexto(Model.CurrentStatus)</strong></span>
+                @if (isEdit)
+                {
+                    <span>ID <strong>#@Model.Id</strong></span>
+                }
+            </div>
+        </div>
+        <div class="admin-panel-hero-actions">
+            @if (isEdit)
+            {
+                <a asp-action="Preview" asp-route-id="@Model.Id" class="btn admin-panel-btn admin-panel-btn-ghost">Preview</a>
+            }
+            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar para lista</a>
+        </div>
+    </section>
+
+    <div class="admin-panel-grid admin-panel-grid-aside">
+        <section class="admin-panel-card-v2">
+            <form id="blogPostForm" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="SubmissionAction" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger admin-panel-validation"></div>
+
+                <div class="admin-panel-card-header">
+                    <div>
+                        <h2>Dados do post</h2>
+                        <p>Identificacao editorial, SEO basico, capa e parametros de publicacao.</p>
+                    </div>
+                    <span class="admin-panel-badge @StatusClasse(Model.CurrentStatus)">@StatusTexto(Model.CurrentStatus)</span>
+                </div>
+
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field admin-panel-field-wide">
+                        <label asp-for="Title">Titulo</label>
+                        <input asp-for="Title" class="form-control admin-panel-control" autocomplete="off" maxlength="180" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-wide">
+                        <label asp-for="Slug">Slug</label>
+                        <input asp-for="Slug" class="form-control admin-panel-control" autocomplete="off" maxlength="180" />
+                        <small class="admin-panel-help">Se deixar vazio, o sistema gera a partir do titulo.</small>
+                        <span asp-validation-for="Slug" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="Summary">Resumo</label>
+                        <textarea asp-for="Summary" class="form-control admin-panel-control" rows="3" maxlength="500" placeholder="Resumo curto para cards e SEO basico."></textarea>
+                        <span asp-validation-for="Summary" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field">
+                        <label asp-for="CategoryId">Categoria</label>
+                        <select asp-for="CategoryId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var categoria in Model.CategoryOptions)
+                            {
+                                <option value="@categoria.Id">@categoria.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-panel-field">
+                        <label asp-for="AuthorUserId">Autor responsavel</label>
+                        <select asp-for="AuthorUserId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var autor in Model.AuthorOptions)
+                            {
+                                <option value="@autor.Id">@autor.Nome</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-panel-field">
+                        <label asp-for="PublicationDateLocal">Publicacao/agendamento</label>
+                        <input id="PublicationDateLocal"
+                               name="PublicationDateLocal"
+                               type="datetime-local"
+                               class="form-control admin-panel-control"
+                               value="@(Model.PublicationDateLocal?.ToString("yyyy-MM-ddTHH:mm"))" />
+                        <small class="admin-panel-help">Use este campo para agendar ou registrar uma data de publicacao.</small>
+                    </div>
+
+                    <div class="admin-panel-field">
+                        <label asp-for="TagsInput">Tags</label>
+                        <input asp-for="TagsInput" class="form-control admin-panel-control" list="blogTagSuggestions" placeholder="Ex.: taiko, escola, eventos" />
+                        <datalist id="blogTagSuggestions">
+                            @foreach (var tag in Model.TagSuggestions)
+                            {
+                                <option value="@tag"></option>
+                            }
+                        </datalist>
+                        <small class="admin-panel-help">Separe tags por virgula.</small>
+                    </div>
+
+                    @if (canFeature)
+                    {
+                        <label class="admin-panel-check-card is-form-check">
+                            <input asp-for="IsFeatured" class="form-check-input" />
+                            <span>Marcar como destaque</span>
+                        </label>
+
+                        <label class="admin-panel-check-card is-form-check">
+                            <input asp-for="IsWeeklyHighlight" class="form-check-input" />
+                            <span>Marcar como blog da semana</span>
+                        </label>
+                    }
+
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="ContentInput">Conteudo inicial</label>
+                        <textarea asp-for="ContentInput"
+                                  class="form-control admin-panel-control"
+                                  rows="14"
+                                  placeholder="Escreva o conteudo do post. Nesta fase o texto e convertido para HTML seguro basico."></textarea>
+                        <small class="admin-panel-help">Titulos, embeds e editor low-code entram na proxima fase.</small>
+                    </div>
+
+                    <div class="admin-panel-field">
+                        <label asp-for="SeoTitle">Meta title</label>
+                        <input asp-for="SeoTitle" class="form-control admin-panel-control" maxlength="180" />
+                        <span asp-validation-for="SeoTitle" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-wide">
+                        <label asp-for="SeoDescription">Meta description</label>
+                        <textarea asp-for="SeoDescription" class="form-control admin-panel-control" rows="3" maxlength="320"></textarea>
+                        <span asp-validation-for="SeoDescription" class="text-danger"></span>
+                    </div>
+
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="CoverImage">Imagem de capa</label>
+                        <div class="blog-admin-cover-box">
+                            <img id="blogCoverPreview"
+                                 src="@(string.IsNullOrWhiteSpace(Model.CurrentCoverImageUrl) ? "/Images/Ikkon_Icon.png" : Model.CurrentCoverImageUrl)"
+                                 alt="Preview da capa"
+                                 class="blog-admin-cover-preview" />
+                            <div class="blog-admin-cover-fields">
+                                <input asp-for="CoverImage" class="form-control admin-panel-control" type="file" accept="image/png,image/jpeg,image/webp" />
+                                <small class="admin-panel-help">JPG, PNG ou WEBP ate 3 MB.</small>
+                                @if (!string.IsNullOrWhiteSpace(Model.CurrentCoverImageUrl))
+                                {
+                                    <label class="admin-panel-check-card is-form-check">
+                                        <input asp-for="RemoveCoverImage" class="form-check-input" />
+                                        <span>Remover capa atual</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-panel-form-actions">
+                        <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
+                        <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost" data-blog-submit="Draft">Salvar rascunho</button>
+                        <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost" data-blog-submit="Schedule">Agendar</button>
+                        @if (isEdit)
+                        {
+                            <button type="button" class="btn admin-panel-btn admin-panel-btn-danger" data-blog-submit="Archive">Arquivar</button>
+                        }
+                        <button type="button" class="btn admin-panel-btn admin-panel-btn-primary" data-blog-submit="Publish">Publicar</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <aside class="admin-panel-form-stack">
+            <section class="admin-panel-card-v2">
+                <div class="admin-panel-card-header">
+                    <div>
+                        <h2>Regras desta fase</h2>
+                        <p>Escopo entregue neste corte do modulo de Blog.</p>
+                    </div>
+                </div>
+                <div class="admin-stat-list">
+                    <div class="admin-stat-row"><span>Editor</span><strong>Texto livre seguro</strong></div>
+                    <div class="admin-stat-row"><span>Midia</span><strong>Capa local</strong></div>
+                    <div class="admin-stat-row"><span>Tags</span><strong>Criacao por texto</strong></div>
+                    <div class="admin-stat-row"><span>Preview</span><strong>Administrativo</strong></div>
+                </div>
+            </section>
+
+            <section class="admin-panel-card-v2">
+                <div class="admin-panel-card-header">
+                    <div>
+                        <h2>Checklist editorial</h2>
+                        <p>Para publicar ou agendar, o service exige os campos essenciais.</p>
+                    </div>
+                </div>
+                <div class="admin-panel-action-list">
+                    <div class="admin-stat-row"><span>Titulo e slug</span><strong>Obrigatorios</strong></div>
+                    <div class="admin-stat-row"><span>Resumo e conteudo</span><strong>Obrigatorios</strong></div>
+                    <div class="admin-stat-row"><span>Categoria e autor</span><strong>Obrigatorios</strong></div>
+                    <div class="admin-stat-row"><span>Imagem de capa</span><strong>Obrigatoria para publicar</strong></div>
+                </div>
+            </section>
+
+            @if (isEdit)
+            {
+                <section class="admin-panel-card-v2">
+                    <div class="admin-panel-card-header">
+                        <div>
+                            <h2>Metadados</h2>
+                            <p>Historico tecnico do post atual.</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-list">
+                        <div class="admin-stat-row"><span>Criado em</span><strong>@Model.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong></div>
+                        <div class="admin-stat-row"><span>Atualizado em</span><strong>@(Model.UpdatedAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</strong></div>
+                        <div class="admin-stat-row"><span>Publicado em</span><strong>@(Model.PublishedAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</strong></div>
+                    </div>
+                </section>
+            }
+        </aside>
+    </div>
+</div>

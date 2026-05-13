@@ -1,0 +1,252 @@
+@using IkkonAdmin.Web.Security
+@model BlogAdminIndexViewModel
+@{
+    ViewData["Title"] = "Blog";
+
+    var canCreate = User.HasPermission(AppPermissions.BlogCreate);
+    var canEdit = User.HasPermission(AppPermissions.BlogEdit);
+    var canDelete = User.HasPermission(AppPermissions.BlogDelete);
+    var canManageCategories = User.HasPermission(AppPermissions.BlogCategoryManage);
+}
+
+@functions {
+    private static string StatusTexto(BlogPostStatusEnum status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "Rascunho",
+            BlogPostStatusEnum.Scheduled => "Agendado",
+            BlogPostStatusEnum.Published => "Publicado",
+            BlogPostStatusEnum.Archived => "Arquivado",
+            _ => status.ToString()
+        };
+    }
+
+    private static string StatusClasse(BlogPostStatusEnum status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "is-muted",
+            BlogPostStatusEnum.Scheduled => "is-warning",
+            BlogPostStatusEnum.Published => "is-success",
+            BlogPostStatusEnum.Archived => "is-dark",
+            _ => "is-muted"
+        };
+    }
+}
+
+<div class="admin-panel-v2-page blog-admin-page">
+    <section class="admin-panel-v2-hero">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Blog interno</span>
+            <h1 class="admin-panel-title">Posts, categorias e agenda editorial</h1>
+            <p class="admin-panel-subtitle">
+                Gerencie rascunhos, publicacoes e destaques do Blog com um fluxo simples para a equipe administrativa.
+            </p>
+            <div class="admin-panel-meta">
+                <span>Total <strong>@Model.TotalPosts</strong></span>
+                <span>Publicados <strong>@Model.PublishedCount</strong></span>
+                <span>Agendados <strong>@Model.ScheduledCount</strong></span>
+            </div>
+        </div>
+        <div class="admin-panel-hero-actions">
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn admin-panel-btn admin-panel-btn-primary">Novo post</a>
+            }
+            @if (canManageCategories)
+            {
+                <a asp-controller="BlogCategorias" asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Categorias</a>
+            }
+        </div>
+    </section>
+
+    <section class="admin-panel-kpi-grid" aria-label="Indicadores do blog">
+        <article class="admin-kpi-card">
+            <div class="admin-kpi-top"><span>Total</span><b>Posts</b></div>
+            <strong>@Model.TotalPosts</strong>
+            <small>Posts ativos no modulo, sem itens excluidos logicamente.</small>
+        </article>
+        <article class="admin-kpi-card is-warning">
+            <div class="admin-kpi-top"><span>Rascunhos</span><b>Edicao</b></div>
+            <strong>@Model.DraftCount</strong>
+            <small>Conteudos ainda nao publicados.</small>
+        </article>
+        <article class="admin-kpi-card is-info">
+            <div class="admin-kpi-top"><span>Agendados</span><b>Fila</b></div>
+            <strong>@Model.ScheduledCount</strong>
+            <small>Posts com publicacao futura.</small>
+        </article>
+        <article class="admin-kpi-card is-success">
+            <div class="admin-kpi-top"><span>Publicados</span><b>No ar</b></div>
+            <strong>@Model.PublishedCount</strong>
+            <small>Conteudos prontos para o site institucional.</small>
+        </article>
+    </section>
+
+    <section class="admin-panel-card-v2 admin-panel-filter-card">
+        <div class="admin-panel-card-header">
+            <div>
+                <h2>Filtrar posts</h2>
+                <p>Busque por titulo, resumo, categoria, tag, autor e status editorial.</p>
+            </div>
+        </div>
+
+        <form asp-action="Index" method="get" class="admin-panel-form-stack">
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field admin-panel-field-wide">
+                    <label asp-for="Filtro.Busca">Busca</label>
+                    <input asp-for="Filtro.Busca" class="form-control admin-panel-control" type="search" placeholder="Titulo, resumo, conteudo, categoria ou tag" />
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.Status">Status</label>
+                    <select asp-for="Filtro.Status" class="form-select admin-panel-control">
+                        <option value="">Todos</option>
+                        @foreach (var status in Enum.GetValues<BlogPostStatusEnum>())
+                        {
+                            <option value="@((int)status)">@StatusTexto(status)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.CategoryId">Categoria</label>
+                    <select asp-for="Filtro.CategoryId" class="form-select admin-panel-control">
+                        <option value="">Todas</option>
+                        @foreach (var categoria in Model.Categories)
+                        {
+                            <option value="@categoria.Id">@categoria.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.AuthorUserId">Autor</label>
+                    <select asp-for="Filtro.AuthorUserId" class="form-select admin-panel-control">
+                        <option value="">Todos</option>
+                        @foreach (var autor in Model.Authors)
+                        {
+                            <option value="@autor.Id">@autor.Nome</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.IsFeatured">Destaque</label>
+                    <select asp-for="Filtro.IsFeatured" class="form-select admin-panel-control">
+                        <option value="">Todos</option>
+                        <option value="true">Em destaque</option>
+                        <option value="false">Nao destacados</option>
+                    </select>
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.IsWeeklyHighlight">Blog da semana</label>
+                    <select asp-for="Filtro.IsWeeklyHighlight" class="form-select admin-panel-control">
+                        <option value="">Todos</option>
+                        <option value="true">Marcados</option>
+                        <option value="false">Nao marcados</option>
+                    </select>
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.PublishedFrom">Publicado de</label>
+                    <input asp-for="Filtro.PublishedFrom" class="form-control admin-panel-control" type="date" />
+                </div>
+
+                <div class="admin-panel-field">
+                    <label asp-for="Filtro.PublishedTo">Publicado ate</label>
+                    <input asp-for="Filtro.PublishedTo" class="form-control admin-panel-control" type="date" />
+                </div>
+
+                <div class="admin-panel-form-actions">
+                    <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button>
+                    <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header">
+            <div>
+                <h2>Posts cadastrados</h2>
+                <p>@Model.Posts.Count post(s) encontrados nesta filtragem.</p>
+            </div>
+            @if (canCreate)
+            {
+                <a asp-action="Create" class="btn admin-panel-btn admin-panel-btn-primary">Novo post</a>
+            }
+        </div>
+
+        <div class="admin-panel-table-wrap table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Post</th>
+                        <th>Status</th>
+                        <th>Categoria</th>
+                        <th>Autor</th>
+                        <th>Publicacao</th>
+                        <th>Criacao</th>
+                        <th>Destaque</th>
+                        <th>Semana</th>
+                        <th>Tags</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Posts.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="10">
+                                <div class="admin-panel-empty">
+                                    Nenhum post encontrado para os filtros atuais.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var post in Model.Posts)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="admin-panel-primary-cell">
+                                        <strong>@post.Title</strong>
+                                        <small>/blog/@post.Slug</small>
+                                    </div>
+                                </td>
+                                <td><span class="admin-panel-badge @StatusClasse(post.Status)">@StatusTexto(post.Status)</span></td>
+                                <td>@(post.CategoryName ?? "-")</td>
+                                <td>@(post.AuthorName ?? "-")</td>
+                                <td>@(post.PublishedAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? post.ScheduledAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                                <td>@post.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                                <td><span class="admin-panel-badge @(post.IsFeatured ? "is-warning" : "is-muted")">@(post.IsFeatured ? "Sim" : "Nao")</span></td>
+                                <td><span class="admin-panel-badge @(post.IsWeeklyHighlight ? "is-success" : "is-muted")">@(post.IsWeeklyHighlight ? "Sim" : "Nao")</span></td>
+                                <td>@post.TagCount</td>
+                                <td class="text-end">
+                                    <div class="admin-panel-row-actions">
+                                        <a asp-action="Preview" asp-route-id="@post.Id" class="btn admin-panel-btn-table is-primary">Preview</a>
+                                        @if (canEdit)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@post.Id" class="btn admin-panel-btn-table">Editar</a>
+                                        }
+                                        @if (canDelete)
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Excluir este post?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn admin-panel-btn-table is-danger">Excluir</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

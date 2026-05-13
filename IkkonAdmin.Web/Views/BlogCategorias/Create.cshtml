@@ -1,0 +1,37 @@
+@model BlogCategoryFormViewModel
+@{
+    ViewData["Title"] = "Nova categoria";
+}
+
+<partial name="_BlogCategoryForm" model="Model" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const nameInput = document.getElementById("Name");
+            const slugInput = document.getElementById("Slug");
+            if (!nameInput || !slugInput) return;
+
+            let slugTouched = !!slugInput.value.trim();
+
+            const slugify = function (value) {
+                return (value || "")
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "");
+            };
+
+            slugInput.addEventListener("input", function () {
+                slugTouched = slugInput.value.trim().length > 0;
+            });
+
+            nameInput.addEventListener("input", function () {
+                if (slugTouched) return;
+                slugInput.value = slugify(nameInput.value);
+            });
+        })();
+    </script>
+}

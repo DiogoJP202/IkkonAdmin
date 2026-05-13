@@ -1,0 +1,120 @@
+# Banco de dados
+
+## Estrutura geral
+
+O banco usa SQL Server via Entity Framework Core.
+
+`ApplicationDbContext` define os principais `DbSet`:
+
+- `Alunos`, `AlunosTurmas`, `Turmas`.
+- `Mensalidades`, `Pagamentos`, `Descontos`, `AcordosFinanceiros`.
+- `Admissoes`, `Desligamentos`, `Graduacoes`, `ExamesGraduacao`, `HistoricosAlunos`.
+- `ConfiguracoesSistema`.
+- `UsuariosSistema`, `RolesSistema`, `PermissoesSistema`.
+- `UsuariosRoles`, `RolesPermissoes`, `UsuariosPermissoes`.
+- `AuditoriaLogs`.
+- `InventarioItens`, `InventarioMovimentacoes`.
+- `GoogleAgendaConexoes`.
+
+## Configurações EF Core
+
+As configurações ficam em `IkkonAdmin.Web/Data/Configurations`.
+
+Padrão:
+
+- `ToTable` com nome plural em português ou nome específico.
+- `HasMaxLength` em strings.
+- `HasPrecision` ou `decimal(x,y)` em valores financeiros.
+- `HasColumnType("date")` para `DateOnly`.
+- `HasColumnType("datetime2")` para timestamps técnicos.
+- Índices em campos de busca e relacionamentos.
+
+## Relacionamentos importantes
+
+- `Aluno` 1:N `Mensalidade`.
+- `Aluno` 1:N `Pagamento`.
+- `Aluno` 1:N `Desconto`.
+- `Aluno` 1:N `AcordoFinanceiro`.
+- `Aluno` 1:N `Admissao`.
+- `Aluno` 1:N `Desligamento`.
+- `Aluno` 1:N `Graduacao`.
+- `Aluno` N:N `Turma` via `AlunoTurma`.
+- `Mensalidade` 1:N `Pagamento`.
+- `RoleSistema` N:N `PermissaoSistema` via `RolePermissao`.
+- `UsuarioSistema` N:N `RoleSistema` via `UsuarioRole`.
+- `UsuarioSistema` N:N `PermissaoSistema` via `UsuarioPermissao`.
+- `UsuarioSistema` 0:1 `Aluno` via `AlunoId`.
+- `InventarioItem` 1:N `InventarioMovimentacao`.
+- `GoogleAgendaConexao` referencia usuário que conectou.
+
+## Índices e restrições relevantes
+
+- `Aluno.CPF` único.
+- `Mensalidade` possui índice único por `{AlunoId, Competencia}`.
+- `UsuarioSistema.LoginNormalizado` único.
+- `UsuarioSistema.EmailNormalizado` único.
+- `UsuarioSistema.AlunoId` único quando não nulo.
+- `RoleSistema.Codigo` único.
+- `PermissaoSistema.Codigo` único.
+- `InventarioItem.CodigoInterno` único filtrado quando preenchido/ativo, conforme configuration.
+- `InventarioItem` possui índices para categoria, tipo, status e ativo.
+
+## Campos recorrentes
+
+Padrões encontrados:
+
+- `Ativo`: usado em turmas, descontos, acordos, cargos, permissões, usuários e inventário.
+- `Status`: usado em aluno, mensalidade, admissão, inventário.
+- `CriadoEmUtc`, `AtualizadoEmUtc`: usado em inventário e conexões Google.
+- `DataCriacaoUtc`: usado em usuários, roles e permissões.
+- `UltimoLoginUtc`: usado em usuários.
+- `Excluido`, `DataExclusaoUtc`: soft delete de usuários.
+- `DataEventoUtc`: auditoria.
+
+Não há um padrão universal de `CreatedAt/UpdatedAt` para todas as entidades legadas.
+
+## Migrations
+
+As migrations ficam em `IkkonAdmin.Web/Data/Migrations`.
+
+Principais migrations identificadas:
+
+- `InitialCreate`.
+- `AddAlunoTurmasManyToMany`.
+- `AddConfiguracoesSistema`.
+- `AddAuthUsuariosSistema`.
+- `AddUserSettingsProfileFields`.
+- `AddAdminAccessControlAndAudit`.
+- `AddRoleTipoAcessoAndPermissionExpansion`.
+- `AddGoogleAgendaAndInventario`.
+- `AddGoogleAgendaOAuthConnection`.
+
+## Aplicação de migrations
+
+No startup, `DatabaseBootstrap.EnsureDatabaseReady` executa `dbContext.Database.Migrate()`.
+
+Também há lógica de baseline para banco criado por script manual e uma garantia específica para `AlunosTurmas`.
+
+## Seed inicial
+
+`SeedData.Initialize` cria:
+
+- Configurações padrão.
+- Turmas e alunos demo.
+- Mensalidades, pagamentos, descontos e acordos.
+- Admissão, desligamento e graduação demo.
+- Inventário demo.
+- Usuários demo.
+- Roles e permissões base.
+
+## Cuidados antes de alterar o banco
+
+- Criar migration EF Core para novas tabelas/campos.
+- Revisar `ApplicationDbContext`.
+- Criar configuration em `Data/Configurations`.
+- Atualizar `SeedData` somente quando necessário.
+- Evitar alterar migrations antigas já aplicadas.
+- Verificar impacto em banco Azure/produção.
+- Não remover colunas/tabelas sem plano de migração de dados.
+- Manter índices coerentes para telas com filtros.
+

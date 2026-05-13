@@ -676,7 +676,15 @@ public static class SeedData
             AppPermissions.GraduacoesCreate,
             AppPermissions.GraduacoesEdit,
             AppPermissions.ConfiguracoesView,
-            AppPermissions.ConfiguracoesEdit
+            AppPermissions.ConfiguracoesEdit,
+            AppPermissions.BlogView,
+            AppPermissions.BlogCreate,
+            AppPermissions.BlogEdit,
+            AppPermissions.BlogPublish,
+            AppPermissions.BlogArchive,
+            AppPermissions.BlogFeature,
+            AppPermissions.BlogCategoryManage,
+            AppPermissions.BlogTagManage
         };
 
         var permissoesAluno = new[]

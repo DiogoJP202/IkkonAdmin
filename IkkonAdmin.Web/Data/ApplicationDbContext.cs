@@ -5,6 +5,10 @@ namespace IkkonAdmin.Web.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
+    public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+    public DbSet<BlogCategory> BlogCategories => Set<BlogCategory>();
+    public DbSet<BlogTag> BlogTags => Set<BlogTag>();
+    public DbSet<BlogPostTag> BlogPostTags => Set<BlogPostTag>();
     public DbSet<Aluno> Alunos => Set<Aluno>();
     public DbSet<AlunoTurma> AlunosTurmas => Set<AlunoTurma>();
     public DbSet<Turma> Turmas => Set<Turma>();
