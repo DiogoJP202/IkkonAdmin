@@ -1,4 +1,5 @@
 ﻿@using IkkonAdmin.Web.Security
+@using IkkonAdmin.Web.Helpers
 @model GoogleAgendaIndexViewModel
 @{
     ViewData["Title"] = "Google Agenda";
@@ -322,19 +323,42 @@
                                             var tipoPrincipal = temEvento ? TipoClass(eventosDia.First().Tipo) : string.Empty;
                                             var classeHoje = dataDia.Date == DateTime.Today ? "is-today" : string.Empty;
                                             var diaSemana = culturaPtBr.TextInfo.ToTitleCase(dataDia.ToString("ddd", culturaPtBr).Replace(".", string.Empty));
+                                            var dataOnly = DateOnly.FromDateTime(dataDia);
+                                            var holidayName = BrazilHolidayHelper.GetHolidayName(dataOnly);
+                                            var isHoliday = !string.IsNullOrWhiteSpace(holidayName);
+                                            var isWeekend = dataDia.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+                                            var classeDiaEspecial = string.Join(" ", new[]
+                                            {
+                                                classeHoje,
+                                                isWeekend ? "is-weekend" : string.Empty,
+                                                isHoliday ? "is-holiday" : string.Empty
+                                            }.Where(x => !string.IsNullOrWhiteSpace(x)));
+                                            var descricaoDiaEspecial = isHoliday
+                                                ? $"Feriado: {holidayName}"
+                                                : isWeekend
+                                                    ? "Fim de semana"
+                                                    : string.Empty;
+                                            var tooltipDia = string.IsNullOrWhiteSpace(descricaoDiaEspecial)
+                                                ? $"{dataDia:dd/MM/yyyy}"
+                                                : $"{dataDia:dd/MM/yyyy} · {descricaoDiaEspecial}";
 
                                             if (temEvento)
                                             {
-                                                <div class="agenda-linear-day has-event @classeHoje agenda-linear-day-@tipoPrincipal"
+                                                <div class="agenda-linear-day has-event @classeDiaEspecial agenda-linear-day-@tipoPrincipal"
                                                      tabindex="0"
                                                      role="button"
+                                                     title="@tooltipDia"
                                                      aria-haspopup="dialog"
-                                                     aria-label="@($"{dataDia:dd/MM/yyyy}: {eventosDia.Count} evento(s). Clique para escolher um evento.")">
+                                                     aria-label="@($"{dataDia:dd/MM/yyyy}: {eventosDia.Count} evento(s). {(string.IsNullOrWhiteSpace(descricaoDiaEspecial) ? string.Empty : descricaoDiaEspecial + ". ")}Clique para escolher um evento.")">
                                                     <span>@dia.ToString("00")</span>
                                                     <small>@diaSemana</small>
                                                     <b>@eventosDia.Count</b>
                                                     <div class="agenda-day-popover" role="dialog" aria-label="@($"Eventos do dia {dataDia:dd/MM/yyyy}")">
                                                         <strong>@dataDia.ToString("dd/MM/yyyy")</strong>
+                                                        @if (!string.IsNullOrWhiteSpace(descricaoDiaEspecial))
+                                                        {
+                                                            <span class="agenda-day-popover-tag @(isHoliday ? "is-holiday" : "is-weekend")">@descricaoDiaEspecial</span>
+                                                        }
                                                         <small class="agenda-day-popover-hint">Escolha qual evento deseja abrir</small>
                                                         @foreach (var eventoDia in eventosDia.Take(5))
                                                         {
@@ -357,7 +381,7 @@
                                             }
                                             else
                                             {
-                                                <span class="agenda-linear-day @classeHoje" title="@dataDia.ToString("dd/MM/yyyy")">
+                                                <span class="agenda-linear-day @classeDiaEspecial" title="@tooltipDia">
                                                     <span>@dia.ToString("00")</span>
                                                     <small>@diaSemana</small>
                                                 </span>
