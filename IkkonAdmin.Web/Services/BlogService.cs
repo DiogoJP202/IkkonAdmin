@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text;
-using System.Text.Encodings.Web;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Models.Entities;
@@ -11,7 +10,8 @@ namespace IkkonAdmin.Web.Services;
 
 public class BlogService(
     ApplicationDbContext dbContext,
-    IBlogMediaService blogMediaService) : IBlogService
+    IBlogMediaService blogMediaService,
+    IBlogContentSanitizer blogContentSanitizer) : IBlogService
 {
     public async Task<BlogAdminIndexViewModel> ListarAsync(
         BlogAdminFilterViewModel filtro,
@@ -145,6 +145,8 @@ public class BlogService(
             Slug = post.Slug,
             Summary = post.Summary,
             ContentInput = post.ContentText,
+            ContentHtmlInput = post.ContentHtml,
+            ContentJsonInput = post.ContentJson,
             CategoryId = post.CategoryId,
             AuthorUserId = post.AuthorUserId,
             IsFeatured = post.IsFeatured,
@@ -163,6 +165,52 @@ public class BlogService(
             CategoryOptions = await ListarCategoriasFormularioAsync(post.CategoryId, cancellationToken),
             AuthorOptions = await ListarAutoresAsync(cancellationToken),
             TagSuggestions = await ListarSugestoesTagsAsync(cancellationToken)
+        };
+    }
+
+    public async Task<BlogPublicIndexViewModel> ListarPublicoAsync(
+        BlogPublicFilterViewModel filtro,
+        CancellationToken cancellationToken = default)
+    {
+        await PromoteScheduledPostsAsync(cancellationToken);
+
+        var now = DateTime.UtcNow;
+        var pageSize = 9;
+        var currentPage = Math.Max(1, filtro.Pagina);
+        var query = AplicarFiltrosPublicos(CriarConsultaPublica(now), filtro);
+        var totalPosts = await query.CountAsync(cancellationToken);
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalPosts / (decimal)pageSize));
+
+        if (currentPage > totalPages)
+        {
+            currentPage = totalPages;
+        }
+
+        filtro.Pagina = currentPage;
+
+        var posts = await SelecionarCardsPublicos(query)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new BlogPublicIndexViewModel
+        {
+            Filtro = filtro,
+            FeaturedPosts = await SelecionarCardsPublicos(
+                    CriarConsultaPublica(now).Where(x => x.IsFeatured))
+                .Take(3)
+                .ToListAsync(cancellationToken),
+            WeeklyHighlights = await SelecionarCardsPublicos(
+                    CriarConsultaPublica(now).Where(x => x.IsWeeklyHighlight))
+                .Take(2)
+                .ToListAsync(cancellationToken),
+            Posts = posts,
+            Categories = await ListarCategoriasPublicasAsync(now, filtro.Categoria, cancellationToken),
+            Tags = await ListarTagsPublicasAsync(now, filtro.Tag, cancellationToken),
+            TotalPosts = totalPosts,
+            CurrentPage = currentPage,
+            PageSize = pageSize,
+            TotalPages = totalPages
         };
     }
 
@@ -207,6 +255,7 @@ public class BlogService(
             author,
             currentCoverUrl: null,
             currentStatus: BlogPostStatusEnum.Draft,
+            currentPublishedAtUtc: null,
             cancellationToken);
 
         if (!validacao.Success)
@@ -228,8 +277,9 @@ public class BlogService(
 
         var now = DateTime.UtcNow;
         var summary = LimparOpcional(model.Summary);
-        var contentText = NormalizarConteudoTexto(model.ContentInput);
-        var contentHtml = GerarHtmlSeguroBasico(model.ContentInput);
+        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        var contentHtml = GerarConteudoHtmlSeguro(model);
+        var contentJson = LimparOpcional(model.ContentJsonInput);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Title), null, cancellationToken);
 
         var post = new BlogPost
@@ -238,7 +288,7 @@ public class BlogService(
             Slug = slug,
             Summary = summary,
             ContentHtml = contentHtml,
-            ContentJson = null,
+            ContentJson = contentJson,
             ContentText = contentText,
             CoverImageUrl = coverImageUrl,
             AuthorUserId = author?.Id ?? usuarioAtualId,
@@ -293,6 +343,7 @@ public class BlogService(
             author,
             post.CoverImageUrl,
             post.Status,
+            post.PublishedAtUtc,
             cancellationToken);
 
         if (!validacao.Success)
@@ -320,15 +371,16 @@ public class BlogService(
         }
 
         var summary = LimparOpcional(model.Summary);
-        var contentText = NormalizarConteudoTexto(model.ContentInput);
-        var contentHtml = GerarHtmlSeguroBasico(model.ContentInput);
+        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        var contentHtml = GerarConteudoHtmlSeguro(model);
+        var contentJson = LimparOpcional(model.ContentJsonInput);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Title), id, cancellationToken);
 
         post.Title = model.Title.Trim();
         post.Slug = slug;
         post.Summary = summary;
         post.ContentHtml = contentHtml;
-        post.ContentJson = null;
+        post.ContentJson = contentJson;
         post.ContentText = contentText;
         post.CoverImageUrl = coverImageUrl;
         post.AuthorUserId = author?.Id ?? usuarioAtualId;
@@ -379,6 +431,7 @@ public class BlogService(
         UsuarioSistema? author,
         string? currentCoverUrl,
         BlogPostStatusEnum currentStatus,
+        DateTime? currentPublishedAtUtc,
         CancellationToken cancellationToken)
     {
         var acao = (model.SubmissionAction ?? "Draft").Trim().ToLowerInvariant();
@@ -387,19 +440,18 @@ public class BlogService(
             : (DateTime?)null;
         var now = DateTime.UtcNow;
         var summary = LimparOpcional(model.Summary);
-        var contentText = NormalizarConteudoTexto(model.ContentInput);
+        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
         var hasCover = model.CoverImage is not null ||
                        (!model.RemoveCoverImage && !string.IsNullOrWhiteSpace(currentCoverUrl));
+        var slugBase = GerarSlug(model.Slug, model.Title);
 
         if (!await CategoriaValidaAsync(model.CategoryId, cancellationToken))
         {
             return BlogWorkflowValidation.Fail("Selecione uma categoria ativa.");
         }
 
-        if (await dbContext.BlogPosts.AnyAsync(
-                x => x.Id != model.Id &&
-                     x.Slug == GerarSlug(model.Slug, model.Title),
-                cancellationToken))
+        if (!string.IsNullOrWhiteSpace(model.Slug) &&
+            await SlugExisteAsync(slugBase, model.Id, cancellationToken))
         {
             return BlogWorkflowValidation.Fail("Ja existe um post com esse slug.");
         }
@@ -443,7 +495,7 @@ public class BlogService(
             case "archive":
                 return BlogWorkflowValidation.Ok(
                     BlogPostStatusEnum.Archived,
-                    currentStatus == BlogPostStatusEnum.Published ? publicationDateUtc ?? now : publicationDateUtc,
+                    currentStatus == BlogPostStatusEnum.Published ? currentPublishedAtUtc : null,
                     null,
                     now);
 
@@ -594,6 +646,126 @@ public class BlogService(
             .ToListAsync(cancellationToken);
     }
 
+    private IQueryable<BlogPost> CriarConsultaPublica(DateTime nowUtc)
+    {
+        return dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.DeletedAtUtc == null &&
+                        x.Status == BlogPostStatusEnum.Published &&
+                        x.PublishedAtUtc.HasValue &&
+                        x.PublishedAtUtc <= nowUtc)
+            .OrderByDescending(x => x.PublishedAtUtc)
+            .ThenByDescending(x => x.CreatedAtUtc);
+    }
+
+    private static IQueryable<BlogPost> AplicarFiltrosPublicos(
+        IQueryable<BlogPost> query,
+        BlogPublicFilterViewModel filtro)
+    {
+        if (!string.IsNullOrWhiteSpace(filtro.Q))
+        {
+            var termo = filtro.Q.Trim();
+            query = query.Where(x =>
+                x.Title.Contains(termo) ||
+                (x.Summary != null && x.Summary.Contains(termo)) ||
+                (x.ContentText != null && x.ContentText.Contains(termo)) ||
+                (x.Category != null && x.Category.Name.Contains(termo)) ||
+                x.PostTags.Any(t => t.BlogTag.Name.Contains(termo)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filtro.Categoria))
+        {
+            var categoriaSlug = filtro.Categoria.Trim();
+            query = query.Where(x => x.Category != null && x.Category.Slug == categoriaSlug);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filtro.Tag))
+        {
+            var tagSlug = filtro.Tag.Trim();
+            query = query.Where(x => x.PostTags.Any(t => t.BlogTag.Slug == tagSlug));
+        }
+
+        return query;
+    }
+
+    private static IQueryable<BlogPublicPostCardViewModel> SelecionarCardsPublicos(IQueryable<BlogPost> query)
+    {
+        return query.Select(x => new BlogPublicPostCardViewModel
+        {
+            Title = x.Title,
+            Slug = x.Slug,
+            Summary = x.Summary,
+            CoverImageUrl = x.CoverImageUrl,
+            AuthorName = x.AuthorDisplayName,
+            CategoryName = x.Category != null ? x.Category.Name : null,
+            CategorySlug = x.Category != null ? x.Category.Slug : null,
+            PublishedAtUtc = x.PublishedAtUtc ?? x.CreatedAtUtc,
+            ReadingTimeMinutes = x.ReadingTimeMinutes,
+            IsFeatured = x.IsFeatured,
+            IsWeeklyHighlight = x.IsWeeklyHighlight,
+            Tags = x.PostTags
+                .OrderBy(t => t.BlogTag.Name)
+                .Select(t => new BlogPublicTagViewModel
+                {
+                    Name = t.BlogTag.Name,
+                    Slug = t.BlogTag.Slug
+                })
+                .Take(5)
+                .ToList()
+        });
+    }
+
+    private async Task<List<BlogPublicTaxonomyItemViewModel>> ListarCategoriasPublicasAsync(
+        DateTime nowUtc,
+        string? selectedSlug,
+        CancellationToken cancellationToken)
+    {
+        var categorias = await dbContext.BlogCategories
+            .AsNoTracking()
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.Name)
+            .Select(x => new BlogPublicTaxonomyItemViewModel
+            {
+                Name = x.Name,
+                Slug = x.Slug,
+                Count = x.Posts.Count(p =>
+                    p.DeletedAtUtc == null &&
+                    p.Status == BlogPostStatusEnum.Published &&
+                    p.PublishedAtUtc.HasValue &&
+                    p.PublishedAtUtc <= nowUtc),
+                IsActive = x.Slug == selectedSlug
+            })
+            .ToListAsync(cancellationToken);
+
+        return categorias.Where(x => x.Count > 0 || x.IsActive).ToList();
+    }
+
+    private async Task<List<BlogPublicTaxonomyItemViewModel>> ListarTagsPublicasAsync(
+        DateTime nowUtc,
+        string? selectedSlug,
+        CancellationToken cancellationToken)
+    {
+        var tags = await dbContext.BlogTags
+            .AsNoTracking()
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.Name)
+            .Select(x => new BlogPublicTaxonomyItemViewModel
+            {
+                Name = x.Name,
+                Slug = x.Slug,
+                Count = x.PostTags.Count(t =>
+                    t.BlogPost.DeletedAtUtc == null &&
+                    t.BlogPost.Status == BlogPostStatusEnum.Published &&
+                    t.BlogPost.PublishedAtUtc.HasValue &&
+                    t.BlogPost.PublishedAtUtc <= nowUtc),
+                IsActive = x.Slug == selectedSlug
+            })
+            .Take(24)
+            .ToListAsync(cancellationToken);
+
+        return tags.Where(x => x.Count > 0 || x.IsActive).ToList();
+    }
+
     private async Task<bool> CategoriaValidaAsync(int? categoryId, CancellationToken cancellationToken)
     {
         if (!categoryId.HasValue)
@@ -603,6 +775,14 @@ public class BlogService(
 
         return await dbContext.BlogCategories
             .AnyAsync(x => x.Id == categoryId.Value && x.IsActive, cancellationToken);
+    }
+
+    private async Task<bool> SlugExisteAsync(string slug, int? ignoreId, CancellationToken cancellationToken)
+    {
+        return await dbContext.BlogPosts.AnyAsync(
+            x => x.Slug == slug &&
+                 (!ignoreId.HasValue || x.Id != ignoreId.Value),
+            cancellationToken);
     }
 
     private async Task<string> GarantirSlugUnicoAsync(string baseSlug, int? ignoreId, CancellationToken cancellationToken)
@@ -670,41 +850,11 @@ public class BlogService(
         return string.IsNullOrWhiteSpace(trimmed) ? null : trimmed;
     }
 
-    private static string? NormalizarConteudoTexto(string? content)
+    private string GerarConteudoHtmlSeguro(BlogPostFormViewModel model)
     {
-        var trimmed = content?.Trim();
-        if (string.IsNullOrWhiteSpace(trimmed))
-        {
-            return null;
-        }
-
-        return string.Join(
-            Environment.NewLine + Environment.NewLine,
-            trimmed
-                .Replace("\r\n", "\n", StringComparison.Ordinal)
-                .Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(x => x.Trim()));
-    }
-
-    private static string GerarHtmlSeguroBasico(string? content)
-    {
-        var text = NormalizarConteudoTexto(content);
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return "<p>Conteudo ainda nao informado.</p>";
-        }
-
-        var paragraphs = text
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(paragraph =>
-            {
-                var encoded = HtmlEncoder.Default.Encode(paragraph.Trim());
-                var withBreaks = encoded.Replace("\n", "<br />", StringComparison.Ordinal);
-                return $"<p>{withBreaks}</p>";
-            });
-
-        return string.Join(Environment.NewLine, paragraphs);
+        return !string.IsNullOrWhiteSpace(model.ContentHtmlInput)
+            ? blogContentSanitizer.SanitizeHtml(model.ContentHtmlInput)
+            : blogContentSanitizer.ConvertPlainTextToSafeHtml(model.ContentInput);
     }
 
     private static int CalcularTempoLeitura(string? contentText)

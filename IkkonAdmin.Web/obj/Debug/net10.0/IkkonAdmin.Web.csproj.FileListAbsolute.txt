@@ -355,4 +355,10 @@ C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\artifacts\verify-bui
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\appsettings.Development.example.json
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.sourcelink.json
 C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-7d1y4yfhd5-7d1y4yfhd5.gz
-C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-qi98qo2pfo-qi98qo2pfo.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\AngleSharp.dll
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\AngleSharp.Css.dll
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\bin\Debug\net10.0\HtmlSanitizer.dll
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\yw4cwtm72w-{0}-qsgwdcbx0l-qsgwdcbx0l.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\8odnjd2ih6-{0}-4k5v1uo076-4k5v1uo076.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\lommt1rhbg-{0}-pg4a3whnud-pg4a3whnud.gz
+C:\Users\diogo\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-r0wt9z2he3-r0wt9z2he3.gz

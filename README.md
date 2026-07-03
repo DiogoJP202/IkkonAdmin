@@ -269,6 +269,67 @@ A aplicação será aberta conforme a porta definida pelo ASP.NET Core, normalme
 http://localhost:5037
 ```
 
+## Como rodar com Docker Compose
+
+O repositório inclui `compose.yaml` para subir a aplicação e um SQL Server local em containers.
+
+### 1. Subir tudo
+
+```bash
+docker compose up --build
+```
+
+A aplicação fica disponível em:
+
+```text
+http://localhost:8080
+```
+
+O SQL Server fica disponível para ferramentas locais em:
+
+```text
+localhost,14333
+```
+
+Credenciais padrão de desenvolvimento do SQL Server:
+
+```text
+User ID: sa
+Password: IkkonLocal!2026
+Database: IkkonAdminDb
+```
+
+O app aplica migrations e seed automaticamente no startup via `DatabaseBootstrap.EnsureDatabaseReady`.
+
+### 2. Personalizar portas ou senha
+
+Copie o template:
+
+```bash
+cp .env.compose.example .env
+```
+
+Depois ajuste, se necessário:
+
+```text
+IKKONADMIN_HTTP_PORT=8080
+IKKONADMIN_SQL_PORT=14333
+IKKONADMIN_DB_NAME=IkkonAdminDb
+IKKONADMIN_SQL_PASSWORD=IkkonLocal!2026
+```
+
+### 3. Parar containers
+
+```bash
+docker compose down
+```
+
+Para remover também o banco e uploads persistidos nos volumes:
+
+```bash
+docker compose down -v
+```
+
 ## Usuários de demonstração
 
 As credenciais de desenvolvimento ficam documentadas em:

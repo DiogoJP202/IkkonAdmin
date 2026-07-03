@@ -77,6 +77,9 @@ public class BlogPostFormViewModel
     [Display(Name = "Conteudo")]
     public string? ContentInput { get; set; }
 
+    public string? ContentHtmlInput { get; set; }
+    public string? ContentJsonInput { get; set; }
+
     [Display(Name = "Categoria")]
     public int? CategoryId { get; set; }
 

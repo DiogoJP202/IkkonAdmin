@@ -3,6 +3,8 @@
 @{
     var isEdit = Model.Id.HasValue;
     var canFeature = User.HasPermission(AppPermissions.BlogFeature);
+    var canPublish = User.HasPermission(AppPermissions.BlogPublish);
+    var canArchive = User.HasPermission(AppPermissions.BlogArchive);
 }
 
 @functions {
@@ -37,7 +39,7 @@
             <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de post" : "Novo post")</span>
             <h1 class="admin-panel-title">@(isEdit ? "Editar post do Blog" : "Criar post do Blog")</h1>
             <p class="admin-panel-subtitle">
-                Nesta fase o conteudo e salvo em texto livre com renderizacao HTML segura basica. O editor rico entra na proxima fase.
+                Nesta fase o conteudo e salvo em texto livre com sanitizacao no backend. O editor rico entra na proxima etapa.
             </p>
             <div class="admin-panel-meta">
                 <span>Status <strong>@StatusTexto(Model.CurrentStatus)</strong></span>
@@ -152,11 +154,42 @@
 
                     <div class="admin-panel-field admin-panel-field-full">
                         <label asp-for="ContentInput">Conteudo inicial</label>
-                        <textarea asp-for="ContentInput"
-                                  class="form-control admin-panel-control"
-                                  rows="14"
-                                  placeholder="Escreva o conteudo do post. Nesta fase o texto e convertido para HTML seguro basico."></textarea>
-                        <small class="admin-panel-help">Titulos, embeds e editor low-code entram na proxima fase.</small>
+                        <div class="blog-admin-editor-shell">
+                            <div id="blogEditorToolbar" class="blog-admin-editor-toolbar">
+                                <span class="ql-formats">
+                                    <select class="ql-header" aria-label="Formato do texto">
+                                        <option value="2">Titulo</option>
+                                        <option value="3">Subtitulo</option>
+                                        <option selected>Texto</option>
+                                    </select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button type="button" class="ql-bold" aria-label="Negrito"></button>
+                                    <button type="button" class="ql-italic" aria-label="Italico"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button type="button" class="ql-list" value="ordered" aria-label="Lista numerada"></button>
+                                    <button type="button" class="ql-list" value="bullet" aria-label="Lista com marcadores"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button type="button" class="ql-link" aria-label="Inserir link"></button>
+                                    <button type="button" class="ql-image" aria-label="Inserir imagem"></button>
+                                    <button type="button" class="ql-blockquote" aria-label="Citacao"></button>
+                                    <button type="button" class="ql-video" aria-label="Inserir video do YouTube"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button type="button" class="ql-clean" aria-label="Limpar formatacao"></button>
+                                </span>
+                            </div>
+                            <div id="blogContentEditor"
+                                 class="blog-admin-rich-editor"
+                                 data-image-upload-url="@Url.Action("UploadContentImage", "BlogAdmin")"
+                                 data-placeholder="Escreva o conteudo do post com titulos, listas, links, citacoes e videos do YouTube."></div>
+                        </div>
+                        <textarea asp-for="ContentInput" hidden></textarea>
+                        <textarea asp-for="ContentHtmlInput" hidden></textarea>
+                        <textarea asp-for="ContentJsonInput" hidden></textarea>
+                        <small class="admin-panel-help">O conteudo e salvo como Delta JSON, HTML sanitizado e texto limpo para busca.</small>
                     </div>
 
                     <div class="admin-panel-field">
@@ -195,12 +228,18 @@
                     <div class="admin-panel-form-actions">
                         <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Cancelar</a>
                         <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost" data-blog-submit="Draft">Salvar rascunho</button>
-                        <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost" data-blog-submit="Schedule">Agendar</button>
-                        @if (isEdit)
+                        @if (canPublish)
+                        {
+                            <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost" data-blog-submit="Schedule">Agendar</button>
+                        }
+                        @if (isEdit && canArchive)
                         {
                             <button type="button" class="btn admin-panel-btn admin-panel-btn-danger" data-blog-submit="Archive">Arquivar</button>
                         }
-                        <button type="button" class="btn admin-panel-btn admin-panel-btn-primary" data-blog-submit="Publish">Publicar</button>
+                        @if (canPublish)
+                        {
+                            <button type="button" class="btn admin-panel-btn admin-panel-btn-primary" data-blog-submit="Publish">Publicar</button>
+                        }
                     </div>
                 </div>
             </form>
@@ -215,7 +254,7 @@
                     </div>
                 </div>
                 <div class="admin-stat-list">
-                    <div class="admin-stat-row"><span>Editor</span><strong>Texto livre seguro</strong></div>
+                    <div class="admin-stat-row"><span>Editor</span><strong>Texto livre sanitizado</strong></div>
                     <div class="admin-stat-row"><span>Midia</span><strong>Capa local</strong></div>
                     <div class="admin-stat-row"><span>Tags</span><strong>Criacao por texto</strong></div>
                     <div class="admin-stat-row"><span>Preview</span><strong>Administrativo</strong></div>

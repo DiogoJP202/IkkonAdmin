@@ -10,7 +10,9 @@ namespace IkkonAdmin.Web.Controllers;
 [Route("admin/blog")]
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.BlogView)]
-public class BlogAdminController(IBlogService blogService) : Controller
+public class BlogAdminController(
+    IBlogService blogService,
+    IBlogMediaService blogMediaService) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index([FromQuery] BlogAdminFilterViewModel filtro, CancellationToken cancellationToken)
@@ -119,6 +121,29 @@ public class BlogAdminController(IBlogService blogService) : Controller
         var result = await blogService.ExcluirAsync(id, ObterUsuarioId(), cancellationToken);
         TempData[result.Success ? "Success" : "Error"] = result.Message;
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost("midia/imagem-conteudo")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UploadContentImage(IFormFile? image, CancellationToken cancellationToken)
+    {
+        if (!User.HasAnyPermission(AppPermissions.BlogCreate, AppPermissions.BlogEdit))
+        {
+            return Forbid();
+        }
+
+        if (image is null)
+        {
+            return BadRequest(new { success = false, message = "Selecione uma imagem valida." });
+        }
+
+        var result = await blogMediaService.SaveContentImageAsync(image, cancellationToken);
+        if (!result.Success || string.IsNullOrWhiteSpace(result.PublicUrl))
+        {
+            return BadRequest(new { success = false, message = result.Message });
+        }
+
+        return Json(new { success = true, url = result.PublicUrl });
     }
 
     private async Task RecarregarOpcoesAsync(BlogPostFormViewModel model, CancellationToken cancellationToken)

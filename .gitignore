@@ -33,6 +33,8 @@ packages/
 .dotnet/
 
 # Local app settings/secrets (keep templates tracked)
+.env
+.env.local
 appsettings.Development.json
 appsettings.Local.json
 appsettings.*.local.json

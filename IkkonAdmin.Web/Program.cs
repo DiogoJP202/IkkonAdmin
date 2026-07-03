@@ -181,6 +181,7 @@ builder.Services.AddScoped<IInventarioService, InventarioService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogCategoriaService, BlogCategoriaService>();
 builder.Services.AddScoped<IBlogMediaService, BlogMediaService>();
+builder.Services.AddScoped<IBlogContentSanitizer, BlogContentSanitizer>();
 builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection("GoogleAgenda"));
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
