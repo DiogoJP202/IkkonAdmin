@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net10.0": {
       "AngleSharp/0.17.1": {
@@ -3157,23 +3157,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\diogo\\.nuget\\packages\\": {},
+    "C:\\Users\\dsoares\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\diogo\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+      "projectUniqueName": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
       "projectName": "IkkonAdmin.Web",
-      "projectPath": "C:\\Users\\diogo\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
-      "packagesPath": "C:\\Users\\diogo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\diogo\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
+      "projectPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+      "packagesPath": "C:\\Users\\dsoares\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\diogo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dsoares\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3187,7 +3187,6 @@
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -3202,11 +3201,10 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.300"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net10.0": {
-        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "HtmlSanitizer": {
@@ -3243,7 +3241,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

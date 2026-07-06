@@ -1,10 +1,33 @@
-﻿<!DOCTYPE html>
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Ikkon SPTD";
+    var pageDescription = ViewData["Description"]?.ToString() ?? "Ikkon SPTD | Escola de Taiko. Ensino de percussao japonesa para todos em Sao Paulo, com aulas, eventos e shows.";
+    var canonicalUrl = ViewData["CanonicalUrl"]?.ToString();
+    var ogTitle = ViewData["OgTitle"]?.ToString() ?? pageTitle;
+    var ogDescription = ViewData["OgDescription"]?.ToString() ?? pageDescription;
+    var ogType = ViewData["OgType"]?.ToString() ?? "website";
+    var ogImage = ViewData["OgImage"]?.ToString();
+}
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <meta name="description" content="@(ViewData["Description"] ?? "Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.")" />
+    <title>@pageTitle</title>
+    <meta name="description" content="@pageDescription" />
+    @if (!string.IsNullOrWhiteSpace(canonicalUrl))
+    {
+        <link rel="canonical" href="@canonicalUrl" />
+        <meta property="og:url" content="@canonicalUrl" />
+    }
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:description" content="@ogDescription" />
+    <meta property="og:type" content="@ogType" />
+    <meta property="og:site_name" content="IKKON SPTD" />
+    @if (!string.IsNullOrWhiteSpace(ogImage))
+    {
+        <meta property="og:image" content="@ogImage" />
+        <meta name="twitter:card" content="summary_large_image" />
+    }
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,5 +43,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

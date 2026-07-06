@@ -5,6 +5,7 @@
     var canFeature = User.HasPermission(AppPermissions.BlogFeature);
     var canPublish = User.HasPermission(AppPermissions.BlogPublish);
     var canArchive = User.HasPermission(AppPermissions.BlogArchive);
+    var canManageCategories = User.HasPermission(AppPermissions.BlogCategoryManage);
 }
 
 @functions {
@@ -39,7 +40,7 @@
             <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de post" : "Novo post")</span>
             <h1 class="admin-panel-title">@(isEdit ? "Editar post do Blog" : "Criar post do Blog")</h1>
             <p class="admin-panel-subtitle">
-                Nesta fase o conteudo e salvo em texto livre com sanitizacao no backend. O editor rico entra na proxima etapa.
+                Use o editor para estruturar texto, imagens e videos do YouTube. O conteudo e sanitizado no backend antes de ser publicado.
             </p>
             <div class="admin-panel-meta">
                 <span>Status <strong>@StatusTexto(Model.CurrentStatus)</strong></span>
@@ -97,13 +98,25 @@
 
                     <div class="admin-panel-field">
                         <label asp-for="CategoryId">Categoria</label>
-                        <select asp-for="CategoryId" class="form-select admin-panel-control">
-                            <option value="">Selecione</option>
-                            @foreach (var categoria in Model.CategoryOptions)
+                        <div class="blog-admin-category-row">
+                            <select asp-for="CategoryId" class="form-select admin-panel-control">
+                                <option value="">Selecione</option>
+                                @foreach (var categoria in Model.CategoryOptions)
+                                {
+                                    <option value="@categoria.Id">@categoria.Name</option>
+                                }
+                            </select>
+                            @if (canManageCategories)
                             {
-                                <option value="@categoria.Id">@categoria.Name</option>
+                                <button type="button" class="btn admin-panel-btn admin-panel-btn-ghost blog-admin-category-manage" data-bs-toggle="modal" data-bs-target="#blogCategoryModal">
+                                    Adicionar
+                                </button>
                             }
-                        </select>
+                        </div>
+                        @if (canManageCategories && Model.CategoryOptions.Count == 0)
+                        {
+                            <small class="admin-panel-help">Nenhuma categoria ativa cadastrada. Use Adicionar para criar a primeira.</small>
+                        }
                     </div>
 
                     <div class="admin-panel-field">
@@ -129,14 +142,21 @@
 
                     <div class="admin-panel-field">
                         <label asp-for="TagsInput">Tags</label>
-                        <input asp-for="TagsInput" class="form-control admin-panel-control" list="blogTagSuggestions" placeholder="Ex.: taiko, escola, eventos" />
+                        <textarea asp-for="TagsInput" hidden></textarea>
+                        <div class="blog-admin-tag-picker" id="blogTagPicker">
+                            <div class="blog-admin-tag-list" id="blogTagList" aria-live="polite"></div>
+                            <div class="blog-admin-tag-entry">
+                                <input id="blogTagInput" type="text" class="form-control admin-panel-control" list="blogTagSuggestions" placeholder="Digite uma tag e pressione Enter" autocomplete="off" />
+                                <button type="button" id="blogAddTagButton" class="btn admin-panel-btn admin-panel-btn-ghost">Adicionar</button>
+                            </div>
+                        </div>
                         <datalist id="blogTagSuggestions">
                             @foreach (var tag in Model.TagSuggestions)
                             {
                                 <option value="@tag"></option>
                             }
                         </datalist>
-                        <small class="admin-panel-help">Separe tags por virgula.</small>
+                        <small class="admin-panel-help">Use Enter para adicionar, clique no X para remover. O limite e de 12 tags.</small>
                     </div>
 
                     @if (canFeature)
@@ -153,7 +173,7 @@
                     }
 
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="ContentInput">Conteudo inicial</label>
+                        <label asp-for="ContentInput">Conteudo</label>
                         <div class="blog-admin-editor-shell">
                             <div id="blogEditorToolbar" class="blog-admin-editor-toolbar">
                                 <span class="ql-formats">
@@ -243,20 +263,86 @@
                     </div>
                 </div>
             </form>
+            @if (canManageCategories)
+            {
+                <div class="modal fade blog-admin-category-modal"
+                     id="blogCategoryModal"
+                     tabindex="-1"
+                     aria-labelledby="blogCategoryModalLabel"
+                     aria-hidden="true"
+                     data-modal-data-url="@Url.Action("ModalData", "BlogCategorias")"
+                     data-create-url="@Url.Action("ModalCreate", "BlogCategorias")"
+                     data-edit-url-template="/admin/blog/categorias/modal/editar/__id__"
+                     data-status-url-template="/admin/blog/categorias/modal/status/__id__"
+                     data-delete-url-template="/admin/blog/categorias/modal/excluir/__id__">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content blog-admin-category-modal-content">
+                            <div class="modal-header">
+                                <div>
+                                    <p class="admin-panel-eyebrow mb-1">Categorias</p>
+                                    <h2 class="modal-title" id="blogCategoryModalLabel">Organizar categorias do Blog</h2>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="blogCategoryModalAlert" class="alert d-none" role="alert"></div>
+                                <div class="blog-admin-category-modal-grid">
+                                    <section class="blog-admin-category-editor">
+                                        <input type="hidden" id="blogCategoryEditId" />
+                                        <div class="admin-panel-field">
+                                            <label for="blogCategoryName">Nome</label>
+                                            <input id="blogCategoryName" class="form-control admin-panel-control" maxlength="120" autocomplete="off" />
+                                        </div>
+                                        <div class="admin-panel-field">
+                                            <label for="blogCategorySlug">Slug</label>
+                                            <input id="blogCategorySlug" class="form-control admin-panel-control" maxlength="140" autocomplete="off" />
+                                            <small class="admin-panel-help">Opcional. Se ficar vazio, o sistema gera pelo nome.</small>
+                                        </div>
+                                        <div class="admin-panel-field">
+                                            <label for="blogCategoryDescription">Descricao</label>
+                                            <textarea id="blogCategoryDescription" class="form-control admin-panel-control" rows="3" maxlength="400"></textarea>
+                                        </div>
+                                        <label class="admin-panel-check-card is-form-check">
+                                            <input id="blogCategoryIsActive" type="checkbox" class="form-check-input" checked />
+                                            <span>Categoria ativa</span>
+                                        </label>
+                                        <div class="blog-admin-category-modal-actions">
+                                            <button type="button" id="blogCategorySaveButton" class="btn admin-panel-btn admin-panel-btn-primary">Salvar categoria</button>
+                                            <button type="button" id="blogCategoryClearButton" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</button>
+                                        </div>
+                                    </section>
+                                    <section class="blog-admin-category-list-shell">
+                                        <div class="admin-panel-card-header">
+                                            <div>
+                                                <h3>Categorias cadastradas</h3>
+                                                <p>Edite, desative ou exclua categorias sem sair do post.</p>
+                                            </div>
+                                        </div>
+                                        <div id="blogCategoryModalList" class="blog-admin-category-list"></div>
+                                    </section>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn admin-panel-btn admin-panel-btn-primary" data-bs-dismiss="modal">Concluir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </section>
 
         <aside class="admin-panel-form-stack">
             <section class="admin-panel-card-v2">
                 <div class="admin-panel-card-header">
                     <div>
-                        <h2>Regras desta fase</h2>
-                        <p>Escopo entregue neste corte do modulo de Blog.</p>
+                        <h2>Recursos editoriais</h2>
+                        <p>Ferramentas disponiveis para montar e publicar posts do Blog.</p>
                     </div>
                 </div>
                 <div class="admin-stat-list">
-                    <div class="admin-stat-row"><span>Editor</span><strong>Texto livre sanitizado</strong></div>
-                    <div class="admin-stat-row"><span>Midia</span><strong>Capa local</strong></div>
-                    <div class="admin-stat-row"><span>Tags</span><strong>Criacao por texto</strong></div>
+                    <div class="admin-stat-row"><span>Editor</span><strong>Quill com HTML sanitizado</strong></div>
+                    <div class="admin-stat-row"><span>Midia</span><strong>Capa e imagens locais</strong></div>
+                    <div class="admin-stat-row"><span>Tags</span><strong>Chips editaveis</strong></div>
                     <div class="admin-stat-row"><span>Preview</span><strong>Administrativo</strong></div>
                 </div>
             </section>

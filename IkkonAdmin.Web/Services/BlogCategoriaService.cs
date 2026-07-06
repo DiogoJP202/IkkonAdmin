@@ -142,6 +142,28 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
         return BlogOperationResult.Ok(ativo ? "Categoria ativada com sucesso." : "Categoria desativada com sucesso.", categoria.Id);
     }
 
+    public async Task<BlogOperationResult> ExcluirAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var categoria = await dbContext.BlogCategories
+            .Include(x => x.Posts)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (categoria is null)
+        {
+            return BlogOperationResult.Fail("Categoria nao encontrada.");
+        }
+
+        if (categoria.Posts.Any(x => x.DeletedAtUtc == null))
+        {
+            return BlogOperationResult.Fail("Esta categoria possui posts vinculados. Desative a categoria para manter o historico dos posts.");
+        }
+
+        dbContext.BlogCategories.Remove(categoria);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return BlogOperationResult.Ok("Categoria excluida com sucesso.", categoria.Id);
+    }
+
     private async Task<string> GarantirSlugUnicoAsync(string baseSlug, int? ignorarId, CancellationToken cancellationToken)
     {
         var slug = baseSlug;

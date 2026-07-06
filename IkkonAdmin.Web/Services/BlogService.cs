@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Models.Entities;
@@ -214,6 +216,84 @@ public class BlogService(
         };
     }
 
+    public async Task<BlogPublicDetailsViewModel?> ObterPublicoPorSlugAsync(
+        string slug,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            return null;
+        }
+
+        await PromoteScheduledPostsAsync(cancellationToken);
+
+        var now = DateTime.UtcNow;
+        var normalizedSlug = slug.Trim();
+
+        var post = await CriarConsultaPublica(now)
+            .Where(x => x.Slug == normalizedSlug)
+            .Select(x => new BlogPublicDetailsViewModel
+            {
+                Title = x.Title,
+                Slug = x.Slug,
+                Summary = x.Summary,
+                ContentHtml = x.ContentHtml ?? string.Empty,
+                CoverImageUrl = x.CoverImageUrl,
+                AuthorName = x.AuthorDisplayName,
+                CategoryName = x.Category != null ? x.Category.Name : null,
+                CategorySlug = x.Category != null ? x.Category.Slug : null,
+                PublishedAtUtc = x.PublishedAtUtc ?? x.CreatedAtUtc,
+                ReadingTimeMinutes = x.ReadingTimeMinutes,
+                SeoTitle = x.SeoTitle,
+                SeoDescription = x.SeoDescription,
+                Tags = x.PostTags
+                    .OrderBy(t => t.BlogTag.Name)
+                    .Select(t => new BlogPublicTagViewModel
+                    {
+                        Name = t.BlogTag.Name,
+                        Slug = t.BlogTag.Slug
+                    })
+                    .ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (post is null)
+        {
+            return null;
+        }
+
+        var relatedQuery = CriarConsultaPublica(now)
+            .Where(x => x.Slug != post.Slug);
+
+        if (!string.IsNullOrWhiteSpace(post.CategorySlug))
+        {
+            relatedQuery = relatedQuery.Where(x => x.Category != null && x.Category.Slug == post.CategorySlug);
+        }
+
+        var relatedPosts = await SelecionarCardsPublicos(relatedQuery)
+            .Take(3)
+            .ToListAsync(cancellationToken);
+
+        if (relatedPosts.Count < 3)
+        {
+            var excludedSlugs = relatedPosts
+                .Select(x => x.Slug)
+                .Append(post.Slug)
+                .ToList();
+
+            var fallbackPosts = await SelecionarCardsPublicos(
+                    CriarConsultaPublica(now)
+                        .Where(x => !excludedSlugs.Contains(x.Slug)))
+                .Take(3 - relatedPosts.Count)
+                .ToListAsync(cancellationToken);
+
+            relatedPosts.AddRange(fallbackPosts);
+        }
+
+        post.RelatedPosts = relatedPosts;
+        return post;
+    }
+
     public async Task<BlogPreviewViewModel?> ObterPreviewAsync(int id, CancellationToken cancellationToken = default)
     {
         await PromoteScheduledPostsAsync(cancellationToken);
@@ -277,7 +357,7 @@ public class BlogService(
 
         var now = DateTime.UtcNow;
         var summary = LimparOpcional(model.Summary);
-        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        var contentText = ObterConteudoTexto(model);
         var contentHtml = GerarConteudoHtmlSeguro(model);
         var contentJson = LimparOpcional(model.ContentJsonInput);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Title), null, cancellationToken);
@@ -371,7 +451,7 @@ public class BlogService(
         }
 
         var summary = LimparOpcional(model.Summary);
-        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        var contentText = ObterConteudoTexto(model);
         var contentHtml = GerarConteudoHtmlSeguro(model);
         var contentJson = LimparOpcional(model.ContentJsonInput);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Title), id, cancellationToken);
@@ -440,7 +520,9 @@ public class BlogService(
             : (DateTime?)null;
         var now = DateTime.UtcNow;
         var summary = LimparOpcional(model.Summary);
-        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        var contentText = ObterConteudoTexto(model);
+        var hasContent = !string.IsNullOrWhiteSpace(contentText) ||
+                         ConteudoHtmlTemMidia(SanitizarHtmlParaValidacao(model.ContentHtmlInput));
         var hasCover = model.CoverImage is not null ||
                        (!model.RemoveCoverImage && !string.IsNullOrWhiteSpace(currentCoverUrl));
         var slugBase = GerarSlug(model.Slug, model.Title);
@@ -464,9 +546,10 @@ public class BlogService(
                     return BlogWorkflowValidation.Fail("Para data futura, use a acao Agendar.");
                 }
 
-                if (!PodePublicar(summary, contentText, author, hasCover, model.CategoryId))
+                var pendenciasPublicacao = ListarPendenciasPublicacao(summary, hasContent, author, hasCover, model.CategoryId);
+                if (pendenciasPublicacao.Count > 0)
                 {
-                    return BlogWorkflowValidation.Fail("Para publicar, informe resumo, conteudo, categoria, autor e imagem de capa.");
+                    return BlogWorkflowValidation.Fail($"Para publicar, informe {FormatarListaPendencias(pendenciasPublicacao)}.");
                 }
 
                 return BlogWorkflowValidation.Ok(
@@ -481,9 +564,10 @@ public class BlogService(
                     return BlogWorkflowValidation.Fail("Informe uma data futura para agendar a publicacao.");
                 }
 
-                if (!PodePublicar(summary, contentText, author, hasCover, model.CategoryId))
+                var pendenciasAgendamento = ListarPendenciasPublicacao(summary, hasContent, author, hasCover, model.CategoryId);
+                if (pendenciasAgendamento.Count > 0)
                 {
-                    return BlogWorkflowValidation.Fail("Para agendar, informe resumo, conteudo, categoria, autor e imagem de capa.");
+                    return BlogWorkflowValidation.Fail($"Para agendar, informe {FormatarListaPendencias(pendenciasAgendamento)}.");
                 }
 
                 return BlogWorkflowValidation.Ok(
@@ -802,18 +886,52 @@ public class BlogService(
         return slug;
     }
 
-    private static bool PodePublicar(
+    private static List<string> ListarPendenciasPublicacao(
         string? summary,
-        string? contentText,
+        bool hasContent,
         UsuarioSistema? author,
         bool hasCover,
         int? categoryId)
     {
-        return !string.IsNullOrWhiteSpace(summary) &&
-               !string.IsNullOrWhiteSpace(contentText) &&
-               hasCover &&
-               categoryId.HasValue &&
-               author is not null;
+        var pendencias = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            pendencias.Add("resumo");
+        }
+
+        if (!hasContent)
+        {
+            pendencias.Add("conteudo");
+        }
+
+        if (!categoryId.HasValue)
+        {
+            pendencias.Add("categoria");
+        }
+
+        if (author is null)
+        {
+            pendencias.Add("autor");
+        }
+
+        if (!hasCover)
+        {
+            pendencias.Add("imagem de capa");
+        }
+
+        return pendencias;
+    }
+
+    private static string FormatarListaPendencias(IReadOnlyList<string> pendencias)
+    {
+        return pendencias.Count switch
+        {
+            0 => "os campos obrigatorios",
+            1 => pendencias[0],
+            2 => $"{pendencias[0]} e {pendencias[1]}",
+            _ => $"{string.Join(", ", pendencias.Take(pendencias.Count - 1))} e {pendencias[^1]}"
+        };
     }
 
     private static string GerarSlug(string? slug, string fallback)
@@ -855,6 +973,46 @@ public class BlogService(
         return !string.IsNullOrWhiteSpace(model.ContentHtmlInput)
             ? blogContentSanitizer.SanitizeHtml(model.ContentHtmlInput)
             : blogContentSanitizer.ConvertPlainTextToSafeHtml(model.ContentInput);
+    }
+
+    private string? ObterConteudoTexto(BlogPostFormViewModel model)
+    {
+        var contentText = blogContentSanitizer.ExtractPlainText(model.ContentInput);
+        if (!string.IsNullOrWhiteSpace(contentText))
+        {
+            return contentText;
+        }
+
+        return ExtrairTextoDeHtml(model.ContentHtmlInput);
+    }
+
+    private static string? ExtrairTextoDeHtml(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return null;
+        }
+
+        var semScripts = Regex.Replace(html, "<(script|style)\\b[^>]*>.*?</\\1>", " ", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        var comEspacos = Regex.Replace(semScripts, "</?(p|div|br|li|h[1-6]|blockquote|tr|td|th)\\b[^>]*>", " ", RegexOptions.IgnoreCase);
+        var semTags = Regex.Replace(comEspacos, "<[^>]+>", " ");
+        var decodificado = WebUtility.HtmlDecode(semTags);
+        var normalizado = Regex.Replace(decodificado, "\\s+", " ").Trim();
+
+        return string.IsNullOrWhiteSpace(normalizado) ? null : normalizado;
+    }
+
+    private static bool ConteudoHtmlTemMidia(string? html)
+    {
+        return !string.IsNullOrWhiteSpace(html) &&
+               Regex.IsMatch(html, "<(img|iframe)\\b", RegexOptions.IgnoreCase);
+    }
+
+    private string? SanitizarHtmlParaValidacao(string? html)
+    {
+        return string.IsNullOrWhiteSpace(html)
+            ? null
+            : blogContentSanitizer.SanitizeHtml(html);
     }
 
     private static int CalcularTempoLeitura(string? contentText)

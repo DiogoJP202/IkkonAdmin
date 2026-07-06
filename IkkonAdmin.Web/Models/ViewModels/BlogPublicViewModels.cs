@@ -25,6 +25,24 @@ public class BlogPublicIndexViewModel
                                    !string.IsNullOrWhiteSpace(Filtro.Tag);
 }
 
+public class BlogPublicDetailsViewModel
+{
+    public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
+    public string? Summary { get; set; }
+    public string ContentHtml { get; set; } = string.Empty;
+    public string? CoverImageUrl { get; set; }
+    public string? AuthorName { get; set; }
+    public string? CategoryName { get; set; }
+    public string? CategorySlug { get; set; }
+    public DateTime PublishedAtUtc { get; set; }
+    public int ReadingTimeMinutes { get; set; }
+    public string? SeoTitle { get; set; }
+    public string? SeoDescription { get; set; }
+    public List<BlogPublicTagViewModel> Tags { get; set; } = new();
+    public List<BlogPublicPostCardViewModel> RelatedPosts { get; set; } = new();
+}
+
 public class BlogPublicPostCardViewModel
 {
     public string Title { get; set; } = string.Empty;

@@ -79,6 +79,13 @@
                                                 @(categoria.IsActive ? "Desativar" : "Ativar")
                                             </button>
                                         </form>
+                                        @if (categoria.TotalPosts == 0)
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@categoria.Id" method="post" onsubmit="return confirm('Excluir esta categoria?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn admin-panel-btn-table is-danger">Excluir</button>
+                                            </form>
+                                        }
                                     </div>
                                 </td>
                             </tr>
