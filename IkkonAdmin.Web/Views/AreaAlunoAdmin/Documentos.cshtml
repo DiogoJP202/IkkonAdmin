@@ -1,0 +1,139 @@
+@model AreaAlunoDocumentosAdminViewModel
+@{
+    ViewData["Title"] = "Documentos";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Documentos</h1>
+            <p class="admin-panel-subtitle">Crie tipos, solicite documentos e aprove ou recuse envios.</p>
+        </div>
+    </section>
+
+    <div class="admin-panel-grid-two mb-4">
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Novo tipo</h2></div>
+            <form asp-action="CriarDocumentoTipo" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoTipo.Nome">Nome</label>
+                        <input asp-for="NovoTipo.Nome" class="form-control admin-panel-control" maxlength="120" />
+                    </div>
+                    <label class="admin-panel-check-card is-form-check">
+                        <input asp-for="NovoTipo.Obrigatorio" class="form-check-input" />
+                        <span>Obrigatorio</span>
+                    </label>
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="NovoTipo.Descricao">Descricao</label>
+                        <textarea asp-for="NovoTipo.Descricao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Criar tipo</button>
+            </form>
+        </section>
+
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Solicitar documento</h2></div>
+            <form asp-action="SolicitarDocumento" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaSolicitacao.AlunoId">Aluno</label>
+                        <select asp-for="NovaSolicitacao.AlunoId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var aluno in Model.Alunos)
+                            {
+                                <option value="@aluno.Id">@aluno.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaSolicitacao.DocumentoTipoId">Tipo</label>
+                        <select asp-for="NovaSolicitacao.DocumentoTipoId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var tipo in Model.Tipos.Where(x => x.Ativo))
+                            {
+                                <option value="@tipo.Id">@tipo.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaSolicitacao.DataLimite">Data limite</label>
+                        <input asp-for="NovaSolicitacao.DataLimite" type="date" class="form-control admin-panel-control" />
+                    </div>
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="NovaSolicitacao.ObservacaoAdministrativa">Observacao</label>
+                        <textarea asp-for="NovaSolicitacao.ObservacaoAdministrativa" class="form-control admin-panel-control" rows="3" maxlength="1000"></textarea>
+                    </div>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Solicitar</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Solicitacoes</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Envio</th><th>Avaliacao</th></tr></thead>
+                <tbody>
+                    @if (Model.Solicitacoes.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma solicitacao encontrada.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Solicitacoes)
+                        {
+                            <tr>
+                                <td>@item.Aluno</td>
+                                <td>
+                                    <strong>@item.Tipo</strong>
+                                    @if (item.DataLimite.HasValue)
+                                    {
+                                        <small class="d-block text-muted">Limite @item.DataLimite.Value.ToString("dd/MM/yyyy")</small>
+                                    }
+                                </td>
+                                <td><span class="admin-panel-badge">@item.Status</span></td>
+                                <td>
+                                    @if (item.UltimoEnvioId.HasValue)
+                                    {
+                                        <a asp-action="BaixarDocumento" asp-route-envioId="@item.UltimoEnvioId.Value">@item.NomeArquivoOriginal</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sem envio</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="AvaliarDocumento" method="post" class="d-flex gap-2 flex-wrap">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="SolicitacaoId" value="@item.SolicitacaoId" />
+                                        <select name="Status" class="form-select admin-panel-control">
+                                            @foreach (var status in Enum.GetValues<DocumentoStatusEnum>())
+                                            {
+                                                if (item.Status == status)
+                                                {
+                                                    <option value="@status" selected>@status</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@status">@status</option>
+                                                }
+                                            }
+                                        </select>
+                                        <input name="ObservacaoAdministrativa" value="@item.ObservacaoAdministrativa" class="form-control admin-panel-control" placeholder="Observacao" />
+                                        <button class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

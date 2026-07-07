@@ -1,0 +1,39 @@
+@model AreaAlunoEventosViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Eventos";
+}
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Eventos e datas importantes</h3>
+            <p class="mb-0 text-muted">Eventos vinculados a voce, suas turmas ou todos os alunos.</p>
+        </div>
+    </div>
+
+    <div class="aluno-portal-list">
+        @if (Model.Eventos.Count == 0)
+        {
+            <p class="text-muted mb-0">Nenhum evento futuro cadastrado.</p>
+        }
+        else
+        {
+            @foreach (var evento in Model.Eventos)
+            {
+                <article class="aluno-portal-list-item">
+                    <strong>@evento.Titulo</strong>
+                    <span>@evento.Tipo | @evento.Inicio.ToString("dd/MM/yyyy HH:mm") - @evento.Fim.ToString("HH:mm") @(evento.Importante ? "| Importante" : string.Empty)</span>
+                    @if (!string.IsNullOrWhiteSpace(evento.Local))
+                    {
+                        <span>@evento.Local</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(evento.Descricao))
+                    {
+                        <span>@evento.Descricao</span>
+                    }
+                </article>
+            }
+        }
+    </div>
+</section>

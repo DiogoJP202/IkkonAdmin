@@ -63,6 +63,30 @@ public static class AuthorizationPolicies
     public const string BlogCategoryManage = "POLICY_BLOG_CATEGORY_MANAGE";
     public const string BlogTagManage = "POLICY_BLOG_TAG_MANAGE";
 
+    public const string AreaAlunoView = "POLICY_AREA_ALUNO_VIEW";
+    public const string AreaAlunoManage = "POLICY_AREA_ALUNO_MANAGE";
+    public const string FrequenciaView = "POLICY_FREQUENCIA_VIEW";
+    public const string FrequenciaCreate = "POLICY_FREQUENCIA_CREATE";
+    public const string FrequenciaEdit = "POLICY_FREQUENCIA_EDIT";
+    public const string DocumentosView = "POLICY_DOCUMENTOS_VIEW";
+    public const string DocumentosCreate = "POLICY_DOCUMENTOS_CREATE";
+    public const string DocumentosEdit = "POLICY_DOCUMENTOS_EDIT";
+    public const string DocumentosApprove = "POLICY_DOCUMENTOS_APPROVE";
+    public const string ComunicadosView = "POLICY_COMUNICADOS_VIEW";
+    public const string ComunicadosCreate = "POLICY_COMUNICADOS_CREATE";
+    public const string ComunicadosEdit = "POLICY_COMUNICADOS_EDIT";
+    public const string ComunicadosDelete = "POLICY_COMUNICADOS_DELETE";
+    public const string EventosAlunoView = "POLICY_EVENTOS_ALUNO_VIEW";
+    public const string EventosAlunoCreate = "POLICY_EVENTOS_ALUNO_CREATE";
+    public const string EventosAlunoEdit = "POLICY_EVENTOS_ALUNO_EDIT";
+    public const string EventosAlunoDelete = "POLICY_EVENTOS_ALUNO_DELETE";
+    public const string ConquistasView = "POLICY_CONQUISTAS_VIEW";
+    public const string ConquistasCreate = "POLICY_CONQUISTAS_CREATE";
+    public const string ConquistasEdit = "POLICY_CONQUISTAS_EDIT";
+    public const string AulasView = "POLICY_AULAS_VIEW";
+    public const string AulasCreate = "POLICY_AULAS_CREATE";
+    public const string AulasEdit = "POLICY_AULAS_EDIT";
+
     public const string AdminGerenciarUsuarios = "POLICY_ADMIN_GERENCIAR_USUARIOS";
     public const string AdminGerenciarCargos = "POLICY_ADMIN_GERENCIAR_CARGOS";
     public const string AdminEditarPermissoes = "POLICY_ADMIN_EDITAR_PERMISSOES";

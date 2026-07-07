@@ -52,4 +52,6 @@ public class UsuarioSistema
     public ICollection<UsuarioPermissao> UsuarioPermissoes { get; set; } = new List<UsuarioPermissao>();
     public ICollection<AuditoriaLog> LogsComoAutor { get; set; } = new List<AuditoriaLog>();
     public ICollection<AuditoriaLog> LogsComoAfetado { get; set; } = new List<AuditoriaLog>();
+    public ICollection<TurmaInstrutor> TurmasComoInstrutor { get; set; } = new List<TurmaInstrutor>();
+    public ICollection<Aula> AulasComoInstrutor { get; set; } = new List<Aula>();
 }

@@ -1,0 +1,82 @@
+@model AreaAlunoComunicadosAdminViewModel
+@{
+    ViewData["Title"] = "Comunicados";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Comunicados</h1>
+            <p class="admin-panel-subtitle">Publique avisos para todos, uma turma ou um aluno especifico.</p>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Novo comunicado</h2></div>
+        <form asp-action="CriarComunicado" method="post" class="admin-panel-form-stack">
+            @Html.AntiForgeryToken()
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field admin-panel-field-wide">
+                    <label asp-for="NovoComunicado.Titulo">Titulo</label>
+                    <input asp-for="NovoComunicado.Titulo" class="form-control admin-panel-control" maxlength="180" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoComunicado.AlvoTipo">Alvo</label>
+                    <select asp-for="NovoComunicado.AlvoTipo" asp-items="Html.GetEnumSelectList<ComunicadoAlvoTipoEnum>()" class="form-select admin-panel-control"></select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoComunicado.AlunoId">Aluno</label>
+                    <select asp-for="NovoComunicado.AlunoId" class="form-select admin-panel-control">
+                        <option value="">Opcional</option>
+                        @foreach (var aluno in Model.Alunos)
+                        {
+                            <option value="@aluno.Id">@aluno.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoComunicado.TurmaId">Turma</label>
+                    <select asp-for="NovoComunicado.TurmaId" class="form-select admin-panel-control">
+                        <option value="">Opcional</option>
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            <option value="@turma.Id">@turma.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoComunicado.ExpiraEmUtc">Expira em</label>
+                    <input asp-for="NovoComunicado.ExpiraEmUtc" type="datetime-local" class="form-control admin-panel-control" />
+                </div>
+                <div class="admin-panel-field-full">
+                    <label asp-for="NovoComunicado.Conteudo">Conteudo</label>
+                    <textarea asp-for="NovoComunicado.Conteudo" class="form-control admin-panel-control" rows="4" maxlength="4000"></textarea>
+                </div>
+                <label class="admin-panel-check-card is-form-check"><input asp-for="NovoComunicado.Importante" class="form-check-input" /><span>Importante</span></label>
+                <label class="admin-panel-check-card is-form-check"><input asp-for="NovoComunicado.Fixado" class="form-check-input" /><span>Fixado</span></label>
+            </div>
+            <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Publicar</button>
+        </form>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Comunicados publicados</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Titulo</th><th>Publicado</th><th>Status</th><th>Leituras</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model.Comunicados)
+                    {
+                        <tr>
+                            <td>@item.Titulo @(item.Importante ? "| Importante" : string.Empty)</td>
+                            <td>@item.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@(item.Ativo ? "Ativo" : "Inativo")</td>
+                            <td>@item.Leituras</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

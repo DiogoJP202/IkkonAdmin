@@ -21,4 +21,7 @@ public class Turma
 
     public ICollection<Aluno> Alunos { get; } = new List<Aluno>();
     public ICollection<AlunoTurma> AlunoTurmas { get; } = new List<AlunoTurma>();
+    public ICollection<TurmaHorario> Horarios { get; } = new List<TurmaHorario>();
+    public ICollection<TurmaInstrutor> Instrutores { get; } = new List<TurmaInstrutor>();
+    public ICollection<Aula> Aulas { get; } = new List<Aula>();
 }

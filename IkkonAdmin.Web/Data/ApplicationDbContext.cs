@@ -32,6 +32,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<InventarioItem> InventarioItens => Set<InventarioItem>();
     public DbSet<InventarioMovimentacao> InventarioMovimentacoes => Set<InventarioMovimentacao>();
     public DbSet<GoogleAgendaConexao> GoogleAgendaConexoes => Set<GoogleAgendaConexao>();
+    public DbSet<TurmaHorario> TurmaHorarios => Set<TurmaHorario>();
+    public DbSet<TurmaInstrutor> TurmaInstrutores => Set<TurmaInstrutor>();
+    public DbSet<Aula> Aulas => Set<Aula>();
+    public DbSet<FrequenciaAluno> FrequenciasAlunos => Set<FrequenciaAluno>();
+    public DbSet<EventoAlunoPortal> EventosAlunoPortal => Set<EventoAlunoPortal>();
+    public DbSet<EventoAlunoPortalAlvo> EventosAlunoPortalAlvos => Set<EventoAlunoPortalAlvo>();
+    public DbSet<Comunicado> Comunicados => Set<Comunicado>();
+    public DbSet<ComunicadoAlvo> ComunicadosAlvos => Set<ComunicadoAlvo>();
+    public DbSet<ComunicadoLeitura> ComunicadosLeituras => Set<ComunicadoLeitura>();
+    public DbSet<DocumentoTipo> DocumentoTipos => Set<DocumentoTipo>();
+    public DbSet<DocumentoSolicitacao> DocumentoSolicitacoes => Set<DocumentoSolicitacao>();
+    public DbSet<DocumentoEnvio> DocumentoEnvios => Set<DocumentoEnvio>();
+    public DbSet<Insignia> Insignias => Set<Insignia>();
+    public DbSet<AlunoInsignia> AlunoInsignias => Set<AlunoInsignia>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

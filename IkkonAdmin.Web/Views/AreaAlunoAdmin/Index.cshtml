@@ -1,0 +1,79 @@
+@model AreaAlunoAdminDashboardViewModel
+@{
+    ViewData["Title"] = "Area do Aluno";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Portal do aluno</span>
+            <h1 class="admin-panel-title">Area do Aluno</h1>
+            <p class="admin-panel-subtitle">Central administrativa para aulas, frequencia, documentos, comunicados, eventos e conquistas.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-primary">Aulas</a>
+            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-ghost">Frequencia</a>
+            <a asp-action="Documentos" class="btn admin-panel-btn admin-panel-btn-ghost">Documentos</a>
+        </div>
+    </section>
+
+    <section class="admin-panel-kpi-grid mb-4">
+        <article class="admin-kpi-card"><span class="admin-kpi-label">Aulas proximas</span><strong>@Model.AulasProximas</strong></article>
+        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">Frequencias no mes</span><strong>@Model.FrequenciasRegistradasMes</strong></article>
+        <article class="admin-kpi-card is-warning"><span class="admin-kpi-label">Documentos pendentes</span><strong>@Model.DocumentosPendentes</strong></article>
+        <article class="admin-kpi-card is-success"><span class="admin-kpi-label">Comunicados ativos</span><strong>@Model.ComunicadosAtivos</strong></article>
+        <article class="admin-kpi-card"><span class="admin-kpi-label">Eventos proximos</span><strong>@Model.EventosProximos</strong></article>
+        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">Conquistas no mes</span><strong>@Model.ConquistasConcedidasMes</strong></article>
+    </section>
+
+    <section class="admin-panel-nav mb-4">
+        <a asp-action="Aulas" class="admin-panel-nav-link"><strong>Aulas e horarios</strong><small>Horarios, instrutores e proximas aulas</small></a>
+        <a asp-action="Frequencia" class="admin-panel-nav-link"><strong>Frequencia</strong><small>Registro de presencas e faltas</small></a>
+        <a asp-action="Documentos" class="admin-panel-nav-link"><strong>Documentos</strong><small>Solicitacoes, uploads e aprovacao</small></a>
+        <a asp-action="Comunicados" class="admin-panel-nav-link"><strong>Comunicados</strong><small>Avisos por aluno, turma ou todos</small></a>
+        <a asp-action="Eventos" class="admin-panel-nav-link"><strong>Eventos</strong><small>Datas importantes do portal</small></a>
+        <a asp-action="Conquistas" class="admin-panel-nav-link"><strong>Conquistas</strong><small>Insignias e marcos</small></a>
+    </section>
+
+    <div class="admin-panel-grid-two">
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Proximas aulas</h2></div>
+            <div class="admin-stat-list">
+                @if (Model.ProximasAulas.Count == 0)
+                {
+                    <div class="admin-panel-empty">Nenhuma aula futura cadastrada.</div>
+                }
+                else
+                {
+                    @foreach (var aula in Model.ProximasAulas)
+                    {
+                        <div class="admin-stat-row">
+                            <span>@aula.Turma</span>
+                            <strong>@aula.Inicio.ToString("dd/MM HH:mm")</strong>
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Documentos recentes</h2></div>
+            <div class="admin-stat-list">
+                @if (Model.DocumentosRecentes.Count == 0)
+                {
+                    <div class="admin-panel-empty">Nenhum documento solicitado.</div>
+                }
+                else
+                {
+                    @foreach (var documento in Model.DocumentosRecentes)
+                    {
+                        <div class="admin-stat-row">
+                            <span>@documento.Aluno - @documento.Tipo</span>
+                            <strong>@documento.Status</strong>
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+    </div>
+</div>

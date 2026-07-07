@@ -48,4 +48,8 @@ public class Aluno
     public ICollection<Desligamento> Desligamentos { get; } = new List<Desligamento>();
     public ICollection<Graduacao> Graduacoes { get; } = new List<Graduacao>();
     public ICollection<HistoricoAluno> Historicos { get; } = new List<HistoricoAluno>();
+    public ICollection<FrequenciaAluno> Frequencias { get; } = new List<FrequenciaAluno>();
+    public ICollection<DocumentoSolicitacao> DocumentosSolicitados { get; } = new List<DocumentoSolicitacao>();
+    public ICollection<ComunicadoLeitura> ComunicadosLidos { get; } = new List<ComunicadoLeitura>();
+    public ICollection<AlunoInsignia> Insignias { get; } = new List<AlunoInsignia>();
 }

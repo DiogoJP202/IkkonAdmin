@@ -13,6 +13,14 @@
     var canAgenda = User.HasAnyPermission(AppPermissions.GoogleAgendaView, AppPermissions.GoogleAgendaManage);
     var canInventario = User.HasAnyPermission(AppPermissions.InventarioView, AppPermissions.InventarioManage);
     var canBlog = User.HasPermission(AppPermissions.BlogView);
+    var canAreaAluno = User.HasAnyPermission(
+        AppPermissions.AreaAlunoView,
+        AppPermissions.AulasView,
+        AppPermissions.FrequenciaView,
+        AppPermissions.DocumentosView,
+        AppPermissions.ComunicadosView,
+        AppPermissions.EventosAlunoView,
+        AppPermissions.ConquistasView);
     var canConfiguracoes = User.HasPermission(AppPermissions.ConfiguracoesView);
 
     var canAdminPanel = User.IsInRole(AppRoles.Admin) && User.HasAnyPermission(
@@ -68,6 +76,10 @@
         @if (canInventario)
         {
             <a href="/admin/inventario" class="nav-link @IsActive("Inventario")">Inventário</a>
+        }
+        @if (canAreaAluno)
+        {
+            <a href="/admin/area-aluno" class="nav-link @IsActive("AreaAlunoAdmin")">Area do Aluno</a>
         }
         @if (canConfiguracoes)
         {

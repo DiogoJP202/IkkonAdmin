@@ -1,18 +1,36 @@
 @model AreaAlunoDashboardViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Área do Aluno";
+    ViewData["Title"] = "Area do Aluno";
 }
 
 <div class="aluno-portal-page">
     <section class="aluno-portal-hero">
-        <div>
-            <span class="aluno-portal-eyebrow">Olá, @Model.NomeCompleto</span>
-            <h2>Seu painel de acompanhamento</h2>
-            <p>Consulte seus dados principais, turmas vinculadas e mensalidades recentes.</p>
+        <div class="aluno-portal-hero-profile">
+            <img class="aluno-portal-avatar"
+                 src="@(string.IsNullOrWhiteSpace(Model.FotoPerfilUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : Model.FotoPerfilUrl)"
+                 alt="Foto de @Model.NomeCompleto" />
+            <div>
+                <span class="aluno-portal-eyebrow">Ola, @Model.NomeCompleto</span>
+                <h2>Seu painel de acompanhamento</h2>
+                <p>Veja aulas, avisos, documentos, financeiro, frequencia e conquistas em um so lugar.</p>
+            </div>
         </div>
         <span class="aluno-portal-status">@Model.Status</span>
     </section>
+
+    @if (Model.Alertas.Count > 0)
+    {
+        <section class="aluno-portal-alerts mb-3">
+            @foreach (var alerta in Model.Alertas)
+            {
+                <a class="alert alert-@alerta.Tipo d-block text-decoration-none mb-2" href="@(alerta.Url ?? "#")">
+                    <strong>@alerta.Titulo</strong>
+                    <span class="d-block">@alerta.Descricao</span>
+                </a>
+            }
+        </section>
+    }
 
     <section class="aluno-portal-kpis">
         <article>
@@ -20,18 +38,48 @@
             <strong>@Model.TotalEmAberto.ToString("C")</strong>
         </article>
         <article>
-            <span>Mensalidades atrasadas</span>
-            <strong>@Model.MensalidadesAtrasadas</strong>
+            <span>Presenca</span>
+            <strong>@Model.PercentualPresenca.ToString("0.#")%</strong>
         </article>
         <article>
-            <span>Turma principal</span>
-            <strong>@(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "Sem turma" : Model.TurmaPrincipal)</strong>
+            <span>Documentos pendentes</span>
+            <strong>@Model.DocumentosPendentes</strong>
+        </article>
+        <article>
+            <span>Comunicados nao lidos</span>
+            <strong>@Model.ComunicadosNaoLidos</strong>
         </article>
     </section>
 
     <div class="row g-3">
         <div class="col-12 col-xl-7">
             <section class="aluno-portal-panel">
+                <div class="aluno-portal-panel-head">
+                    <div>
+                        <h3>Proximas aulas</h3>
+                        <p class="mb-0 text-muted">Agenda vinculada as suas turmas.</p>
+                    </div>
+                    <a href="/area-do-aluno/aulas">Ver aulas</a>
+                </div>
+                <div class="aluno-portal-list">
+                    @if (Model.ProximasAulas.Count == 0)
+                    {
+                        <p class="text-muted mb-0">Nenhuma aula futura cadastrada.</p>
+                    }
+                    else
+                    {
+                        @foreach (var aula in Model.ProximasAulas)
+                        {
+                            <div class="aluno-portal-list-item">
+                                <strong>@aula.Turma</strong>
+                                <span>@aula.Inicio.ToString("dd/MM HH:mm") - @aula.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(aula.Local) ? string.Empty : $"| {aula.Local}")</span>
+                            </div>
+                        }
+                    }
+                </div>
+            </section>
+
+            <section class="aluno-portal-panel mt-3">
                 <div class="aluno-portal-panel-head">
                     <h3>Mensalidades recentes</h3>
                     <a href="/area-do-aluno/financeiro">Ver financeiro</a>
@@ -40,7 +88,7 @@
                     <table class="table align-middle mb-0 aluno-portal-table">
                         <thead>
                             <tr>
-                                <th>Competência</th>
+                                <th>Competencia</th>
                                 <th>Vencimento</th>
                                 <th>Status</th>
                                 <th class="text-end">Valor</th>
@@ -68,38 +116,63 @@
                 </div>
             </section>
         </div>
+
         <div class="col-12 col-xl-5">
             <section class="aluno-portal-panel">
                 <div class="aluno-portal-panel-head">
-                    <h3>Atalhos</h3>
+                    <h3>Comunicados recentes</h3>
+                    <a href="/area-do-aluno/comunicados">Ver todos</a>
                 </div>
-                <div class="aluno-portal-actions">
-                    <a href="/area-do-aluno/perfil">Meu perfil</a>
-                    <a href="/area-do-aluno/financeiro">Minhas mensalidades</a>
-                    <a href="/area-do-aluno/turmas">Minhas turmas</a>
+                <div class="aluno-portal-list">
+                    @if (Model.ComunicadosRecentes.Count == 0)
+                    {
+                        <p class="text-muted mb-0">Nenhum comunicado ativo.</p>
+                    }
+                    else
+                    {
+                        @foreach (var comunicado in Model.ComunicadosRecentes)
+                        {
+                            <div class="aluno-portal-list-item">
+                                <strong>@comunicado.Titulo</strong>
+                                <span>@comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy") @(comunicado.Lido ? "| Lido" : "| Novo")</span>
+                            </div>
+                        }
+                    }
                 </div>
             </section>
 
             <section class="aluno-portal-panel mt-3">
                 <div class="aluno-portal-panel-head">
-                    <h3>Turmas vinculadas</h3>
-                    <a href="/area-do-aluno/turmas">Ver todas</a>
+                    <h3>Eventos importantes</h3>
+                    <a href="/area-do-aluno/eventos">Ver eventos</a>
                 </div>
                 <div class="aluno-portal-list">
-                    @if (Model.Turmas.Count == 0)
+                    @if (Model.ProximosEventos.Count == 0)
                     {
-                        <p class="text-muted mb-0">Nenhuma turma vinculada no momento.</p>
+                        <p class="text-muted mb-0">Nenhum evento futuro cadastrado.</p>
                     }
                     else
                     {
-                        @foreach (var turma in Model.Turmas)
+                        @foreach (var evento in Model.ProximosEventos)
                         {
                             <div class="aluno-portal-list-item">
-                                <strong>@turma.Nome</strong>
-                                <span>@turma.Modalidade @(string.IsNullOrWhiteSpace(turma.Horario) ? string.Empty : $"| {turma.Horario}")</span>
+                                <strong>@evento.Titulo</strong>
+                                <span>@evento.Inicio.ToString("dd/MM HH:mm") @(evento.Importante ? "| Importante" : string.Empty)</span>
                             </div>
                         }
                     }
+                </div>
+            </section>
+
+            <section class="aluno-portal-panel mt-3">
+                <div class="aluno-portal-panel-head">
+                    <h3>Atalhos</h3>
+                </div>
+                <div class="aluno-portal-actions">
+                    <a href="/area-do-aluno/documentos">Enviar documentos</a>
+                    <a href="/area-do-aluno/frequencia">Ver frequencia</a>
+                    <a href="/configuracoes">Conta e senha</a>
+                    <a href="/area-do-aluno/conquistas">Conquistas</a>
                 </div>
             </section>
         </div>

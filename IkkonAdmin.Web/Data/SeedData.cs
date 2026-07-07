@@ -684,7 +684,28 @@ public static class SeedData
             AppPermissions.BlogArchive,
             AppPermissions.BlogFeature,
             AppPermissions.BlogCategoryManage,
-            AppPermissions.BlogTagManage
+            AppPermissions.BlogTagManage,
+            AppPermissions.AreaAlunoView,
+            AppPermissions.AreaAlunoManage,
+            AppPermissions.FrequenciaView,
+            AppPermissions.FrequenciaCreate,
+            AppPermissions.FrequenciaEdit,
+            AppPermissions.DocumentosView,
+            AppPermissions.DocumentosCreate,
+            AppPermissions.DocumentosEdit,
+            AppPermissions.DocumentosApprove,
+            AppPermissions.ComunicadosView,
+            AppPermissions.ComunicadosCreate,
+            AppPermissions.ComunicadosEdit,
+            AppPermissions.EventosAlunoView,
+            AppPermissions.EventosAlunoCreate,
+            AppPermissions.EventosAlunoEdit,
+            AppPermissions.ConquistasView,
+            AppPermissions.ConquistasCreate,
+            AppPermissions.ConquistasEdit,
+            AppPermissions.AulasView,
+            AppPermissions.AulasCreate,
+            AppPermissions.AulasEdit
         };
 
         var permissoesAluno = new[]

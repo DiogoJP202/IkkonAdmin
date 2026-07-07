@@ -1,0 +1,65 @@
+@model AreaAlunoRegistroFrequenciaViewModel
+@{
+    ViewData["Title"] = "Registrar frequencia";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">@Model.Turma</span>
+            <h1 class="admin-panel-title">Registrar frequencia</h1>
+            <p class="admin-panel-subtitle">@Model.Inicio.ToString("dd/MM/yyyy HH:mm") - @Model.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(Model.Instrutor) ? string.Empty : $"| {Model.Instrutor}")</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar</a>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <form asp-action="SalvarFrequencia" asp-route-aulaId="@Model.AulaId" method="post">
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table class="table admin-panel-table align-middle mb-0">
+                    <thead><tr><th>Aluno</th><th>Status</th><th>Justificada</th><th>Justificativa</th></tr></thead>
+                    <tbody>
+                        @for (var i = 0; i < Model.Alunos.Count; i++)
+                        {
+                            var aluno = Model.Alunos.ElementAt(i);
+                            <tr>
+                                <td>
+                                    @aluno.AlunoNome
+                                    <input type="hidden" name="Alunos[@i].AlunoId" value="@aluno.AlunoId" />
+                                    <input type="hidden" name="Alunos[@i].AlunoNome" value="@aluno.AlunoNome" />
+                                </td>
+                                <td>
+                                    <select name="Alunos[@i].Status" class="form-select admin-panel-control">
+                                        @foreach (var status in Enum.GetValues<StatusFrequenciaEnum>())
+                                        {
+                                            if (aluno.Status == status)
+                                            {
+                                                <option value="@status" selected>@status</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@status">@status</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" name="Alunos[@i].Justificada" value="true" class="form-check-input" @(aluno.Justificada ? "checked" : string.Empty) />
+                                </td>
+                                <td>
+                                    <input name="Alunos[@i].Justificativa" value="@aluno.Justificativa" class="form-control admin-panel-control" maxlength="500" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="admin-panel-form-actions mt-3">
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar frequencia</button>
+            </div>
+        </form>
+    </section>
+</div>

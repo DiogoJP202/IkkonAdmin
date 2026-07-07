@@ -1,0 +1,46 @@
+@model AreaAlunoFrequenciaAdminViewModel
+@{
+    ViewData["Title"] = "Frequencia";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Frequencia</h1>
+            <p class="admin-panel-subtitle">Escolha uma aula para registrar ou revisar presencas e faltas.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-ghost">Aulas</a>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Aula</th><th>Turma</th><th>Status</th><th>Registros</th><th class="text-end">Acoes</th></tr></thead>
+                <tbody>
+                    @if (Model.Aulas.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma aula cadastrada.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var aula in Model.Aulas)
+                        {
+                            <tr>
+                                <td>@aula.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@aula.Turma</td>
+                                <td>@aula.Status</td>
+                                <td>@aula.FrequenciasRegistradas/@aula.TotalAlunos</td>
+                                <td class="text-end">
+                                    <a asp-action="RegistroFrequencia" asp-route-aulaId="@aula.Id" class="btn admin-panel-btn-table is-primary">Registrar</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

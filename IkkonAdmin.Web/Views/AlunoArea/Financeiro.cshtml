@@ -35,13 +35,15 @@
                     <th>Vencimento</th>
                     <th>Status</th>
                     <th>Pagamento</th>
+                    <th>Forma</th>
                     <th class="text-end">Valor</th>
+                    <th class="text-end">Comprovante</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.Mensalidades.Count == 0)
                 {
-                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma mensalidade encontrada.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma mensalidade encontrada.</td></tr>
                 }
                 else
                 {
@@ -52,7 +54,18 @@
                             <td>@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
                             <td><span class="aluno-portal-pill">@mensalidade.Status</span></td>
                             <td>@(mensalidade.DataPagamento.HasValue ? mensalidade.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
+                            <td>@(mensalidade.FormaPagamento.HasValue ? mensalidade.FormaPagamento.Value.ToString() : "-")</td>
                             <td class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
+                            <td class="text-end">
+                                @if (!string.IsNullOrWhiteSpace(mensalidade.Comprovante))
+                                {
+                                    <a href="@mensalidade.Comprovante" target="_blank" rel="noopener">Abrir</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
                         </tr>
                     }
                 }

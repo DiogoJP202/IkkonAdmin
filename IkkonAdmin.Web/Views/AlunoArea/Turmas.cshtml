@@ -8,7 +8,7 @@
     <div class="aluno-portal-panel-head">
         <div>
             <h3>Turmas vinculadas</h3>
-            <p class="mb-0 text-muted">Turma principal: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "não definida" : Model.TurmaPrincipal)</p>
+            <p class="mb-0 text-muted">Turma principal: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "nao definida" : Model.TurmaPrincipal)</p>
         </div>
     </div>
 
@@ -24,9 +24,43 @@
                 <article class="aluno-portal-turma-card">
                     <span>@turma.Modalidade</span>
                     <h3>@turma.Nome</h3>
-                    <p>@(string.IsNullOrWhiteSpace(turma.Horario) ? "Horário não informado" : turma.Horario)</p>
+                    <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? "Instrutor nao informado" : turma.Instrutor)</p>
+                    @if (turma.Horarios.Count > 0)
+                    {
+                        @foreach (var horario in turma.Horarios)
+                        {
+                            <small>@horario.DiaSemana - @horario.HoraInicio.ToString("HH:mm") as @horario.HoraFim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(horario.Local) ? string.Empty : $"| {horario.Local}")</small>
+                        }
+                    }
+                    else
+                    {
+                        <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? "Horario nao informado" : turma.Horario)</small>
+                    }
                     <small>Vinculado em @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
                 </article>
+            }
+        }
+    </div>
+</section>
+
+<section class="aluno-portal-panel mt-3">
+    <div class="aluno-portal-panel-head">
+        <h3>Proximas aulas</h3>
+        <a href="/area-do-aluno/aulas">Ver agenda completa</a>
+    </div>
+    <div class="aluno-portal-list">
+        @if (Model.ProximasAulas.Count == 0)
+        {
+            <p class="text-muted mb-0">Nenhuma aula futura cadastrada.</p>
+        }
+        else
+        {
+            @foreach (var aula in Model.ProximasAulas)
+            {
+                <div class="aluno-portal-list-item">
+                    <strong>@aula.Turma</strong>
+                    <span>@aula.Inicio.ToString("dd/MM/yyyy HH:mm") - @aula.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(aula.Local) ? string.Empty : $"| {aula.Local}")</span>
+                </div>
             }
         }
     </div>

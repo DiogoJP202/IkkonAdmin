@@ -67,6 +67,30 @@ public static class AppPermissions
     public const string BlogCategoryManage = "BLOG_CATEGORY_MANAGE";
     public const string BlogTagManage = "BLOG_TAG_MANAGE";
 
+    public const string AreaAlunoView = "AREA_ALUNO_VIEW";
+    public const string AreaAlunoManage = "AREA_ALUNO_MANAGE";
+    public const string FrequenciaView = "FREQUENCIA_VIEW";
+    public const string FrequenciaCreate = "FREQUENCIA_CREATE";
+    public const string FrequenciaEdit = "FREQUENCIA_EDIT";
+    public const string DocumentosView = "DOCUMENTOS_VIEW";
+    public const string DocumentosCreate = "DOCUMENTOS_CREATE";
+    public const string DocumentosEdit = "DOCUMENTOS_EDIT";
+    public const string DocumentosApprove = "DOCUMENTOS_APPROVE";
+    public const string ComunicadosView = "COMUNICADOS_VIEW";
+    public const string ComunicadosCreate = "COMUNICADOS_CREATE";
+    public const string ComunicadosEdit = "COMUNICADOS_EDIT";
+    public const string ComunicadosDelete = "COMUNICADOS_DELETE";
+    public const string EventosAlunoView = "EVENTOS_ALUNO_VIEW";
+    public const string EventosAlunoCreate = "EVENTOS_ALUNO_CREATE";
+    public const string EventosAlunoEdit = "EVENTOS_ALUNO_EDIT";
+    public const string EventosAlunoDelete = "EVENTOS_ALUNO_DELETE";
+    public const string ConquistasView = "CONQUISTAS_VIEW";
+    public const string ConquistasCreate = "CONQUISTAS_CREATE";
+    public const string ConquistasEdit = "CONQUISTAS_EDIT";
+    public const string AulasView = "AULAS_VIEW";
+    public const string AulasCreate = "AULAS_CREATE";
+    public const string AulasEdit = "AULAS_EDIT";
+
     public static IReadOnlyList<AppPermissionDefinition> Definicoes { get; } = new[]
     {
         new AppPermissionDefinition(GerenciarUsuarios, "Gerenciar usuarios", "Permite criar, editar, ativar e excluir usuarios do sistema.", "Administracao"),
@@ -130,7 +154,31 @@ public static class AppPermissions
         new AppPermissionDefinition(BlogDelete, "Excluir posts do blog", "Permite excluir posts do blog com exclusao logica.", "Blog"),
         new AppPermissionDefinition(BlogFeature, "Destacar posts do blog", "Permite marcar posts como destaque e blog da semana.", "Blog"),
         new AppPermissionDefinition(BlogCategoryManage, "Gerenciar categorias do blog", "Permite criar, editar e ativar categorias do blog.", "Blog"),
-        new AppPermissionDefinition(BlogTagManage, "Gerenciar tags do blog", "Permite criar e associar tags no modulo de blog.", "Blog")
+        new AppPermissionDefinition(BlogTagManage, "Gerenciar tags do blog", "Permite criar e associar tags no modulo de blog.", "Blog"),
+
+        new AppPermissionDefinition(AreaAlunoView, "Visualizar area do aluno", "Permite consultar a operacao administrativa do portal do aluno.", "Area do Aluno"),
+        new AppPermissionDefinition(AreaAlunoManage, "Gerenciar area do aluno", "Permite configurar recursos gerais do portal do aluno.", "Area do Aluno"),
+        new AppPermissionDefinition(FrequenciaView, "Visualizar frequencia", "Permite consultar aulas e registros de frequencia.", "Area do Aluno"),
+        new AppPermissionDefinition(FrequenciaCreate, "Criar frequencia", "Permite registrar presencas e faltas.", "Area do Aluno"),
+        new AppPermissionDefinition(FrequenciaEdit, "Editar frequencia", "Permite corrigir registros de frequencia.", "Area do Aluno"),
+        new AppPermissionDefinition(DocumentosView, "Visualizar documentos", "Permite consultar documentos solicitados e enviados por alunos.", "Area do Aluno"),
+        new AppPermissionDefinition(DocumentosCreate, "Solicitar documentos", "Permite criar tipos e solicitacoes de documentos.", "Area do Aluno"),
+        new AppPermissionDefinition(DocumentosEdit, "Editar documentos", "Permite atualizar solicitacoes de documentos.", "Area do Aluno"),
+        new AppPermissionDefinition(DocumentosApprove, "Aprovar documentos", "Permite aprovar ou recusar documentos enviados.", "Area do Aluno"),
+        new AppPermissionDefinition(ComunicadosView, "Visualizar comunicados", "Permite consultar comunicados internos do portal.", "Area do Aluno"),
+        new AppPermissionDefinition(ComunicadosCreate, "Criar comunicados", "Permite publicar comunicados para alunos e turmas.", "Area do Aluno"),
+        new AppPermissionDefinition(ComunicadosEdit, "Editar comunicados", "Permite atualizar comunicados publicados.", "Area do Aluno"),
+        new AppPermissionDefinition(ComunicadosDelete, "Excluir comunicados", "Permite remover comunicados do portal.", "Area do Aluno"),
+        new AppPermissionDefinition(EventosAlunoView, "Visualizar eventos dos alunos", "Permite consultar eventos internos do portal do aluno.", "Area do Aluno"),
+        new AppPermissionDefinition(EventosAlunoCreate, "Criar eventos dos alunos", "Permite cadastrar eventos para alunos, turmas ou todos.", "Area do Aluno"),
+        new AppPermissionDefinition(EventosAlunoEdit, "Editar eventos dos alunos", "Permite atualizar eventos internos do portal.", "Area do Aluno"),
+        new AppPermissionDefinition(EventosAlunoDelete, "Excluir eventos dos alunos", "Permite remover eventos internos do portal.", "Area do Aluno"),
+        new AppPermissionDefinition(ConquistasView, "Visualizar conquistas", "Permite consultar insignias e conquistas dos alunos.", "Area do Aluno"),
+        new AppPermissionDefinition(ConquistasCreate, "Criar conquistas", "Permite criar insignias e atribui-las a alunos.", "Area do Aluno"),
+        new AppPermissionDefinition(ConquistasEdit, "Editar conquistas", "Permite atualizar insignias e conquistas.", "Area do Aluno"),
+        new AppPermissionDefinition(AulasView, "Visualizar aulas", "Permite consultar aulas e horarios estruturados.", "Area do Aluno"),
+        new AppPermissionDefinition(AulasCreate, "Criar aulas", "Permite cadastrar horarios e aulas.", "Area do Aluno"),
+        new AppPermissionDefinition(AulasEdit, "Editar aulas", "Permite atualizar horarios e aulas.", "Area do Aluno")
     };
 
     public static IReadOnlyCollection<string> Todas { get; } = Definicoes

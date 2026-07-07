@@ -1,0 +1,96 @@
+@model AreaAlunoConquistasAdminViewModel
+@{
+    ViewData["Title"] = "Conquistas";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Conquistas</h1>
+            <p class="admin-panel-subtitle">Crie insignias e atribua marcos de evolucao aos alunos.</p>
+        </div>
+    </section>
+
+    <div class="admin-panel-grid-two mb-4">
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Nova insignia</h2></div>
+            <form asp-action="CriarInsignia" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaInsignia.Nome">Nome</label>
+                        <input asp-for="NovaInsignia.Nome" class="form-control admin-panel-control" maxlength="120" />
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaInsignia.Categoria">Categoria</label>
+                        <input asp-for="NovaInsignia.Categoria" class="form-control admin-panel-control" maxlength="80" />
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaInsignia.Icone">Icone</label>
+                        <input asp-for="NovaInsignia.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="star" />
+                    </div>
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="NovaInsignia.Descricao">Descricao</label>
+                        <textarea asp-for="NovaInsignia.Descricao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Criar insignia</button>
+            </form>
+        </section>
+
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Atribuir conquista</h2></div>
+            <form asp-action="AtribuirInsignia" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaAtribuicao.AlunoId">Aluno</label>
+                        <select asp-for="NovaAtribuicao.AlunoId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var aluno in Model.Alunos)
+                            {
+                                <option value="@aluno.Id">@aluno.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaAtribuicao.InsigniaId">Insignia</label>
+                        <select asp-for="NovaAtribuicao.InsigniaId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var insignia in Model.Insignias.Where(x => x.Ativa))
+                            {
+                                <option value="@insignia.Id">@insignia.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="NovaAtribuicao.Observacao">Observacao</label>
+                        <textarea asp-for="NovaAtribuicao.Observacao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Atribuir</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Conquistas recentes</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Aluno</th><th>Insignia</th><th>Origem</th><th>Data</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model.Conquistas)
+                    {
+                        <tr>
+                            <td>@item.Aluno</td>
+                            <td>@item.Insignia</td>
+                            <td>@item.Origem</td>
+                            <td>@item.ConcedidaEmUtc.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

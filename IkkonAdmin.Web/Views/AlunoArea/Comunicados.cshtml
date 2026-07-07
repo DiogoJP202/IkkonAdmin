@@ -1,0 +1,40 @@
+@model AreaAlunoComunicadosViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Comunicados";
+}
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Comunicados e avisos</h3>
+            <p class="mb-0 text-muted">Avisos direcionados a voce, suas turmas ou todos os alunos.</p>
+        </div>
+    </div>
+
+    <div class="aluno-portal-list">
+        @if (Model.Comunicados.Count == 0)
+        {
+            <p class="text-muted mb-0">Nenhum comunicado ativo.</p>
+        }
+        else
+        {
+            @foreach (var comunicado in Model.Comunicados)
+            {
+                <article class="aluno-portal-list-item">
+                    <strong>@comunicado.Titulo @(comunicado.Importante ? "| Importante" : string.Empty)</strong>
+                    <span>@comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm") @(comunicado.Lido ? "| Lido" : "| Novo")</span>
+                    <span>@comunicado.Conteudo</span>
+                    @if (!comunicado.Lido)
+                    {
+                        <form asp-action="MarcarComunicadoLido" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="comunicadoId" value="@comunicado.Id" />
+                            <button class="btn btn-sm btn-outline-secondary" type="submit">Marcar como lido</button>
+                        </form>
+                    }
+                </article>
+            }
+        }
+    </div>
+</section>

@@ -1,0 +1,161 @@
+@model AreaAlunoAulasAdminViewModel
+@{
+    ViewData["Title"] = "Aulas e horarios";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Aulas e horarios</h1>
+            <p class="admin-panel-subtitle">Cadastre horarios estruturados, instrutores e aulas futuras.</p>
+        </div>
+        <div class="admin-panel-hero-actions">
+            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Visao geral</a>
+            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-primary">Frequencia</a>
+        </div>
+    </section>
+
+    <div class="admin-panel-grid-two mb-4">
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Novo horario</h2></div>
+            <form asp-action="CriarHorario" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoHorario.TurmaId">Turma</label>
+                        <select asp-for="NovoHorario.TurmaId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var turma in Model.Turmas)
+                            {
+                                <option value="@turma.Id">@turma.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoHorario.DiaSemana">Dia</label>
+                        <select asp-for="NovoHorario.DiaSemana" asp-items="Html.GetEnumSelectList<DayOfWeek>()" class="form-select admin-panel-control"></select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoHorario.HoraInicio">Inicio</label>
+                        <input asp-for="NovoHorario.HoraInicio" type="time" class="form-control admin-panel-control" />
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoHorario.HoraFim">Fim</label>
+                        <input asp-for="NovoHorario.HoraFim" type="time" class="form-control admin-panel-control" />
+                    </div>
+                    <div class="admin-panel-field admin-panel-field-full">
+                        <label asp-for="NovoHorario.Local">Local</label>
+                        <input asp-for="NovoHorario.Local" class="form-control admin-panel-control" maxlength="150" />
+                    </div>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Salvar horario</button>
+            </form>
+        </section>
+
+        <section class="admin-panel-card-v2">
+            <div class="admin-panel-card-header"><h2>Vincular instrutor</h2></div>
+            <form asp-action="VincularInstrutor" method="post" class="admin-panel-form-stack">
+                @Html.AntiForgeryToken()
+                <div class="admin-panel-form-grid">
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoInstrutor.TurmaId">Turma</label>
+                        <select asp-for="NovoInstrutor.TurmaId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var turma in Model.Turmas)
+                            {
+                                <option value="@turma.Id">@turma.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoInstrutor.UsuarioSistemaId">Instrutor</label>
+                        <select asp-for="NovoInstrutor.UsuarioSistemaId" class="form-select admin-panel-control">
+                            <option value="">Selecione</option>
+                            @foreach (var instrutor in Model.Instrutores)
+                            {
+                                <option value="@instrutor.Id">@instrutor.Nome</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovoInstrutor.DataInicio">Inicio</label>
+                        <input asp-for="NovoInstrutor.DataInicio" type="date" class="form-control admin-panel-control" />
+                    </div>
+                    <label class="admin-panel-check-card is-form-check">
+                        <input asp-for="NovoInstrutor.Principal" class="form-check-input" />
+                        <span>Instrutor principal</span>
+                    </label>
+                </div>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Vincular</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Nova aula</h2></div>
+        <form asp-action="CriarAula" method="post" class="admin-panel-form-stack">
+            @Html.AntiForgeryToken()
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.TurmaId">Turma</label>
+                    <select asp-for="NovaAula.TurmaId" class="form-select admin-panel-control">
+                        <option value="">Selecione</option>
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            <option value="@turma.Id">@turma.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.InstrutorUsuarioId">Instrutor</label>
+                    <select asp-for="NovaAula.InstrutorUsuarioId" class="form-select admin-panel-control">
+                        <option value="">Sem instrutor</option>
+                        @foreach (var instrutor in Model.Instrutores)
+                        {
+                            <option value="@instrutor.Id">@instrutor.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.Inicio">Inicio</label>
+                    <input asp-for="NovaAula.Inicio" type="datetime-local" class="form-control admin-panel-control" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.Fim">Fim</label>
+                    <input asp-for="NovaAula.Fim" type="datetime-local" class="form-control admin-panel-control" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.Status">Status</label>
+                    <select asp-for="NovaAula.Status" asp-items="Html.GetEnumSelectList<StatusAulaEnum>()" class="form-select admin-panel-control"></select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovaAula.Local">Local</label>
+                    <input asp-for="NovaAula.Local" class="form-control admin-panel-control" maxlength="150" />
+                </div>
+            </div>
+            <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Cadastrar aula</button>
+        </form>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Aulas cadastradas</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Data</th><th>Turma</th><th>Instrutor</th><th>Status</th><th class="text-end">Frequencia</th></tr></thead>
+                <tbody>
+                    @foreach (var aula in Model.Aulas)
+                    {
+                        <tr>
+                            <td>@aula.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@aula.Turma</td>
+                            <td>@(aula.Instrutor ?? "-")</td>
+                            <td><span class="admin-panel-badge">@aula.Status</span></td>
+                            <td class="text-end">@aula.FrequenciasRegistradas/@aula.TotalAlunos</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

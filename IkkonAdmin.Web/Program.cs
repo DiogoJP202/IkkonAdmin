@@ -158,6 +158,30 @@ builder.Services.AddAuthorization(options =>
     AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogCategoryManage, AppPermissions.BlogCategoryManage);
     AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogTagManage, AppPermissions.BlogTagManage);
 
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AreaAlunoView, AppPermissions.AreaAlunoView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AreaAlunoManage, AppPermissions.AreaAlunoManage);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaView, AppPermissions.FrequenciaView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaCreate, AppPermissions.FrequenciaCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaEdit, AppPermissions.FrequenciaEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosView, AppPermissions.DocumentosView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosCreate, AppPermissions.DocumentosCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosEdit, AppPermissions.DocumentosEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosApprove, AppPermissions.DocumentosApprove);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosView, AppPermissions.ComunicadosView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosCreate, AppPermissions.ComunicadosCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosEdit, AppPermissions.ComunicadosEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosDelete, AppPermissions.ComunicadosDelete);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoView, AppPermissions.EventosAlunoView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoCreate, AppPermissions.EventosAlunoCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoEdit, AppPermissions.EventosAlunoEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoDelete, AppPermissions.EventosAlunoDelete);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasView, AppPermissions.ConquistasView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasCreate, AppPermissions.ConquistasCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasEdit, AppPermissions.ConquistasEdit);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasView, AppPermissions.AulasView);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasCreate, AppPermissions.AulasCreate);
+    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasEdit, AppPermissions.AulasEdit);
+
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarUsuarios, AppPermissions.GerenciarUsuarios);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarCargos, AppPermissions.GerenciarCargos);
     AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminEditarPermissoes, AppPermissions.EditarPermissoes);
@@ -177,6 +201,7 @@ builder.Services.AddScoped<IAdminPainelService, AdminPainelService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAreaAlunoService, AreaAlunoService>();
+builder.Services.AddScoped<IAreaAlunoAdminService, AreaAlunoAdminService>();
 builder.Services.AddScoped<IInventarioService, InventarioService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBlogCategoriaService, BlogCategoriaService>();

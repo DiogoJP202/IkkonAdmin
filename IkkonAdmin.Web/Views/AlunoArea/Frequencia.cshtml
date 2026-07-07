@@ -1,0 +1,69 @@
+@model AreaAlunoFrequenciaViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Frequencia";
+}
+
+<section class="aluno-portal-kpis mb-3">
+    <article>
+        <span>Presenca</span>
+        <strong>@Model.PercentualPresenca.ToString("0.#")%</strong>
+    </article>
+    <article>
+        <span>Presencas</span>
+        <strong>@Model.Presencas</strong>
+    </article>
+    <article>
+        <span>Faltas justificadas</span>
+        <strong>@Model.FaltasJustificadas</strong>
+    </article>
+    <article>
+        <span>Faltas nao justificadas</span>
+        <strong>@Model.FaltasNaoJustificadas</strong>
+    </article>
+</section>
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Historico de frequencia</h3>
+            <p class="mb-0 text-muted">Periodo: @Model.Inicio.ToString("dd/MM/yyyy") a @Model.Fim.ToString("dd/MM/yyyy")</p>
+        </div>
+        <form method="get" class="d-flex gap-2 flex-wrap">
+            <input type="date" name="inicio" value="@Model.Inicio.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+            <input type="date" name="fim" value="@Model.Fim.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+            <button class="btn btn-sm btn-outline-secondary" type="submit">Filtrar</button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 aluno-portal-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Turma</th>
+                    <th>Status</th>
+                    <th>Justificativa</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Registros.Count == 0)
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-4">Nenhum registro de frequencia no periodo.</td></tr>
+                }
+                else
+                {
+                    @foreach (var registro in Model.Registros)
+                    {
+                        <tr>
+                            <td>@registro.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@registro.Turma</td>
+                            <td><span class="aluno-portal-pill">@registro.Status</span></td>
+                            <td>@(string.IsNullOrWhiteSpace(registro.Justificativa) ? "-" : registro.Justificativa)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

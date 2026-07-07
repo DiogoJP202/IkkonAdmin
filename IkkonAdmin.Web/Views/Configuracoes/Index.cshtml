@@ -1,7 +1,7 @@
 ﻿@model UserSettingsPageViewModel
 @using IkkonAdmin.Web.Security
 @{
-    Layout = User.IsInRole(AppRoles.Aluno) ? "_AuthLayout" : "_Layout";
+    Layout = User.IsInRole(AppRoles.Aluno) ? "_AlunoLayout" : "_Layout";
     ViewData["Title"] = "Configurações";
 
     var isAluno = User.IsInRole(AppRoles.Aluno);

@@ -168,6 +168,45 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.ToTable("Alunos", (string)null);
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.AlunoInsignia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ConcedidaEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ConcedidaPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InsigniaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Observacao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Origem")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConcedidaPorUsuarioId");
+
+                    b.HasIndex("InsigniaId");
+
+                    b.HasIndex("AlunoId", "InsigniaId")
+                        .IsUnique();
+
+                    b.ToTable("AlunoInsignias", (string)null);
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.AlunoTurma", b =>
                 {
                     b.Property<int>("AlunoId")
@@ -242,6 +281,52 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.HasIndex("Entidade", "Acao");
 
                     b.ToTable("AuditoriaLogs", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Aula", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Fim")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("InstrutorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Local")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Observacoes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TurmaHorarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstrutorUsuarioId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TurmaHorarioId");
+
+                    b.HasIndex("TurmaId", "Inicio");
+
+                    b.ToTable("Aulas", (string)null);
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogCategory", b =>
@@ -451,6 +536,100 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.ToTable("BlogTags", (string)null);
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Comunicado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Conteudo")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<int?>("CriadoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpiraEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Fixado")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Importante")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("PublicadoEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoPorUsuarioId");
+
+                    b.HasIndex("Ativo", "PublicadoEmUtc", "ExpiraEmUtc");
+
+                    b.ToTable("Comunicados", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ComunicadoAlvo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComunicadoId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Todos")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("TurmaId");
+
+                    b.HasIndex("ComunicadoId", "AlunoId", "TurmaId", "Todos");
+
+                    b.ToTable("ComunicadosAlvos", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ComunicadoLeitura", b =>
+                {
+                    b.Property<int>("ComunicadoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LidoEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ComunicadoId", "AlunoId");
+
+                    b.HasIndex("AlunoId");
+
+                    b.ToTable("ComunicadosLeituras", (string)null);
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ConfiguracaoSistema", b =>
                 {
                     b.Property<int>("Id")
@@ -617,6 +796,203 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.ToTable("Desligamentos", (string)null);
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoEnvio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArquivoUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ContentType")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<int>("DocumentoSolicitacaoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EnviadoEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("EnviadoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NomeArquivoOriginal")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long>("TamanhoBytes")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentoSolicitacaoId");
+
+                    b.HasIndex("EnviadoPorUsuarioId");
+
+                    b.ToTable("DocumentoEnvios", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoSolicitacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("DataLimite")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DataSolicitacaoUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DocumentoTipoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ObservacaoAdministrativa")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("SolicitadoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSolicitacaoUtc");
+
+                    b.HasIndex("DocumentoTipoId");
+
+                    b.HasIndex("SolicitadoPorUsuarioId");
+
+                    b.HasIndex("AlunoId", "Status");
+
+                    b.ToTable("DocumentoSolicitacoes", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoTipo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<bool>("Obrigatorio")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nome")
+                        .IsUnique();
+
+                    b.ToTable("DocumentoTipos", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.EventoAlunoPortal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("Fim")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GoogleEventoId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("Importante")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Local")
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(180)
+                        .HasColumnType("nvarchar(180)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Tipo");
+
+                    b.HasIndex("Ativo", "Inicio");
+
+                    b.ToTable("EventosAlunoPortal", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.EventoAlunoPortalAlvo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventoAlunoPortalId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Todos")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("TurmaId");
+
+                    b.HasIndex("EventoAlunoPortalId", "AlunoId", "TurmaId", "Todos");
+
+                    b.ToTable("EventosAlunoPortalAlvos", (string)null);
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ExameGraduacao", b =>
                 {
                     b.Property<int>("Id")
@@ -641,6 +1017,48 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExamesGraduacao", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.FrequenciaAluno", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AulaId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Justificada")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Justificativa")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("RegistradoEmUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("RegistradoPorUsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegistradoPorUsuarioId");
+
+                    b.HasIndex("AlunoId", "Status");
+
+                    b.HasIndex("AulaId", "AlunoId")
+                        .IsUnique();
+
+                    b.ToTable("FrequenciasAlunos", (string)null);
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.GoogleAgendaConexao", b =>
@@ -763,6 +1181,46 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.HasIndex("AlunoId");
 
                     b.ToTable("HistoricoAlunos", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Insignia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Categoria")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Icone")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("RegraAutomatica")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nome")
+                        .IsUnique();
+
+                    b.ToTable("Insignias", (string)null);
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.InventarioItem", b =>
@@ -1135,6 +1593,72 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.ToTable("Turmas", (string)null);
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.TurmaHorario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("DiaSemana")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("HoraFim")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Local")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TurmaId", "DiaSemana", "HoraInicio");
+
+                    b.ToTable("TurmaHorarios", (string)null);
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.TurmaInstrutor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly?>("DataFim")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataInicio")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("Principal")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TurmaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioSistemaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioSistemaId");
+
+                    b.HasIndex("TurmaId", "UsuarioSistemaId", "DataInicio");
+
+                    b.ToTable("TurmaInstrutores", (string)null);
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.UsuarioPermissao", b =>
                 {
                     b.Property<int>("UsuarioId")
@@ -1310,6 +1834,32 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("Turma");
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.AlunoInsignia", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany("Insignias")
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "ConcedidaPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("ConcedidaPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Insignia", "Insignia")
+                        .WithMany("Alunos")
+                        .HasForeignKey("InsigniaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("ConcedidaPorUsuario");
+
+                    b.Navigation("Insignia");
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.AlunoTurma", b =>
                 {
                     b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
@@ -1344,6 +1894,31 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("UsuarioAfetado");
 
                     b.Navigation("UsuarioResponsavel");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Aula", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "InstrutorUsuario")
+                        .WithMany("AulasComoInstrutor")
+                        .HasForeignKey("InstrutorUsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.TurmaHorario", "TurmaHorario")
+                        .WithMany("Aulas")
+                        .HasForeignKey("TurmaHorarioId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Turma", "Turma")
+                        .WithMany("Aulas")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("InstrutorUsuario");
+
+                    b.Navigation("Turma");
+
+                    b.Navigation("TurmaHorario");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogPost", b =>
@@ -1382,6 +1957,60 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("BlogTag");
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Comunicado", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "CriadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("CriadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("CriadoPorUsuario");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ComunicadoAlvo", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Comunicado", "Comunicado")
+                        .WithMany("Alvos")
+                        .HasForeignKey("ComunicadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Turma", "Turma")
+                        .WithMany()
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Comunicado");
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ComunicadoLeitura", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany("ComunicadosLidos")
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Comunicado", "Comunicado")
+                        .WithMany("Leituras")
+                        .HasForeignKey("ComunicadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Comunicado");
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Desconto", b =>
                 {
                     b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
@@ -1402,6 +2031,101 @@ namespace IkkonAdmin.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Aluno");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoEnvio", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.DocumentoSolicitacao", "DocumentoSolicitacao")
+                        .WithMany("Envios")
+                        .HasForeignKey("DocumentoSolicitacaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "EnviadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("EnviadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DocumentoSolicitacao");
+
+                    b.Navigation("EnviadoPorUsuario");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoSolicitacao", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany("DocumentosSolicitados")
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.DocumentoTipo", "DocumentoTipo")
+                        .WithMany("Solicitacoes")
+                        .HasForeignKey("DocumentoTipoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "SolicitadoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("SolicitadoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("DocumentoTipo");
+
+                    b.Navigation("SolicitadoPorUsuario");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.EventoAlunoPortalAlvo", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany()
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.EventoAlunoPortal", "EventoAlunoPortal")
+                        .WithMany("Alvos")
+                        .HasForeignKey("EventoAlunoPortalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Turma", "Turma")
+                        .WithMany()
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("EventoAlunoPortal");
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.FrequenciaAluno", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aluno", "Aluno")
+                        .WithMany("Frequencias")
+                        .HasForeignKey("AlunoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Aula", "Aula")
+                        .WithMany("Frequencias")
+                        .HasForeignKey("AulaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "RegistradoPorUsuario")
+                        .WithMany()
+                        .HasForeignKey("RegistradoPorUsuarioId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Aluno");
+
+                    b.Navigation("Aula");
+
+                    b.Navigation("RegistradoPorUsuario");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.GoogleAgendaConexao", b =>
@@ -1527,6 +2251,36 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.TurmaHorario", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Turma", "Turma")
+                        .WithMany("Horarios")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Turma");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.TurmaInstrutor", b =>
+                {
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.Turma", "Turma")
+                        .WithMany("Instrutores")
+                        .HasForeignKey("TurmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("IkkonAdmin.Web.Models.Entities.UsuarioSistema", "UsuarioSistema")
+                        .WithMany("TurmasComoInstrutor")
+                        .HasForeignKey("UsuarioSistemaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Turma");
+
+                    b.Navigation("UsuarioSistema");
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.UsuarioPermissao", b =>
                 {
                     b.HasOne("IkkonAdmin.Web.Models.Entities.PermissaoSistema", "Permissao")
@@ -1583,17 +2337,30 @@ namespace IkkonAdmin.Web.Data.Migrations
 
                     b.Navigation("AlunoTurmas");
 
+                    b.Navigation("ComunicadosLidos");
+
                     b.Navigation("Descontos");
 
                     b.Navigation("Desligamentos");
+
+                    b.Navigation("DocumentosSolicitados");
+
+                    b.Navigation("Frequencias");
 
                     b.Navigation("Graduacoes");
 
                     b.Navigation("Historicos");
 
+                    b.Navigation("Insignias");
+
                     b.Navigation("Mensalidades");
 
                     b.Navigation("Pagamentos");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Aula", b =>
+                {
+                    b.Navigation("Frequencias");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.BlogCategory", b =>
@@ -1611,9 +2378,36 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("PostTags");
                 });
 
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Comunicado", b =>
+                {
+                    b.Navigation("Alvos");
+
+                    b.Navigation("Leituras");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoSolicitacao", b =>
+                {
+                    b.Navigation("Envios");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.DocumentoTipo", b =>
+                {
+                    b.Navigation("Solicitacoes");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.EventoAlunoPortal", b =>
+                {
+                    b.Navigation("Alvos");
+                });
+
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.ExameGraduacao", b =>
                 {
                     b.Navigation("Graduacoes");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.Insignia", b =>
+                {
+                    b.Navigation("Alunos");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.InventarioItem", b =>
@@ -1645,13 +2439,28 @@ namespace IkkonAdmin.Web.Data.Migrations
                     b.Navigation("AlunoTurmas");
 
                     b.Navigation("Alunos");
+
+                    b.Navigation("Aulas");
+
+                    b.Navigation("Horarios");
+
+                    b.Navigation("Instrutores");
+                });
+
+            modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.TurmaHorario", b =>
+                {
+                    b.Navigation("Aulas");
                 });
 
             modelBuilder.Entity("IkkonAdmin.Web.Models.Entities.UsuarioSistema", b =>
                 {
+                    b.Navigation("AulasComoInstrutor");
+
                     b.Navigation("LogsComoAfetado");
 
                     b.Navigation("LogsComoAutor");
+
+                    b.Navigation("TurmasComoInstrutor");
 
                     b.Navigation("UsuarioPermissoes");
 

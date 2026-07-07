@@ -1,0 +1,93 @@
+@model AreaAlunoEventosAdminViewModel
+@{
+    ViewData["Title"] = "Eventos dos alunos";
+}
+
+<div class="admin-panel-v2-page">
+    <section class="admin-panel-v2-hero is-compact mb-4">
+        <div class="admin-panel-hero-copy">
+            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <h1 class="admin-panel-title">Eventos</h1>
+            <p class="admin-panel-subtitle">Cadastre datas importantes vinculadas a todos, uma turma ou um aluno.</p>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Novo evento</h2></div>
+        <form asp-action="CriarEvento" method="post" class="admin-panel-form-stack">
+            @Html.AntiForgeryToken()
+            <div class="admin-panel-form-grid">
+                <div class="admin-panel-field admin-panel-field-wide">
+                    <label asp-for="NovoEvento.Titulo">Titulo</label>
+                    <input asp-for="NovoEvento.Titulo" class="form-control admin-panel-control" maxlength="180" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.Tipo">Tipo</label>
+                    <select asp-for="NovoEvento.Tipo" asp-items="Html.GetEnumSelectList<EventoAlunoTipoEnum>()" class="form-select admin-panel-control"></select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.Inicio">Inicio</label>
+                    <input asp-for="NovoEvento.Inicio" type="datetime-local" class="form-control admin-panel-control" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.Fim">Fim</label>
+                    <input asp-for="NovoEvento.Fim" type="datetime-local" class="form-control admin-panel-control" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.Local">Local</label>
+                    <input asp-for="NovoEvento.Local" class="form-control admin-panel-control" maxlength="180" />
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.AlvoTipo">Alvo</label>
+                    <select asp-for="NovoEvento.AlvoTipo" asp-items="Html.GetEnumSelectList<ComunicadoAlvoTipoEnum>()" class="form-select admin-panel-control"></select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.AlunoId">Aluno</label>
+                    <select asp-for="NovoEvento.AlunoId" class="form-select admin-panel-control">
+                        <option value="">Opcional</option>
+                        @foreach (var aluno in Model.Alunos)
+                        {
+                            <option value="@aluno.Id">@aluno.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field">
+                    <label asp-for="NovoEvento.TurmaId">Turma</label>
+                    <select asp-for="NovoEvento.TurmaId" class="form-select admin-panel-control">
+                        <option value="">Opcional</option>
+                        @foreach (var turma in Model.Turmas)
+                        {
+                            <option value="@turma.Id">@turma.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div class="admin-panel-field-full">
+                    <label asp-for="NovoEvento.Descricao">Descricao</label>
+                    <textarea asp-for="NovoEvento.Descricao" class="form-control admin-panel-control" rows="3" maxlength="2000"></textarea>
+                </div>
+                <label class="admin-panel-check-card is-form-check"><input asp-for="NovoEvento.Importante" class="form-check-input" /><span>Importante</span></label>
+            </div>
+            <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Cadastrar evento</button>
+        </form>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Eventos cadastrados</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Evento</th><th>Data</th><th>Tipo</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model.Eventos)
+                    {
+                        <tr>
+                            <td>@item.Titulo @(item.Importante ? "| Importante" : string.Empty)</td>
+                            <td>@item.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.Tipo</td>
+                            <td>@(item.Ativo ? "Ativo" : "Inativo")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,55 @@
+@model AreaAlunoDocumentosViewModel
+@{
+    Layout = "_AlunoLayout";
+    ViewData["Title"] = "Documentos";
+}
+
+<section class="aluno-portal-panel">
+    <div class="aluno-portal-panel-head">
+        <div>
+            <h3>Documentos solicitados</h3>
+            <p class="mb-0 text-muted">Envie arquivos solicitados e acompanhe a aprovacao.</p>
+        </div>
+    </div>
+
+    <div class="aluno-portal-list">
+        @if (Model.Documentos.Count == 0)
+        {
+            <p class="text-muted mb-0">Nenhum documento solicitado.</p>
+        }
+        else
+        {
+            @foreach (var documento in Model.Documentos)
+            {
+                <article class="aluno-portal-list-item">
+                    <strong>@documento.Tipo</strong>
+                    <span>Status: @documento.Status @(documento.DataLimite.HasValue ? $"| Limite: {documento.DataLimite.Value:dd/MM/yyyy}" : string.Empty)</span>
+                    @if (!string.IsNullOrWhiteSpace(documento.Descricao))
+                    {
+                        <span>@documento.Descricao</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(documento.ObservacaoAdministrativa))
+                    {
+                        <span>Observacao: @documento.ObservacaoAdministrativa</span>
+                    }
+                    @if (documento.UltimoEnvioId.HasValue)
+                    {
+                        <span>
+                            Enviado: @documento.NomeArquivoOriginal
+                            <a asp-action="BaixarDocumento" asp-route-envioId="@documento.UltimoEnvioId.Value">baixar</a>
+                        </span>
+                    }
+                    @if (documento.Status != DocumentoStatusEnum.Aprovado)
+                    {
+                        <form asp-action="EnviarDocumento" method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="solicitacaoId" value="@documento.SolicitacaoId" />
+                            <input type="file" name="arquivo" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp" required />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Enviar</button>
+                        </form>
+                    }
+                </article>
+            }
+        }
+    </div>
+</section>
