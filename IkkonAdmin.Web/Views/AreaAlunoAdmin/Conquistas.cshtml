@@ -30,6 +30,10 @@
                         <label asp-for="NovaInsignia.Icone">Icone</label>
                         <input asp-for="NovaInsignia.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="star" />
                     </div>
+                    <div class="admin-panel-field">
+                        <label asp-for="NovaInsignia.RegraAutomatica">Regra automatica</label>
+                        <input asp-for="NovaInsignia.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" />
+                    </div>
                     <div class="admin-panel-field admin-panel-field-full">
                         <label asp-for="NovaInsignia.Descricao">Descricao</label>
                         <textarea asp-for="NovaInsignia.Descricao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
@@ -74,20 +78,117 @@
         </section>
     </div>
 
-    <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Conquistas recentes</h2></div>
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Insignias cadastradas</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Aluno</th><th>Insignia</th><th>Origem</th><th>Data</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Regra</th>
+                        <th>Status</th>
+                        <th>Descricao</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    @foreach (var item in Model.Conquistas)
+                    @if (Model.Insignias.Count == 0)
                     {
-                        <tr>
-                            <td>@item.Aluno</td>
-                            <td>@item.Insignia</td>
-                            <td>@item.Origem</td>
-                            <td>@item.ConcedidaEmUtc.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                        </tr>
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma insignia cadastrada.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Insignias)
+                        {
+                            var editFormId = $"insignia-edit-{item.Id}";
+                            var deleteFormId = $"insignia-delete-{item.Id}";
+                            <tr>
+                                <td>
+                                    <input form="@editFormId" name="Nome" value="@item.Nome" class="form-control admin-panel-control mb-2" maxlength="120" />
+                                    <input form="@editFormId" name="Icone" value="@item.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="Icone" />
+                                </td>
+                                <td><input form="@editFormId" name="Categoria" value="@item.Categoria" class="form-control admin-panel-control" maxlength="80" /></td>
+                                <td><input form="@editFormId" name="RegraAutomatica" value="@item.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" /></td>
+                                <td>
+                                    <input form="@editFormId" type="hidden" name="Ativa" value="false" />
+                                    <label class="admin-panel-inline-check">
+                                        <input form="@editFormId" name="Ativa" value="true" type="checkbox" class="form-check-input" checked="@item.Ativa" />
+                                        <span>Ativa</span>
+                                    </label>
+                                </td>
+                                <td><textarea form="@editFormId" name="Descricao" class="form-control admin-panel-control" rows="3" maxlength="500">@item.Descricao</textarea></td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarInsignia" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirInsignia" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2">
+        <div class="admin-panel-card-header"><h2>Conquistas atribuidas</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Insignia</th>
+                        <th>Origem</th>
+                        <th>Data</th>
+                        <th>Observacao</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Conquistas.Count == 0)
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma conquista atribuida.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Conquistas)
+                        {
+                            var editFormId = $"conquista-edit-{item.Id}";
+                            var deleteFormId = $"conquista-delete-{item.Id}";
+                            <tr>
+                                <td>
+                                    <select form="@editFormId" name="AlunoId" class="form-select admin-panel-control">
+                                        @foreach (var aluno in Model.Alunos)
+                                        {
+                                            <option value="@aluno.Id" selected="@(item.AlunoId == aluno.Id)">@aluno.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="InsigniaId" class="form-select admin-panel-control">
+                                        @foreach (var insignia in Model.Insignias)
+                                        {
+                                            <option value="@insignia.Id" selected="@(item.InsigniaId == insignia.Id)">@insignia.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>@item.Origem</td>
+                                <td>@item.ConcedidaEmUtc.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                                <td><input form="@editFormId" name="Observacao" value="@item.Observacao" class="form-control admin-panel-control" maxlength="500" /></td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarAlunoInsignia" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirAlunoInsignia" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>

@@ -8,7 +8,7 @@
         <div class="admin-panel-hero-copy">
             <span class="admin-panel-eyebrow">Area do Aluno</span>
             <h1 class="admin-panel-title">Documentos</h1>
-            <p class="admin-panel-subtitle">Crie tipos, solicite documentos e aprove ou recuse envios.</p>
+            <p class="admin-panel-subtitle">Crie tipos, solicite documentos, edite prazos e aprove ou recuse envios.</p>
         </div>
     </section>
 
@@ -74,30 +74,91 @@
         </section>
     </div>
 
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Tipos de documento</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Nome</th><th>Descricao</th><th>Obrigatorio</th><th>Ativo</th><th class="text-end">Acoes</th></tr></thead>
+                <tbody>
+                    @if (Model.Tipos.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum tipo cadastrado.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var tipo in Model.Tipos)
+                        {
+                            var editFormId = $"tipo-doc-edit-{tipo.Id}";
+                            var deleteFormId = $"tipo-doc-delete-{tipo.Id}";
+                            <tr>
+                                <td><input form="@editFormId" name="Nome" value="@tipo.Nome" class="form-control admin-panel-control" maxlength="120" /></td>
+                                <td><textarea form="@editFormId" name="Descricao" class="form-control admin-panel-control" rows="2" maxlength="500">@tipo.Descricao</textarea></td>
+                                <td>
+                                    <input form="@editFormId" type="hidden" name="Obrigatorio" value="false" />
+                                    <input form="@editFormId" name="Obrigatorio" value="true" type="checkbox" class="form-check-input" checked="@tipo.Obrigatorio" />
+                                </td>
+                                <td>
+                                    <input form="@editFormId" type="hidden" name="Ativo" value="false" />
+                                    <input form="@editFormId" name="Ativo" value="true" type="checkbox" class="form-check-input" checked="@tipo.Ativo" />
+                                </td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarDocumentoTipo" asp-route-id="@tipo.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirDocumentoTipo" asp-route-id="@tipo.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="admin-panel-card-v2">
         <div class="admin-panel-card-header"><h2>Solicitacoes</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Envio</th><th>Avaliacao</th></tr></thead>
+                <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Limite</th><th>Envio</th><th>Observacao</th><th class="text-end">Acoes</th></tr></thead>
                 <tbody>
                     @if (Model.Solicitacoes.Count == 0)
                     {
-                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma solicitacao encontrada.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma solicitacao encontrada.</td></tr>
                     }
                     else
                     {
                         @foreach (var item in Model.Solicitacoes)
                         {
+                            var editFormId = $"solicitacao-doc-edit-{item.SolicitacaoId}";
+                            var deleteFormId = $"solicitacao-doc-delete-{item.SolicitacaoId}";
                             <tr>
-                                <td>@item.Aluno</td>
                                 <td>
-                                    <strong>@item.Tipo</strong>
-                                    @if (item.DataLimite.HasValue)
-                                    {
-                                        <small class="d-block text-muted">Limite @item.DataLimite.Value.ToString("dd/MM/yyyy")</small>
-                                    }
+                                    <select form="@editFormId" name="AlunoId" class="form-select admin-panel-control">
+                                        @foreach (var aluno in Model.Alunos)
+                                        {
+                                            <option value="@aluno.Id" selected="@(item.AlunoId == aluno.Id)">@aluno.Nome</option>
+                                        }
+                                    </select>
                                 </td>
-                                <td><span class="admin-panel-badge">@item.Status</span></td>
+                                <td>
+                                    <select form="@editFormId" name="DocumentoTipoId" class="form-select admin-panel-control">
+                                        @foreach (var tipo in Model.Tipos)
+                                        {
+                                            <option value="@tipo.Id" selected="@(item.DocumentoTipoId == tipo.Id)">@tipo.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="Status" class="form-select admin-panel-control">
+                                        @foreach (var status in Enum.GetValues<DocumentoStatusEnum>())
+                                        {
+                                            <option value="@status" selected="@(item.Status == status)">@status</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input form="@editFormId" name="DataLimite" type="date" value="@(item.DataLimite?.ToString("yyyy-MM-dd"))" class="form-control admin-panel-control" /></td>
                                 <td>
                                     @if (item.UltimoEnvioId.HasValue)
                                     {
@@ -108,26 +169,14 @@
                                         <span class="text-muted">Sem envio</span>
                                     }
                                 </td>
+                                <td><input form="@editFormId" name="ObservacaoAdministrativa" value="@item.ObservacaoAdministrativa" class="form-control admin-panel-control" maxlength="1000" /></td>
                                 <td>
-                                    <form asp-action="AvaliarDocumento" method="post" class="d-flex gap-2 flex-wrap">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="SolicitacaoId" value="@item.SolicitacaoId" />
-                                        <select name="Status" class="form-select admin-panel-control">
-                                            @foreach (var status in Enum.GetValues<DocumentoStatusEnum>())
-                                            {
-                                                if (item.Status == status)
-                                                {
-                                                    <option value="@status" selected>@status</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@status">@status</option>
-                                                }
-                                            }
-                                        </select>
-                                        <input name="ObservacaoAdministrativa" value="@item.ObservacaoAdministrativa" class="form-control admin-panel-control" placeholder="Observacao" />
-                                        <button class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
-                                    </form>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarDocumentoSolicitacao" asp-route-id="@item.SolicitacaoId" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirDocumentoSolicitacao" asp-route-id="@item.SolicitacaoId" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
                                 </td>
                             </tr>
                         }

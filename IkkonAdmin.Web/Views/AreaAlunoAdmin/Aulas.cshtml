@@ -8,7 +8,7 @@
         <div class="admin-panel-hero-copy">
             <span class="admin-panel-eyebrow">Area do Aluno</span>
             <h1 class="admin-panel-title">Aulas e horarios</h1>
-            <p class="admin-panel-subtitle">Cadastre horarios estruturados, instrutores e aulas futuras.</p>
+            <p class="admin-panel-subtitle">Cadastre, edite e organize horarios estruturados, instrutores e aulas futuras.</p>
         </div>
         <div class="admin-panel-hero-actions">
             <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Visao geral</a>
@@ -133,26 +133,183 @@
                     <label asp-for="NovaAula.Local">Local</label>
                     <input asp-for="NovaAula.Local" class="form-control admin-panel-control" maxlength="150" />
                 </div>
+                <div class="admin-panel-field admin-panel-field-full">
+                    <label asp-for="NovaAula.Observacoes">Observacoes</label>
+                    <textarea asp-for="NovaAula.Observacoes" class="form-control admin-panel-control" rows="2"></textarea>
+                </div>
             </div>
             <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Cadastrar aula</button>
         </form>
+    </section>
+
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Horarios cadastrados</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Turma</th><th>Dia</th><th>Inicio</th><th>Fim</th><th>Local</th><th>Status</th><th class="text-end">Acoes</th></tr></thead>
+                <tbody>
+                    @if (Model.Horarios.Count == 0)
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum horario cadastrado.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var horario in Model.Horarios)
+                        {
+                            var editFormId = $"horario-edit-{horario.Id}";
+                            var deleteFormId = $"horario-delete-{horario.Id}";
+                            <tr>
+                                <td>
+                                    <select form="@editFormId" name="TurmaId" class="form-select admin-panel-control">
+                                        @foreach (var turma in Model.Turmas)
+                                        {
+                                            <option value="@turma.Id" selected="@(horario.TurmaId == turma.Id)">@turma.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="DiaSemana" class="form-select admin-panel-control">
+                                        @foreach (var dia in Enum.GetValues<DayOfWeek>())
+                                        {
+                                            <option value="@dia" selected="@(horario.DiaSemana == dia)">@dia</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input form="@editFormId" name="HoraInicio" type="time" value="@horario.HoraInicio.ToString("HH:mm")" class="form-control admin-panel-control" /></td>
+                                <td><input form="@editFormId" name="HoraFim" type="time" value="@horario.HoraFim.ToString("HH:mm")" class="form-control admin-panel-control" /></td>
+                                <td><input form="@editFormId" name="Local" value="@horario.Local" class="form-control admin-panel-control" maxlength="150" /></td>
+                                <td><span class="admin-panel-badge">@(horario.Ativo ? "Ativo" : "Inativo")</span></td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarHorario" asp-route-id="@horario.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirHorario" asp-route-id="@horario.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-panel-card-v2 mb-4">
+        <div class="admin-panel-card-header"><h2>Instrutores vinculados</h2></div>
+        <div class="table-responsive">
+            <table class="table admin-panel-table align-middle mb-0">
+                <thead><tr><th>Turma</th><th>Instrutor</th><th>Inicio</th><th>Fim</th><th>Principal</th><th class="text-end">Acoes</th></tr></thead>
+                <tbody>
+                    @if (Model.TurmaInstrutores.Count == 0)
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhum instrutor vinculado.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var vinculo in Model.TurmaInstrutores)
+                        {
+                            var editFormId = $"instrutor-edit-{vinculo.Id}";
+                            var deleteFormId = $"instrutor-delete-{vinculo.Id}";
+                            <tr>
+                                <td>
+                                    <select form="@editFormId" name="TurmaId" class="form-select admin-panel-control">
+                                        @foreach (var turma in Model.Turmas)
+                                        {
+                                            <option value="@turma.Id" selected="@(vinculo.TurmaId == turma.Id)">@turma.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="UsuarioSistemaId" class="form-select admin-panel-control">
+                                        @foreach (var instrutor in Model.Instrutores)
+                                        {
+                                            <option value="@instrutor.Id" selected="@(vinculo.UsuarioSistemaId == instrutor.Id)">@instrutor.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input form="@editFormId" name="DataInicio" type="date" value="@vinculo.DataInicio.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></td>
+                                <td><input form="@editFormId" name="DataFim" type="date" value="@(vinculo.DataFim?.ToString("yyyy-MM-dd"))" class="form-control admin-panel-control" /></td>
+                                <td>
+                                    <input form="@editFormId" type="hidden" name="Principal" value="false" />
+                                    <input form="@editFormId" name="Principal" value="true" type="checkbox" class="form-check-input" checked="@vinculo.Principal" />
+                                </td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarInstrutor" asp-route-id="@vinculo.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirInstrutor" asp-route-id="@vinculo.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </section>
 
     <section class="admin-panel-card-v2">
         <div class="admin-panel-card-header"><h2>Aulas cadastradas</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Data</th><th>Turma</th><th>Instrutor</th><th>Status</th><th class="text-end">Frequencia</th></tr></thead>
+                <thead><tr><th>Turma</th><th>Instrutor</th><th>Inicio</th><th>Fim</th><th>Status</th><th>Local</th><th class="text-end">Frequencia</th><th class="text-end">Acoes</th></tr></thead>
                 <tbody>
-                    @foreach (var aula in Model.Aulas)
+                    @if (Model.Aulas.Count == 0)
                     {
-                        <tr>
-                            <td>@aula.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@aula.Turma</td>
-                            <td>@(aula.Instrutor ?? "-")</td>
-                            <td><span class="admin-panel-badge">@aula.Status</span></td>
-                            <td class="text-end">@aula.FrequenciasRegistradas/@aula.TotalAlunos</td>
-                        </tr>
+                        <tr><td colspan="8" class="text-center text-muted py-4">Nenhuma aula cadastrada.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var aula in Model.Aulas)
+                        {
+                            var editFormId = $"aula-edit-{aula.Id}";
+                            var deleteFormId = $"aula-delete-{aula.Id}";
+                            <tr>
+                                <td>
+                                    <select form="@editFormId" name="TurmaId" class="form-select admin-panel-control">
+                                        @foreach (var turma in Model.Turmas)
+                                        {
+                                            <option value="@turma.Id" selected="@(aula.TurmaId == turma.Id)">@turma.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="InstrutorUsuarioId" class="form-select admin-panel-control">
+                                        <option value="">Sem instrutor</option>
+                                        @foreach (var instrutor in Model.Instrutores)
+                                        {
+                                            <option value="@instrutor.Id" selected="@(aula.InstrutorUsuarioId == instrutor.Id)">@instrutor.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input form="@editFormId" name="Inicio" type="datetime-local" value="@aula.Inicio.ToString("yyyy-MM-ddTHH:mm")" class="form-control admin-panel-control" /></td>
+                                <td><input form="@editFormId" name="Fim" type="datetime-local" value="@aula.Fim.ToString("yyyy-MM-ddTHH:mm")" class="form-control admin-panel-control" /></td>
+                                <td>
+                                    <select form="@editFormId" name="Status" class="form-select admin-panel-control">
+                                        @foreach (var status in Enum.GetValues<StatusAulaEnum>())
+                                        {
+                                            <option value="@status" selected="@(aula.Status == status)">@status</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input form="@editFormId" name="Local" value="@aula.Local" class="form-control admin-panel-control" maxlength="150" /></td>
+                                <td class="text-end">@aula.FrequenciasRegistradas/@aula.TotalAlunos</td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarAula" asp-route-id="@aula.Id" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="TurmaHorarioId" value="@aula.TurmaHorarioId" />
+                                            <input type="hidden" name="Observacoes" value="@aula.Observacoes" />
+                                        </form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirAula" asp-route-id="@aula.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>

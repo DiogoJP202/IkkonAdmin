@@ -64,16 +64,87 @@
         <div class="admin-panel-card-header"><h2>Comunicados publicados</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Titulo</th><th>Publicado</th><th>Status</th><th>Leituras</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Titulo</th>
+                        <th>Alvo</th>
+                        <th>Publicacao</th>
+                        <th>Flags</th>
+                        <th>Status</th>
+                        <th>Conteudo</th>
+                        <th class="text-end">Acoes</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    @foreach (var item in Model.Comunicados)
+                    @if (Model.Comunicados.Count == 0)
                     {
-                        <tr>
-                            <td>@item.Titulo @(item.Importante ? "| Importante" : string.Empty)</td>
-                            <td>@item.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@(item.Ativo ? "Ativo" : "Inativo")</td>
-                            <td>@item.Leituras</td>
-                        </tr>
+                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum comunicado publicado.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model.Comunicados)
+                        {
+                            var editFormId = $"comunicado-edit-{item.Id}";
+                            var deleteFormId = $"comunicado-delete-{item.Id}";
+                            <tr>
+                                <td>
+                                    <input form="@editFormId" name="Titulo" value="@item.Titulo" class="form-control admin-panel-control" maxlength="180" />
+                                </td>
+                                <td>
+                                    <select form="@editFormId" name="AlvoTipo" class="form-select admin-panel-control mb-2">
+                                        @foreach (var alvo in Enum.GetValues<ComunicadoAlvoTipoEnum>())
+                                        {
+                                            <option value="@alvo" selected="@(item.AlvoTipo == alvo)">@alvo</option>
+                                        }
+                                    </select>
+                                    <select form="@editFormId" name="AlunoId" class="form-select admin-panel-control mb-2">
+                                        <option value="">Aluno opcional</option>
+                                        @foreach (var aluno in Model.Alunos)
+                                        {
+                                            <option value="@aluno.Id" selected="@(item.AlunoId == aluno.Id)">@aluno.Nome</option>
+                                        }
+                                    </select>
+                                    <select form="@editFormId" name="TurmaId" class="form-select admin-panel-control">
+                                        <option value="">Turma opcional</option>
+                                        @foreach (var turma in Model.Turmas)
+                                        {
+                                            <option value="@turma.Id" selected="@(item.TurmaId == turma.Id)">@turma.Nome</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input form="@editFormId" name="PublicadoEmUtc" type="datetime-local" value="@item.PublicadoEmUtc.ToLocalTime().ToString("yyyy-MM-ddTHH:mm")" class="form-control admin-panel-control mb-2" />
+                                    <input form="@editFormId" name="ExpiraEmUtc" type="datetime-local" value="@(item.ExpiraEmUtc?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm"))" class="form-control admin-panel-control" />
+                                </td>
+                                <td>
+                                    <label class="admin-panel-inline-check">
+                                        <input form="@editFormId" type="hidden" name="Importante" value="false" />
+                                        <input form="@editFormId" name="Importante" value="true" type="checkbox" class="form-check-input" checked="@item.Importante" />
+                                        <span>Importante</span>
+                                    </label>
+                                    <label class="admin-panel-inline-check">
+                                        <input form="@editFormId" type="hidden" name="Fixado" value="false" />
+                                        <input form="@editFormId" name="Fixado" value="true" type="checkbox" class="form-check-input" checked="@item.Fixado" />
+                                        <span>Fixado</span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <span class="admin-panel-status-pill @(item.Ativo ? "is-success" : "is-muted")">@(item.Ativo ? "Ativo" : "Inativo")</span>
+                                    <span class="text-muted d-block mt-2">@item.Leituras leitura(s)</span>
+                                </td>
+                                <td>
+                                    <textarea form="@editFormId" name="Conteudo" class="form-control admin-panel-control" rows="4" maxlength="4000">@item.Conteudo</textarea>
+                                </td>
+                                <td>
+                                    <div class="admin-panel-row-actions justify-content-end">
+                                        <form id="@editFormId" asp-action="AtualizarComunicado" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        <form id="@deleteFormId" asp-action="ExcluirComunicado" asp-route-id="@item.Id" method="post">@Html.AntiForgeryToken()</form>
+                                        <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>

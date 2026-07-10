@@ -77,6 +77,64 @@ public class AreaAlunoAdminService(
         return AreaAlunoOperacaoResult.Ok("Horario cadastrado.");
     }
 
+    public async Task<AreaAlunoOperacaoResult> AtualizarHorarioAsync(
+        int id,
+        TurmaHorarioFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        if (model.HoraFim <= model.HoraInicio)
+        {
+            return AreaAlunoOperacaoResult.Falha("O horario final deve ser posterior ao inicial.");
+        }
+
+        var horario = await dbContext.TurmaHorarios.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (horario is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Horario nao encontrado.");
+        }
+
+        var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
+        if (!turmaExiste)
+        {
+            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+        }
+
+        horario.TurmaId = model.TurmaId;
+        horario.DiaSemana = model.DiaSemana;
+        horario.HoraInicio = model.HoraInicio;
+        horario.HoraFim = model.HoraFim;
+        horario.Local = LimparOpcional(model.Local);
+        horario.Ativo = true;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Horario atualizado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirHorarioAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var horario = await dbContext.TurmaHorarios
+            .Include(x => x.Aulas)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (horario is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Horario nao encontrado.");
+        }
+
+        if (horario.Aulas.Count > 0)
+        {
+            horario.Ativo = false;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return AreaAlunoOperacaoResult.Ok("Horario desativado porque possui aulas vinculadas.");
+        }
+
+        dbContext.TurmaHorarios.Remove(horario);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Horario excluido.");
+    }
+
     public async Task<AreaAlunoOperacaoResult> VincularInstrutorAsync(
         TurmaInstrutorFormViewModel model,
         CancellationToken cancellationToken = default)
@@ -122,6 +180,72 @@ public class AreaAlunoAdminService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         return AreaAlunoOperacaoResult.Ok("Instrutor vinculado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> AtualizarInstrutorAsync(
+        int id,
+        TurmaInstrutorFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var vinculo = await dbContext.TurmaInstrutores.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (vinculo is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Vinculo de instrutor nao encontrado.");
+        }
+
+        var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
+        if (!turmaExiste)
+        {
+            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+        }
+
+        var instrutorValido = await dbContext.UsuariosSistema
+            .AnyAsync(
+                x => x.Id == model.UsuarioSistemaId &&
+                     x.Ativo &&
+                     x.TipoAcesso != TipoAcessoEnum.Aluno,
+                cancellationToken);
+
+        if (!instrutorValido)
+        {
+            return AreaAlunoOperacaoResult.Falha("Instrutor nao encontrado ou sem acesso interno.");
+        }
+
+        if (model.Principal)
+        {
+            var principais = await dbContext.TurmaInstrutores
+                .Where(x => x.Id != id && x.TurmaId == model.TurmaId && x.Principal && !x.DataFim.HasValue)
+                .ToListAsync(cancellationToken);
+
+            foreach (var principal in principais)
+            {
+                principal.Principal = false;
+            }
+        }
+
+        vinculo.TurmaId = model.TurmaId;
+        vinculo.UsuarioSistemaId = model.UsuarioSistemaId;
+        vinculo.Principal = model.Principal;
+        vinculo.DataInicio = model.DataInicio;
+        vinculo.DataFim = model.DataFim;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Instrutor atualizado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirInstrutorAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var vinculo = await dbContext.TurmaInstrutores.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (vinculo is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Vinculo de instrutor nao encontrado.");
+        }
+
+        dbContext.TurmaInstrutores.Remove(vinculo);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Instrutor removido da turma.");
     }
 
     public async Task<AreaAlunoOperacaoResult> CriarAulaAsync(
@@ -179,6 +303,92 @@ public class AreaAlunoAdminService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         return AreaAlunoOperacaoResult.Ok("Aula cadastrada.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> AtualizarAulaAsync(
+        int id,
+        AulaFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        if (model.Fim <= model.Inicio)
+        {
+            return AreaAlunoOperacaoResult.Falha("O fim da aula deve ser posterior ao inicio.");
+        }
+
+        var aula = await dbContext.Aulas.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (aula is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Aula nao encontrada.");
+        }
+
+        var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
+        if (!turmaExiste)
+        {
+            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+        }
+
+        if (model.TurmaHorarioId.HasValue)
+        {
+            var horarioValido = await dbContext.TurmaHorarios
+                .AnyAsync(x => x.Id == model.TurmaHorarioId.Value && x.TurmaId == model.TurmaId, cancellationToken);
+
+            if (!horarioValido)
+            {
+                return AreaAlunoOperacaoResult.Falha("Horario nao pertence a turma selecionada.");
+            }
+        }
+
+        if (model.InstrutorUsuarioId.HasValue)
+        {
+            var instrutorValido = await dbContext.UsuariosSistema
+                .AnyAsync(
+                    x => x.Id == model.InstrutorUsuarioId.Value &&
+                         x.Ativo &&
+                         x.TipoAcesso != TipoAcessoEnum.Aluno,
+                    cancellationToken);
+
+            if (!instrutorValido)
+            {
+                return AreaAlunoOperacaoResult.Falha("Instrutor invalido.");
+            }
+        }
+
+        aula.TurmaId = model.TurmaId;
+        aula.TurmaHorarioId = model.TurmaHorarioId;
+        aula.InstrutorUsuarioId = model.InstrutorUsuarioId;
+        aula.Inicio = model.Inicio;
+        aula.Fim = model.Fim;
+        aula.Local = LimparOpcional(model.Local);
+        aula.Status = model.Status;
+        aula.Observacoes = LimparOpcional(model.Observacoes);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Aula atualizada.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirAulaAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var aula = await dbContext.Aulas
+            .Include(x => x.Frequencias)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (aula is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Aula nao encontrada.");
+        }
+
+        if (aula.Frequencias.Count > 0)
+        {
+            aula.Status = StatusAulaEnum.Cancelada;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return AreaAlunoOperacaoResult.Ok("Aula cancelada porque possui frequencia registrada.");
+        }
+
+        dbContext.Aulas.Remove(aula);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Aula excluida.");
     }
 
     public async Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(CancellationToken cancellationToken = default)
@@ -316,6 +526,60 @@ public class AreaAlunoAdminService(
         return AreaAlunoOperacaoResult.Ok("Tipo de documento criado.");
     }
 
+    public async Task<AreaAlunoOperacaoResult> AtualizarDocumentoTipoAsync(
+        int id,
+        DocumentoTipoFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var tipo = await dbContext.DocumentoTipos.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (tipo is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento nao encontrado.");
+        }
+
+        var nome = model.Nome.Trim();
+        var existe = await dbContext.DocumentoTipos
+            .AnyAsync(x => x.Id != id && x.Nome == nome, cancellationToken);
+
+        if (existe)
+        {
+            return AreaAlunoOperacaoResult.Falha("Ja existe um tipo de documento com este nome.");
+        }
+
+        tipo.Nome = nome;
+        tipo.Descricao = LimparOpcional(model.Descricao);
+        tipo.Obrigatorio = model.Obrigatorio;
+        tipo.Ativo = model.Ativo;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Tipo de documento atualizado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirDocumentoTipoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var tipo = await dbContext.DocumentoTipos
+            .Include(x => x.Solicitacoes)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (tipo is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento nao encontrado.");
+        }
+
+        if (tipo.Solicitacoes.Count > 0)
+        {
+            tipo.Ativo = false;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return AreaAlunoOperacaoResult.Ok("Tipo desativado porque possui solicitacoes vinculadas.");
+        }
+
+        dbContext.DocumentoTipos.Remove(tipo);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Tipo de documento excluido.");
+    }
+
     public async Task<AreaAlunoOperacaoResult> SolicitarDocumentoAsync(
         DocumentoSolicitacaoFormViewModel model,
         int? usuarioId,
@@ -342,6 +606,60 @@ public class AreaAlunoAdminService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         return AreaAlunoOperacaoResult.Ok("Documento solicitado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> AtualizarDocumentoSolicitacaoAsync(
+        int id,
+        DocumentoSolicitacaoEdicaoViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var solicitacao = await dbContext.DocumentoSolicitacoes
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (solicitacao is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Solicitacao nao encontrada.");
+        }
+
+        var tipoExiste = await dbContext.DocumentoTipos.AnyAsync(x => x.Id == model.DocumentoTipoId, cancellationToken);
+        var alunoExiste = await dbContext.Alunos.AnyAsync(x => x.Id == model.AlunoId, cancellationToken);
+
+        if (!tipoExiste || !alunoExiste)
+        {
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento ou aluno invalido.");
+        }
+
+        solicitacao.DocumentoTipoId = model.DocumentoTipoId;
+        solicitacao.AlunoId = model.AlunoId;
+        solicitacao.Status = model.Status;
+        solicitacao.DataLimite = model.DataLimite;
+        solicitacao.ObservacaoAdministrativa = LimparOpcional(model.ObservacaoAdministrativa);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Solicitacao atualizada.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirDocumentoSolicitacaoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var solicitacao = await dbContext.DocumentoSolicitacoes
+            .Include(x => x.Envios)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (solicitacao is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Solicitacao nao encontrada.");
+        }
+
+        if (solicitacao.Envios.Count > 0)
+        {
+            return AreaAlunoOperacaoResult.Falha("Nao e possivel excluir uma solicitacao com arquivos enviados. Altere o status para recusado ou pendente.");
+        }
+
+        dbContext.DocumentoSolicitacoes.Remove(solicitacao);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Solicitacao excluida.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AvaliarDocumentoAsync(
@@ -422,6 +740,68 @@ public class AreaAlunoAdminService(
         return AreaAlunoOperacaoResult.Ok("Comunicado publicado.");
     }
 
+    public async Task<AreaAlunoOperacaoResult> AtualizarComunicadoAsync(
+        int id,
+        ComunicadoFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var alvoValidado = await ValidarAlvoAsync(model.AlvoTipo, model.AlunoId, model.TurmaId, cancellationToken);
+        if (!alvoValidado.Sucesso)
+        {
+            return alvoValidado;
+        }
+
+        var comunicado = await dbContext.Comunicados
+            .Include(x => x.Alvos)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (comunicado is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Comunicado nao encontrado.");
+        }
+
+        comunicado.Titulo = model.Titulo.Trim();
+        comunicado.Conteudo = model.Conteudo.Trim();
+        comunicado.Importante = model.Importante;
+        comunicado.Fixado = model.Fixado;
+        comunicado.PublicadoEmUtc = model.PublicadoEmUtc;
+        comunicado.ExpiraEmUtc = model.ExpiraEmUtc;
+        comunicado.Ativo = true;
+
+        dbContext.ComunicadosAlvos.RemoveRange(comunicado.Alvos);
+        comunicado.Alvos.Add(CriarComunicadoAlvo(model.AlvoTipo, model.AlunoId, model.TurmaId));
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Comunicado atualizado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirComunicadoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var comunicado = await dbContext.Comunicados
+            .Include(x => x.Alvos)
+            .Include(x => x.Leituras)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (comunicado is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Comunicado nao encontrado.");
+        }
+
+        if (comunicado.Leituras.Count > 0)
+        {
+            comunicado.Ativo = false;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return AreaAlunoOperacaoResult.Ok("Comunicado desativado porque ja possui leituras.");
+        }
+
+        dbContext.ComunicadosAlvos.RemoveRange(comunicado.Alvos);
+        dbContext.Comunicados.Remove(comunicado);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Comunicado excluido.");
+    }
+
     public async Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(CancellationToken cancellationToken = default)
     {
         return new AreaAlunoEventosAdminViewModel
@@ -467,6 +847,65 @@ public class AreaAlunoAdminService(
         return AreaAlunoOperacaoResult.Ok("Evento cadastrado.");
     }
 
+    public async Task<AreaAlunoOperacaoResult> AtualizarEventoAsync(
+        int id,
+        EventoAlunoFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        if (model.Fim <= model.Inicio)
+        {
+            return AreaAlunoOperacaoResult.Falha("O fim do evento deve ser posterior ao inicio.");
+        }
+
+        var alvoValidado = await ValidarAlvoAsync(model.AlvoTipo, model.AlunoId, model.TurmaId, cancellationToken);
+        if (!alvoValidado.Sucesso)
+        {
+            return alvoValidado;
+        }
+
+        var evento = await dbContext.EventosAlunoPortal
+            .Include(x => x.Alvos)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (evento is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Evento nao encontrado.");
+        }
+
+        evento.Titulo = model.Titulo.Trim();
+        evento.Descricao = LimparOpcional(model.Descricao);
+        evento.Inicio = model.Inicio;
+        evento.Fim = model.Fim;
+        evento.Local = LimparOpcional(model.Local);
+        evento.Tipo = model.Tipo;
+        evento.Importante = model.Importante;
+        evento.GoogleEventoId = LimparOpcional(model.GoogleEventoId);
+        evento.Ativo = true;
+
+        dbContext.EventosAlunoPortalAlvos.RemoveRange(evento.Alvos);
+        evento.Alvos.Add(CriarEventoAlvo(model.AlvoTipo, model.AlunoId, model.TurmaId));
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Evento atualizado.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirEventoAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var evento = await dbContext.EventosAlunoPortal
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (evento is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Evento nao encontrado.");
+        }
+
+        evento.Ativo = false;
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Evento desativado.");
+    }
+
     public async Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(CancellationToken cancellationToken = default)
     {
         return new AreaAlunoConquistasAdminViewModel
@@ -502,6 +941,62 @@ public class AreaAlunoAdminService(
         return AreaAlunoOperacaoResult.Ok("Insignia criada.");
     }
 
+    public async Task<AreaAlunoOperacaoResult> AtualizarInsigniaAsync(
+        int id,
+        InsigniaFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var insignia = await dbContext.Insignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (insignia is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Insignia nao encontrada.");
+        }
+
+        var nome = model.Nome.Trim();
+        var existe = await dbContext.Insignias
+            .AnyAsync(x => x.Id != id && x.Nome == nome, cancellationToken);
+
+        if (existe)
+        {
+            return AreaAlunoOperacaoResult.Falha("Ja existe uma insignia com este nome.");
+        }
+
+        insignia.Nome = nome;
+        insignia.Descricao = LimparOpcional(model.Descricao);
+        insignia.Icone = LimparOpcional(model.Icone);
+        insignia.Categoria = LimparOpcional(model.Categoria);
+        insignia.RegraAutomatica = LimparOpcional(model.RegraAutomatica);
+        insignia.Ativa = model.Ativa;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Insignia atualizada.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirInsigniaAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var insignia = await dbContext.Insignias
+            .Include(x => x.Alunos)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (insignia is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Insignia nao encontrada.");
+        }
+
+        if (insignia.Alunos.Count > 0)
+        {
+            insignia.Ativa = false;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return AreaAlunoOperacaoResult.Ok("Insignia desativada porque ja foi atribuida.");
+        }
+
+        dbContext.Insignias.Remove(insignia);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Insignia excluida.");
+    }
+
     public async Task<AreaAlunoOperacaoResult> AtribuirInsigniaAsync(
         AlunoInsigniaFormViewModel model,
         int? usuarioId,
@@ -535,6 +1030,56 @@ public class AreaAlunoAdminService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         return AreaAlunoOperacaoResult.Ok("Insignia atribuida ao aluno.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> AtualizarAlunoInsigniaAsync(
+        int id,
+        AlunoInsigniaFormViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        var conquista = await dbContext.AlunoInsignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (conquista is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Conquista nao encontrada.");
+        }
+
+        var alunoExiste = await dbContext.Alunos.AnyAsync(x => x.Id == model.AlunoId, cancellationToken);
+        var insigniaExiste = await dbContext.Insignias.AnyAsync(x => x.Id == model.InsigniaId && x.Ativa, cancellationToken);
+
+        if (!alunoExiste || !insigniaExiste)
+        {
+            return AreaAlunoOperacaoResult.Falha("Aluno ou insignia invalida.");
+        }
+
+        var duplicada = await dbContext.AlunoInsignias
+            .AnyAsync(x => x.Id != id && x.AlunoId == model.AlunoId && x.InsigniaId == model.InsigniaId, cancellationToken);
+
+        if (duplicada)
+        {
+            return AreaAlunoOperacaoResult.Falha("Este aluno ja possui esta insignia.");
+        }
+
+        conquista.AlunoId = model.AlunoId;
+        conquista.InsigniaId = model.InsigniaId;
+        conquista.Observacao = LimparOpcional(model.Observacao);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Conquista atualizada.");
+    }
+
+    public async Task<AreaAlunoOperacaoResult> ExcluirAlunoInsigniaAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var conquista = await dbContext.AlunoInsignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (conquista is null)
+        {
+            return AreaAlunoOperacaoResult.Falha("Conquista nao encontrada.");
+        }
+
+        dbContext.AlunoInsignias.Remove(conquista);
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return AreaAlunoOperacaoResult.Ok("Conquista removida do aluno.");
     }
 
     private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarAlunosOpcoesAsync(CancellationToken cancellationToken)
@@ -590,6 +1135,7 @@ public class AreaAlunoAdminService(
             .Select(x => new AreaAlunoHorarioAdminItemViewModel
             {
                 Id = x.Id,
+                TurmaId = x.TurmaId,
                 Turma = x.Turma != null ? x.Turma.Nome : $"Turma #{x.TurmaId}",
                 DiaSemana = x.DiaSemana,
                 HoraInicio = x.HoraInicio,
@@ -611,7 +1157,9 @@ public class AreaAlunoAdminService(
             .Select(x => new AreaAlunoInstrutorAdminItemViewModel
             {
                 Id = x.Id,
+                TurmaId = x.TurmaId,
                 Turma = x.Turma != null ? x.Turma.Nome : $"Turma #{x.TurmaId}",
+                UsuarioSistemaId = x.UsuarioSistemaId,
                 Instrutor = x.UsuarioSistema != null ? x.UsuarioSistema.NomeExibicao : $"Usuario #{x.UsuarioSistemaId}",
                 Principal = x.Principal,
                 DataInicio = x.DataInicio,
@@ -637,12 +1185,16 @@ public class AreaAlunoAdminService(
             .Select(x => new AreaAlunoAulaAdminItemViewModel
             {
                 Id = x.Id,
+                TurmaId = x.TurmaId,
                 Turma = x.Turma != null ? x.Turma.Nome : $"Turma #{x.TurmaId}",
+                TurmaHorarioId = x.TurmaHorarioId,
+                InstrutorUsuarioId = x.InstrutorUsuarioId,
                 Inicio = x.Inicio,
                 Fim = x.Fim,
                 Local = x.Local,
                 Instrutor = x.InstrutorUsuario != null ? x.InstrutorUsuario.NomeExibicao : null,
                 Status = x.Status,
+                Observacoes = x.Observacoes,
                 TotalAlunos = x.Turma != null ? x.Turma.AlunoTurmas.Count : 0,
                 FrequenciasRegistradas = x.Frequencias.Count
             })
@@ -686,7 +1238,9 @@ public class AreaAlunoAdminService(
                 return new AreaAlunoDocumentoAdminItemViewModel
                 {
                     SolicitacaoId = x.Id,
+                    AlunoId = x.AlunoId,
                     Aluno = x.Aluno?.NomeCompleto ?? $"Aluno #{x.AlunoId}",
+                    DocumentoTipoId = x.DocumentoTipoId,
                     Tipo = x.DocumentoTipo?.Nome ?? $"Documento #{x.DocumentoTipoId}",
                     Status = x.Status,
                     DataSolicitacaoUtc = x.DataSolicitacaoUtc,
@@ -704,46 +1258,71 @@ public class AreaAlunoAdminService(
         int limite,
         CancellationToken cancellationToken)
     {
-        return await dbContext.Comunicados
+        var comunicados = await dbContext.Comunicados
             .AsNoTracking()
+            .Include(x => x.Alvos)
             .Include(x => x.Leituras)
             .OrderByDescending(x => x.Fixado)
             .ThenByDescending(x => x.PublicadoEmUtc)
             .Take(limite)
-            .Select(x => new AreaAlunoComunicadoAdminItemViewModel
-            {
-                Id = x.Id,
-                Titulo = x.Titulo,
-                Importante = x.Importante,
-                Fixado = x.Fixado,
-                Ativo = x.Ativo,
-                PublicadoEmUtc = x.PublicadoEmUtc,
-                ExpiraEmUtc = x.ExpiraEmUtc,
-                Leituras = x.Leituras.Count
-            })
             .ToListAsync(cancellationToken);
+
+        return comunicados
+            .Select(x =>
+            {
+                var alvo = x.Alvos.FirstOrDefault();
+                return new AreaAlunoComunicadoAdminItemViewModel
+                {
+                    Id = x.Id,
+                    Titulo = x.Titulo,
+                    Conteudo = x.Conteudo,
+                    Importante = x.Importante,
+                    Fixado = x.Fixado,
+                    Ativo = x.Ativo,
+                    PublicadoEmUtc = x.PublicadoEmUtc,
+                    ExpiraEmUtc = x.ExpiraEmUtc,
+                    AlvoTipo = ObterAlvoTipo(alvo?.Todos == true, alvo?.AlunoId, alvo?.TurmaId),
+                    AlunoId = alvo?.AlunoId,
+                    TurmaId = alvo?.TurmaId,
+                    Leituras = x.Leituras.Count
+                };
+            })
+            .ToList();
     }
 
     private async Task<IReadOnlyCollection<AreaAlunoEventoAdminItemViewModel>> ListarEventosAdminAsync(
         int limite,
         CancellationToken cancellationToken)
     {
-        return await dbContext.EventosAlunoPortal
+        var eventos = await dbContext.EventosAlunoPortal
             .AsNoTracking()
+            .Include(x => x.Alvos)
             .OrderBy(x => x.Inicio)
             .Take(limite)
-            .Select(x => new AreaAlunoEventoAdminItemViewModel
-            {
-                Id = x.Id,
-                Titulo = x.Titulo,
-                Inicio = x.Inicio,
-                Fim = x.Fim,
-                Local = x.Local,
-                Tipo = x.Tipo,
-                Importante = x.Importante,
-                Ativo = x.Ativo
-            })
             .ToListAsync(cancellationToken);
+
+        return eventos
+            .Select(x =>
+            {
+                var alvo = x.Alvos.FirstOrDefault();
+                return new AreaAlunoEventoAdminItemViewModel
+                {
+                    Id = x.Id,
+                    Titulo = x.Titulo,
+                    Descricao = x.Descricao,
+                    Inicio = x.Inicio,
+                    Fim = x.Fim,
+                    Local = x.Local,
+                    Tipo = x.Tipo,
+                    Importante = x.Importante,
+                    Ativo = x.Ativo,
+                    GoogleEventoId = x.GoogleEventoId,
+                    AlvoTipo = ObterAlvoTipo(alvo?.Todos == true, alvo?.AlunoId, alvo?.TurmaId),
+                    AlunoId = alvo?.AlunoId,
+                    TurmaId = alvo?.TurmaId
+                };
+            })
+            .ToList();
     }
 
     private async Task<IReadOnlyCollection<AreaAlunoInsigniaItemViewModel>> ListarInsigniasAsync(CancellationToken cancellationToken)
@@ -755,7 +1334,10 @@ public class AreaAlunoAdminService(
             {
                 Id = x.Id,
                 Nome = x.Nome,
+                Descricao = x.Descricao,
+                Icone = x.Icone,
                 Categoria = x.Categoria,
+                RegraAutomatica = x.RegraAutomatica,
                 Ativa = x.Ativa
             })
             .ToListAsync(cancellationToken);
@@ -774,10 +1356,13 @@ public class AreaAlunoAdminService(
             .Select(x => new AreaAlunoConquistaAdminItemViewModel
             {
                 Id = x.Id,
+                AlunoId = x.AlunoId,
                 Aluno = x.Aluno != null ? x.Aluno.NomeCompleto : $"Aluno #{x.AlunoId}",
+                InsigniaId = x.InsigniaId,
                 Insignia = x.Insignia != null ? x.Insignia.Nome : $"Insignia #{x.InsigniaId}",
                 ConcedidaEmUtc = x.ConcedidaEmUtc,
-                Origem = x.Origem
+                Origem = x.Origem,
+                Observacao = x.Observacao
             })
             .ToListAsync(cancellationToken);
     }
@@ -835,6 +1420,29 @@ public class AreaAlunoAdminService(
             AlunoId = alvoTipo == ComunicadoAlvoTipoEnum.Aluno ? alunoId : null,
             TurmaId = alvoTipo == ComunicadoAlvoTipoEnum.Turma ? turmaId : null
         };
+    }
+
+    private static ComunicadoAlvoTipoEnum ObterAlvoTipo(
+        bool todos,
+        int? alunoId,
+        int? turmaId)
+    {
+        if (todos)
+        {
+            return ComunicadoAlvoTipoEnum.Todos;
+        }
+
+        if (alunoId.HasValue)
+        {
+            return ComunicadoAlvoTipoEnum.Aluno;
+        }
+
+        if (turmaId.HasValue)
+        {
+            return ComunicadoAlvoTipoEnum.Turma;
+        }
+
+        return ComunicadoAlvoTipoEnum.Todos;
     }
 
     private string ObterDocumentosPath()

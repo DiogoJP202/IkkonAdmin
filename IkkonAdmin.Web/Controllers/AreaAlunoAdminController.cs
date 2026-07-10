@@ -40,6 +40,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Aulas));
     }
 
+    [HttpPost("aulas/horarios/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> AtualizarHorario(int id, TurmaHorarioFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarHorarioAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horario.")));
+
+        return RedirectToAction(nameof(Aulas));
+    }
+
+    [HttpPost("aulas/horarios/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> ExcluirHorario(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirHorarioAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Aulas));
+    }
+
     [HttpPost("aulas/instrutores")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.AulasCreate)]
@@ -53,6 +75,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Aulas));
     }
 
+    [HttpPost("aulas/instrutores/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> AtualizarInstrutor(int id, TurmaInstrutorFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarInstrutorAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do instrutor.")));
+
+        return RedirectToAction(nameof(Aulas));
+    }
+
+    [HttpPost("aulas/instrutores/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> ExcluirInstrutor(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirInstrutorAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Aulas));
+    }
+
     [HttpPost("aulas")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.AulasCreate)]
@@ -63,6 +107,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
                 ? areaAlunoAdminService.CriarAulaAsync(model, cancellationToken)
                 : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da aula.")));
 
+        return RedirectToAction(nameof(Aulas));
+    }
+
+    [HttpPost("aulas/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> AtualizarAula(int id, AulaFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarAulaAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da aula.")));
+
+        return RedirectToAction(nameof(Aulas));
+    }
+
+    [HttpPost("aulas/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasEdit)]
+    public async Task<IActionResult> ExcluirAula(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirAulaAsync(id, cancellationToken));
         return RedirectToAction(nameof(Aulas));
     }
 
@@ -114,6 +180,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Documentos));
     }
 
+    [HttpPost("documentos/tipos/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.DocumentosEdit)]
+    public async Task<IActionResult> AtualizarDocumentoTipo(int id, DocumentoTipoFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarDocumentoTipoAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise o tipo de documento.")));
+
+        return RedirectToAction(nameof(Documentos));
+    }
+
+    [HttpPost("documentos/tipos/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.DocumentosEdit)]
+    public async Task<IActionResult> ExcluirDocumentoTipo(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirDocumentoTipoAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Documentos));
+    }
+
     [HttpPost("documentos/solicitar")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.DocumentosCreate)]
@@ -124,6 +212,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
                 ? areaAlunoAdminService.SolicitarDocumentoAsync(model, ObterUsuarioId(), cancellationToken)
                 : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitacao de documento.")));
 
+        return RedirectToAction(nameof(Documentos));
+    }
+
+    [HttpPost("documentos/solicitacoes/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.DocumentosEdit)]
+    public async Task<IActionResult> AtualizarDocumentoSolicitacao(int id, DocumentoSolicitacaoEdicaoViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarDocumentoSolicitacaoAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitacao de documento.")));
+
+        return RedirectToAction(nameof(Documentos));
+    }
+
+    [HttpPost("documentos/solicitacoes/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.DocumentosEdit)]
+    public async Task<IActionResult> ExcluirDocumentoSolicitacao(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirDocumentoSolicitacaoAsync(id, cancellationToken));
         return RedirectToAction(nameof(Documentos));
     }
 
@@ -173,6 +283,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Comunicados));
     }
 
+    [HttpPost("comunicados/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ComunicadosEdit)]
+    public async Task<IActionResult> AtualizarComunicado(int id, ComunicadoFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarComunicadoAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do comunicado.")));
+
+        return RedirectToAction(nameof(Comunicados));
+    }
+
+    [HttpPost("comunicados/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ComunicadosDelete)]
+    public async Task<IActionResult> ExcluirComunicado(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirComunicadoAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Comunicados));
+    }
+
     [HttpGet("eventos")]
     [Authorize(Policy = AuthorizationPolicies.EventosAlunoView)]
     public async Task<IActionResult> Eventos(CancellationToken cancellationToken)
@@ -191,6 +323,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
                 ? areaAlunoAdminService.CriarEventoAsync(model, cancellationToken)
                 : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do evento.")));
 
+        return RedirectToAction(nameof(Eventos));
+    }
+
+    [HttpPost("eventos/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.EventosAlunoEdit)]
+    public async Task<IActionResult> AtualizarEvento(int id, EventoAlunoFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarEventoAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do evento.")));
+
+        return RedirectToAction(nameof(Eventos));
+    }
+
+    [HttpPost("eventos/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.EventosAlunoDelete)]
+    public async Task<IActionResult> ExcluirEvento(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirEventoAsync(id, cancellationToken));
         return RedirectToAction(nameof(Eventos));
     }
 
@@ -215,6 +369,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Conquistas));
     }
 
+    [HttpPost("conquistas/insignias/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ConquistasEdit)]
+    public async Task<IActionResult> AtualizarInsignia(int id, InsigniaFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarInsigniaAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insignia.")));
+
+        return RedirectToAction(nameof(Conquistas));
+    }
+
+    [HttpPost("conquistas/insignias/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ConquistasEdit)]
+    public async Task<IActionResult> ExcluirInsignia(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirInsigniaAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Conquistas));
+    }
+
     [HttpPost("conquistas/atribuir")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.ConquistasCreate)]
@@ -225,6 +401,28 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
                 ? areaAlunoAdminService.AtribuirInsigniaAsync(model, ObterUsuarioId(), cancellationToken)
                 : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a atribuicao de insignia.")));
 
+        return RedirectToAction(nameof(Conquistas));
+    }
+
+    [HttpPost("conquistas/atribuicoes/{id:int}/editar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ConquistasEdit)]
+    public async Task<IActionResult> AtualizarAlunoInsignia(int id, AlunoInsigniaFormViewModel model, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(
+            ModelState.IsValid
+                ? areaAlunoAdminService.AtualizarAlunoInsigniaAsync(id, model, cancellationToken)
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a conquista.")));
+
+        return RedirectToAction(nameof(Conquistas));
+    }
+
+    [HttpPost("conquistas/atribuicoes/{id:int}/excluir")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ConquistasEdit)]
+    public async Task<IActionResult> ExcluirAlunoInsignia(int id, CancellationToken cancellationToken)
+    {
+        await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirAlunoInsigniaAsync(id, cancellationToken));
         return RedirectToAction(nameof(Conquistas));
     }
 

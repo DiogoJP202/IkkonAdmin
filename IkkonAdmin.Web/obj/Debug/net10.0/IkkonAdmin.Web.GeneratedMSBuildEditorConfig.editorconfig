@@ -46,8 +46,32 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEFjZXNzb0luZGlzcG9uaXZlbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Aulas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEF1bGFzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Comunicados.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXENvbXVuaWNhZG9zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Conquistas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXENvbnF1aXN0YXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Documentos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXERvY3VtZW50b3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Eventos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEV2ZW50b3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Financeiro.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEZpbmFuY2Vpcm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Frequencia.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEZyZXF1ZW5jaWEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Index.cshtml]
@@ -80,6 +104,38 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9zXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Aulas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQXVsYXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Comunicados.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQ29tdW5pY2Fkb3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Conquistas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQ29ucXVpc3Rhcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Documentos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRG9jdW1lbnRvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Eventos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRXZlbnRvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Frequencia.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRnJlcXVlbmNpYS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/RegistroFrequencia.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cUmVnaXN0cm9GcmVxdWVuY2lhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Auth/AcessoNegado.cshtml]

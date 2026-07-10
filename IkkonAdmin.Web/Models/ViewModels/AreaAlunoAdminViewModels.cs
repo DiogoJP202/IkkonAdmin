@@ -178,6 +178,21 @@ public class DocumentoSolicitacaoFormViewModel
     public string? ObservacaoAdministrativa { get; set; }
 }
 
+public class DocumentoSolicitacaoEdicaoViewModel
+{
+    [Required(ErrorMessage = "Selecione o tipo.")]
+    public int DocumentoTipoId { get; set; }
+
+    [Required(ErrorMessage = "Selecione o aluno.")]
+    public int AlunoId { get; set; }
+
+    public DocumentoStatusEnum Status { get; set; } = DocumentoStatusEnum.Solicitado;
+    public DateOnly? DataLimite { get; set; }
+
+    [StringLength(1000)]
+    public string? ObservacaoAdministrativa { get; set; }
+}
+
 public class DocumentoAvaliacaoFormViewModel
 {
     public int SolicitacaoId { get; set; }
@@ -268,6 +283,7 @@ public class AlunoInsigniaFormViewModel
 public class AreaAlunoHorarioAdminItemViewModel
 {
     public int Id { get; set; }
+    public int TurmaId { get; set; }
     public string Turma { get; set; } = string.Empty;
     public DayOfWeek DiaSemana { get; set; }
     public TimeOnly HoraInicio { get; set; }
@@ -279,7 +295,9 @@ public class AreaAlunoHorarioAdminItemViewModel
 public class AreaAlunoInstrutorAdminItemViewModel
 {
     public int Id { get; set; }
+    public int TurmaId { get; set; }
     public string Turma { get; set; } = string.Empty;
+    public int UsuarioSistemaId { get; set; }
     public string Instrutor { get; set; } = string.Empty;
     public bool Principal { get; set; }
     public DateOnly DataInicio { get; set; }
@@ -289,12 +307,16 @@ public class AreaAlunoInstrutorAdminItemViewModel
 public class AreaAlunoAulaAdminItemViewModel
 {
     public int Id { get; set; }
+    public int TurmaId { get; set; }
     public string Turma { get; set; } = string.Empty;
+    public int? TurmaHorarioId { get; set; }
+    public int? InstrutorUsuarioId { get; set; }
     public DateTime Inicio { get; set; }
     public DateTime Fim { get; set; }
     public string? Local { get; set; }
     public string? Instrutor { get; set; }
     public StatusAulaEnum Status { get; set; }
+    public string? Observacoes { get; set; }
     public int TotalAlunos { get; set; }
     public int FrequenciasRegistradas { get; set; }
 }
@@ -311,7 +333,9 @@ public class AreaAlunoDocumentoTipoItemViewModel
 public class AreaAlunoDocumentoAdminItemViewModel
 {
     public int SolicitacaoId { get; set; }
+    public int AlunoId { get; set; }
     public string Aluno { get; set; } = string.Empty;
+    public int DocumentoTipoId { get; set; }
     public string Tipo { get; set; } = string.Empty;
     public DocumentoStatusEnum Status { get; set; }
     public DateTime DataSolicitacaoUtc { get; set; }
@@ -326,11 +350,15 @@ public class AreaAlunoComunicadoAdminItemViewModel
 {
     public int Id { get; set; }
     public string Titulo { get; set; } = string.Empty;
+    public string Conteudo { get; set; } = string.Empty;
     public bool Importante { get; set; }
     public bool Fixado { get; set; }
     public bool Ativo { get; set; }
     public DateTime PublicadoEmUtc { get; set; }
     public DateTime? ExpiraEmUtc { get; set; }
+    public ComunicadoAlvoTipoEnum AlvoTipo { get; set; } = ComunicadoAlvoTipoEnum.Todos;
+    public int? AlunoId { get; set; }
+    public int? TurmaId { get; set; }
     public int Leituras { get; set; }
 }
 
@@ -338,27 +366,38 @@ public class AreaAlunoEventoAdminItemViewModel
 {
     public int Id { get; set; }
     public string Titulo { get; set; } = string.Empty;
+    public string? Descricao { get; set; }
     public DateTime Inicio { get; set; }
     public DateTime Fim { get; set; }
     public string? Local { get; set; }
     public EventoAlunoTipoEnum Tipo { get; set; }
     public bool Importante { get; set; }
     public bool Ativo { get; set; }
+    public string? GoogleEventoId { get; set; }
+    public ComunicadoAlvoTipoEnum AlvoTipo { get; set; } = ComunicadoAlvoTipoEnum.Todos;
+    public int? AlunoId { get; set; }
+    public int? TurmaId { get; set; }
 }
 
 public class AreaAlunoInsigniaItemViewModel
 {
     public int Id { get; set; }
     public string Nome { get; set; } = string.Empty;
+    public string? Descricao { get; set; }
+    public string? Icone { get; set; }
     public string? Categoria { get; set; }
+    public string? RegraAutomatica { get; set; }
     public bool Ativa { get; set; }
 }
 
 public class AreaAlunoConquistaAdminItemViewModel
 {
     public int Id { get; set; }
+    public int AlunoId { get; set; }
     public string Aluno { get; set; } = string.Empty;
+    public int InsigniaId { get; set; }
     public string Insignia { get; set; } = string.Empty;
     public DateTime ConcedidaEmUtc { get; set; }
     public InsigniaOrigemEnum Origem { get; set; }
+    public string? Observacao { get; set; }
 }

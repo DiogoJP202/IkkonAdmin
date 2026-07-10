@@ -15517,6 +15517,38 @@ textarea.admin-panel-control {
 .admin-panel-badge.is-danger { background: #fff1f0; color: var(--panel-danger); }
 .admin-panel-badge.is-warning { background: #fff7e8; color: var(--panel-warning); }
 
+.admin-panel-status-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.34rem 0.58rem;
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.admin-panel-status-pill.is-success {
+  background: #e8f6ee;
+  color: #17633d;
+}
+
+.admin-panel-status-pill.is-muted {
+  background: #eef1f5;
+  color: #667085;
+}
+
+.admin-panel-inline-check {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-bottom: 0.42rem;
+  color: #4b5565;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
 .admin-panel-row-actions {
   justify-content: flex-end;
   gap: 0.35rem;

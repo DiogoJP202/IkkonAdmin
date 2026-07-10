@@ -589,5 +589,6 @@ C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\
 C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.pdb
 C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\IkkonAdmin.Web.genruntimeconfig.cache
 C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\ref\IkkonAdmin.Web.dll
-C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-cq5mbgir32-cq5mbgir32.gz
 C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\lommt1rhbg-{0}-f2a8f6ww64-f2a8f6ww64.gz
+C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\n8drn3dedf-{0}-6ucxpbh4p8-6ucxpbh4p8.gz
+C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\59128giy75-{0}-25icrjwjye-25icrjwjye.gz

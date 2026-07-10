@@ -22,6 +22,7 @@ logs/
 
 # Runtime uploads
 IkkonAdmin.Web/wwwroot/uploads/
+IkkonAdmin.Web/App_Data/
 
 # NuGet
 *.nupkg
