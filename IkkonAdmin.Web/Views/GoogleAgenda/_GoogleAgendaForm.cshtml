@@ -31,7 +31,7 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-12 col-lg-8">
-                                <label asp-for="Titulo" class="form-label agenda-label"></label>
+                                <label asp-for="Titulo" class="form-label agenda-label">Título</label>
                                 <input asp-for="Titulo" class="form-control agenda-control" placeholder="Ex.: Aula Taiko Iniciante A - Fundamentos" autocomplete="off" autofocus />
                                 <span asp-validation-for="Titulo" class="text-danger"></span>
                             </div>
@@ -53,13 +53,13 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
-                                <label asp-for="Inicio" class="form-label agenda-label"></label>
+                                <label asp-for="Inicio" class="form-label agenda-label">Início</label>
                                 <input asp-for="Inicio" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control agenda-control" />
                                 <span class="agenda-help-text">Informe data e horário de início.</span>
                                 <span asp-validation-for="Inicio" class="text-danger"></span>
                             </div>
                             <div class="col-12 col-md-6">
-                                <label asp-for="Fim" class="form-label agenda-label"></label>
+                                <label asp-for="Fim" class="form-label agenda-label">Fim</label>
                                 <input asp-for="Fim" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control agenda-control" />
                                 <span class="agenda-help-text">Informe data e horário de encerramento.</span>
                                 <span asp-validation-for="Fim" class="text-danger"></span>
@@ -82,7 +82,7 @@
                                 <span asp-validation-for="Local" class="text-danger"></span>
                             </div>
                             <div class="col-12">
-                                <label asp-for="Descricao" class="form-label agenda-label"></label>
+                                <label asp-for="Descricao" class="form-label agenda-label">Descrição</label>
                                 <textarea asp-for="Descricao" class="form-control agenda-control" rows="6" placeholder="Ex.: responsáveis, materiais necessários, observações da aula, chamada, montagem, repertório ou orientações para chegada."></textarea>
                                 <span asp-validation-for="Descricao" class="text-danger"></span>
                             </div>

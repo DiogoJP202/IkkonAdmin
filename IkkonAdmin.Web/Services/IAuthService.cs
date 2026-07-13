@@ -11,6 +11,10 @@ public interface IAuthService
         TipoAcessoEnum tipoAcesso,
         string? enderecoIp = null,
         CancellationToken cancellationToken = default);
+
+    Task<AuthResult> RecarregarSessaoAsync(
+        int usuarioId,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed record AuthResult(

@@ -1,21 +1,21 @@
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = I18n["Dashboard", "Dashboard"];
 
     var meses = new[]
     {
-        new { Valor = 1, Nome = "Janeiro" },
-        new { Valor = 2, Nome = "Fevereiro" },
-        new { Valor = 3, Nome = "Março" },
-        new { Valor = 4, Nome = "Abril" },
-        new { Valor = 5, Nome = "Maio" },
-        new { Valor = 6, Nome = "Junho" },
-        new { Valor = 7, Nome = "Julho" },
-        new { Valor = 8, Nome = "Agosto" },
-        new { Valor = 9, Nome = "Setembro" },
-        new { Valor = 10, Nome = "Outubro" },
-        new { Valor = 11, Nome = "Novembro" },
-        new { Valor = 12, Nome = "Dezembro" }
+        new { Valor = 1, Nome = I18n["Janeiro", "January"] },
+        new { Valor = 2, Nome = I18n["Fevereiro", "February"] },
+        new { Valor = 3, Nome = I18n["Março", "March"] },
+        new { Valor = 4, Nome = I18n["Abril", "April"] },
+        new { Valor = 5, Nome = I18n["Maio", "May"] },
+        new { Valor = 6, Nome = I18n["Junho", "June"] },
+        new { Valor = 7, Nome = I18n["Julho", "July"] },
+        new { Valor = 8, Nome = I18n["Agosto", "August"] },
+        new { Valor = 9, Nome = I18n["Setembro", "September"] },
+        new { Valor = 10, Nome = I18n["Outubro", "October"] },
+        new { Valor = 11, Nome = I18n["Novembro", "November"] },
+        new { Valor = 12, Nome = I18n["Dezembro", "December"] }
     };
 
     var anos = Enumerable.Range(Model.AnoReferencia - 1, 3);
@@ -24,7 +24,7 @@
     var vencemHoje = Model.ProximosVencimentos.Count(x => x.DiasParaVencimento == 0);
     var vencemAteTresDias = Model.ProximosVencimentos.Count(x => x.DiasParaVencimento >= 0 && x.DiasParaVencimento <= 3);
     var totalAbertoCompetencia = Model.ProximosVencimentos.Sum(x => x.Valor);
-    var culturaPtBr = System.Globalization.CultureInfo.GetCultureInfo("pt-BR");
+    var culturaAtual = System.Globalization.CultureInfo.CurrentCulture;
 }
 
 @functions {
@@ -50,23 +50,30 @@
 
     private static string VencimentoTexto(int diasParaVencimento, StatusMensalidadeEnum status)
     {
+        var isEnglish = System.Globalization.CultureInfo.CurrentUICulture.Name.StartsWith("en", StringComparison.OrdinalIgnoreCase);
+
         if (diasParaVencimento < 0 || status == StatusMensalidadeEnum.Atrasado)
         {
             var dias = Math.Abs(diasParaVencimento);
+            if (isEnglish)
+            {
+                return $"{dias} {(dias == 1 ? "day" : "days")} overdue";
+            }
+
             return $"{dias} {(dias == 1 ? "dia" : "dias")} em atraso";
         }
 
         if (diasParaVencimento == 0)
         {
-            return "Vence hoje";
+            return isEnglish ? "Due today" : "Vence hoje";
         }
 
         if (diasParaVencimento == 1)
         {
-            return "Vence amanhã";
+            return isEnglish ? "Due tomorrow" : "Vence amanhã";
         }
 
-        return $"Vence em {diasParaVencimento} dias";
+        return isEnglish ? $"Due in {diasParaVencimento} days" : $"Vence em {diasParaVencimento} dias";
     }
 
     private static string RiscoClasse(int maiorDiasAtraso)
@@ -95,29 +102,29 @@
 <div class="dashboard-v2-page">
     <section class="dashboard-v2-hero mb-4">
         <div class="dashboard-v2-hero-copy">
-            <span class="dashboard-v2-eyebrow">Central operacional</span>
-            <h1>Dashboard administrativo</h1>
+            <span class="dashboard-v2-eyebrow">@I18n["Central operacional", "Operations center"]</span>
+            <h1>@I18n["Dashboard administrativo", "Administrative dashboard"]</h1>
             <p>
-                Acompanhe alunos, mensalidades, inadimplência e atividades recentes em uma visão direta para a rotina da escola.
+                @I18n["Acompanhe alunos, mensalidades, inadimplência e atividades recentes em uma visão direta para a rotina da escola.", "Track students, monthly fees, overdue payments, and recent activity in a direct view for the school's routine."]
             </p>
 
             <div class="dashboard-v2-meta">
-                <span>Competência <strong>@Model.MesAnoReferenciaDescricao</strong></span>
-                <span>Inadimplentes <strong>@Model.QuantidadeAlunosInadimplentes</strong></span>
-                <span>Pendências críticas <strong>@pendenciasCriticas</strong></span>
+                <span>@I18n["Competência", "Period"] <strong>@Model.MesAnoReferenciaDescricao</strong></span>
+                <span>@I18n["Inadimplentes", "Overdue students"] <strong>@Model.QuantidadeAlunosInadimplentes</strong></span>
+                <span>@I18n["Pendências críticas", "Critical pending items"] <strong>@pendenciasCriticas</strong></span>
             </div>
         </div>
 
         <form asp-action="Index" method="get" class="dashboard-v2-filter-card">
             <div class="dashboard-v2-filter-heading">
-                <strong>Filtros do painel</strong>
-                <span>Refine a operação por competência e turma.</span>
+                <strong>@I18n["Filtros do painel", "Dashboard filters"]</strong>
+                <span>@I18n["Refine a operação por competência e turma.", "Refine the operation by period and group."]</span>
             </div>
 
             <div class="dashboard-v2-filter-grid">
                 <div class="dashboard-v2-field">
-                    <label for="mesReferencia">Mês de referência</label>
-                    <select id="mesReferencia" name="mesReferencia" class="form-select dashboard-v2-control" aria-label="Mês de referência">
+                    <label for="mesReferencia">@I18n["Mês de referência", "Reference month"]</label>
+                    <select id="mesReferencia" name="mesReferencia" class="form-select dashboard-v2-control" aria-label="@I18n["Mês de referência", "Reference month"]">
                         @foreach (var mes in meses)
                         {
                             if (mes.Valor == Model.MesReferencia)
@@ -133,8 +140,8 @@
                 </div>
 
                 <div class="dashboard-v2-field">
-                    <label for="anoReferencia">Ano</label>
-                    <select id="anoReferencia" name="anoReferencia" class="form-select dashboard-v2-control" aria-label="Ano de referência">
+                    <label for="anoReferencia">@I18n["Ano", "Year"]</label>
+                    <select id="anoReferencia" name="anoReferencia" class="form-select dashboard-v2-control" aria-label="@I18n["Ano de referência", "Reference year"]">
                         @foreach (var ano in anos)
                         {
                             if (ano == Model.AnoReferencia)
@@ -150,9 +157,9 @@
                 </div>
 
                 <div class="dashboard-v2-field dashboard-v2-field-wide">
-                    <label for="turmaId">Turma</label>
-                    <select id="turmaId" name="turmaId" class="form-select dashboard-v2-control" aria-label="Filtrar por turma">
-                        <option value="">Todas as turmas</option>
+                    <label for="turmaId">@I18n["Turma", "Group"]</label>
+                    <select id="turmaId" name="turmaId" class="form-select dashboard-v2-control" aria-label="@I18n["Filtrar por turma", "Filter by group"]">
+                        <option value="">@I18n["Todas as turmas", "All groups"]</option>
                         @foreach (var turma in Model.TurmasDisponiveis)
                         {
                             if (Model.TurmaIdFiltro.HasValue && turma.Id == Model.TurmaIdFiltro.Value)
@@ -169,25 +176,25 @@
             </div>
 
             <button type="submit" class="btn dashboard-v2-btn dashboard-v2-btn-primary w-100">
-                Aplicar filtros
+                @I18n["Aplicar filtros", "Apply filters"]
             </button>
         </form>
     </section>
 
-    <section class="dashboard-v2-actions mb-4" aria-label="Ações rápidas">
+    <section class="dashboard-v2-actions mb-4" aria-label="@I18n["Ações rápidas", "Quick actions"]">
         <a asp-controller="Financeiro"
            asp-action="RegistrarPagamento"
            asp-route-returnUrl="@returnUrl"
            class="dashboard-v2-action-card">
-            <span>Pagamento</span>
-            <strong>Registrar pagamento</strong>
-            <small>Baixe mensalidades manualmente.</small>
+            <span>@I18n["Pagamento", "Payment"]</span>
+            <strong>@I18n["Registrar pagamento", "Register payment"]</strong>
+            <small>@I18n["Baixe mensalidades manualmente.", "Settle monthly fees manually."]</small>
         </a>
 
         <a asp-controller="Financeiro" asp-action="Index" class="dashboard-v2-action-card">
-            <span>Financeiro</span>
-            <strong>Abrir financeiro</strong>
-            <small>Consulte cobranças e histórico.</small>
+            <span>@I18n["Financeiro", "Finance"]</span>
+            <strong>@I18n["Abrir financeiro", "Open finance"]</strong>
+            <small>@I18n["Consulte cobranças e histórico.", "Review charges and history."]</small>
         </a>
 
         <form asp-controller="Financeiro" asp-action="GerarMensalidades" method="post" class="dashboard-v2-action-form">
@@ -196,54 +203,54 @@
             <input type="hidden" name="mesCompetenciaGeracao" value="@Model.MesReferencia" />
             <input type="hidden" name="returnUrl" value="@returnUrl" />
             <button type="submit" class="dashboard-v2-action-card dashboard-v2-action-button">
-                <span>Competência</span>
-                <strong>Gerar mensalidades</strong>
-                <small>Crie cobranças para o mês selecionado.</small>
+                <span>@I18n["Competência", "Period"]</span>
+                <strong>@I18n["Gerar mensalidades", "Generate monthly fees"]</strong>
+                <small>@I18n["Crie cobranças para o mês selecionado.", "Create charges for the selected month."]</small>
             </button>
         </form>
 
         <a asp-controller="Alunos" asp-action="Create" class="dashboard-v2-action-card">
-            <span>Alunos</span>
-            <strong>Cadastrar aluno</strong>
-            <small>Inclua um novo aluno na base.</small>
+            <span>@I18n["Alunos", "Students"]</span>
+            <strong>@I18n["Cadastrar aluno", "Register student"]</strong>
+            <small>@I18n["Inclua um novo aluno na base.", "Add a new student to the database."]</small>
         </a>
     </section>
 
-    <section class="dashboard-v2-kpi-grid mb-4" aria-label="Indicadores principais">
+    <section class="dashboard-v2-kpi-grid mb-4" aria-label="@I18n["Indicadores principais", "Main indicators"]">
         <article class="dashboard-v2-kpi-card">
             <div class="dashboard-v2-kpi-top">
-                <span>Alunos ativos</span>
-                <b>Base</b>
+                <span>@I18n["Alunos ativos", "Active students"]</span>
+                <b>@I18n["Base", "Base"]</b>
             </div>
             <strong>@Model.QuantidadeAlunosAtivos</strong>
-            <small>Alunos em operação na escola.</small>
+            <small>@I18n["Alunos em operação na escola.", "Students active in the school."]</small>
         </article>
 
         <article class="dashboard-v2-kpi-card is-warning">
             <div class="dashboard-v2-kpi-top">
-                <span>Pendentes</span>
+                <span>@I18n["Pendentes", "Pending"]</span>
                 <b>@Model.MesAnoReferenciaDescricao</b>
             </div>
             <strong>@Model.MensalidadesPendentes</strong>
-            <small>@totalAbertoCompetencia.ToString("C") em cobranças abertas.</small>
+            <small>@totalAbertoCompetencia.ToString("C") @I18n["em cobranças abertas.", "in open charges."]</small>
         </article>
 
         <article class="dashboard-v2-kpi-card is-danger">
             <div class="dashboard-v2-kpi-top">
-                <span>Atrasadas</span>
-                <b>Prioridade</b>
+                <span>@I18n["Atrasadas", "Overdue"]</span>
+                <b>@I18n["Prioridade", "Priority"]</b>
             </div>
             <strong>@Model.MensalidadesAtrasadas</strong>
-            <small>@Model.QuantidadeAlunosInadimplentes aluno(s) com atraso.</small>
+            <small>@Model.QuantidadeAlunosInadimplentes @I18n["aluno(s) com atraso.", "student(s) overdue."]</small>
         </article>
 
         <article class="dashboard-v2-kpi-card is-success">
             <div class="dashboard-v2-kpi-top">
-                <span>Receita recebida</span>
-                <b>Mês</b>
+                <span>@I18n["Receita recebida", "Revenue received"]</span>
+                <b>@I18n["Mês", "Month"]</b>
             </div>
             <strong>@Model.ReceitaRecebidaNoMes.ToString("C")</strong>
-            <small>Total em atraso: @Model.TotalEmAtraso.ToString("C").</small>
+            <small>@I18n["Total em atraso", "Total overdue"]: @Model.TotalEmAtraso.ToString("C").</small>
         </article>
     </section>
 
@@ -251,12 +258,12 @@
         <div class="dashboard-v2-panel dashboard-v2-panel-large">
             <div class="dashboard-v2-panel-heading">
                 <div>
-                    <span class="dashboard-v2-eyebrow">Cobranças</span>
-                    <h2>Agenda de cobrança</h2>
-                    <p>@vencemHoje vencendo hoje, @vencemAteTresDias vencendo em até 3 dias.</p>
+                    <span class="dashboard-v2-eyebrow">@I18n["Cobranças", "Charges"]</span>
+                    <h2>@I18n["Agenda de cobrança", "Billing agenda"]</h2>
+                    <p>@vencemHoje @I18n["vencendo hoje", "due today"], @vencemAteTresDias @I18n["vencendo em até 3 dias", "due within 3 days"].</p>
                 </div>
                 <a asp-controller="Financeiro" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">
-                    Ver financeiro
+                    @I18n["Ver financeiro", "View finance"]
                 </a>
             </div>
 
@@ -264,12 +271,12 @@
                 <table class="table dashboard-v2-table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Aluno</th>
-                            <th>Turma</th>
-                            <th>Vencimento</th>
-                            <th class="text-end">Valor</th>
+                            <th>@I18n["Aluno", "Student"]</th>
+                            <th>@I18n["Turma", "Group"]</th>
+                            <th>@I18n["Vencimento", "Due date"]</th>
+                            <th class="text-end">@I18n["Valor", "Amount"]</th>
                             <th>Status</th>
-                            <th class="text-end">Ações</th>
+                            <th class="text-end">@I18n["Ações", "Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -278,8 +285,8 @@
                             <tr>
                                 <td colspan="6">
                                     <div class="dashboard-v2-empty-state">
-                                        <strong>Nenhuma cobrança em aberto.</strong>
-                                        <span>Os filtros atuais não retornaram mensalidades pendentes ou atrasadas.</span>
+                                        <strong>@I18n["Nenhuma cobrança em aberto.", "No open charges."]</strong>
+                                        <span>@I18n["Os filtros atuais não retornaram mensalidades pendentes ou atrasadas.", "The current filters did not return pending or overdue monthly fees."]</span>
                                     </div>
                                 </td>
                             </tr>
@@ -296,15 +303,15 @@
                                             <span>@InicialAluno(item.Aluno)</span>
                                             <div>
                                                 <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId">@item.Aluno</a>
-                                                <small>Mensalidade #@item.MensalidadeId</small>
+                                                <small>@I18n["Mensalidade", "Monthly fee"] #@item.MensalidadeId</small>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>@(item.Turma ?? "Sem turma")</td>
+                                    <td>@(item.Turma ?? I18n["Sem turma", "No group"])</td>
                                     <td>
                                         <div class="dashboard-v2-date-cell">
                                             <strong>@item.Vencimento.ToString("dd/MM/yyyy")</strong>
-                                            <small>@item.Vencimento.ToString("dddd", culturaPtBr)</small>
+                                            <small>@item.Vencimento.ToString("dddd", culturaAtual)</small>
                                         </div>
                                     </td>
                                     <td class="text-end fw-bold">@item.Valor.ToString("C")</td>
@@ -319,14 +326,14 @@
                                                asp-action="Details"
                                                asp-route-id="@item.AlunoId"
                                                class="btn dashboard-v2-btn-table">
-                                                Aluno
+                                                @I18n["Aluno", "Student"]
                                             </a>
                                             <a asp-controller="Financeiro"
                                                asp-action="RegistrarPagamento"
                                                asp-route-mensalidadeId="@item.MensalidadeId"
                                                asp-route-returnUrl="@returnUrl"
                                                class="btn dashboard-v2-btn-table dashboard-v2-btn-table-primary">
-                                                Registrar
+                                                @I18n["Registrar", "Register"]
                                             </a>
                                         </div>
                                     </td>
@@ -341,17 +348,17 @@
         <aside class="dashboard-v2-panel">
             <div class="dashboard-v2-panel-heading">
                 <div>
-                    <span class="dashboard-v2-eyebrow">Atenção</span>
-                    <h2>Inadimplência</h2>
-                    <p>Priorize alunos com maior atraso e valor em aberto.</p>
+                    <span class="dashboard-v2-eyebrow">@I18n["Atenção", "Attention"]</span>
+                    <h2>@I18n["Inadimplência", "Overdue payments"]</h2>
+                    <p>@I18n["Priorize alunos com maior atraso e valor em aberto.", "Prioritize students with the longest overdue time and highest open balance."]</p>
                 </div>
             </div>
 
             @if (Model.Inadimplentes.Count == 0)
             {
                 <div class="dashboard-v2-empty-state dashboard-v2-empty-compact">
-                    <strong>Sem inadimplentes no filtro.</strong>
-                    <span>A operação financeira está limpa para a seleção atual.</span>
+                    <strong>@I18n["Sem inadimplentes no filtro.", "No overdue students in this filter."]</strong>
+                    <span>@I18n["A operação financeira está limpa para a seleção atual.", "The financial operation is clear for the current selection."]</span>
                 </div>
             }
             else
@@ -365,7 +372,7 @@
                             <div class="dashboard-v2-risk-header">
                                 <div>
                                     <a asp-controller="Alunos" asp-action="Details" asp-route-id="@item.AlunoId">@item.Aluno</a>
-                                    <small>@(item.Turma ?? "Sem turma") · @item.QuantidadeMensalidades mensalidade(s)</small>
+                                    <small>@(item.Turma ?? I18n["Sem turma", "No group"]) · @item.QuantidadeMensalidades @I18n["mensalidade(s)", "monthly fee(s)"]</small>
                                 </div>
                                 <span>@item.MaiorDiasAtraso d</span>
                             </div>
@@ -376,13 +383,13 @@
                                        asp-action="HistoricoAluno"
                                        asp-route-alunoId="@item.AlunoId"
                                        class="btn dashboard-v2-btn-table">
-                                        Histórico
+                                        @I18n["Histórico", "History"]
                                     </a>
                                     <a asp-controller="Financeiro"
                                        asp-action="RegistrarPagamento"
                                        asp-route-returnUrl="@returnUrl"
                                        class="btn dashboard-v2-btn-table dashboard-v2-btn-table-primary">
-                                        Cobrar
+                                        @I18n["Cobrar", "Charge"]
                                     </a>
                                 </div>
                             </div>
@@ -397,17 +404,17 @@
         <div class="dashboard-v2-panel">
             <div class="dashboard-v2-panel-heading">
                 <div>
-                    <span class="dashboard-v2-eyebrow">Histórico</span>
-                    <h2>Atividades recentes</h2>
-                    <p>Últimos movimentos registrados na base de alunos.</p>
+                    <span class="dashboard-v2-eyebrow">@I18n["Histórico", "History"]</span>
+                    <h2>@I18n["Atividades recentes", "Recent activity"]</h2>
+                    <p>@I18n["Últimos movimentos registrados na base de alunos.", "Latest movements registered in the student database."]</p>
                 </div>
             </div>
 
             @if (Model.AtividadesRecentes.Count == 0)
             {
                 <div class="dashboard-v2-empty-state dashboard-v2-empty-compact">
-                    <strong>Sem atividades recentes.</strong>
-                    <span>Nenhum evento foi registrado para os filtros aplicados.</span>
+                    <strong>@I18n["Sem atividades recentes.", "No recent activity."]</strong>
+                    <span>@I18n["Nenhum evento foi registrado para os filtros aplicados.", "No event was registered for the applied filters."]</span>
                 </div>
             }
             else
@@ -431,37 +438,37 @@
         </div>
 
         <div class="dashboard-v2-priority-card">
-            <span class="dashboard-v2-eyebrow">Plano rápido</span>
-            <h2>Prioridades do turno</h2>
-            <p>Use este bloco para decidir o que tratar primeiro na operação diária.</p>
+            <span class="dashboard-v2-eyebrow">@I18n["Plano rápido", "Quick plan"]</span>
+            <h2>@I18n["Prioridades do turno", "Shift priorities"]</h2>
+            <p>@I18n["Use este bloco para decidir o que tratar primeiro na operação diária.", "Use this block to decide what to handle first in the daily operation."]</p>
 
             <ul>
                 <li>
                     <span class="is-danger"></span>
-                    <strong>@Model.MensalidadesAtrasadas mensalidade(s) atrasada(s)</strong>
-                    <small>Tratar cobranças vencidas antes de novas rotinas administrativas.</small>
+                    <strong>@Model.MensalidadesAtrasadas @I18n["mensalidade(s) atrasada(s)", "overdue monthly fee(s)"]</strong>
+                    <small>@I18n["Tratar cobranças vencidas antes de novas rotinas administrativas.", "Handle overdue charges before new administrative routines."]</small>
                 </li>
                 <li>
                     <span class="is-warning"></span>
-                    <strong>@Model.MensalidadesPendentes pendente(s) na competência</strong>
-                    <small>Validar pagamentos recebidos e comprovantes enviados.</small>
+                    <strong>@Model.MensalidadesPendentes @I18n["pendente(s) na competência", "pending in the period"]</strong>
+                    <small>@I18n["Validar pagamentos recebidos e comprovantes enviados.", "Validate received payments and submitted receipts."]</small>
                 </li>
                 <li>
                     <span class="is-info"></span>
-                    <strong>@Model.TotalEmAtraso.ToString("C") em aberto</strong>
-                    <small>Acompanhar acordos, descontos e casos recorrentes.</small>
+                    <strong>@Model.TotalEmAtraso.ToString("C") @I18n["em aberto", "open"]</strong>
+                    <small>@I18n["Acompanhar acordos, descontos e casos recorrentes.", "Follow agreements, discounts, and recurring cases."]</small>
                 </li>
                 <li>
                     <span class="is-success"></span>
-                    <strong>@Model.QuantidadeAlunosAtivos aluno(s) ativo(s)</strong>
-                    <small>Base atual para mensalidades e planejamento de turmas.</small>
+                    <strong>@Model.QuantidadeAlunosAtivos @I18n["aluno(s) ativo(s)", "active student(s)"]</strong>
+                    <small>@I18n["Base atual para mensalidades e planejamento de turmas.", "Current base for monthly fees and group planning."]</small>
                 </li>
             </ul>
 
             <div class="dashboard-v2-priority-actions">
-                <a asp-controller="Financeiro" asp-action="Atrasados" class="btn dashboard-v2-btn dashboard-v2-btn-danger">Ver atrasados</a>
-                <a asp-controller="Admissoes" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">Admissões</a>
-                <a asp-controller="Desligamentos" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">Desligamentos</a>
+                <a asp-controller="Financeiro" asp-action="Atrasados" class="btn dashboard-v2-btn dashboard-v2-btn-danger">@I18n["Ver atrasados", "View overdue"]</a>
+                <a asp-controller="Admissoes" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">@I18n["Admissões", "Admissions"]</a>
+                <a asp-controller="Desligamentos" asp-action="Index" class="btn dashboard-v2-btn dashboard-v2-btn-ghost">@I18n["Desligamentos", "Deactivations"]</a>
             </div>
         </div>
     </section>

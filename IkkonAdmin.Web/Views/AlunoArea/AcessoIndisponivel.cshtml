@@ -1,15 +1,14 @@
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Acesso indisponível";
+    ViewData["Title"] = I18n["Acesso indisponível", "Access unavailable"];
 }
 
 <section class="aluno-portal-panel">
     <div class="aluno-portal-empty">
-        <h2>Conta sem vínculo de aluno</h2>
+        <h2>@I18n["Conta sem vínculo de aluno", "Account without student link"]</h2>
         <p>
-            Sua conta está autenticada como aluno, mas ainda não possui um cadastro de aluno vinculado.
-            Entre em contato com a equipe da escola para ajustar o acesso.
+            @I18n["Sua conta está autenticada como aluno, mas ainda não possui um cadastro de aluno vinculado. Entre em contato com a equipe da escola para ajustar o acesso.", "Your account is authenticated as a student, but it does not have a linked student record yet. Contact the school team to adjust your access."]
         </p>
-        <a href="/" class="btn btn-outline-secondary">Voltar ao site institucional</a>
+        <a href="/" class="btn btn-outline-secondary">@I18n["Voltar ao site institucional", "Back to institutional site"]</a>
     </div>
 </section>

@@ -2,70 +2,70 @@
 @using IkkonAdmin.Web.Security
 @{
     Layout = User.IsInRole(AppRoles.Aluno) ? "_AlunoLayout" : "_Layout";
-    ViewData["Title"] = "Configurações";
+    ViewData["Title"] = I18n["Configurações", "Settings"];
 
     var isAluno = User.IsInRole(AppRoles.Aluno);
-    var retornoUrl = isAluno ? "/area-do-aluno" : "/Home";
-    var ultimoLogin = Model.SecurityStatus.UltimoLoginUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sem registro";
+    var retornoUrl = isAluno ? "/area-do-aluno" : "/admin";
+    var ultimoLogin = Model.SecurityStatus.UltimoLoginUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? I18n["Sem registro", "No record"];
 }
 
 <div class="configuracoes-v2-page">
     <section class="configuracoes-v2-hero mb-4">
         <div class="configuracoes-v2-hero-copy">
-            <span class="configuracoes-v2-eyebrow">Gerenciamento de conta</span>
-            <h1>Conta e preferências</h1>
+            <span class="configuracoes-v2-eyebrow">@I18n["Gerenciamento de conta", "Account management"]</span>
+            <h1>@I18n["Conta e preferências", "Account and preferences"]</h1>
             <p>
-                Atualize dados pessoais, senha, preferências e acompanhe os acessos recentes da sua conta.
+                @I18n["Atualize dados pessoais, senha, preferências e acompanhe os acessos recentes da sua conta.", "Update personal data, password, preferences, and track recent account access."]
             </p>
             <div class="configuracoes-v2-meta">
-                <span>Perfil <strong>@Model.AccountType.NomeTipoConta</strong></span>
-                <span>Status <strong>@(Model.SecurityStatus.ContaAtiva ? "Ativa" : "Inativa")</strong></span>
-                <span>Último login <strong>@ultimoLogin</strong></span>
+                <span>@I18n["Perfil", "Profile"] <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong></span>
+                <span>Status <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong></span>
+                <span>@I18n["Último login", "Last login"] <strong>@ultimoLogin</strong></span>
             </div>
         </div>
 
         <div class="configuracoes-v2-hero-actions">
-            <a href="@retornoUrl" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">Voltar</a>
+            <a href="@retornoUrl" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Voltar", "Back"]</a>
         </div>
     </section>
 
     <div id="userSettingsFeedback" class="configuracoes-v2-feedback alert d-none" role="alert" aria-live="polite"></div>
 
-    <section class="configuracoes-v2-kpi-grid mb-4" aria-label="Resumo da conta">
+    <section class="configuracoes-v2-kpi-grid mb-4" aria-label="@I18n["Resumo da conta", "Account summary"]">
         <article class="configuracoes-v2-kpi-card @(Model.AccountInfo.ContaAtiva ? "is-success" : "is-danger")">
             <div class="configuracoes-v2-kpi-top">
-                <span>Conta</span>
+                <span>@I18n["Conta", "Account"]</span>
                 <b>Status</b>
             </div>
-            <strong>@(Model.AccountInfo.ContaAtiva ? "Ativa" : "Inativa")</strong>
-            <small>Estado atual da sua conta no sistema.</small>
+            <strong>@(Model.AccountInfo.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong>
+            <small>@I18n["Estado atual da sua conta no sistema.", "Current status of your system account."]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card">
             <div class="configuracoes-v2-kpi-top">
-                <span>Tipo</span>
-                <b>Acesso</b>
+                <span>@I18n["Tipo", "Type"]</span>
+                <b>@I18n["Acesso", "Access"]</b>
             </div>
-            <strong>@Model.AccountType.NomeTipoConta</strong>
-            <small>Perfil de acesso definido pelo administrador.</small>
+            <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong>
+            <small>@I18n["Perfil de acesso definido pelo administrador.", "Access profile defined by the administrator."]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card is-info">
             <div class="configuracoes-v2-kpi-top">
-                <span>Histórico</span>
-                <b>Acessos</b>
+                <span>@I18n["Histórico", "History"]</span>
+                <b>@I18n["Acessos", "Access"]</b>
             </div>
             <strong>@Model.SecurityStatus.HistoricoAcessos.Count</strong>
-            <small>Eventos recentes registrados para sua conta.</small>
+            <small>@I18n["Eventos recentes registrados para sua conta.", "Recent events registered for your account."]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card is-warning">
             <div class="configuracoes-v2-kpi-top">
-                <span>Preferências</span>
-                <b>Uso diário</b>
+                <span>@I18n["Preferências", "Preferences"]</span>
+                <b>@I18n["Uso diário", "Daily use"]</b>
             </div>
-            <strong>@(Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro ? "Claro" : "Escuro")</strong>
-            <small>Idioma: @(Model.Preferences.IdiomaPreferencia == IdiomaPreferenciaEnum.PtBr ? "Português" : "English").</small>
+            <strong>@(Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro ? I18n["Claro", "Light"] : I18n["Escuro", "Dark"])</strong>
+            <small>@I18n["Tema da interface e alertas do painel.", "Interface theme and panel alerts."]</small>
         </article>
     </section>
 
@@ -80,13 +80,13 @@
             <partial name="Partials/_AccountType" model="Model" />
 
             <section class="configuracoes-v2-assist-card">
-                <span class="configuracoes-v2-eyebrow">Boas práticas</span>
-                <h2>Segurança diária</h2>
+                <span class="configuracoes-v2-eyebrow">@I18n["Boas práticas", "Best practices"]</span>
+                <h2>@I18n["Segurança diária", "Daily security"]</h2>
                 <ul>
-                    <li>Use uma senha forte e diferente de outros serviços.</li>
-                    <li>Revise o histórico de acessos quando notar comportamento estranho.</li>
-                    <li>Mantenha e-mail e telefone atualizados para suporte interno.</li>
-                    <li>Permissões e tipo de conta só podem ser alterados por administradores.</li>
+                    <li>@I18n["Use uma senha forte e diferente de outros serviços.", "Use a strong password that is different from other services."]</li>
+                    <li>@I18n["Revise o histórico de acessos quando notar comportamento estranho.", "Review access history when you notice unusual behavior."]</li>
+                    <li>@I18n["Mantenha e-mail e telefone atualizados para suporte interno.", "Keep email and phone updated for internal support."]</li>
+                    <li>@I18n["Permissões e tipo de conta só podem ser alterados por administradores.", "Permissions and account type can only be changed by administrators."]</li>
                 </ul>
             </section>
         </aside>

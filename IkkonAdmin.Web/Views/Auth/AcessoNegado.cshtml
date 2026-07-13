@@ -1,6 +1,6 @@
 @{
     Layout = "_AuthLayout";
-    ViewData["Title"] = "Acesso negado";
+    ViewData["Title"] = I18n["Acesso negado", "Access denied"];
 }
 
 <div class="auth-page">
@@ -12,18 +12,18 @@
                     <div class="auth-card-head">
                         <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo Ikkon" class="auth-logo" />
                         <div>
-                            <p class="auth-kicker mb-1">Permissões</p>
-                            <h1 class="auth-title mb-0">Acesso negado</h1>
+                            <p class="auth-kicker mb-1">@I18n["Permissões", "Permissions"]</p>
+                            <h1 class="auth-title mb-0">@I18n["Acesso negado", "Access denied"]</h1>
                         </div>
                     </div>
 
                     <p class="auth-subtitle mb-3">
-                        Sua conta está autenticada, mas não possui permissão para acessar esta página.
+                        @I18n["Sua conta está autenticada, mas não possui permissão para acessar esta página.", "Your account is authenticated, but it does not have permission to access this page."]
                     </p>
 
                     <div class="d-grid gap-2">
-                        <a class="btn btn-danger" href="/admin">Voltar para o painel</a>
-                        <a class="btn btn-outline-secondary" href="/configuracoes">Abrir configurações</a>
+                        <a class="btn btn-danger" href="/admin">@I18n["Voltar para o painel", "Back to dashboard"]</a>
+                        <a class="btn btn-outline-secondary" href="/configuracoes">@I18n["Abrir configurações", "Open settings"]</a>
                     </div>
                 </article>
             </div>

@@ -3,12 +3,12 @@
 <article class="configuracoes-v2-card">
     <div class="configuracoes-v2-card-header">
         <div>
-            <span class="configuracoes-v2-eyebrow">Dados da conta</span>
-            <h2>Informações pessoais</h2>
-            <p>Atualize nome, e-mail, telefone e foto de perfil usados no sistema.</p>
+            <span class="configuracoes-v2-eyebrow">@I18n["Dados da conta", "Account data"]</span>
+            <h2>@I18n["Informações pessoais", "Personal information"]</h2>
+            <p>@I18n["Atualize nome, e-mail, telefone e foto de perfil usados no sistema.", "Update name, email, phone, and profile photo used in the system."]</p>
         </div>
         <span class="configuracoes-v2-status-pill @(Model.AccountInfo.ContaAtiva ? "is-success" : "is-muted")">
-            Conta @(Model.AccountInfo.ContaAtiva ? "ativa" : "inativa")
+            @I18n["Conta", "Account"] @(Model.AccountInfo.ContaAtiva ? I18n["ativa", "active"] : I18n["inativa", "inactive"])
         </span>
     </div>
 
@@ -19,23 +19,23 @@
             <div class="configuracoes-v2-photo-panel">
                 <img id="userPhotoPreview"
                      src="@(string.IsNullOrWhiteSpace(Model.AccountInfo.FotoPerfilUrl) ? "/Images/Ikkon_Icon.png" : Model.AccountInfo.FotoPerfilUrl)"
-                     alt="Foto de perfil"
+                     alt="@I18n["Foto de perfil", "Profile photo"]"
                      class="configuracoes-v2-photo" />
-                <label for="FotoPerfil" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">Alterar foto</label>
+                <label for="FotoPerfil" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Alterar foto", "Change photo"]</label>
                 <input id="FotoPerfil" name="FotoPerfil" type="file" accept="image/png,image/jpeg,image/webp" class="d-none" data-photo-input data-photo-preview="#userPhotoPreview" />
-                <small>JPG, PNG ou WEBP até 2 MB.</small>
+                <small>@I18n["JPG, PNG ou WEBP até 2 MB.", "JPG, PNG, or WEBP up to 2 MB."]</small>
             </div>
 
             <div class="configuracoes-v2-form-grid">
                 <div class="configuracoes-v2-field configuracoes-v2-field-span-2">
-                    <label for="NomeCompleto">Nome completo</label>
+                    <label for="NomeCompleto">@I18n["Nome completo", "Full name"]</label>
                     <input class="form-control configuracoes-v2-control"
                            id="NomeCompleto"
                            name="NomeCompleto"
                            value="@Model.AccountInfo.NomeCompleto"
                            maxlength="200"
                            autocomplete="name"
-                           placeholder="Ex.: Maria Fernanda Sato" />
+                           placeholder="@I18n["Ex.: Maria Fernanda Sato", "Ex.: Maria Fernanda Sato"]" />
                     <span class="text-danger small field-error" data-field-error="NomeCompleto"></span>
                 </div>
 
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="configuracoes-v2-field">
-                    <label for="Telefone">Telefone</label>
+                    <label for="Telefone">@I18n["Telefone", "Phone"]</label>
                     <input type="tel"
                            class="form-control configuracoes-v2-control"
                            id="Telefone"
@@ -69,7 +69,7 @@
         </div>
 
         <div class="configuracoes-v2-form-actions">
-            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="Salvando...">Salvar alterações</button>
+            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Salvando...", "Saving..."]">@I18n["Salvar alterações", "Save changes"]</button>
         </div>
     </form>
 </article>

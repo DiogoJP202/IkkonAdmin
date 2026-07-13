@@ -283,7 +283,7 @@ public class AreaAlunoService(
         var alunoId = await ObterAlunoIdVinculadoAsync(usuarioId, cancellationToken);
         if (!alunoId.HasValue)
         {
-            return AreaAlunoOperacaoResult.Falha("Conta de aluno nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Conta de aluno não encontrada.");
         }
 
         if (arquivo.Length <= 0)
@@ -293,13 +293,13 @@ public class AreaAlunoService(
 
         if (arquivo.Length > MaxDocumentSizeBytes)
         {
-            return AreaAlunoOperacaoResult.Falha("O arquivo deve ter no maximo 10 MB.");
+            return AreaAlunoOperacaoResult.Falha("O arquivo deve ter no máximo 10 MB.");
         }
 
         var extension = Path.GetExtension(arquivo.FileName ?? string.Empty);
         if (!DocumentExtensions.Contains(extension))
         {
-            return AreaAlunoOperacaoResult.Falha("Formato invalido. Use PDF, JPG, PNG ou WEBP.");
+            return AreaAlunoOperacaoResult.Falha("Formato inválido. Use PDF, JPG, PNG ou WEBP.");
         }
 
         var solicitacao = await dbContext.DocumentoSolicitacoes
@@ -307,12 +307,12 @@ public class AreaAlunoService(
 
         if (solicitacao is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Solicitacao de documento nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Solicitação de documento não encontrada.");
         }
 
         if (solicitacao.Status == DocumentoStatusEnum.Aprovado)
         {
-            return AreaAlunoOperacaoResult.Falha("Este documento ja foi aprovado.");
+            return AreaAlunoOperacaoResult.Falha("Este documento já foi aprovado.");
         }
 
         var uploadsPath = ObterDocumentosPath();
@@ -888,9 +888,9 @@ public class AreaAlunoService(
         {
             await GarantirInsigniaAutomaticaAsync(
                 aluno.Id,
-                "Graduacao conquistada",
-                "Resultado aprovado em exame de graduacao.",
-                "Evolucao",
+                "Graduação conquistada",
+                "Resultado aprovado em exame de graduação.",
+                "Evolução",
                 "graduacao-aprovada",
                 cancellationToken);
         }
@@ -981,7 +981,7 @@ public class AreaAlunoService(
             alertas.Add(new AreaAlunoAlertaViewModel
             {
                 Tipo = "danger",
-                Titulo = "Pendencia financeira",
+                Titulo = "Pendência financeira",
                 Descricao = $"{mensalidadesAtrasadas} mensalidade(s) em atraso. Total em aberto: {totalEmAberto:C}.",
                 Url = "/area-do-aluno/financeiro"
             });
@@ -994,7 +994,7 @@ public class AreaAlunoService(
             {
                 Tipo = "warning",
                 Titulo = "Documentos pendentes",
-                Descricao = $"{documentosPendentes} documento(s) aguardam envio ou revisao.",
+                Descricao = $"{documentosPendentes} documento(s) aguardam envio ou revisão.",
                 Url = "/area-do-aluno/documentos"
             });
         }
@@ -1006,7 +1006,7 @@ public class AreaAlunoService(
             {
                 Tipo = "info",
                 Titulo = "Comunicados novos",
-                Descricao = $"{comunicadosNaoLidos} comunicado(s) ainda nao foram lidos.",
+                Descricao = $"{comunicadosNaoLidos} comunicado(s) ainda não foram lidos.",
                 Url = "/area-do-aluno/comunicados"
             });
         }
@@ -1017,7 +1017,7 @@ public class AreaAlunoService(
             alertas.Add(new AreaAlunoAlertaViewModel
             {
                 Tipo = "success",
-                Titulo = "Proxima aula",
+                Titulo = "Próxima aula",
                 Descricao = $"{proximaAula.Turma} em {proximaAula.Inicio:dd/MM HH:mm}.",
                 Url = "/area-do-aluno/aulas"
             });

@@ -1,14 +1,14 @@
 @model AreaAlunoAulasViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Aulas e Horarios";
+    ViewData["Title"] = I18n["Aulas e Horários", "Classes and Schedule"];
 }
 
 <section class="aluno-portal-panel mb-3">
     <div class="aluno-portal-panel-head">
         <div>
-            <h3>Proximas aulas</h3>
-            <p class="mb-0 text-muted">Aulas cadastradas pela equipe para as suas turmas.</p>
+            <h3>@I18n["Próximas aulas", "Upcoming classes"]</h3>
+            <p class="mb-0 text-muted">@I18n["Aulas cadastradas pela equipe para as suas turmas.", "Classes registered by the team for your groups."]</p>
         </div>
     </div>
 
@@ -16,9 +16,9 @@
         <table class="table align-middle mb-0 aluno-portal-table">
             <thead>
                 <tr>
-                    <th>Data</th>
-                    <th>Turma</th>
-                    <th>Instrutor</th>
+                    <th>@I18n["Data", "Date"]</th>
+                    <th>@I18n["Turma", "Group"]</th>
+                    <th>@I18n["Instrutor", "Instructor"]</th>
                     <th>Local</th>
                     <th>Status</th>
                 </tr>
@@ -26,7 +26,7 @@
             <tbody>
                 @if (Model.ProximasAulas.Count == 0)
                 {
-                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma aula futura cadastrada.</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-4">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</td></tr>
                 }
                 else
                 {
@@ -40,7 +40,7 @@
                             <td>@aula.Turma</td>
                             <td>@(string.IsNullOrWhiteSpace(aula.Instrutor) ? "-" : aula.Instrutor)</td>
                             <td>@(string.IsNullOrWhiteSpace(aula.Local) ? "-" : aula.Local)</td>
-                            <td><span class="aluno-portal-pill">@aula.Status</span></td>
+                            <td><span class="aluno-portal-pill">@I18n.Term(aula.Status)</span></td>
                         </tr>
                     }
                 }
@@ -51,7 +51,7 @@
 
 <section class="aluno-portal-panel">
     <div class="aluno-portal-panel-head">
-        <h3>Horarios das turmas</h3>
+        <h3>@I18n["Horários das turmas", "Group schedules"]</h3>
     </div>
     <div class="aluno-portal-turma-grid">
         @foreach (var turma in Model.Turmas)
@@ -59,16 +59,16 @@
             <article class="aluno-portal-turma-card">
                 <span>@turma.Modalidade</span>
                 <h3>@turma.Nome</h3>
-                <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? "Instrutor nao informado" : turma.Instrutor)</p>
+                <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided"] : turma.Instrutor)</p>
                 @if (turma.Horarios.Count == 0)
                 {
-                    <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? "Horario nao informado" : turma.Horario)</small>
+                    <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided"] : turma.Horario)</small>
                 }
                 else
                 {
                     @foreach (var horario in turma.Horarios)
                     {
-                        <small>@horario.DiaSemana - @horario.HoraInicio.ToString("HH:mm") as @horario.HoraFim.ToString("HH:mm")</small>
+                        <small>@I18n.Term(horario.DiaSemana) - @horario.HoraInicio.ToString("HH:mm") @I18n["às", "to"] @horario.HoraFim.ToString("HH:mm")</small>
                     }
                 }
             </article>

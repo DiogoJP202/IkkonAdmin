@@ -101,7 +101,7 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
 
         if (aluno is null)
         {
-            return new GraduacaoRegistroResultado { Erro = "Aluno nao encontrado." };
+            return new GraduacaoRegistroResultado { Erro = "Aluno não encontrado." };
         }
 
         if (aluno.Status != StatusAlunoEnum.Ativo)
@@ -127,7 +127,7 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
 
             if (!exameExiste)
             {
-                return new GraduacaoRegistroResultado { Erro = "Exame informado nao encontrado." };
+                return new GraduacaoRegistroResultado { Erro = "Exame informado não encontrado." };
             }
         }
         else if (input.DataExameNovo.HasValue)

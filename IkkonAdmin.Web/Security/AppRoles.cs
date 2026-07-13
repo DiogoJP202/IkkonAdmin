@@ -13,6 +13,6 @@ public static class AppRoles
         TipoAcessoEnum.Admin => Admin,
         TipoAcessoEnum.Funcionario => Funcionario,
         TipoAcessoEnum.Aluno => Aluno,
-        _ => throw new ArgumentOutOfRangeException(nameof(tipoAcesso), tipoAcesso, "Tipo de acesso invalido.")
+        _ => throw new ArgumentOutOfRangeException(nameof(tipoAcesso), tipoAcesso, "Tipo de acesso inválido.")
     };
 }

@@ -4,12 +4,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IkkonAdmin.Web.Services;
 using IkkonAdmin.Web.Security;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace IkkonAdmin.Web.Controllers;
 
 [Authorize]
 [Authorize(Policy = AuthorizationPolicies.ConfiguracoesView)]
-public class ConfiguracoesController(IUserSettingsService userSettingsService) : Controller
+public class ConfiguracoesController(
+    IUserSettingsService userSettingsService,
+    IAuthService authService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -56,7 +60,12 @@ public class ConfiguracoesController(IUserSettingsService userSettingsService) :
             return BadRequest(new { success = false, message = result.Message });
         }
 
-        return Ok(new { success = true, message = result.Message });
+        if (!await RenovarSessaoAsync(userId, cancellationToken))
+        {
+            return Unauthorized(new { success = false, message = "Sessão inválida. Faça login novamente." });
+        }
+
+        return Ok(new { success = true, message = result.Message, refreshPage = true });
     }
 
     [HttpPost]
@@ -114,7 +123,35 @@ public class ConfiguracoesController(IUserSettingsService userSettingsService) :
             return BadRequest(new { success = false, message = result.Message });
         }
 
-        return Ok(new { success = true, message = result.Message });
+        if (!await RenovarSessaoAsync(userId, cancellationToken))
+        {
+            return Unauthorized(new { success = false, message = "Sessão inválida. Faça login novamente." });
+        }
+
+        return Ok(new { success = true, message = result.Message, refreshPage = true });
+    }
+
+    private async Task<bool> RenovarSessaoAsync(int userId, CancellationToken cancellationToken)
+    {
+        var sessionResult = await authService.RecarregarSessaoAsync(userId, cancellationToken);
+        if (!sessionResult.Sucesso)
+        {
+            return false;
+        }
+
+        var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        var properties = authenticateResult.Properties ?? new AuthenticationProperties
+        {
+            IsPersistent = false,
+            AllowRefresh = true
+        };
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            AuthClaimsFactory.CriarPrincipal(sessionResult),
+            properties);
+
+        return true;
     }
 
     private bool TryGetCurrentUserId(out int userId)

@@ -1,13 +1,13 @@
 @model AreaAlunoRegistroFrequenciaViewModel
 @{
-    ViewData["Title"] = "Registrar frequencia";
+    ViewData["Title"] = "Registrar frequência";
 }
 
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
             <span class="admin-panel-eyebrow">@Model.Turma</span>
-            <h1 class="admin-panel-title">Registrar frequencia</h1>
+            <h1 class="admin-panel-title">Registrar frequência</h1>
             <p class="admin-panel-subtitle">@Model.Inicio.ToString("dd/MM/yyyy HH:mm") - @Model.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(Model.Instrutor) ? string.Empty : $"| {Model.Instrutor}")</p>
         </div>
         <div class="admin-panel-hero-actions">
@@ -58,7 +58,7 @@
                 </table>
             </div>
             <div class="admin-panel-form-actions mt-3">
-                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar frequencia</button>
+                <button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Salvar frequência</button>
             </div>
         </form>
     </section>

@@ -83,7 +83,7 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
 
         if (existeAberto)
         {
-            throw new InvalidOperationException("Ja existe um processo de desligamento em aberto para este aluno.");
+            throw new InvalidOperationException("Já existe um processo de desligamento em aberto para este aluno.");
         }
 
         await dbContext.Desligamentos.AddAsync(desligamento, cancellationToken);
@@ -132,12 +132,12 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
 
         if (desligamento is null)
         {
-            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento nao encontrado." };
+            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento não encontrado." };
         }
 
         if (desligamento.DataConfirmacao.HasValue)
         {
-            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento ja confirmado.", AlunoId = desligamento.AlunoId };
+            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento já confirmado.", AlunoId = desligamento.AlunoId };
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);

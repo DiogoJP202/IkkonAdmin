@@ -1,24 +1,24 @@
 @model AreaAlunoAulasAdminViewModel
 @{
-    ViewData["Title"] = "Aulas e horarios";
+    ViewData["Title"] = "Aulas e horários";
 }
 
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Area do Aluno</span>
-            <h1 class="admin-panel-title">Aulas e horarios</h1>
-            <p class="admin-panel-subtitle">Cadastre, edite e organize horarios estruturados, instrutores e aulas futuras.</p>
+            <span class="admin-panel-eyebrow">Área do Aluno</span>
+            <h1 class="admin-panel-title">Aulas e horários</h1>
+            <p class="admin-panel-subtitle">Cadastre, edite e organize horários estruturados, instrutores e aulas futuras.</p>
         </div>
         <div class="admin-panel-hero-actions">
-            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Visao geral</a>
-            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-primary">Frequencia</a>
+            <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Visão geral</a>
+            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-primary">Frequência</a>
         </div>
     </section>
 
     <div class="admin-panel-grid-two mb-4">
         <section class="admin-panel-card-v2">
-            <div class="admin-panel-card-header"><h2>Novo horario</h2></div>
+            <div class="admin-panel-card-header"><h2>Novo horário</h2></div>
             <form asp-action="CriarHorario" method="post" class="admin-panel-form-stack">
                 @Html.AntiForgeryToken()
                 <div class="admin-panel-form-grid">
@@ -37,7 +37,7 @@
                         <select asp-for="NovoHorario.DiaSemana" asp-items="Html.GetEnumSelectList<DayOfWeek>()" class="form-select admin-panel-control"></select>
                     </div>
                     <div class="admin-panel-field">
-                        <label asp-for="NovoHorario.HoraInicio">Inicio</label>
+                        <label asp-for="NovoHorario.HoraInicio">Início</label>
                         <input asp-for="NovoHorario.HoraInicio" type="time" class="form-control admin-panel-control" />
                     </div>
                     <div class="admin-panel-field">
@@ -49,7 +49,7 @@
                         <input asp-for="NovoHorario.Local" class="form-control admin-panel-control" maxlength="150" />
                     </div>
                 </div>
-                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Salvar horario</button>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Salvar horário</button>
             </form>
         </section>
 
@@ -79,7 +79,7 @@
                         </select>
                     </div>
                     <div class="admin-panel-field">
-                        <label asp-for="NovoInstrutor.DataInicio">Inicio</label>
+                        <label asp-for="NovoInstrutor.DataInicio">Início</label>
                         <input asp-for="NovoInstrutor.DataInicio" type="date" class="form-control admin-panel-control" />
                     </div>
                     <label class="admin-panel-check-card is-form-check">
@@ -118,7 +118,7 @@
                     </select>
                 </div>
                 <div class="admin-panel-field">
-                    <label asp-for="NovaAula.Inicio">Inicio</label>
+                    <label asp-for="NovaAula.Inicio">Início</label>
                     <input asp-for="NovaAula.Inicio" type="datetime-local" class="form-control admin-panel-control" />
                 </div>
                 <div class="admin-panel-field">
@@ -134,7 +134,7 @@
                     <input asp-for="NovaAula.Local" class="form-control admin-panel-control" maxlength="150" />
                 </div>
                 <div class="admin-panel-field admin-panel-field-full">
-                    <label asp-for="NovaAula.Observacoes">Observacoes</label>
+                    <label asp-for="NovaAula.Observacoes">Observações</label>
                     <textarea asp-for="NovaAula.Observacoes" class="form-control admin-panel-control" rows="2"></textarea>
                 </div>
             </div>
@@ -143,14 +143,14 @@
     </section>
 
     <section class="admin-panel-card-v2 mb-4">
-        <div class="admin-panel-card-header"><h2>Horarios cadastrados</h2></div>
+        <div class="admin-panel-card-header"><h2>Horários cadastrados</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Turma</th><th>Dia</th><th>Inicio</th><th>Fim</th><th>Local</th><th>Status</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Turma</th><th>Dia</th><th>Início</th><th>Fim</th><th>Local</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Horarios.Count == 0)
                     {
-                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum horario cadastrado.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum horário cadastrado.</td></tr>
                     }
                     else
                     {
@@ -199,7 +199,7 @@
         <div class="admin-panel-card-header"><h2>Instrutores vinculados</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Turma</th><th>Instrutor</th><th>Inicio</th><th>Fim</th><th>Principal</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Turma</th><th>Instrutor</th><th>Início</th><th>Fim</th><th>Principal</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.TurmaInstrutores.Count == 0)
                     {
@@ -254,7 +254,7 @@
         <div class="admin-panel-card-header"><h2>Aulas cadastradas</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Turma</th><th>Instrutor</th><th>Inicio</th><th>Fim</th><th>Status</th><th>Local</th><th class="text-end">Frequencia</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Turma</th><th>Instrutor</th><th>Início</th><th>Fim</th><th>Status</th><th>Local</th><th class="text-end">Frequência</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Aulas.Count == 0)
                     {

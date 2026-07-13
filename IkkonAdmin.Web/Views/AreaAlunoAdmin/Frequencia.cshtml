@@ -1,14 +1,14 @@
 @model AreaAlunoFrequenciaAdminViewModel
 @{
-    ViewData["Title"] = "Frequencia";
+    ViewData["Title"] = "Frequência";
 }
 
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Area do Aluno</span>
-            <h1 class="admin-panel-title">Frequencia</h1>
-            <p class="admin-panel-subtitle">Escolha uma aula para registrar ou revisar presencas e faltas.</p>
+            <span class="admin-panel-eyebrow">Área do Aluno</span>
+            <h1 class="admin-panel-title">Frequência</h1>
+            <p class="admin-panel-subtitle">Escolha uma aula para registrar ou revisar presenças e faltas.</p>
         </div>
         <div class="admin-panel-hero-actions">
             <a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-ghost">Aulas</a>
@@ -18,7 +18,7 @@
     <section class="admin-panel-card-v2">
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Aula</th><th>Turma</th><th>Status</th><th>Registros</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Aula</th><th>Turma</th><th>Status</th><th>Registros</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Aulas.Count == 0)
                     {

@@ -3,12 +3,12 @@
 <article class="configuracoes-v2-card">
     <div class="configuracoes-v2-card-header">
         <div>
-            <span class="configuracoes-v2-eyebrow">Segurança</span>
-            <h2>Senha e histórico de acessos</h2>
-            <p>Altere sua senha e acompanhe eventos recentes de autenticação.</p>
+            <span class="configuracoes-v2-eyebrow">@I18n["Segurança", "Security"]</span>
+            <h2>@I18n["Senha e histórico de acessos", "Password and access history"]</h2>
+            <p>@I18n["Altere sua senha e acompanhe eventos recentes de autenticação.", "Change your password and track recent authentication events."]</p>
         </div>
         <span class="configuracoes-v2-status-pill @(Model.SecurityStatus.ContaAtiva ? "is-success" : "is-muted")">
-            @(Model.SecurityStatus.ContaAtiva ? "Ativa" : "Inativa")
+            @(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])
         </span>
     </div>
 
@@ -19,69 +19,69 @@
 
                 <div class="configuracoes-v2-form-grid">
                     <div class="configuracoes-v2-field configuracoes-v2-field-span-2">
-                        <label for="SenhaAtual">Senha atual</label>
+                        <label for="SenhaAtual">@I18n["Senha atual", "Current password"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="SenhaAtual"
                                name="SenhaAtual"
                                autocomplete="current-password"
-                               placeholder="Informe sua senha atual" />
+                               placeholder="@I18n["Informe sua senha atual", "Enter your current password"]" />
                         <span class="text-danger small field-error" data-field-error="SenhaAtual"></span>
                     </div>
 
                     <div class="configuracoes-v2-field">
-                        <label for="NovaSenha">Nova senha</label>
+                        <label for="NovaSenha">@I18n["Nova senha", "New password"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="NovaSenha"
                                name="NovaSenha"
                                autocomplete="new-password"
-                               placeholder="Mínimo de 8 caracteres" />
+                               placeholder="@I18n["Mínimo de 8 caracteres", "At least 8 characters"]" />
                         <span class="text-danger small field-error" data-field-error="NovaSenha"></span>
                     </div>
 
                     <div class="configuracoes-v2-field">
-                        <label for="ConfirmacaoNovaSenha">Confirmar nova senha</label>
+                        <label for="ConfirmacaoNovaSenha">@I18n["Confirmar nova senha", "Confirm new password"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="ConfirmacaoNovaSenha"
                                name="ConfirmacaoNovaSenha"
                                autocomplete="new-password"
-                               placeholder="Repita a nova senha" />
+                               placeholder="@I18n["Repita a nova senha", "Repeat the new password"]" />
                         <span class="text-danger small field-error" data-field-error="ConfirmacaoNovaSenha"></span>
                     </div>
                 </div>
 
                 <div class="configuracoes-v2-form-actions">
-                    <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="Atualizando...">Alterar senha</button>
+                    <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Atualizando...", "Updating..."]">@I18n["Alterar senha", "Change password"]</button>
                 </div>
             </form>
 
             <aside class="configuracoes-v2-security-summary">
                 <article>
-                    <span>Status da conta</span>
-                    <strong>@(Model.SecurityStatus.ContaAtiva ? "Ativa" : "Inativa")</strong>
+                    <span>@I18n["Status da conta", "Account status"]</span>
+                    <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong>
                 </article>
                 <article>
-                    <span>Último login</span>
-                    <strong>@(Model.SecurityStatus.UltimoLoginUtc.HasValue ? Model.SecurityStatus.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "Sem registro")</strong>
+                    <span>@I18n["Último login", "Last login"]</span>
+                    <strong>@(Model.SecurityStatus.UltimoLoginUtc.HasValue ? Model.SecurityStatus.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : I18n["Sem registro", "No record"])</strong>
                 </article>
             </aside>
         </div>
 
         <div class="configuracoes-v2-history-block">
             <div class="configuracoes-v2-subheading">
-                <span>Histórico</span>
-                <h3>Acessos recentes</h3>
+                <span>@I18n["Histórico", "History"]</span>
+                <h3>@I18n["Acessos recentes", "Recent access"]</h3>
             </div>
 
             <div class="table-responsive">
                 <table class="table configuracoes-v2-table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Data e hora</th>
+                            <th>@I18n["Data e hora", "Date and time"]</th>
                             <th>IP</th>
-                            <th>Evento</th>
+                            <th>@I18n["Evento", "Event"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,8 +90,8 @@
                             <tr>
                                 <td colspan="3">
                                     <div class="configuracoes-v2-empty-state">
-                                        <strong>Nenhum acesso registrado</strong>
-                                        <span>Quando houver autenticações registradas, elas aparecerão aqui.</span>
+                                        <strong>@I18n["Nenhum acesso registrado", "No access registered"]</strong>
+                                        <span>@I18n["Quando houver autenticações registradas, elas aparecerão aqui.", "When authentications are registered, they will appear here."]</span>
                                     </div>
                                 </td>
                             </tr>

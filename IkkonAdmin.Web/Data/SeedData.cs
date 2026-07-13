@@ -530,7 +530,7 @@ public static class SeedData
             new RoleSistema
             {
                 Codigo = AppRoles.Funcionario,
-                Nome = "Funcionario",
+                Nome = "Funcionário",
                 Descricao = "Acesso operacional interno.",
                 TipoAcesso = TipoAcessoEnum.Funcionario,
                 Ativo = true,
@@ -540,7 +540,7 @@ public static class SeedData
             {
                 Codigo = AppRoles.Aluno,
                 Nome = "Aluno",
-                Descricao = "Acesso a area do aluno.",
+                Descricao = "Acesso à área do aluno.",
                 TipoAcesso = TipoAcessoEnum.Aluno,
                 Ativo = true,
                 IsSistema = true

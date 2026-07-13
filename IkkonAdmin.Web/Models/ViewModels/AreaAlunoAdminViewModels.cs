@@ -107,10 +107,10 @@ public class TurmaHorarioFormViewModel
 
     public DayOfWeek DiaSemana { get; set; } = DayOfWeek.Monday;
 
-    [Required(ErrorMessage = "Informe o horario inicial.")]
+    [Required(ErrorMessage = "Informe o horário inicial.")]
     public TimeOnly HoraInicio { get; set; } = new(19, 0);
 
-    [Required(ErrorMessage = "Informe o horario final.")]
+    [Required(ErrorMessage = "Informe o horário final.")]
     public TimeOnly HoraFim { get; set; } = new(20, 30);
 
     [StringLength(150)]
@@ -204,11 +204,11 @@ public class DocumentoAvaliacaoFormViewModel
 
 public class ComunicadoFormViewModel
 {
-    [Required(ErrorMessage = "Informe o titulo.")]
+    [Required(ErrorMessage = "Informe o título.")]
     [StringLength(180)]
     public string Titulo { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Informe o conteudo.")]
+    [Required(ErrorMessage = "Informe o conteúdo.")]
     [StringLength(4000)]
     public string Conteudo { get; set; } = string.Empty;
 
@@ -223,7 +223,7 @@ public class ComunicadoFormViewModel
 
 public class EventoAlunoFormViewModel
 {
-    [Required(ErrorMessage = "Informe o titulo.")]
+    [Required(ErrorMessage = "Informe o título.")]
     [StringLength(180)]
     public string Titulo { get; set; } = string.Empty;
 
@@ -249,7 +249,7 @@ public class EventoAlunoFormViewModel
 
 public class InsigniaFormViewModel
 {
-    [Required(ErrorMessage = "Informe o nome da insignia.")]
+    [Required(ErrorMessage = "Informe o nome da insígnia.")]
     [StringLength(120)]
     public string Nome { get; set; } = string.Empty;
 
@@ -273,7 +273,7 @@ public class AlunoInsigniaFormViewModel
     [Required(ErrorMessage = "Selecione o aluno.")]
     public int AlunoId { get; set; }
 
-    [Required(ErrorMessage = "Selecione a insignia.")]
+    [Required(ErrorMessage = "Selecione a insígnia.")]
     public int InsigniaId { get; set; }
 
     [StringLength(500)]

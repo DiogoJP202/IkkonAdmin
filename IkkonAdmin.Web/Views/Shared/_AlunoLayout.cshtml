@@ -1,41 +1,51 @@
-﻿<!DOCTYPE html>
-<html lang="pt-BR">
+@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@{
+    var temaPreferencia = User.FindFirst(AppClaimTypes.TemaPreferencia)?.Value;
+    var isDarkTheme = string.Equals(temaPreferencia, TemaPreferenciaEnum.Escuro.ToString(), StringComparison.OrdinalIgnoreCase);
+    var themeClass = isDarkTheme ? "aluno-theme-dark" : "aluno-theme-light";
+    var themeName = isDarkTheme ? "dark" : "light";
+    var htmlLang = I18n.IsEnglish ? "en" : "pt-BR";
+    var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+}
+<!DOCTYPE html>
+<html lang="@htmlLang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Área do Aluno IKKON</title>
+    <title>@ViewData["Title"] - @I18n["Área do Aluno IKKON", "IKKON Student Area"]</title>
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="aluno-portal-body">
+<body class="aluno-portal-body @themeClass" data-theme="@themeName">
     <div class="aluno-portal-shell">
         <aside id="alunoPortalSidebar" class="aluno-portal-sidebar">
             <a class="aluno-portal-brand" href="/area-do-aluno">
                 <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON" />
                 <span>
                     <strong>IKKON SPTD</strong>
-                    <small>Área do Aluno</small>
+                    <small>@I18n["Área do Aluno", "Student Area"]</small>
                 </span>
             </a>
 
-            <nav class="aluno-portal-nav" aria-label="Navegação da Área do Aluno">
-                <a class="@(Context.Request.Path.Value?.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno">Início</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/aulas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/aulas">Aulas</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/frequencia", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/frequencia">Frequência</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">Meu perfil</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/financeiro", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/financeiro">Financeiro</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/documentos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/documentos">Documentos</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/comunicados", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/comunicados">Comunicados</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/eventos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/eventos">Eventos</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/conquistas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/conquistas">Conquistas</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/turmas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/turmas">Turmas</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/configuracoes", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/configuracoes">Conta e senha</a>
+            <nav class="aluno-portal-nav" aria-label="@I18n["Navegação da Área do Aluno", "Student Area navigation"]">
+                <a class="@(Context.Request.Path.Value?.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno">@I18n["Início", "Home"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/aulas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/aulas">@I18n["Aulas", "Classes"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/frequencia", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/frequencia">@I18n["Frequência", "Attendance"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">@I18n["Meu perfil", "My profile"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/financeiro", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/financeiro">@I18n["Financeiro", "Finance"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/documentos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/documentos">@I18n["Documentos", "Documents"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/comunicados", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/comunicados">@I18n["Comunicados", "Announcements"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/eventos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/eventos">@I18n["Eventos", "Events"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/conquistas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/conquistas">@I18n["Conquistas", "Achievements"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/turmas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/turmas">@I18n["Turmas", "Groups"]</a>
+                <a class="@(Context.Request.Path.Value?.Contains("/configuracoes", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/configuracoes">@I18n["Conta e senha", "Account and password"]</a>
             </nav>
 
             <form action="/aluno/sair" method="post" class="mt-auto">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-light w-100">Sair</button>
+                <button type="submit" class="btn btn-outline-light w-100">@I18n["Sair", "Sign out"]</button>
             </form>
         </aside>
         <div class="aluno-portal-sidebar-backdrop" data-aluno-menu-close aria-hidden="true"></div>
@@ -48,17 +58,24 @@
                             data-aluno-menu-toggle
                             aria-controls="alunoPortalSidebar"
                             aria-expanded="false"
-                            aria-label="Abrir menu da Área do Aluno">
+                            aria-label="@I18n["Abrir menu da Área do Aluno", "Open Student Area menu"]">
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                     </button>
                     <div>
-                        <span class="aluno-portal-eyebrow">Portal</span>
+                        <span class="aluno-portal-eyebrow">@I18n["Portal", "Portal"]</span>
                         <h1>@ViewData["Title"]</h1>
                     </div>
                 </div>
-                <a href="/" class="btn btn-outline-secondary btn-sm">Site institucional</a>
+                <div class="d-flex align-items-center gap-2">
+                    <a class="btn btn-outline-secondary btn-sm"
+                       asp-controller="Idioma"
+                       asp-action="Alterar"
+                       asp-route-culture="@I18n.ToggleCulture"
+                       asp-route-returnUrl="@languageReturnUrl">@I18n.ToggleLabel</a>
+                    <a href="/" class="btn btn-outline-secondary btn-sm">@I18n["Site institucional", "Institutional site"]</a>
+                </div>
             </div>
 
             <div class="aluno-portal-content">
@@ -69,6 +86,7 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/i18n-ui.js" asp-append-version="true"></script>
     <script src="~/js/aluno-portal.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

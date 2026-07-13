@@ -1,21 +1,21 @@
 @model AreaAlunoTurmasViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Minhas Turmas";
+    ViewData["Title"] = I18n["Minhas Turmas", "My Groups"];
 }
 
 <section class="aluno-portal-panel">
     <div class="aluno-portal-panel-head">
         <div>
-            <h3>Turmas vinculadas</h3>
-            <p class="mb-0 text-muted">Turma principal: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? "nao definida" : Model.TurmaPrincipal)</p>
+            <h3>@I18n["Turmas vinculadas", "Linked groups"]</h3>
+            <p class="mb-0 text-muted">@I18n["Turma principal", "Main group"]: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? I18n["não definida", "not set"] : Model.TurmaPrincipal)</p>
         </div>
     </div>
 
     <div class="aluno-portal-turma-grid">
         @if (Model.Turmas.Count == 0)
         {
-            <p class="text-muted mb-0">Nenhuma turma vinculada no momento.</p>
+            <p class="text-muted mb-0">@I18n["Nenhuma turma vinculada no momento.", "No linked groups at the moment."]</p>
         }
         else
         {
@@ -24,19 +24,19 @@
                 <article class="aluno-portal-turma-card">
                     <span>@turma.Modalidade</span>
                     <h3>@turma.Nome</h3>
-                    <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? "Instrutor nao informado" : turma.Instrutor)</p>
+                    <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided"] : turma.Instrutor)</p>
                     @if (turma.Horarios.Count > 0)
                     {
                         @foreach (var horario in turma.Horarios)
                         {
-                            <small>@horario.DiaSemana - @horario.HoraInicio.ToString("HH:mm") as @horario.HoraFim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(horario.Local) ? string.Empty : $"| {horario.Local}")</small>
+                            <small>@I18n.Term(horario.DiaSemana) - @horario.HoraInicio.ToString("HH:mm") @I18n["às", "to"] @horario.HoraFim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(horario.Local) ? string.Empty : $"| {horario.Local}")</small>
                         }
                     }
                     else
                     {
-                        <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? "Horario nao informado" : turma.Horario)</small>
+                        <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided"] : turma.Horario)</small>
                     }
-                    <small>Vinculado em @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
+                    <small>@I18n["Vinculado em", "Linked on"] @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
                 </article>
             }
         }
@@ -45,13 +45,13 @@
 
 <section class="aluno-portal-panel mt-3">
     <div class="aluno-portal-panel-head">
-        <h3>Proximas aulas</h3>
-        <a href="/area-do-aluno/aulas">Ver agenda completa</a>
+        <h3>@I18n["Próximas aulas", "Upcoming classes"]</h3>
+        <a href="/area-do-aluno/aulas">@I18n["Ver agenda completa", "View full schedule"]</a>
     </div>
     <div class="aluno-portal-list">
         @if (Model.ProximasAulas.Count == 0)
         {
-            <p class="text-muted mb-0">Nenhuma aula futura cadastrada.</p>
+            <p class="text-muted mb-0">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</p>
         }
         else
         {

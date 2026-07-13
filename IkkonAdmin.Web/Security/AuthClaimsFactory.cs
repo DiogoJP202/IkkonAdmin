@@ -20,12 +20,18 @@ public static class AuthClaimsFactory
         {
             new(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
             new(ClaimTypes.Name, usuario.NomeExibicao),
-            new(AppClaimTypes.TipoAcesso, usuario.TipoAcesso.ToString())
+            new(AppClaimTypes.TipoAcesso, usuario.TipoAcesso.ToString()),
+            new(AppClaimTypes.TemaPreferencia, usuario.TemaPreferencia.ToString())
         };
 
         if (!string.IsNullOrWhiteSpace(usuario.Email))
         {
             claims.Add(new Claim(ClaimTypes.Email, usuario.Email));
+        }
+
+        if (!string.IsNullOrWhiteSpace(usuario.FotoPerfilUrl))
+        {
+            claims.Add(new Claim(AppClaimTypes.FotoPerfilUrl, usuario.FotoPerfilUrl));
         }
 
         if (usuario.AlunoId.HasValue)

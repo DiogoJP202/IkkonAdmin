@@ -1,21 +1,21 @@
 @model AreaAlunoEventosViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Eventos";
+    ViewData["Title"] = I18n["Eventos", "Events"];
 }
 
 <section class="aluno-portal-panel">
     <div class="aluno-portal-panel-head">
         <div>
-            <h3>Eventos e datas importantes</h3>
-            <p class="mb-0 text-muted">Eventos vinculados a voce, suas turmas ou todos os alunos.</p>
+            <h3>@I18n["Eventos e datas importantes", "Events and important dates"]</h3>
+            <p class="mb-0 text-muted">@I18n["Eventos vinculados a você, suas turmas ou todos os alunos.", "Events linked to you, your groups, or all students."]</p>
         </div>
     </div>
 
     <div class="aluno-portal-list">
         @if (Model.Eventos.Count == 0)
         {
-            <p class="text-muted mb-0">Nenhum evento futuro cadastrado.</p>
+            <p class="text-muted mb-0">@I18n["Nenhum evento futuro cadastrado.", "No upcoming events registered."]</p>
         }
         else
         {
@@ -23,7 +23,7 @@
             {
                 <article class="aluno-portal-list-item">
                     <strong>@evento.Titulo</strong>
-                    <span>@evento.Tipo | @evento.Inicio.ToString("dd/MM/yyyy HH:mm") - @evento.Fim.ToString("HH:mm") @(evento.Importante ? "| Importante" : string.Empty)</span>
+                    <span>@I18n.Term(evento.Tipo) | @evento.Inicio.ToString("dd/MM/yyyy HH:mm") - @evento.Fim.ToString("HH:mm") @(evento.Importante ? I18n["| Importante", "| Important"] : string.Empty)</span>
                     @if (!string.IsNullOrWhiteSpace(evento.Local))
                     {
                         <span>@evento.Local</span>

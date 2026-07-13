@@ -6,15 +6,15 @@
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <span class="admin-panel-eyebrow">Área do Aluno</span>
             <h1 class="admin-panel-title">Conquistas</h1>
-            <p class="admin-panel-subtitle">Crie insignias e atribua marcos de evolucao aos alunos.</p>
+            <p class="admin-panel-subtitle">Crie insígnias e atribua marcos de evolução aos alunos.</p>
         </div>
     </section>
 
     <div class="admin-panel-grid-two mb-4">
         <section class="admin-panel-card-v2">
-            <div class="admin-panel-card-header"><h2>Nova insignia</h2></div>
+            <div class="admin-panel-card-header"><h2>Nova insígnia</h2></div>
             <form asp-action="CriarInsignia" method="post" class="admin-panel-form-stack">
                 @Html.AntiForgeryToken()
                 <div class="admin-panel-form-grid">
@@ -27,19 +27,19 @@
                         <input asp-for="NovaInsignia.Categoria" class="form-control admin-panel-control" maxlength="80" />
                     </div>
                     <div class="admin-panel-field">
-                        <label asp-for="NovaInsignia.Icone">Icone</label>
+                        <label asp-for="NovaInsignia.Icone">Ícone</label>
                         <input asp-for="NovaInsignia.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="star" />
                     </div>
                     <div class="admin-panel-field">
-                        <label asp-for="NovaInsignia.RegraAutomatica">Regra automatica</label>
+                        <label asp-for="NovaInsignia.RegraAutomatica">Regra automática</label>
                         <input asp-for="NovaInsignia.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" />
                     </div>
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="NovaInsignia.Descricao">Descricao</label>
+                        <label asp-for="NovaInsignia.Descricao">Descrição</label>
                         <textarea asp-for="NovaInsignia.Descricao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
                     </div>
                 </div>
-                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Criar insignia</button>
+                <button class="btn admin-panel-btn admin-panel-btn-primary" type="submit">Criar insígnia</button>
             </form>
         </section>
 
@@ -59,7 +59,7 @@
                         </select>
                     </div>
                     <div class="admin-panel-field">
-                        <label asp-for="NovaAtribuicao.InsigniaId">Insignia</label>
+                        <label asp-for="NovaAtribuicao.InsigniaId">Insígnia</label>
                         <select asp-for="NovaAtribuicao.InsigniaId" class="form-select admin-panel-control">
                             <option value="">Selecione</option>
                             @foreach (var insignia in Model.Insignias.Where(x => x.Ativa))
@@ -69,7 +69,7 @@
                         </select>
                     </div>
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="NovaAtribuicao.Observacao">Observacao</label>
+                        <label asp-for="NovaAtribuicao.Observacao">Observação</label>
                         <textarea asp-for="NovaAtribuicao.Observacao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
     </div>
 
     <section class="admin-panel-card-v2 mb-4">
-        <div class="admin-panel-card-header"><h2>Insignias cadastradas</h2></div>
+        <div class="admin-panel-card-header"><h2>Insígnias cadastradas</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead>
@@ -88,14 +88,14 @@
                         <th>Categoria</th>
                         <th>Regra</th>
                         <th>Status</th>
-                        <th>Descricao</th>
-                        <th class="text-end">Acoes</th>
+                        <th>Descrição</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.Insignias.Count == 0)
                     {
-                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma insignia cadastrada.</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma insígnia cadastrada.</td></tr>
                     }
                     else
                     {
@@ -106,7 +106,7 @@
                             <tr>
                                 <td>
                                     <input form="@editFormId" name="Nome" value="@item.Nome" class="form-control admin-panel-control mb-2" maxlength="120" />
-                                    <input form="@editFormId" name="Icone" value="@item.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="Icone" />
+                                    <input form="@editFormId" name="Icone" value="@item.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="Ícone" />
                                 </td>
                                 <td><input form="@editFormId" name="Categoria" value="@item.Categoria" class="form-control admin-panel-control" maxlength="80" /></td>
                                 <td><input form="@editFormId" name="RegraAutomatica" value="@item.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" /></td>
@@ -135,23 +135,23 @@
     </section>
 
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Conquistas atribuidas</h2></div>
+        <div class="admin-panel-card-header"><h2>Conquistas atribuídas</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Aluno</th>
-                        <th>Insignia</th>
+                        <th>Insígnia</th>
                         <th>Origem</th>
                         <th>Data</th>
-                        <th>Observacao</th>
-                        <th class="text-end">Acoes</th>
+                        <th>Observação</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.Conquistas.Count == 0)
                     {
-                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma conquista atribuida.</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma conquista atribuída.</td></tr>
                     }
                     else
                     {

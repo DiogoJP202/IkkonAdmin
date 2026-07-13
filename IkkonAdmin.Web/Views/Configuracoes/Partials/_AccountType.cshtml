@@ -1,17 +1,17 @@
 ﻿@model UserSettingsPageViewModel
 
 <section class="configuracoes-v2-side-card">
-    <span class="configuracoes-v2-eyebrow">Tipo de conta</span>
-    <h2>Perfil e permissões</h2>
-    <p>Informações de acesso definidas pelo administrador do sistema.</p>
+    <span class="configuracoes-v2-eyebrow">@I18n["Tipo de conta", "Account type"]</span>
+    <h2>@I18n["Perfil e permissões", "Profile and permissions"]</h2>
+    <p>@I18n["Informações de acesso definidas pelo administrador do sistema.", "Access information defined by the system administrator."]</p>
 
     <div class="configuracoes-v2-account-type-box">
-        <span>Perfil atual</span>
-        <strong>@Model.AccountType.NomeTipoConta</strong>
+        <span>@I18n["Perfil atual", "Current profile"]</span>
+        <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong>
     </div>
 
     <div class="configuracoes-v2-permissions-box">
-        <span>Permissões básicas</span>
+        <span>@I18n["Permissões básicas", "Basic permissions"]</span>
         <ul>
             @foreach (var permission in Model.AccountType.PermissoesBasicas)
             {

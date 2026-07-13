@@ -1,47 +1,47 @@
 @model AreaAlunoAdminDashboardViewModel
 @{
-    ViewData["Title"] = "Area do Aluno";
+    ViewData["Title"] = I18n["Área do Aluno", "Student Area"];
 }
 
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Portal do aluno</span>
-            <h1 class="admin-panel-title">Area do Aluno</h1>
-            <p class="admin-panel-subtitle">Central administrativa para aulas, frequencia, documentos, comunicados, eventos e conquistas.</p>
+            <span class="admin-panel-eyebrow">@I18n["Portal do aluno", "Student portal"]</span>
+            <h1 class="admin-panel-title">@I18n["Área do Aluno", "Student Area"]</h1>
+            <p class="admin-panel-subtitle">@I18n["Central administrativa para aulas, frequência, documentos, comunicados, eventos e conquistas.", "Administrative center for classes, attendance, documents, announcements, events, and achievements."]</p>
         </div>
         <div class="admin-panel-hero-actions">
-            <a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-primary">Aulas</a>
-            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-ghost">Frequencia</a>
-            <a asp-action="Documentos" class="btn admin-panel-btn admin-panel-btn-ghost">Documentos</a>
+            <a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-primary">@I18n["Aulas", "Classes"]</a>
+            <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-ghost">@I18n["Frequência", "Attendance"]</a>
+            <a asp-action="Documentos" class="btn admin-panel-btn admin-panel-btn-ghost">@I18n["Documentos", "Documents"]</a>
         </div>
     </section>
 
     <section class="admin-panel-kpi-grid mb-4">
-        <article class="admin-kpi-card"><span class="admin-kpi-label">Aulas proximas</span><strong>@Model.AulasProximas</strong></article>
-        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">Frequencias no mes</span><strong>@Model.FrequenciasRegistradasMes</strong></article>
-        <article class="admin-kpi-card is-warning"><span class="admin-kpi-label">Documentos pendentes</span><strong>@Model.DocumentosPendentes</strong></article>
-        <article class="admin-kpi-card is-success"><span class="admin-kpi-label">Comunicados ativos</span><strong>@Model.ComunicadosAtivos</strong></article>
-        <article class="admin-kpi-card"><span class="admin-kpi-label">Eventos proximos</span><strong>@Model.EventosProximos</strong></article>
-        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">Conquistas no mes</span><strong>@Model.ConquistasConcedidasMes</strong></article>
+        <article class="admin-kpi-card"><span class="admin-kpi-label">@I18n["Aulas próximas", "Upcoming classes"]</span><strong>@Model.AulasProximas</strong></article>
+        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">@I18n["Frequências no mês", "Attendance records this month"]</span><strong>@Model.FrequenciasRegistradasMes</strong></article>
+        <article class="admin-kpi-card is-warning"><span class="admin-kpi-label">@I18n["Documentos pendentes", "Pending documents"]</span><strong>@Model.DocumentosPendentes</strong></article>
+        <article class="admin-kpi-card is-success"><span class="admin-kpi-label">@I18n["Comunicados ativos", "Active announcements"]</span><strong>@Model.ComunicadosAtivos</strong></article>
+        <article class="admin-kpi-card"><span class="admin-kpi-label">@I18n["Eventos próximos", "Upcoming events"]</span><strong>@Model.EventosProximos</strong></article>
+        <article class="admin-kpi-card is-info"><span class="admin-kpi-label">@I18n["Conquistas no mês", "Achievements this month"]</span><strong>@Model.ConquistasConcedidasMes</strong></article>
     </section>
 
     <section class="admin-panel-nav mb-4">
-        <a asp-action="Aulas" class="admin-panel-nav-link"><strong>Aulas e horarios</strong><small>Horarios, instrutores e proximas aulas</small></a>
-        <a asp-action="Frequencia" class="admin-panel-nav-link"><strong>Frequencia</strong><small>Registro de presencas e faltas</small></a>
-        <a asp-action="Documentos" class="admin-panel-nav-link"><strong>Documentos</strong><small>Solicitacoes, uploads e aprovacao</small></a>
-        <a asp-action="Comunicados" class="admin-panel-nav-link"><strong>Comunicados</strong><small>Avisos por aluno, turma ou todos</small></a>
-        <a asp-action="Eventos" class="admin-panel-nav-link"><strong>Eventos</strong><small>Datas importantes do portal</small></a>
-        <a asp-action="Conquistas" class="admin-panel-nav-link"><strong>Conquistas</strong><small>Insignias e marcos</small></a>
+        <a asp-action="Aulas" class="admin-panel-nav-link"><strong>@I18n["Aulas e horários", "Classes and schedules"]</strong><small>@I18n["Horários, instrutores e próximas aulas", "Schedules, instructors, and upcoming classes"]</small></a>
+        <a asp-action="Frequencia" class="admin-panel-nav-link"><strong>@I18n["Frequência", "Attendance"]</strong><small>@I18n["Registro de presenças e faltas", "Presence and absence records"]</small></a>
+        <a asp-action="Documentos" class="admin-panel-nav-link"><strong>@I18n["Documentos", "Documents"]</strong><small>@I18n["Solicitações, uploads e aprovação", "Requests, uploads, and approval"]</small></a>
+        <a asp-action="Comunicados" class="admin-panel-nav-link"><strong>@I18n["Comunicados", "Announcements"]</strong><small>@I18n["Avisos por aluno, turma ou todos", "Notices by student, group, or everyone"]</small></a>
+        <a asp-action="Eventos" class="admin-panel-nav-link"><strong>@I18n["Eventos", "Events"]</strong><small>@I18n["Datas importantes do portal", "Important portal dates"]</small></a>
+        <a asp-action="Conquistas" class="admin-panel-nav-link"><strong>@I18n["Conquistas", "Achievements"]</strong><small>@I18n["Insígnias e marcos", "Badges and milestones"]</small></a>
     </section>
 
     <div class="admin-panel-grid-two">
         <section class="admin-panel-card-v2">
-            <div class="admin-panel-card-header"><h2>Proximas aulas</h2></div>
+            <div class="admin-panel-card-header"><h2>@I18n["Próximas aulas", "Upcoming classes"]</h2></div>
             <div class="admin-stat-list">
                 @if (Model.ProximasAulas.Count == 0)
                 {
-                    <div class="admin-panel-empty">Nenhuma aula futura cadastrada.</div>
+                    <div class="admin-panel-empty">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</div>
                 }
                 else
                 {
@@ -57,11 +57,11 @@
         </section>
 
         <section class="admin-panel-card-v2">
-            <div class="admin-panel-card-header"><h2>Documentos recentes</h2></div>
+            <div class="admin-panel-card-header"><h2>@I18n["Documentos recentes", "Recent documents"]</h2></div>
             <div class="admin-stat-list">
                 @if (Model.DocumentosRecentes.Count == 0)
                 {
-                    <div class="admin-panel-empty">Nenhum documento solicitado.</div>
+                    <div class="admin-panel-empty">@I18n["Nenhum documento solicitado.", "No requested documents."]</div>
                 }
                 else
                 {
@@ -69,7 +69,7 @@
                     {
                         <div class="admin-stat-row">
                             <span>@documento.Aluno - @documento.Tipo</span>
-                            <strong>@documento.Status</strong>
+                            <strong>@I18n.Term(documento.Status)</strong>
                         </div>
                     }
                 }

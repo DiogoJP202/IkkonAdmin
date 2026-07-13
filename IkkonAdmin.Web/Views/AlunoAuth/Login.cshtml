@@ -1,7 +1,8 @@
 @model LoginViewModel
 @{
     Layout = "_AuthLayout";
-    ViewData["Title"] = "Entrar na Área do Aluno";
+    ViewData["Title"] = I18n["Entrar na Área do Aluno", "Sign in to Student Area"];
+    var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
 }
 
 <div class="auth-page">
@@ -13,13 +14,13 @@
                     <div class="auth-card-head">
                         <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON" class="auth-logo" />
                         <div>
-                            <p class="auth-kicker mb-1">Área do aluno</p>
-                            <h1 class="auth-title mb-0">Entrar no portal</h1>
+                            <p class="auth-kicker mb-1">@I18n["Área do aluno", "Student area"]</p>
+                            <h1 class="auth-title mb-0">@I18n["Entrar no portal", "Sign in to the portal"]</h1>
                         </div>
                     </div>
 
                     <p class="auth-subtitle">
-                        Acesse suas informações pessoais, turmas e mensalidades usando sua conta de aluno.
+                        @I18n["Acesse suas informações pessoais, turmas e mensalidades usando sua conta de aluno.", "Access your personal information, groups, and monthly fees using your student account."]
                     </p>
 
                     <form action="/aluno/login" method="post" novalidate>
@@ -29,26 +30,31 @@
 
                         <div class="mb-3">
                             <label asp-for="LoginOuEmail" class="form-label"></label>
-                            <input asp-for="LoginOuEmail" class="form-control auth-input" placeholder="seu.email@dominio.com ou usuario" autocomplete="username" />
+                            <input asp-for="LoginOuEmail" class="form-control auth-input" placeholder="@I18n["seu.email@dominio.com ou usuário", "your.email@domain.com or username"]" autocomplete="username" />
                             <span asp-validation-for="LoginOuEmail" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Senha" class="form-label"></label>
-                            <input asp-for="Senha" class="form-control auth-input" placeholder="Informe sua senha" autocomplete="current-password" />
+                            <input asp-for="Senha" class="form-control auth-input" placeholder="@I18n["Informe sua senha", "Enter your password"]" autocomplete="current-password" />
                             <span asp-validation-for="Senha" class="text-danger small"></span>
                         </div>
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small mb-3"></div>
 
                         <button type="submit" class="btn btn-danger w-100 auth-submit">
-                            Entrar na Área do Aluno
+                            @I18n["Entrar na Área do Aluno", "Sign in to Student Area"]
                         </button>
                     </form>
 
                     <div class="auth-footer-links mt-3">
-                        <a href="/" class="link-secondary text-decoration-none">Voltar para o site</a>
-                        <a href="/auth/login" class="link-secondary text-decoration-none">Login administrativo</a>
+                        <a href="/" class="link-secondary text-decoration-none">@I18n["Voltar para o site", "Back to site"]</a>
+                        <a href="/auth/login" class="link-secondary text-decoration-none">@I18n["Login administrativo", "Admin login"]</a>
+                        <a class="link-secondary text-decoration-none"
+                           asp-controller="Idioma"
+                           asp-action="Alterar"
+                           asp-route-culture="@I18n.ToggleCulture"
+                           asp-route-returnUrl="@languageReturnUrl">@I18n.ToggleLabel</a>
                     </div>
                 </article>
             </div>

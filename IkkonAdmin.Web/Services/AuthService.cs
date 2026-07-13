@@ -67,6 +67,24 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
         return AuthResult.Ok(usuario, roles, permissoes);
     }
 
+    public async Task<AuthResult> RecarregarSessaoAsync(
+        int usuarioId,
+        CancellationToken cancellationToken = default)
+    {
+        var usuario = await dbContext.UsuariosSistema
+            .FirstOrDefaultAsync(x => x.Id == usuarioId && x.Ativo, cancellationToken);
+
+        if (usuario is null)
+        {
+            return AuthResult.Falha();
+        }
+
+        var roles = await ObterRolesAsync(usuario, cancellationToken);
+        var permissoes = await ObterPermissoesAsync(usuario.Id, roles, cancellationToken);
+
+        return AuthResult.Ok(usuario, roles, permissoes);
+    }
+
     private static string? Normalizar(string? valor)
     {
         return string.IsNullOrWhiteSpace(valor)

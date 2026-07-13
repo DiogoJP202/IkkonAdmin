@@ -7,6 +7,6 @@ public enum InsigniaOrigemEnum
     [Display(Name = "Manual")]
     Manual = 1,
 
-    [Display(Name = "Automatica")]
+    [Display(Name = "Automática")]
     Automatica = 2
 }

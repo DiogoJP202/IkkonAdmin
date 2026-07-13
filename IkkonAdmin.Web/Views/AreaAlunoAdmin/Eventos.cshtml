@@ -6,7 +6,7 @@
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <span class="admin-panel-eyebrow">Área do Aluno</span>
             <h1 class="admin-panel-title">Eventos</h1>
             <p class="admin-panel-subtitle">Cadastre datas importantes vinculadas a todos, uma turma ou um aluno.</p>
         </div>
@@ -18,7 +18,7 @@
             @Html.AntiForgeryToken()
             <div class="admin-panel-form-grid">
                 <div class="admin-panel-field admin-panel-field-wide">
-                    <label asp-for="NovoEvento.Titulo">Titulo</label>
+                    <label asp-for="NovoEvento.Titulo">Título</label>
                     <input asp-for="NovoEvento.Titulo" class="form-control admin-panel-control" maxlength="180" />
                 </div>
                 <div class="admin-panel-field">
@@ -26,7 +26,7 @@
                     <select asp-for="NovoEvento.Tipo" asp-items="Html.GetEnumSelectList<EventoAlunoTipoEnum>()" class="form-select admin-panel-control"></select>
                 </div>
                 <div class="admin-panel-field">
-                    <label asp-for="NovoEvento.Inicio">Inicio</label>
+                    <label asp-for="NovoEvento.Inicio">Início</label>
                     <input asp-for="NovoEvento.Inicio" type="datetime-local" class="form-control admin-panel-control" />
                 </div>
                 <div class="admin-panel-field">
@@ -66,7 +66,7 @@
                     <input asp-for="NovoEvento.GoogleEventoId" class="form-control admin-panel-control" maxlength="200" />
                 </div>
                 <div class="admin-panel-field-full">
-                    <label asp-for="NovoEvento.Descricao">Descricao</label>
+                    <label asp-for="NovoEvento.Descricao">Descrição</label>
                     <textarea asp-for="NovoEvento.Descricao" class="form-control admin-panel-control" rows="3" maxlength="2000"></textarea>
                 </div>
                 <label class="admin-panel-check-card is-form-check"><input asp-for="NovoEvento.Importante" class="form-check-input" /><span>Importante</span></label>
@@ -86,8 +86,8 @@
                         <th>Alvo</th>
                         <th>Local</th>
                         <th>Status</th>
-                        <th>Descricao</th>
-                        <th class="text-end">Acoes</th>
+                        <th>Descrição</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -256,7 +256,7 @@ public class AdminPainelService(
     {
         if (string.IsNullOrWhiteSpace(model.SenhaInicial))
         {
-            return AdminOperationResult.Fail("Informe uma senha inicial para o usuario.");
+            return AdminOperationResult.Fail("Informe uma senha inicial para o usuário.");
         }
 
         if (!IsStrongPassword(model.SenhaInicial))
@@ -269,7 +269,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo invalido para o novo usuario.");
+            return AdminOperationResult.Fail("Cargo inválido para o novo usuário.");
         }
 
         var loginNormalizado = Normalize(model.Login);
@@ -280,7 +280,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.LoginNormalizado == loginNormalizado, cancellationToken);
         if (loginEmUso)
         {
-            return AdminOperationResult.Fail("Este login ja esta em uso.");
+            return AdminOperationResult.Fail("Este login já está em uso.");
         }
 
         var emailEmUso = await dbContext.UsuariosSistema
@@ -288,7 +288,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.EmailNormalizado == emailNormalizado, cancellationToken);
         if (emailEmUso)
         {
-            return AdminOperationResult.Fail("Este e-mail ja esta em uso.");
+            return AdminOperationResult.Fail("Este e-mail já está em uso.");
         }
 
         var usuario = new UsuarioSistema
@@ -319,13 +319,13 @@ public class AdminPainelService(
             "CRIAR_USUARIO",
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
-            $"Usuario {usuario.NomeExibicao} criado.",
+            $"Usuário {usuario.NomeExibicao} criado.",
             null,
             SnapshotUsuario(usuario),
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuario criado com sucesso.");
+        return AdminOperationResult.Ok("Usuário criado com sucesso.");
     }
 
     public async Task<AdminOperationResult> AtualizarUsuarioAsync(
@@ -341,7 +341,7 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuario nao encontrado.");
+            return AdminOperationResult.Fail("Usuário não encontrado.");
         }
 
         var role = await dbContext.RolesSistema
@@ -349,7 +349,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo invalido para o usuario.");
+            return AdminOperationResult.Fail("Cargo inválido para o usuário.");
         }
 
         var loginNormalizado = Normalize(model.Login);
@@ -360,7 +360,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.Id != id && x.LoginNormalizado == loginNormalizado, cancellationToken);
         if (loginEmUso)
         {
-            return AdminOperationResult.Fail("Este login ja esta em uso.");
+            return AdminOperationResult.Fail("Este login já está em uso.");
         }
 
         var emailEmUso = await dbContext.UsuariosSistema
@@ -368,7 +368,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.Id != id && x.EmailNormalizado == emailNormalizado, cancellationToken);
         if (emailEmUso)
         {
-            return AdminOperationResult.Fail("Este e-mail ja esta em uso.");
+            return AdminOperationResult.Fail("Este e-mail já está em uso.");
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -391,13 +391,13 @@ public class AdminPainelService(
             "EDITAR_USUARIO",
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
-            $"Usuario {usuario.NomeExibicao} atualizado.",
+            $"Usuário {usuario.NomeExibicao} atualizado.",
             antes,
             SnapshotUsuario(usuario),
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuario atualizado com sucesso.");
+        return AdminOperationResult.Ok("Usuário atualizado com sucesso.");
     }
 
     public async Task<AdminOperationResult> AlterarStatusUsuarioAsync(
@@ -413,17 +413,17 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuario nao encontrado.");
+            return AdminOperationResult.Fail("Usuário não encontrado.");
         }
 
         if (usuario.Id == usuarioResponsavelId && !ativo)
         {
-            return AdminOperationResult.Fail("Nao e permitido desativar o proprio usuario.");
+            return AdminOperationResult.Fail("Não é permitido desativar o próprio usuário.");
         }
 
         if (usuario.Ativo == ativo)
         {
-            return AdminOperationResult.Ok("Status ja estava atualizado.");
+            return AdminOperationResult.Ok("Status já estava atualizado.");
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -436,7 +436,7 @@ public class AdminPainelService(
             ativo ? "ATIVAR_USUARIO" : "DESATIVAR_USUARIO",
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
-            $"Usuario {(ativo ? "ativado" : "desativado")}.",
+            $"Usuário {(ativo ? "ativado" : "desativado")}.",
             antes,
             SnapshotUsuario(usuario),
             enderecoIp,
@@ -457,17 +457,17 @@ public class AdminPainelService(
 
         if (usuario is null)
         {
-            return AdminOperationResult.Fail("Usuario nao encontrado.");
+            return AdminOperationResult.Fail("Usuário não encontrado.");
         }
 
         if (usuario.Excluido)
         {
-            return AdminOperationResult.Ok("Usuario ja estava excluido.");
+            return AdminOperationResult.Ok("Usuário já estava excluído.");
         }
 
         if (usuario.Id == usuarioResponsavelId)
         {
-            return AdminOperationResult.Fail("Nao e permitido excluir o proprio usuario.");
+            return AdminOperationResult.Fail("Não é permitido excluir o próprio usuário.");
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -485,13 +485,13 @@ public class AdminPainelService(
             "EXCLUIR_USUARIO",
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
-            "Usuario removido (soft delete).",
+            "Usuário removido (soft delete).",
             antes,
             SnapshotUsuario(usuario),
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuario excluido com sucesso.");
+        return AdminOperationResult.Ok("Usuário excluído com sucesso.");
     }
 
     public async Task<AdminAcessosViewModel?> ObterAcessosAsync(int usuarioId, CancellationToken cancellationToken = default)
@@ -553,7 +553,7 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuario nao encontrado.");
+            return AdminOperationResult.Fail("Usuário não encontrado.");
         }
 
         var role = await dbContext.RolesSistema
@@ -561,7 +561,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo invalido.");
+            return AdminOperationResult.Fail("Cargo inválido.");
         }
 
         var permissoesValidas = await dbContext.PermissoesSistema
@@ -596,7 +596,7 @@ public class AdminPainelService(
             "EDITAR_ACESSOS",
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
-            "Permissoes e cargo do usuario atualizados.",
+            "Permissões e cargo do usuário atualizados.",
             antes,
             depois,
             enderecoIp,
@@ -771,7 +771,7 @@ public class AdminPainelService(
         var codigo = NormalizarCodigoRole(model.Codigo, nome);
         if (string.IsNullOrWhiteSpace(codigo))
         {
-            return AdminOperationResult.Fail("Nao foi possivel gerar um codigo valido para o cargo.");
+            return AdminOperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
         }
 
         if (codigo.Length > 60)
@@ -784,7 +784,7 @@ public class AdminPainelService(
 
         if (codigoEmUso)
         {
-            return AdminOperationResult.Fail("Ja existe um cargo com este codigo.");
+            return AdminOperationResult.Fail("Já existe um cargo com este código.");
         }
 
         var permissoesIds = await ValidarPermissoesSelecionadasAsync(model.PermissoesSelecionadas, cancellationToken);
@@ -833,7 +833,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo nao encontrado.");
+            return AdminOperationResult.Fail("Cargo não encontrado.");
         }
 
         var nome = model.Nome.Trim();
@@ -850,7 +850,7 @@ public class AdminPainelService(
         {
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                return AdminOperationResult.Fail("Nao foi possivel gerar um codigo valido para o cargo.");
+                return AdminOperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
             }
 
             if (codigo.Length > 60)
@@ -863,7 +863,7 @@ public class AdminPainelService(
 
             if (codigoEmUso)
             {
-                return AdminOperationResult.Fail("Ja existe um cargo com este codigo.");
+                return AdminOperationResult.Fail("Já existe um cargo com este código.");
             }
         }
 
@@ -940,17 +940,17 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo nao encontrado.");
+            return AdminOperationResult.Fail("Cargo não encontrado.");
         }
 
         if (role.IsSistema)
         {
-            return AdminOperationResult.Fail("Nao e permitido alterar status de cargos do sistema.");
+            return AdminOperationResult.Fail("Não é permitido alterar status de cargos do sistema.");
         }
 
         if (role.Ativo == ativo)
         {
-            return AdminOperationResult.Ok("Status do cargo ja estava atualizado.");
+            return AdminOperationResult.Ok("Status do cargo já estava atualizado.");
         }
 
         var antes = SnapshotRole(role);
@@ -989,12 +989,12 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo nao encontrado.");
+            return AdminOperationResult.Fail("Cargo não encontrado.");
         }
 
         if (role.IsSistema)
         {
-            return AdminOperationResult.Fail("Nao e permitido remover cargos do sistema.");
+            return AdminOperationResult.Fail("Não é permitido remover cargos do sistema.");
         }
 
         var antes = SnapshotRole(role);

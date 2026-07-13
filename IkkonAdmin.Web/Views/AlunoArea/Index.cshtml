@@ -1,7 +1,7 @@
 @model AreaAlunoDashboardViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Area do Aluno";
+    ViewData["Title"] = I18n["Área do Aluno", "Student Area"];
 }
 
 <div class="aluno-portal-page">
@@ -11,12 +11,12 @@
                  src="@(string.IsNullOrWhiteSpace(Model.FotoPerfilUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : Model.FotoPerfilUrl)"
                  alt="Foto de @Model.NomeCompleto" />
             <div>
-                <span class="aluno-portal-eyebrow">Ola, @Model.NomeCompleto</span>
-                <h2>Seu painel de acompanhamento</h2>
-                <p>Veja aulas, avisos, documentos, financeiro, frequencia e conquistas em um so lugar.</p>
+                <span class="aluno-portal-eyebrow">@I18n["Olá", "Hello"], @Model.NomeCompleto</span>
+                <h2>@I18n["Seu painel de acompanhamento", "Your tracking dashboard"]</h2>
+                <p>@I18n["Veja aulas, avisos, documentos, financeiro, frequência e conquistas em um só lugar.", "See classes, announcements, documents, finances, attendance, and achievements in one place."]</p>
             </div>
         </div>
-        <span class="aluno-portal-status">@Model.Status</span>
+        <span class="aluno-portal-status">@I18n.Term(Model.Status)</span>
     </section>
 
     @if (Model.Alertas.Count > 0)
@@ -34,19 +34,19 @@
 
     <section class="aluno-portal-kpis">
         <article>
-            <span>Total em aberto</span>
+            <span>@I18n["Total em aberto", "Open balance"]</span>
             <strong>@Model.TotalEmAberto.ToString("C")</strong>
         </article>
         <article>
-            <span>Presenca</span>
+            <span>@I18n["Presença", "Attendance"]</span>
             <strong>@Model.PercentualPresenca.ToString("0.#")%</strong>
         </article>
         <article>
-            <span>Documentos pendentes</span>
+            <span>@I18n["Documentos pendentes", "Pending documents"]</span>
             <strong>@Model.DocumentosPendentes</strong>
         </article>
         <article>
-            <span>Comunicados nao lidos</span>
+            <span>@I18n["Comunicados não lidos", "Unread announcements"]</span>
             <strong>@Model.ComunicadosNaoLidos</strong>
         </article>
     </section>
@@ -56,15 +56,15 @@
             <section class="aluno-portal-panel">
                 <div class="aluno-portal-panel-head">
                     <div>
-                        <h3>Proximas aulas</h3>
-                        <p class="mb-0 text-muted">Agenda vinculada as suas turmas.</p>
+                        <h3>@I18n["Próximas aulas", "Upcoming classes"]</h3>
+                        <p class="mb-0 text-muted">@I18n["Agenda vinculada às suas turmas.", "Schedule linked to your groups."]</p>
                     </div>
-                    <a href="/area-do-aluno/aulas">Ver aulas</a>
+                    <a href="/area-do-aluno/aulas">@I18n["Ver aulas", "View classes"]</a>
                 </div>
                 <div class="aluno-portal-list">
                     @if (Model.ProximasAulas.Count == 0)
                     {
-                        <p class="text-muted mb-0">Nenhuma aula futura cadastrada.</p>
+                        <p class="text-muted mb-0">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</p>
                     }
                     else
                     {
@@ -81,23 +81,23 @@
 
             <section class="aluno-portal-panel mt-3">
                 <div class="aluno-portal-panel-head">
-                    <h3>Mensalidades recentes</h3>
-                    <a href="/area-do-aluno/financeiro">Ver financeiro</a>
+                    <h3>@I18n["Mensalidades recentes", "Recent monthly fees"]</h3>
+                    <a href="/area-do-aluno/financeiro">@I18n["Ver financeiro", "View finance"]</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0 aluno-portal-table">
                         <thead>
                             <tr>
-                                <th>Competencia</th>
-                                <th>Vencimento</th>
+                                <th>@I18n["Competência", "Period"]</th>
+                                <th>@I18n["Vencimento", "Due date"]</th>
                                 <th>Status</th>
-                                <th class="text-end">Valor</th>
+                                <th class="text-end">@I18n["Valor", "Amount"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (Model.MensalidadesRecentes.Count == 0)
                             {
-                                <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma mensalidade encontrada.</td></tr>
+                                <tr><td colspan="4" class="text-center text-muted py-4">@I18n["Nenhuma mensalidade encontrada.", "No monthly fees found."]</td></tr>
                             }
                             else
                             {
@@ -106,7 +106,7 @@
                                     <tr>
                                         <td>@mensalidade.Competencia.ToString("MM/yyyy")</td>
                                         <td>@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
-                                        <td><span class="aluno-portal-pill">@mensalidade.Status</span></td>
+                                        <td><span class="aluno-portal-pill">@I18n.Term(mensalidade.Status)</span></td>
                                         <td class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
                                     </tr>
                                 }
@@ -120,13 +120,13 @@
         <div class="col-12 col-xl-5">
             <section class="aluno-portal-panel">
                 <div class="aluno-portal-panel-head">
-                    <h3>Comunicados recentes</h3>
-                    <a href="/area-do-aluno/comunicados">Ver todos</a>
+                    <h3>@I18n["Comunicados recentes", "Recent announcements"]</h3>
+                    <a href="/area-do-aluno/comunicados">@I18n["Ver todos", "View all"]</a>
                 </div>
                 <div class="aluno-portal-list">
                     @if (Model.ComunicadosRecentes.Count == 0)
                     {
-                        <p class="text-muted mb-0">Nenhum comunicado ativo.</p>
+                        <p class="text-muted mb-0">@I18n["Nenhum comunicado ativo.", "No active announcements."]</p>
                     }
                     else
                     {
@@ -134,7 +134,7 @@
                         {
                             <div class="aluno-portal-list-item">
                                 <strong>@comunicado.Titulo</strong>
-                                <span>@comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy") @(comunicado.Lido ? "| Lido" : "| Novo")</span>
+                                <span>@comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy") @(comunicado.Lido ? I18n["| Lido", "| Read"] : I18n["| Novo", "| New"])</span>
                             </div>
                         }
                     }
@@ -143,13 +143,13 @@
 
             <section class="aluno-portal-panel mt-3">
                 <div class="aluno-portal-panel-head">
-                    <h3>Eventos importantes</h3>
-                    <a href="/area-do-aluno/eventos">Ver eventos</a>
+                    <h3>@I18n["Eventos importantes", "Important events"]</h3>
+                    <a href="/area-do-aluno/eventos">@I18n["Ver eventos", "View events"]</a>
                 </div>
                 <div class="aluno-portal-list">
                     @if (Model.ProximosEventos.Count == 0)
                     {
-                        <p class="text-muted mb-0">Nenhum evento futuro cadastrado.</p>
+                        <p class="text-muted mb-0">@I18n["Nenhum evento futuro cadastrado.", "No upcoming events registered."]</p>
                     }
                     else
                     {
@@ -157,7 +157,7 @@
                         {
                             <div class="aluno-portal-list-item">
                                 <strong>@evento.Titulo</strong>
-                                <span>@evento.Inicio.ToString("dd/MM HH:mm") @(evento.Importante ? "| Importante" : string.Empty)</span>
+                                <span>@evento.Inicio.ToString("dd/MM HH:mm") @(evento.Importante ? I18n["| Importante", "| Important"] : string.Empty)</span>
                             </div>
                         }
                     }
@@ -166,13 +166,13 @@
 
             <section class="aluno-portal-panel mt-3">
                 <div class="aluno-portal-panel-head">
-                    <h3>Atalhos</h3>
+                    <h3>@I18n["Atalhos", "Shortcuts"]</h3>
                 </div>
                 <div class="aluno-portal-actions">
-                    <a href="/area-do-aluno/documentos">Enviar documentos</a>
-                    <a href="/area-do-aluno/frequencia">Ver frequencia</a>
-                    <a href="/configuracoes">Conta e senha</a>
-                    <a href="/area-do-aluno/conquistas">Conquistas</a>
+                    <a href="/area-do-aluno/documentos">@I18n["Enviar documentos", "Send documents"]</a>
+                    <a href="/area-do-aluno/frequencia">@I18n["Ver frequência", "View attendance"]</a>
+                    <a href="/configuracoes">@I18n["Conta e senha", "Account and password"]</a>
+                    <a href="/area-do-aluno/conquistas">@I18n["Conquistas", "Achievements"]</a>
                 </div>
             </section>
         </div>

@@ -1,5 +1,14 @@
+@using IkkonAdmin.Web.Enums
+@using IkkonAdmin.Web.Security
+@{
+    var temaPreferencia = User.FindFirst(AppClaimTypes.TemaPreferencia)?.Value;
+    var isDarkTheme = string.Equals(temaPreferencia, TemaPreferenciaEnum.Escuro.ToString(), StringComparison.OrdinalIgnoreCase);
+    var themeClass = isDarkTheme ? "admin-theme-dark" : "admin-theme-light";
+    var themeName = isDarkTheme ? "dark" : "light";
+    var htmlLang = I18n.IsEnglish ? "en" : "pt-BR";
+}
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="@htmlLang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,9 +18,10 @@
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="admin-body">
+<body class="admin-body @themeClass" data-theme="@themeName">
     <div class="admin-shell">
         @await Html.PartialAsync("_Sidebar")
+        <div class="admin-sidebar-backdrop" data-admin-sidebar-close aria-hidden="true"></div>
 
         <div class="admin-content">
             @await Html.PartialAsync("_Topbar")
@@ -26,6 +36,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/i18n-ui.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

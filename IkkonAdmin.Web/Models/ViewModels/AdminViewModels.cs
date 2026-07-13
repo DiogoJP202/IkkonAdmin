@@ -160,7 +160,7 @@ public class AdminRoleFormViewModel
 
     [Display(Name = "Nome do cargo")]
     [Required(ErrorMessage = "Informe o nome do cargo.")]
-    [StringLength(100, ErrorMessage = "Nome deve ter no maximo 100 caracteres.")]
+    [StringLength(100, ErrorMessage = "Nome deve ter no máximo 100 caracteres.")]
     public string Nome { get; set; } = string.Empty;
 
     [Display(Name = "Código interno")]

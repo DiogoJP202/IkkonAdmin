@@ -3,44 +3,29 @@
 <article class="configuracoes-v2-card">
     <div class="configuracoes-v2-card-header">
         <div>
-            <span class="configuracoes-v2-eyebrow">Preferências</span>
-            <h2>Experiência de uso</h2>
-            <p>Defina tema, idioma e canais de notificação para o uso diário.</p>
+            <span class="configuracoes-v2-eyebrow">@I18n["Preferências", "Preferences"]</span>
+            <h2>@I18n["Experiência de uso", "User experience"]</h2>
+            <p>@I18n["Defina tema e canais de notificação para o uso diário.", "Set theme and notification channels for daily use."]</p>
         </div>
     </div>
 
     <form asp-action="AtualizarPreferencias" method="post" class="configuracoes-v2-card-body" data-config-form>
         @Html.AntiForgeryToken()
+        <input type="hidden" name="IdiomaPreferencia" value="@Model.Preferences.IdiomaPreferencia" />
 
         <div class="configuracoes-v2-form-grid">
             <div class="configuracoes-v2-field">
-                <label for="TemaPreferencia">Tema</label>
+                <label for="TemaPreferencia">@I18n["Tema", "Theme"]</label>
                 <select class="form-select configuracoes-v2-control" id="TemaPreferencia" name="TemaPreferencia">
                     @if (Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro)
                     {
-                        <option value="@TemaPreferenciaEnum.Claro" selected>Claro</option>
-                        <option value="@TemaPreferenciaEnum.Escuro">Escuro</option>
+                        <option value="@TemaPreferenciaEnum.Claro" selected>@I18n["Claro", "Light"]</option>
+                        <option value="@TemaPreferenciaEnum.Escuro">@I18n["Escuro", "Dark"]</option>
                     }
                     else
                     {
-                        <option value="@TemaPreferenciaEnum.Claro">Claro</option>
-                        <option value="@TemaPreferenciaEnum.Escuro" selected>Escuro</option>
-                    }
-                </select>
-            </div>
-
-            <div class="configuracoes-v2-field">
-                <label for="IdiomaPreferencia">Idioma</label>
-                <select class="form-select configuracoes-v2-control" id="IdiomaPreferencia" name="IdiomaPreferencia">
-                    @if (Model.Preferences.IdiomaPreferencia == IdiomaPreferenciaEnum.PtBr)
-                    {
-                        <option value="@IdiomaPreferenciaEnum.PtBr" selected>Português (Brasil)</option>
-                        <option value="@IdiomaPreferenciaEnum.EnUs">English (US)</option>
-                    }
-                    else
-                    {
-                        <option value="@IdiomaPreferenciaEnum.PtBr">Português (Brasil)</option>
-                        <option value="@IdiomaPreferenciaEnum.EnUs" selected>English (US)</option>
+                        <option value="@TemaPreferenciaEnum.Claro">@I18n["Claro", "Light"]</option>
+                        <option value="@TemaPreferenciaEnum.Escuro" selected>@I18n["Escuro", "Dark"]</option>
                     }
                 </select>
             </div>
@@ -51,8 +36,8 @@
                 <input class="form-check-input" type="checkbox" id="NotificarEmail" name="NotificarEmail" value="true" @(Model.Preferences.NotificarEmail ? "checked" : null) />
                 <input type="hidden" name="NotificarEmail" value="false" />
                 <span>
-                    <strong>Notificações por e-mail</strong>
-                    <small>Receber avisos e comunicações importantes por e-mail.</small>
+                    <strong>@I18n["Notificações por e-mail", "Email notifications"]</strong>
+                    <small>@I18n["Receber avisos e comunicações importantes por e-mail.", "Receive important notices and communications by email."]</small>
                 </span>
             </label>
 
@@ -60,14 +45,14 @@
                 <input class="form-check-input" type="checkbox" id="NotificarSistema" name="NotificarSistema" value="true" @(Model.Preferences.NotificarSistema ? "checked" : null) />
                 <input type="hidden" name="NotificarSistema" value="false" />
                 <span>
-                    <strong>Notificações no sistema</strong>
-                    <small>Receber alertas e mensagens dentro do painel.</small>
+                    <strong>@I18n["Notificações no sistema", "In-system notifications"]</strong>
+                    <small>@I18n["Receber alertas e mensagens dentro do painel.", "Receive alerts and messages inside the panel."]</small>
                 </span>
             </label>
         </div>
 
         <div class="configuracoes-v2-form-actions">
-            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="Salvando...">Salvar preferências</button>
+            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Salvando...", "Saving..."]">@I18n["Salvar preferências", "Save preferences"]</button>
         </div>
     </form>
 </article>

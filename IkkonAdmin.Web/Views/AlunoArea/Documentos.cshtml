@@ -1,21 +1,21 @@
 @model AreaAlunoDocumentosViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = "Documentos";
+    ViewData["Title"] = I18n["Documentos", "Documents"];
 }
 
 <section class="aluno-portal-panel">
     <div class="aluno-portal-panel-head">
         <div>
-            <h3>Documentos solicitados</h3>
-            <p class="mb-0 text-muted">Envie arquivos solicitados e acompanhe a aprovacao.</p>
+            <h3>@I18n["Documentos solicitados", "Requested documents"]</h3>
+            <p class="mb-0 text-muted">@I18n["Envie arquivos solicitados e acompanhe a aprovação.", "Upload requested files and track approval."]</p>
         </div>
     </div>
 
     <div class="aluno-portal-list">
         @if (Model.Documentos.Count == 0)
         {
-            <p class="text-muted mb-0">Nenhum documento solicitado.</p>
+            <p class="text-muted mb-0">@I18n["Nenhum documento solicitado.", "No requested documents."]</p>
         }
         else
         {
@@ -23,20 +23,20 @@
             {
                 <article class="aluno-portal-list-item">
                     <strong>@documento.Tipo</strong>
-                    <span>Status: @documento.Status @(documento.DataLimite.HasValue ? $"| Limite: {documento.DataLimite.Value:dd/MM/yyyy}" : string.Empty)</span>
+                    <span>Status: @I18n.Term(documento.Status) @(documento.DataLimite.HasValue ? I18n["| Limite: ", "| Deadline: "] + documento.DataLimite.Value.ToString("dd/MM/yyyy") : string.Empty)</span>
                     @if (!string.IsNullOrWhiteSpace(documento.Descricao))
                     {
                         <span>@documento.Descricao</span>
                     }
                     @if (!string.IsNullOrWhiteSpace(documento.ObservacaoAdministrativa))
                     {
-                        <span>Observacao: @documento.ObservacaoAdministrativa</span>
+                        <span>@I18n["Observação", "Note"]: @documento.ObservacaoAdministrativa</span>
                     }
                     @if (documento.UltimoEnvioId.HasValue)
                     {
                         <span>
-                            Enviado: @documento.NomeArquivoOriginal
-                            <a asp-action="BaixarDocumento" asp-route-envioId="@documento.UltimoEnvioId.Value">baixar</a>
+                            @I18n["Enviado", "Sent"]: @documento.NomeArquivoOriginal
+                            <a asp-action="BaixarDocumento" asp-route-envioId="@documento.UltimoEnvioId.Value">@I18n["baixar", "download"]</a>
                         </span>
                     }
                     @if (documento.Status != DocumentoStatusEnum.Aprovado)
@@ -45,7 +45,7 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="solicitacaoId" value="@documento.SolicitacaoId" />
                             <input type="file" name="arquivo" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp" required />
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">Enviar</button>
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">@I18n["Enviar", "Send"]</button>
                         </form>
                     }
                 </article>

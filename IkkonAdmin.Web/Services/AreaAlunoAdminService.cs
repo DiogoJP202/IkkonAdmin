@@ -54,13 +54,13 @@ public class AreaAlunoAdminService(
     {
         if (model.HoraFim <= model.HoraInicio)
         {
-            return AreaAlunoOperacaoResult.Falha("O horario final deve ser posterior ao inicial.");
+            return AreaAlunoOperacaoResult.Falha("O horário final deve ser posterior ao inicial.");
         }
 
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         await dbContext.TurmaHorarios.AddAsync(new TurmaHorario
@@ -74,7 +74,7 @@ public class AreaAlunoAdminService(
         }, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Horario cadastrado.");
+        return AreaAlunoOperacaoResult.Ok("Horário cadastrado.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AtualizarHorarioAsync(
@@ -84,19 +84,19 @@ public class AreaAlunoAdminService(
     {
         if (model.HoraFim <= model.HoraInicio)
         {
-            return AreaAlunoOperacaoResult.Falha("O horario final deve ser posterior ao inicial.");
+            return AreaAlunoOperacaoResult.Falha("O horário final deve ser posterior ao inicial.");
         }
 
         var horario = await dbContext.TurmaHorarios.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (horario is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Horario nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Horário não encontrado.");
         }
 
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         horario.TurmaId = model.TurmaId;
@@ -107,7 +107,7 @@ public class AreaAlunoAdminService(
         horario.Ativo = true;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Horario atualizado.");
+        return AreaAlunoOperacaoResult.Ok("Horário atualizado.");
     }
 
     public async Task<AreaAlunoOperacaoResult> ExcluirHorarioAsync(
@@ -120,19 +120,19 @@ public class AreaAlunoAdminService(
 
         if (horario is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Horario nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Horário não encontrado.");
         }
 
         if (horario.Aulas.Count > 0)
         {
             horario.Ativo = false;
             await dbContext.SaveChangesAsync(cancellationToken);
-            return AreaAlunoOperacaoResult.Ok("Horario desativado porque possui aulas vinculadas.");
+            return AreaAlunoOperacaoResult.Ok("Horário desativado porque possui aulas vinculadas.");
         }
 
         dbContext.TurmaHorarios.Remove(horario);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Horario excluido.");
+        return AreaAlunoOperacaoResult.Ok("Horário excluído.");
     }
 
     public async Task<AreaAlunoOperacaoResult> VincularInstrutorAsync(
@@ -142,7 +142,7 @@ public class AreaAlunoAdminService(
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         var instrutorValido = await dbContext.UsuariosSistema
@@ -154,7 +154,7 @@ public class AreaAlunoAdminService(
 
         if (!instrutorValido)
         {
-            return AreaAlunoOperacaoResult.Falha("Instrutor nao encontrado ou sem acesso interno.");
+            return AreaAlunoOperacaoResult.Falha("Instrutor não encontrado ou sem acesso interno.");
         }
 
         if (model.Principal)
@@ -190,13 +190,13 @@ public class AreaAlunoAdminService(
         var vinculo = await dbContext.TurmaInstrutores.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (vinculo is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Vinculo de instrutor nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Vínculo de instrutor não encontrado.");
         }
 
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         var instrutorValido = await dbContext.UsuariosSistema
@@ -208,7 +208,7 @@ public class AreaAlunoAdminService(
 
         if (!instrutorValido)
         {
-            return AreaAlunoOperacaoResult.Falha("Instrutor nao encontrado ou sem acesso interno.");
+            return AreaAlunoOperacaoResult.Falha("Instrutor não encontrado ou sem acesso interno.");
         }
 
         if (model.Principal)
@@ -240,7 +240,7 @@ public class AreaAlunoAdminService(
         var vinculo = await dbContext.TurmaInstrutores.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (vinculo is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Vinculo de instrutor nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Vínculo de instrutor não encontrado.");
         }
 
         dbContext.TurmaInstrutores.Remove(vinculo);
@@ -260,7 +260,7 @@ public class AreaAlunoAdminService(
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         if (model.TurmaHorarioId.HasValue)
@@ -270,7 +270,7 @@ public class AreaAlunoAdminService(
 
             if (!horarioValido)
             {
-                return AreaAlunoOperacaoResult.Falha("Horario nao pertence a turma selecionada.");
+                return AreaAlunoOperacaoResult.Falha("Horário não pertence à turma selecionada.");
             }
         }
 
@@ -285,7 +285,7 @@ public class AreaAlunoAdminService(
 
             if (!instrutorValido)
             {
-                return AreaAlunoOperacaoResult.Falha("Instrutor invalido.");
+                return AreaAlunoOperacaoResult.Falha("Instrutor inválido.");
             }
         }
 
@@ -318,13 +318,13 @@ public class AreaAlunoAdminService(
         var aula = await dbContext.Aulas.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (aula is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Aula nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Aula não encontrada.");
         }
 
         var turmaExiste = await dbContext.Turmas.AnyAsync(x => x.Id == model.TurmaId, cancellationToken);
         if (!turmaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Turma nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Turma não encontrada.");
         }
 
         if (model.TurmaHorarioId.HasValue)
@@ -334,7 +334,7 @@ public class AreaAlunoAdminService(
 
             if (!horarioValido)
             {
-                return AreaAlunoOperacaoResult.Falha("Horario nao pertence a turma selecionada.");
+                return AreaAlunoOperacaoResult.Falha("Horário não pertence à turma selecionada.");
             }
         }
 
@@ -349,7 +349,7 @@ public class AreaAlunoAdminService(
 
             if (!instrutorValido)
             {
-                return AreaAlunoOperacaoResult.Falha("Instrutor invalido.");
+                return AreaAlunoOperacaoResult.Falha("Instrutor inválido.");
             }
         }
 
@@ -376,14 +376,14 @@ public class AreaAlunoAdminService(
 
         if (aula is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Aula nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Aula não encontrada.");
         }
 
         if (aula.Frequencias.Count > 0)
         {
             aula.Status = StatusAulaEnum.Cancelada;
             await dbContext.SaveChangesAsync(cancellationToken);
-            return AreaAlunoOperacaoResult.Ok("Aula cancelada porque possui frequencia registrada.");
+            return AreaAlunoOperacaoResult.Ok("Aula cancelada porque possui frequência registrada.");
         }
 
         dbContext.Aulas.Remove(aula);
@@ -459,7 +459,7 @@ public class AreaAlunoAdminService(
 
         if (aula is null || aula.Turma is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Aula nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Aula não encontrada.");
         }
 
         var alunosDaTurma = aula.Turma.AlunoTurmas.Select(x => x.AlunoId).ToHashSet();
@@ -490,7 +490,7 @@ public class AreaAlunoAdminService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Frequencia salva.");
+        return AreaAlunoOperacaoResult.Ok("Frequência salva.");
     }
 
     public async Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default)
@@ -511,7 +511,7 @@ public class AreaAlunoAdminService(
         var existe = await dbContext.DocumentoTipos.AnyAsync(x => x.Nome == nome, cancellationToken);
         if (existe)
         {
-            return AreaAlunoOperacaoResult.Falha("Ja existe um tipo de documento com este nome.");
+            return AreaAlunoOperacaoResult.Falha("Já existe um tipo de documento com este nome.");
         }
 
         await dbContext.DocumentoTipos.AddAsync(new DocumentoTipo
@@ -534,7 +534,7 @@ public class AreaAlunoAdminService(
         var tipo = await dbContext.DocumentoTipos.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (tipo is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Tipo de documento nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento não encontrado.");
         }
 
         var nome = model.Nome.Trim();
@@ -543,7 +543,7 @@ public class AreaAlunoAdminService(
 
         if (existe)
         {
-            return AreaAlunoOperacaoResult.Falha("Ja existe um tipo de documento com este nome.");
+            return AreaAlunoOperacaoResult.Falha("Já existe um tipo de documento com este nome.");
         }
 
         tipo.Nome = nome;
@@ -565,19 +565,19 @@ public class AreaAlunoAdminService(
 
         if (tipo is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Tipo de documento nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento não encontrado.");
         }
 
         if (tipo.Solicitacoes.Count > 0)
         {
             tipo.Ativo = false;
             await dbContext.SaveChangesAsync(cancellationToken);
-            return AreaAlunoOperacaoResult.Ok("Tipo desativado porque possui solicitacoes vinculadas.");
+            return AreaAlunoOperacaoResult.Ok("Tipo desativado porque possui solicitações vinculadas.");
         }
 
         dbContext.DocumentoTipos.Remove(tipo);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Tipo de documento excluido.");
+        return AreaAlunoOperacaoResult.Ok("Tipo de documento excluído.");
     }
 
     public async Task<AreaAlunoOperacaoResult> SolicitarDocumentoAsync(
@@ -590,7 +590,7 @@ public class AreaAlunoAdminService(
 
         if (!tipoExiste || !alunoExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Tipo de documento ou aluno invalido.");
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento ou aluno inválido.");
         }
 
         await dbContext.DocumentoSolicitacoes.AddAsync(new DocumentoSolicitacao
@@ -618,7 +618,7 @@ public class AreaAlunoAdminService(
 
         if (solicitacao is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Solicitacao nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Solicitação não encontrada.");
         }
 
         var tipoExiste = await dbContext.DocumentoTipos.AnyAsync(x => x.Id == model.DocumentoTipoId, cancellationToken);
@@ -626,7 +626,7 @@ public class AreaAlunoAdminService(
 
         if (!tipoExiste || !alunoExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Tipo de documento ou aluno invalido.");
+            return AreaAlunoOperacaoResult.Falha("Tipo de documento ou aluno inválido.");
         }
 
         solicitacao.DocumentoTipoId = model.DocumentoTipoId;
@@ -636,7 +636,7 @@ public class AreaAlunoAdminService(
         solicitacao.ObservacaoAdministrativa = LimparOpcional(model.ObservacaoAdministrativa);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Solicitacao atualizada.");
+        return AreaAlunoOperacaoResult.Ok("Solicitação atualizada.");
     }
 
     public async Task<AreaAlunoOperacaoResult> ExcluirDocumentoSolicitacaoAsync(
@@ -649,17 +649,17 @@ public class AreaAlunoAdminService(
 
         if (solicitacao is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Solicitacao nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Solicitação não encontrada.");
         }
 
         if (solicitacao.Envios.Count > 0)
         {
-            return AreaAlunoOperacaoResult.Falha("Nao e possivel excluir uma solicitacao com arquivos enviados. Altere o status para recusado ou pendente.");
+            return AreaAlunoOperacaoResult.Falha("Não é possível excluir uma solicitação com arquivos enviados. Altere o status para recusado ou pendente.");
         }
 
         dbContext.DocumentoSolicitacoes.Remove(solicitacao);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Solicitacao excluida.");
+        return AreaAlunoOperacaoResult.Ok("Solicitação excluída.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AvaliarDocumentoAsync(
@@ -671,7 +671,7 @@ public class AreaAlunoAdminService(
 
         if (solicitacao is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Solicitacao nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Solicitação não encontrada.");
         }
 
         solicitacao.Status = model.Status;
@@ -757,7 +757,7 @@ public class AreaAlunoAdminService(
 
         if (comunicado is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Comunicado nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Comunicado não encontrado.");
         }
 
         comunicado.Titulo = model.Titulo.Trim();
@@ -786,20 +786,20 @@ public class AreaAlunoAdminService(
 
         if (comunicado is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Comunicado nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Comunicado não encontrado.");
         }
 
         if (comunicado.Leituras.Count > 0)
         {
             comunicado.Ativo = false;
             await dbContext.SaveChangesAsync(cancellationToken);
-            return AreaAlunoOperacaoResult.Ok("Comunicado desativado porque ja possui leituras.");
+            return AreaAlunoOperacaoResult.Ok("Comunicado desativado porque já possui leituras.");
         }
 
         dbContext.ComunicadosAlvos.RemoveRange(comunicado.Alvos);
         dbContext.Comunicados.Remove(comunicado);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Comunicado excluido.");
+        return AreaAlunoOperacaoResult.Ok("Comunicado excluído.");
     }
 
     public async Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(CancellationToken cancellationToken = default)
@@ -869,7 +869,7 @@ public class AreaAlunoAdminService(
 
         if (evento is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Evento nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Evento não encontrado.");
         }
 
         evento.Titulo = model.Titulo.Trim();
@@ -898,7 +898,7 @@ public class AreaAlunoAdminService(
 
         if (evento is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Evento nao encontrado.");
+            return AreaAlunoOperacaoResult.Falha("Evento não encontrado.");
         }
 
         evento.Ativo = false;
@@ -924,7 +924,7 @@ public class AreaAlunoAdminService(
         var existe = await dbContext.Insignias.AnyAsync(x => x.Nome == nome, cancellationToken);
         if (existe)
         {
-            return AreaAlunoOperacaoResult.Falha("Ja existe uma insignia com este nome.");
+            return AreaAlunoOperacaoResult.Falha("Já existe uma insígnia com este nome.");
         }
 
         await dbContext.Insignias.AddAsync(new Insignia
@@ -938,7 +938,7 @@ public class AreaAlunoAdminService(
         }, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Insignia criada.");
+        return AreaAlunoOperacaoResult.Ok("Insígnia criada.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AtualizarInsigniaAsync(
@@ -949,7 +949,7 @@ public class AreaAlunoAdminService(
         var insignia = await dbContext.Insignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (insignia is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Insignia nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Insígnia não encontrada.");
         }
 
         var nome = model.Nome.Trim();
@@ -958,7 +958,7 @@ public class AreaAlunoAdminService(
 
         if (existe)
         {
-            return AreaAlunoOperacaoResult.Falha("Ja existe uma insignia com este nome.");
+            return AreaAlunoOperacaoResult.Falha("Já existe uma insígnia com este nome.");
         }
 
         insignia.Nome = nome;
@@ -969,7 +969,7 @@ public class AreaAlunoAdminService(
         insignia.Ativa = model.Ativa;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Insignia atualizada.");
+        return AreaAlunoOperacaoResult.Ok("Insígnia atualizada.");
     }
 
     public async Task<AreaAlunoOperacaoResult> ExcluirInsigniaAsync(
@@ -982,19 +982,19 @@ public class AreaAlunoAdminService(
 
         if (insignia is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Insignia nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Insígnia não encontrada.");
         }
 
         if (insignia.Alunos.Count > 0)
         {
             insignia.Ativa = false;
             await dbContext.SaveChangesAsync(cancellationToken);
-            return AreaAlunoOperacaoResult.Ok("Insignia desativada porque ja foi atribuida.");
+            return AreaAlunoOperacaoResult.Ok("Insígnia desativada porque já foi atribuída.");
         }
 
         dbContext.Insignias.Remove(insignia);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Insignia excluida.");
+        return AreaAlunoOperacaoResult.Ok("Insígnia excluída.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AtribuirInsigniaAsync(
@@ -1007,7 +1007,7 @@ public class AreaAlunoAdminService(
 
         if (!alunoExiste || !insigniaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Aluno ou insignia invalida.");
+            return AreaAlunoOperacaoResult.Falha("Aluno ou insígnia inválida.");
         }
 
         var jaPossui = await dbContext.AlunoInsignias
@@ -1015,7 +1015,7 @@ public class AreaAlunoAdminService(
 
         if (jaPossui)
         {
-            return AreaAlunoOperacaoResult.Falha("Este aluno ja possui esta insignia.");
+            return AreaAlunoOperacaoResult.Falha("Este aluno já possui esta insígnia.");
         }
 
         await dbContext.AlunoInsignias.AddAsync(new AlunoInsignia
@@ -1029,7 +1029,7 @@ public class AreaAlunoAdminService(
         }, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return AreaAlunoOperacaoResult.Ok("Insignia atribuida ao aluno.");
+        return AreaAlunoOperacaoResult.Ok("Insígnia atribuída ao aluno.");
     }
 
     public async Task<AreaAlunoOperacaoResult> AtualizarAlunoInsigniaAsync(
@@ -1040,7 +1040,7 @@ public class AreaAlunoAdminService(
         var conquista = await dbContext.AlunoInsignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (conquista is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Conquista nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Conquista não encontrada.");
         }
 
         var alunoExiste = await dbContext.Alunos.AnyAsync(x => x.Id == model.AlunoId, cancellationToken);
@@ -1048,7 +1048,7 @@ public class AreaAlunoAdminService(
 
         if (!alunoExiste || !insigniaExiste)
         {
-            return AreaAlunoOperacaoResult.Falha("Aluno ou insignia invalida.");
+            return AreaAlunoOperacaoResult.Falha("Aluno ou insígnia inválida.");
         }
 
         var duplicada = await dbContext.AlunoInsignias
@@ -1056,7 +1056,7 @@ public class AreaAlunoAdminService(
 
         if (duplicada)
         {
-            return AreaAlunoOperacaoResult.Falha("Este aluno ja possui esta insignia.");
+            return AreaAlunoOperacaoResult.Falha("Este aluno já possui esta insígnia.");
         }
 
         conquista.AlunoId = model.AlunoId;
@@ -1074,7 +1074,7 @@ public class AreaAlunoAdminService(
         var conquista = await dbContext.AlunoInsignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (conquista is null)
         {
-            return AreaAlunoOperacaoResult.Falha("Conquista nao encontrada.");
+            return AreaAlunoOperacaoResult.Falha("Conquista não encontrada.");
         }
 
         dbContext.AlunoInsignias.Remove(conquista);
@@ -1160,7 +1160,7 @@ public class AreaAlunoAdminService(
                 TurmaId = x.TurmaId,
                 Turma = x.Turma != null ? x.Turma.Nome : $"Turma #{x.TurmaId}",
                 UsuarioSistemaId = x.UsuarioSistemaId,
-                Instrutor = x.UsuarioSistema != null ? x.UsuarioSistema.NomeExibicao : $"Usuario #{x.UsuarioSistemaId}",
+                Instrutor = x.UsuarioSistema != null ? x.UsuarioSistema.NomeExibicao : $"Usuário #{x.UsuarioSistemaId}",
                 Principal = x.Principal,
                 DataInicio = x.DataInicio,
                 DataFim = x.DataFim
@@ -1359,7 +1359,7 @@ public class AreaAlunoAdminService(
                 AlunoId = x.AlunoId,
                 Aluno = x.Aluno != null ? x.Aluno.NomeCompleto : $"Aluno #{x.AlunoId}",
                 InsigniaId = x.InsigniaId,
-                Insignia = x.Insignia != null ? x.Insignia.Nome : $"Insignia #{x.InsigniaId}",
+                Insignia = x.Insignia != null ? x.Insignia.Nome : $"Insígnia #{x.InsigniaId}",
                 ConcedidaEmUtc = x.ConcedidaEmUtc,
                 Origem = x.Origem,
                 Observacao = x.Observacao
@@ -1393,7 +1393,7 @@ public class AreaAlunoAdminService(
 
         return turmaExiste
             ? AreaAlunoOperacaoResult.Ok("Alvo valido.")
-            : AreaAlunoOperacaoResult.Falha("Selecione uma turma valida.");
+            : AreaAlunoOperacaoResult.Falha("Selecione uma turma válida.");
     }
 
     private static ComunicadoAlvo CriarComunicadoAlvo(

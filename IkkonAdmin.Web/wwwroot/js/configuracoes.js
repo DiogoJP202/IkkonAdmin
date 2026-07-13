@@ -81,6 +81,10 @@
         if (form.dataset.resetOnSuccess === "true") {
           form.reset();
         }
+
+        if (payload.refreshPage) {
+          window.setTimeout(() => window.location.reload(), 650);
+        }
       } catch {
         showFeedback("danger", "Falha de comunicação. Tente novamente em instantes.");
       } finally {

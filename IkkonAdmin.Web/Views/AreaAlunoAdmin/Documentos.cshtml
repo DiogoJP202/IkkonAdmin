@@ -6,7 +6,7 @@
 <div class="admin-panel-v2-page">
     <section class="admin-panel-v2-hero is-compact mb-4">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">Area do Aluno</span>
+            <span class="admin-panel-eyebrow">Área do Aluno</span>
             <h1 class="admin-panel-title">Documentos</h1>
             <p class="admin-panel-subtitle">Crie tipos, solicite documentos, edite prazos e aprove ou recuse envios.</p>
         </div>
@@ -24,10 +24,10 @@
                     </div>
                     <label class="admin-panel-check-card is-form-check">
                         <input asp-for="NovoTipo.Obrigatorio" class="form-check-input" />
-                        <span>Obrigatorio</span>
+                        <span>Obrigatório</span>
                     </label>
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="NovoTipo.Descricao">Descricao</label>
+                        <label asp-for="NovoTipo.Descricao">Descrição</label>
                         <textarea asp-for="NovoTipo.Descricao" class="form-control admin-panel-control" rows="3" maxlength="500"></textarea>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         <input asp-for="NovaSolicitacao.DataLimite" type="date" class="form-control admin-panel-control" />
                     </div>
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="NovaSolicitacao.ObservacaoAdministrativa">Observacao</label>
+                        <label asp-for="NovaSolicitacao.ObservacaoAdministrativa">Observação</label>
                         <textarea asp-for="NovaSolicitacao.ObservacaoAdministrativa" class="form-control admin-panel-control" rows="3" maxlength="1000"></textarea>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
         <div class="admin-panel-card-header"><h2>Tipos de documento</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Nome</th><th>Descricao</th><th>Obrigatorio</th><th>Ativo</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Nome</th><th>Descrição</th><th>Obrigatório</th><th>Ativo</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Tipos.Count == 0)
                     {
@@ -118,14 +118,14 @@
     </section>
 
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Solicitacoes</h2></div>
+        <div class="admin-panel-card-header"><h2>Solicitações</h2></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
-                <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Limite</th><th>Envio</th><th>Observacao</th><th class="text-end">Acoes</th></tr></thead>
+                <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Limite</th><th>Envio</th><th>Observação</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Solicitacoes.Count == 0)
                     {
-                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma solicitacao encontrada.</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma solicitação encontrada.</td></tr>
                     }
                     else
                     {

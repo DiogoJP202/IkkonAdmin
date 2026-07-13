@@ -15,7 +15,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
     [Authorize(Policy = AuthorizationPolicies.AreaAlunoView)]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Area do Aluno";
+        ViewData["Title"] = "Área do Aluno";
         return View(await areaAlunoAdminService.ObterDashboardAsync(cancellationToken));
     }
 
@@ -23,7 +23,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
     [Authorize(Policy = AuthorizationPolicies.AulasView)]
     public async Task<IActionResult> Aulas(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Aulas e horarios";
+        ViewData["Title"] = "Aulas e horários";
         return View(await areaAlunoAdminService.ObterAulasAsync(cancellationToken));
     }
 
@@ -35,7 +35,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarHorarioAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horario.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horário.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -48,7 +48,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarHorarioAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horario.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horário.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -136,7 +136,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
     [Authorize(Policy = AuthorizationPolicies.FrequenciaView)]
     public async Task<IActionResult> Frequencia(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Frequencia";
+        ViewData["Title"] = "Frequência";
         return View(await areaAlunoAdminService.ObterFrequenciaAsync(cancellationToken));
     }
 
@@ -144,7 +144,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
     [Authorize(Policy = AuthorizationPolicies.FrequenciaCreate)]
     public async Task<IActionResult> RegistroFrequencia(int aulaId, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Registrar frequencia";
+        ViewData["Title"] = "Registrar frequência";
         var model = await areaAlunoAdminService.ObterRegistroFrequenciaAsync(aulaId, cancellationToken);
         return model is null ? NotFound() : View(model);
     }
@@ -210,7 +210,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.SolicitarDocumentoAsync(model, ObterUsuarioId(), cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitacao de documento.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitação de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -223,7 +223,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarDocumentoSolicitacaoAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitacao de documento.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitação de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -364,7 +364,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarInsigniaAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insignia.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -377,7 +377,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarInsigniaAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insignia.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -399,7 +399,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtribuirInsigniaAsync(model, ObterUsuarioId(), cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a atribuicao de insignia.")));
+                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a atribuição de insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }

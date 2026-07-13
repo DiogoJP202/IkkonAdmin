@@ -17,7 +17,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminVisualizarDados)]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Administracao";
+        ViewData["Title"] = "Administração";
         var vm = await adminPainelService.ObterPainelAsync(cancellationToken);
         return View(vm);
     }
@@ -49,7 +49,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminGerenciarUsuarios)]
     public async Task<IActionResult> NovoUsuario(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Novo Usuario";
+        ViewData["Title"] = "Novo Usuário";
 
         var model = new AdminUsuarioFormViewModel
         {
@@ -66,7 +66,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminGerenciarUsuarios)]
     public async Task<IActionResult> NovoUsuario(AdminUsuarioFormViewModel model, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Novo Usuario";
+        ViewData["Title"] = "Novo Usuário";
 
         if (!ModelState.IsValid)
         {
@@ -100,7 +100,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminGerenciarUsuarios)]
     public async Task<IActionResult> EditarUsuario(int id, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Editar Usuario";
+        ViewData["Title"] = "Editar Usuário";
         var model = await adminPainelService.ObterUsuarioParaEdicaoAsync(id, cancellationToken);
         if (model is null)
         {
@@ -116,7 +116,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminGerenciarUsuarios)]
     public async Task<IActionResult> EditarUsuario(int id, AdminUsuarioFormViewModel model, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Editar Usuario";
+        ViewData["Title"] = "Editar Usuário";
 
         if (id != model.Id)
         {
@@ -199,7 +199,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminEditarPermissoes)]
     public async Task<IActionResult> Acessos(int id, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Permissoes e Acessos";
+        ViewData["Title"] = "Permissões e Acessos";
         var vm = await adminPainelService.ObterAcessosAsync(id, cancellationToken);
         if (vm is null)
         {
@@ -214,7 +214,7 @@ public class PainelAdminController(
     [Authorize(Policy = AuthorizationPolicies.AdminEditarPermissoes)]
     public async Task<IActionResult> Acessos(AdminAcessosUpdateRequest request, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Permissoes e Acessos";
+        ViewData["Title"] = "Permissões e Acessos";
 
         if (!TryGetCurrentUserId(out var usuarioResponsavelId))
         {

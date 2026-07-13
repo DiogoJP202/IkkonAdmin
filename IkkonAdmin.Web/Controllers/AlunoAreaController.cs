@@ -73,7 +73,7 @@ public class AlunoAreaController(IAreaAlunoService areaAlunoService) : Controlle
     [HttpGet]
     public async Task<IActionResult> Aulas(CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Aulas e Horarios";
+        ViewData["Title"] = "Aulas e Horários";
 
         var usuarioId = ObterUsuarioId();
         if (!usuarioId.HasValue)
@@ -88,7 +88,7 @@ public class AlunoAreaController(IAreaAlunoService areaAlunoService) : Controlle
     [HttpGet]
     public async Task<IActionResult> Frequencia(DateOnly? inicio, DateOnly? fim, CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Frequencia";
+        ViewData["Title"] = "Frequência";
 
         var usuarioId = ObterUsuarioId();
         if (!usuarioId.HasValue)

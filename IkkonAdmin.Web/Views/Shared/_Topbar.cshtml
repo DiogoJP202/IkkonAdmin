@@ -1,16 +1,36 @@
-﻿<header class="admin-topbar">
-    <div>
-        <h1 class="h5 mb-1">@ViewData["Title"]</h1>
-        <small class="text-muted">Painel administrativo interno</small>
+@{
+    var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+}
+<header class="admin-topbar">
+    <div class="admin-topbar-heading">
+        <button type="button"
+                class="admin-sidebar-topbar-toggle"
+                data-admin-sidebar-toggle
+                aria-controls="adminSidebar"
+                aria-expanded="false"
+                aria-label="@I18n["Abrir menu", "Open menu"]">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
+        <div>
+            <h1 class="h5 mb-1">@ViewData["Title"]</h1>
+            <small class="text-muted">@I18n["Painel administrativo interno", "Internal admin panel"]</small>
+        </div>
     </div>
     <div class="text-end admin-topbar-actions">
         <small class="text-muted d-block">@DateTime.Now.ToString("dd/MM/yyyy")</small>
-        <small class="text-muted d-block">@(User?.Identity?.Name ?? "Operação interna")</small>
+        <small class="text-muted d-block">@(User?.Identity?.Name ?? I18n["Operação interna", "Internal operation"])</small>
         @if (User?.Identity?.IsAuthenticated == true)
         {
             <form asp-controller="Auth" asp-action="Logout" method="post" class="mt-2">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-sm btn-outline-secondary">Sair</button>
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-controller="Idioma"
+                   asp-action="Alterar"
+                   asp-route-culture="@I18n.ToggleCulture"
+                   asp-route-returnUrl="@languageReturnUrl">@I18n.ToggleLabel</a>
+                <button type="submit" class="btn btn-sm btn-outline-secondary">@I18n["Sair", "Sign out"]</button>
             </form>
         }
     </div>

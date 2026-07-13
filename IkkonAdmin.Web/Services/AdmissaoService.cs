@@ -110,12 +110,12 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
 
         if (admissao is null)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Admissao nao encontrada." };
+            return new AdmissaoMatriculaResultado { Erro = "Admissão não encontrada." };
         }
 
         if (admissao.AlunoId.HasValue)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Esta admissao ja possui matricula vinculada." };
+            return new AdmissaoMatriculaResultado { Erro = "Esta admissão já possui matrícula vinculada." };
         }
 
         var cpf = SomenteDigitos(input.CPF);
@@ -129,7 +129,7 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
 
         if (cpfJaExiste)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Ja existe um aluno cadastrado com esse CPF." };
+            return new AdmissaoMatriculaResultado { Erro = "Já existe um aluno cadastrado com esse CPF." };
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
