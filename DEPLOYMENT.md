@@ -1,4 +1,4 @@
-﻿# Deploy do IkkonAdmin
+# Deploy do IkkonAdmin
 
 Este guia descreve uma forma simples de colocar o IkkonAdmin no ar para validação do cliente.
 
@@ -134,6 +134,26 @@ GoogleAgenda__TimeZone=America/Sao_Paulo
 ```
 
 Se não for testar Google Agenda agora, pode deixar essas variáveis sem configurar. A tela da agenda pode avisar que a integração não está configurada.
+
+## Uploads e storage
+
+O sistema salva arquivos em duas áreas diferentes:
+
+- imagens públicas do blog em `wwwroot/uploads/blog`;
+- documentos privados de alunos em `App_Data/uploads/documentos`.
+
+Em desenvolvimento local isso é suficiente. Em hospedagens com filesystem efêmero, como Render Free, esses arquivos podem ser perdidos quando o container for recriado ou movido.
+
+Para demonstração simples, uploads locais podem ser aceitos com essa limitação conhecida. Para ambiente real, use storage persistente externo:
+
+- Azure Blob Storage;
+- Amazon S3;
+- Cloudflare R2;
+- outro storage de objetos.
+
+Documentos de aluno não devem ser movidos para uma pasta pública sem controle de autorização. Eles precisam continuar passando por download autenticado/autorizado.
+
+Guia detalhado: [Uploads e storage](./docs/UPLOADS_E_STORAGE.md).
 
 ## Banco de dados recomendado
 

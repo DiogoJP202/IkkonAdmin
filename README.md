@@ -1,152 +1,100 @@
-﻿# IkkonAdmin
+# IkkonAdmin
 
 <p align="center">
   <img src="./IkkonAdmin.Web/wwwroot/Images/Ikkon_Icon.png" alt="Logo IKKON SPTD" width="120" />
 </p>
 
-<h3 align="center">Sistema administrativo e site institucional para o IKKON SPTD | Escola de Taiko</h3>
+<h3 align="center">Sistema administrativo, portal do aluno, blog e site institucional para o IKKON SPTD | São Paulo Taiko Dojo</h3>
 
 <p align="center">
   <strong>ASP.NET Core MVC · Entity Framework Core · SQL Server · Razor Views · Bootstrap 5</strong>
 </p>
 
 <p align="center">
-  <a href="#sobre-a-escola">Escola</a> ·
-  <a href="#sobre-o-projeto">Projeto</a> ·
-  <a href="#funcionalidades">Funcionalidades</a> ·
-  <a href="#arquitetura-e-tecnologias">Tecnologias</a> ·
-  <a href="#como-rodar-localmente">Como rodar</a>
+  <a href="#visão-geral">Visão geral</a> ·
+  <a href="#módulos">Módulos</a> ·
+  <a href="#arquitetura">Arquitetura</a> ·
+  <a href="#rodando-localmente">Rodar local</a> ·
+  <a href="#documentação">Documentação</a>
 </p>
 
 ---
 
-## Sobre a escola
+## Visão geral
 
-O **IKKON SPTD | Ikkon São Paulo Taiko Dojo** é uma escola de taiko em São Paulo dedicada ao ensino de percussão japonesa, fue e teoria musical. A escola une cultura japonesa, disciplina, musicalidade, energia de grupo e presença de palco, acolhendo alunos iniciantes e pessoas com diferentes níveis de experiência.
+O **IkkonAdmin** é uma aplicação web criada para apoiar a operação do **IKKON SPTD | Ikkon São Paulo Taiko Dojo**, escola de taiko em São Paulo dedicada ao ensino de percussão japonesa, fue, teoria musical e apresentações culturais.
 
-Além das aulas, o IKKON também atua como grupo artístico em apresentações, eventos culturais, festivais, ações especiais e shows.
-
-<p align="center">
-  <img src="./IkkonAdmin.Web/wwwroot/Images/AulaTaiko.png" alt="Aula de taiko no IKKON SPTD" width="860" />
-</p>
-
-**Mensagem central da escola:** ensino de percussão japonesa para todos.
-
-**Endereço:** Rua Domingos de Morais, 2975, São Paulo, Brazil
-
-**Canais oficiais:**
-
-- Instagram: [@ikkontaiko](https://www.instagram.com/ikkontaiko/)
-- TikTok: [@ikkontaiko](https://www.tiktok.com/@ikkontaiko)
-- Facebook: [Ikkon Taiko](https://web.facebook.com/ikkontaiko/?_rdc=1&_rdr#)
-- E-mail: [contato@ikkontaiko.com](mailto:contato@ikkontaiko.com)
-- WhatsApp: [+55 11 93779-9916](https://wa.me/5511937799916)
-
-## Sobre o projeto
-
-O **IkkonAdmin** é uma solução web criada para apoiar a operação administrativa da escola, substituindo controles manuais feitos em planilhas, Notion, WhatsApp e registros financeiros descentralizados.
-
-Este projeto está sendo desenvolvido como um **trabalho voluntário**, com o objetivo de ajudar a escola a organizar processos internos, reduzir retrabalho operacional e criar uma base tecnológica evolutiva para os próximos anos.
-
-A proposta não é criar um sistema complexo demais, mas sim uma ferramenta administrativa real, clara e útil para o dia a dia da equipe.
-
-## Problema que a solução resolve
-
-Antes do sistema, os principais processos dependiam de controles manuais:
+O sistema centraliza rotinas que antes dependiam de planilhas, Notion, WhatsApp e controles financeiros separados:
 
 - cadastro e acompanhamento de alunos;
-- mensalidades, atrasos, descontos e acordos financeiros;
-- admissões e integração de novos alunos;
-- desligamentos e encerramento financeiro;
-- graduação e histórico de níveis;
+- turmas, aulas, frequência e instrutores;
+- financeiro, mensalidades, pagamentos, atrasos e acordos;
+- admissões, desligamentos e graduações;
 - inventário de instrumentos e equipamentos;
-- agenda de aulas, eventos e compromissos;
-- permissões de acesso para equipe interna.
+- agenda operacional com Google Agenda;
+- portal do aluno;
+- comunicados, documentos, eventos e conquistas;
+- blog público com versões por idioma;
+- usuários, cargos, permissões e auditoria.
 
-O IkkonAdmin centraliza essas informações em um painel interno, com autenticação, controle de permissões e rotas separadas para área administrativa e área do aluno.
+Este projeto nasceu como uma iniciativa voluntária para organizar processos internos da escola e criar uma base técnica evolutiva para os próximos anos.
 
-## Site institucional
+## Módulos
 
-O projeto também contém uma landing page institucional para apresentar a escola, separar a comunicação entre aulas e eventos, e facilitar contato com potenciais alunos ou contratantes.
+### Site institucional
 
-Rotas institucionais principais:
+Rotas públicas:
 
-- `/` - Home institucional
-- `/escola` - Página focada nas aulas e cursos
-- `/eventos` - Página focada no grupo artístico e apresentações
-- `/contato` - Contato institucional
+- `/` - apresentação institucional.
+- `/escola` - aulas, cursos e experiência do aluno.
+- `/eventos` - grupo artístico, apresentações e eventos.
+- `/blog` - publicações, novidades e bastidores.
 
-<p align="center">
-  <img src="./IkkonAdmin.Web/wwwroot/Images/FotoAlunos.jpg" alt="Alunos do IKKON SPTD" width="420" />
-  <img src="./IkkonAdmin.Web/wwwroot/Images/Alunos2.jfif" alt="Comunidade IKKON SPTD" width="420" />
-</p>
+O site possui suporte de interface para português, inglês e japonês nas áreas públicas definidas, com seletor de idioma por cookie.
 
-## Vídeos da escola
+### Painel administrativo
 
-### Aulas e prática
+O painel interno fica sob `/admin` e usa autenticação por cookie, roles e permissões granulares. Ele cobre:
 
-| Vídeo | Link |
-|---|---|
-| <a href="https://youtu.be/4iX-E6uIAXI"><img src="https://img.youtube.com/vi/4iX-E6uIAXI/hqdefault.jpg" alt="Videoaula IKKON" width="240" /></a> | [Assistir no YouTube](https://youtu.be/4iX-E6uIAXI) |
-| <a href="https://www.youtube.com/watch?v=b7DFAQNTpAg"><img src="https://img.youtube.com/vi/b7DFAQNTpAg/hqdefault.jpg" alt="Aula de taiko" width="240" /></a> | [Assistir no YouTube](https://www.youtube.com/watch?v=b7DFAQNTpAg) |
-| <a href="https://www.youtube.com/watch?v=FlwgqLo6yBI"><img src="https://img.youtube.com/vi/FlwgqLo6yBI/hqdefault.jpg" alt="Prática musical" width="240" /></a> | [Assistir no YouTube](https://www.youtube.com/watch?v=FlwgqLo6yBI) |
+- dashboard operacional;
+- alunos, turmas, financeiro, admissões, desligamentos e graduações;
+- inventário;
+- agenda;
+- blog;
+- administração de usuários, cargos, permissões, sistema e auditoria;
+- manutenção operacional da Área do Aluno.
 
-### Apresentações e eventos
+### Área do Aluno
 
-| Vídeo | Link |
-|---|---|
-| <a href="https://youtu.be/2n3U_-pqmZY"><img src="https://img.youtube.com/vi/2n3U_-pqmZY/hqdefault.jpg" alt="Apresentação de taiko" width="240" /></a> | [Assistir no YouTube](https://youtu.be/2n3U_-pqmZY) |
-| <a href="https://youtu.be/ts0OQIXZ5m4"><img src="https://img.youtube.com/vi/ts0OQIXZ5m4/hqdefault.jpg" alt="Evento cultural" width="240" /></a> | [Assistir no YouTube](https://youtu.be/ts0OQIXZ5m4) |
-| <a href="https://youtu.be/2IDfcF9q_Wc"><img src="https://img.youtube.com/vi/2IDfcF9q_Wc/hqdefault.jpg" alt="Show de taiko" width="240" /></a> | [Assistir no YouTube](https://youtu.be/2IDfcF9q_Wc) |
+O aluno acessa por `/aluno/login` e usa o portal em `/area-do-aluno`. O portal consulta dados pelo usuário autenticado, usando o vínculo `UsuarioSistema.AlunoId`, sem receber `AlunoId` sensível por rota.
 
-## Funcionalidades
+Funcionalidades principais:
 
-### Área administrativa
+- dashboard do aluno;
+- perfil;
+- financeiro;
+- turmas, aulas e horários;
+- frequência;
+- documentos;
+- comunicados;
+- eventos;
+- conquistas.
 
-- Dashboard operacional com indicadores reais.
-- Cadastro, edição, filtros e detalhes de alunos.
-- Controle de turmas e vínculo de alunos com múltiplas turmas.
-- Financeiro com mensalidades, pagamentos, atrasos, acordos e descontos.
-- Admissões com acompanhamento de aula experimental, matrícula e checklist.
-- Desligamentos com pendências, motivo, confirmação e encerramento.
-- Graduações com exames, resultados e histórico de nível.
-- Configurações de conta, preferências, senha e histórico de acessos.
-- Painel administrativo para usuários, cargos, permissões e auditoria.
-- Inventário de taikos, bachis e equipamentos.
-- Integração com Google Agenda para eventos e compromissos.
+### Blog
 
-### Área do aluno
+O blog possui painel editorial em `/admin/blog` e área pública em `/blog`. Recursos atuais:
 
-A área do aluno foi separada da área administrativa para preparar uma experiência própria para alunos.
+- editor rico com texto, imagem e vídeo do YouTube;
+- imagem de capa;
+- categorias e tags;
+- rascunho, agendamento, publicação e arquivamento;
+- destaque e blog da semana;
+- versões por idioma: `pt-BR`, `en-US` e `ja-JP`;
+- SEO básico por post.
 
-- Login separado em `/aluno/login`.
-- Portal em `/area-do-aluno`.
-- Perfil do aluno autenticado.
-- Turmas vinculadas.
-- Resumo financeiro individual.
-- Proteção por vínculo `UsuarioSistema.AlunoId`.
+## Arquitetura
 
-### Controle de acesso
-
-O sistema usa autenticação por cookie/sessão e autorização baseada em roles, claims e policies.
-
-Perfis principais:
-
-- `ADMIN`
-- `FUNCIONARIO`
-- `ALUNO`
-
-Exemplos de permissões:
-
-- `ALUNOS_VIEW`, `ALUNOS_CREATE`, `ALUNOS_EDIT`
-- `FINANCEIRO_VIEW`, `FINANCEIRO_EDIT`
-- `GOOGLE_AGENDA_VIEW`, `GOOGLE_AGENDA_MANAGE`
-- `INVENTARIO_VIEW`, `INVENTARIO_MANAGE`
-- `GERENCIAR_USUARIOS`, `EDITAR_PERMISSOES`
-
-## Arquitetura e tecnologias
-
-O projeto segue uma arquitetura MVC em camadas simples, adequada para um sistema administrativo interno em evolução.
+O projeto segue MVC server-side em uma solução ASP.NET Core:
 
 ```text
 IkkonAdmin
@@ -163,87 +111,55 @@ IkkonAdmin
 │   ├── Services
 │   ├── Views
 │   └── wwwroot
+├── docs
+├── DEPLOYMENT.md
 ├── GOOGLE_AGENDA_SETUP.md
 ├── USUARIOS_ACESSO.md
 └── README.md
 ```
 
-### Stack principal
+Stack principal:
 
-- **.NET 10 / ASP.NET Core MVC** para estrutura web.
+- **.NET 10 / ASP.NET Core MVC**.
 - **Razor Views** para renderização server-side.
-- **Entity Framework Core 10** para acesso a dados e migrations.
-- **SQL Server** como banco relacional.
-- **Bootstrap 5** como base de layout responsivo.
-- **CSS customizado** para identidade visual administrativa e institucional.
-- **Data Protection** para proteção de tokens sensíveis da integração Google.
-- **HttpClient** para comunicação com Google Calendar API.
+- **Entity Framework Core 10** com SQL Server.
+- **Bootstrap 5** e CSS customizado.
+- **Data Protection** para tokens sensíveis.
+- **Google Calendar API** via `HttpClient`.
 
-### Decisões técnicas
+Princípios usados:
 
-- **MVC server-side**: reduz complexidade inicial e entrega produtividade para um sistema administrativo interno.
-- **Services em vez de repositories genéricos**: mantém regras de negócio claras sem abstrações desnecessárias no MVP.
-- **ViewModels por tela**: evita expor entidades diretamente nas views e melhora controle de dados exibidos.
-- **Policies e claims**: permite controle granular por módulo e ação.
-- **Migrations versionadas**: mantém evolução do banco rastreável.
-- **Rotas separadas para aluno e administração**: evita misturar CRUD interno com portal do aluno.
+- regras de negócio concentradas em services;
+- ViewModels por tela;
+- Entity Framework Core com configurations por entidade;
+- policies e claims para autorização granular;
+- separação clara entre site público, painel administrativo e portal do aluno;
+- migrations versionadas.
 
-## Banco de dados
-
-O sistema usa SQL Server com Entity Framework Core Migrations.
-
-Entidades principais:
-
-- `Aluno`
-- `Turma`
-- `AlunoTurma`
-- `Mensalidade`
-- `Pagamento`
-- `Desconto`
-- `AcordoFinanceiro`
-- `Admissao`
-- `Desligamento`
-- `Graduacao`
-- `ExameGraduacao`
-- `UsuarioSistema`
-- `RoleSistema`
-- `PermissaoSistema`
-- `AuditLog`
-- `InventarioItem`
-- `InventarioMovimentacao`
-- `GoogleAgendaConexao`
-
-## Como rodar localmente
+## Rodando localmente
 
 ### Pré-requisitos
 
 - .NET SDK compatível com `net10.0`.
 - SQL Server ou SQL Server Express LocalDB.
 - Git.
-- Opcional: `dotnet-ef` para comandos de migration.
+- Opcional: `dotnet-ef`.
 
-### 1. Clonar o repositório
-
-```bash
-git clone <url-do-repositorio>
-cd IkkonAdmin
-```
-
-### 2. Restaurar pacotes
+### Restaurar pacotes
 
 ```bash
 dotnet restore IkkonAdmin.Web/IkkonAdmin.Web.csproj
 ```
 
-### 3. Configurar connection string
+### Configurar banco
 
-Arquivo principal:
+Arquivo:
 
 ```text
 IkkonAdmin.Web/appsettings.json
 ```
 
-Exemplo local:
+Exemplo:
 
 ```json
 "ConnectionStrings": {
@@ -251,47 +167,45 @@ Exemplo local:
 }
 ```
 
-### 4. Aplicar migrations
+### Aplicar migrations
 
 ```bash
 dotnet ef database update --project IkkonAdmin.Web/IkkonAdmin.Web.csproj --startup-project IkkonAdmin.Web/IkkonAdmin.Web.csproj
 ```
 
-### 5. Rodar a aplicação
+### Rodar aplicação
 
 ```bash
 dotnet run --project IkkonAdmin.Web/IkkonAdmin.Web.csproj
 ```
 
-A aplicação será aberta conforme a porta definida pelo ASP.NET Core, normalmente algo como:
+URL comum em desenvolvimento:
 
 ```text
 http://localhost:5037
 ```
 
-## Como rodar com Docker Compose
+## Docker Compose
 
-O repositório inclui `compose.yaml` para subir a aplicação e um SQL Server local em containers.
-
-### 1. Subir tudo
+O projeto inclui `compose.yaml` para subir app e SQL Server local em containers:
 
 ```bash
 docker compose up --build
 ```
 
-A aplicação fica disponível em:
+Aplicação:
 
 ```text
 http://localhost:8080
 ```
 
-O SQL Server fica disponível para ferramentas locais em:
+SQL Server local:
 
 ```text
 localhost,14333
 ```
 
-Credenciais padrão de desenvolvimento do SQL Server:
+Credenciais padrão do container de desenvolvimento:
 
 ```text
 User ID: sa
@@ -299,44 +213,9 @@ Password: IkkonLocal!2026
 Database: IkkonAdminDb
 ```
 
-O app aplica migrations e seed automaticamente no startup via `DatabaseBootstrap.EnsureDatabaseReady`.
-
-### 2. Personalizar portas ou senha
-
-Copie o template:
-
-```bash
-cp .env.compose.example .env
-```
-
-Depois ajuste, se necessário:
-
-```text
-IKKONADMIN_HTTP_PORT=8080
-IKKONADMIN_SQL_PORT=14333
-IKKONADMIN_DB_NAME=IkkonAdminDb
-IKKONADMIN_SQL_PASSWORD=IkkonLocal!2026
-```
-
-### 3. Parar containers
-
-```bash
-docker compose down
-```
-
-Para remover também o banco e uploads persistidos nos volumes:
-
-```bash
-docker compose down -v
-```
-
 ## Usuários de demonstração
 
-As credenciais de desenvolvimento ficam documentadas em:
-
-```text
-USUARIOS_ACESSO.md
-```
+As credenciais de desenvolvimento estão em [USUARIOS_ACESSO.md](./USUARIOS_ACESSO.md).
 
 Resumo:
 
@@ -346,59 +225,44 @@ Resumo:
 | Funcionário | `funcionario.operacional` | `Func@123` | `/admin` |
 | Aluno | `aluno.demo` | `Aluno@123` | `/area-do-aluno` |
 
-> Essas credenciais são apenas para desenvolvimento e demonstração. Em produção, todas devem ser alteradas.
+> Credenciais apenas para desenvolvimento e demonstração. Em produção, altere todas as senhas.
 
-## Google Agenda
+## Documentação
 
-A integração com Google Agenda exige um OAuth Client Web criado no Google Cloud.
+Documentação técnica e funcional separada:
 
-O guia completo está em:
+- [Arquitetura e convenções](./docs/ARQUITETURA.md)
+- [Área do Aluno](./docs/AREA_DO_ALUNO.md)
+- [Blog e idiomas](./docs/BLOG_E_IDIOMAS.md)
+- [Módulos administrativos e permissões](./docs/MODULOS_ADMINISTRATIVOS.md)
+- [Uploads e storage](./docs/UPLOADS_E_STORAGE.md)
+- [Deploy](./DEPLOYMENT.md)
+- [Google Agenda](./GOOGLE_AGENDA_SETUP.md)
+- [Usuários de acesso](./USUARIOS_ACESSO.md)
+
+## Deploy
+
+O guia de publicação fica em [DEPLOYMENT.md](./DEPLOYMENT.md). O endpoint de healthcheck disponível é:
 
 ```text
-GOOGLE_AGENDA_SETUP.md
+/health
 ```
 
-Configuração esperada:
-
-```json
-"GoogleAgenda": {
-  "ApplicationName": "IkkonAdmin",
-  "CalendarId": "primary",
-  "CredentialsPath": "",
-  "OAuthClientSecretsPath": ".secrets/google-oauth-client.json",
-  "RedirectUri": "http://localhost:5037/admin/agenda/google/callback",
-  "TimeZone": "America/Sao_Paulo"
-}
-```
-
-A pasta `.secrets/` é ignorada pelo Git e deve armazenar credenciais locais.
+Para ambientes com uploads reais, leia também [Uploads e storage](./docs/UPLOADS_E_STORAGE.md).
 
 ## Segurança
 
-Cuidados já considerados no projeto:
+Cuidados já considerados:
 
 - autenticação separada para administração e aluno;
 - autorização por roles, claims e policies;
-- validação server-side das ações protegidas;
-- proteção de rotas administrativas;
-- não exposição de dados administrativos na área do aluno;
-- tokens do Google protegidos com ASP.NET Core Data Protection;
-- uploads ignorados no Git;
-- secrets fora do repositório.
-
-## Roadmap técnico
-
-Possíveis evoluções futuras:
-
-- segunda via de mensalidade para alunos;
-- pagamento online;
-- upload e gestão de contratos;
-- calendário de aulas na área do aluno;
-- notificações internas;
-- relatórios financeiros avançados;
-- vínculo entre eventos da agenda e itens reservados do inventário;
-- melhoria da auditoria administrativa;
-- deploy com ambiente de produção e pipeline CI/CD.
+- validação server-side de ações protegidas;
+- query filter para usuários excluídos;
+- área do aluno sempre resolvida pelo usuário autenticado;
+- dados financeiros e documentos protegidos por permissão e vínculo;
+- tokens do Google protegidos com Data Protection;
+- documentos de aluno armazenados fora de `wwwroot`;
+- secrets e uploads ignorados no Git.
 
 ## Licença e observação
 
