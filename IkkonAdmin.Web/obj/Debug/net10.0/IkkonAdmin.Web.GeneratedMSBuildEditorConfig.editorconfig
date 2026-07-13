@@ -166,6 +166,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXF9CbG9nUG9zdEZvcm0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostVersionsModalBody.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXF9CbG9nUG9zdFZlcnNpb25zTW9kYWxCb2R5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -372,6 +376,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicConstructionTag.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb25zdHJ1Y3Rpb25UYWcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicContactCta.cshtml]

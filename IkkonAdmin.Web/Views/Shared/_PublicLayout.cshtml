@@ -2,6 +2,7 @@
     var pageTitle = ViewData["Title"]?.ToString() ?? "Ikkon SPTD";
     var japaneseLandingEnabled = ViewData["JapaneseLandingEnabled"] as bool? == true;
     var japanesePublicEnabled = ViewData["JapanesePublicEnabled"] as bool? == true;
+    var publicConstructionTagEnabled = ViewData["PublicConstructionTagEnabled"] as bool? == true;
     var japaneseContentEnabled = japaneseLandingEnabled || japanesePublicEnabled;
     var pageDescription = ViewData["Description"]?.ToString() ?? (japaneseContentEnabled
         ? I18n["Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.", "Ikkon SPTD | Taiko school. Japanese percussion classes for everyone in Sao Paulo, with classes, events, and shows.", "IKKON SPTD | サンパウロの和太鼓教室。レッスン、イベント、公演を通じて日本の打楽器を学べる場所です。"]
@@ -40,13 +41,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    @if (japaneseLandingEnabled)
+    @if (publicConstructionTagEnabled)
     {
         <link rel="stylesheet" href="~/css/public-construction-tag.css" asp-append-version="true" />
     }
 </head>
 <body class="institucional-body">
-    @if (japaneseLandingEnabled)
+    @if (publicConstructionTagEnabled)
     {
         <partial name="_PublicConstructionTag" />
     }
@@ -56,7 +57,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/i18n-ui.js" asp-append-version="true"></script>
     <script src="~/js/landing.js" asp-append-version="true"></script>
-    @if (japaneseLandingEnabled)
+    @if (publicConstructionTagEnabled)
     {
         <script src="~/js/public-construction-tag.js" asp-append-version="true"></script>
     }
