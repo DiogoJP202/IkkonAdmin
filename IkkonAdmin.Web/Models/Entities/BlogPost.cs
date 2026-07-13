@@ -33,6 +33,10 @@ public class BlogPost
     public BlogCategory? Category { get; set; }
 
     public BlogPostStatusEnum Status { get; set; } = BlogPostStatusEnum.Draft;
+    [StringLength(10)]
+    public string LanguageCode { get; set; } = "pt-BR";
+    public int? TranslationGroupId { get; set; }
+    public BlogPost? TranslationGroupRoot { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsWeeklyHighlight { get; set; }
     public DateTime? PublishedAtUtc { get; set; }
@@ -53,4 +57,5 @@ public class BlogPost
     public DateTime? DeletedAtUtc { get; set; }
 
     public ICollection<BlogPostTag> PostTags { get; set; } = new List<BlogPostTag>();
+    public ICollection<BlogPost> TranslationVersions { get; set; } = new List<BlogPost>();
 }

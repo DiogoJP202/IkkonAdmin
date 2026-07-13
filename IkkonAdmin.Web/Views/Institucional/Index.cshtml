@@ -1,14 +1,15 @@
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = "IKKON SPTD | Taiko em São Paulo";
+    ViewData["Title"] = I18n["IKKON SPTD | Taiko em São Paulo", "IKKON SPTD | Taiko in Sao Paulo", "IKKON SPTD | サンパウロの和太鼓"];
     ViewData["PublicSection"] = "home";
     ViewData["ContactMode"] = "geral";
+    ViewData["JapaneseLandingEnabled"] = true;
 
     var videosDestaque = new List<PublicVideoCardViewModel>
     {
-        new("4iX-E6uIAXI", "Aula e prática de taiko", "Um recorte da vivência de treino, ritmo e presença em grupo."),
-        new("2n3U_-pqmZY", "Taiko em apresentação", "Energia dos tambores japoneses em contexto de palco e evento."),
-        new("b7DFAQNTpAg", "Desenvolvimento musical", "Estudo técnico para quem começa do zero e quer evoluir com consistência.")
+        new("4iX-E6uIAXI", I18n["Aula e prática de taiko", "Taiko class and practice", "和太鼓のレッスンと練習"], I18n["Um recorte da vivência de treino, ritmo e presença em grupo.", "A glimpse into training, rhythm, and group presence.", "練習、リズム、仲間とつくる存在感の一場面です。"]),
+        new("2n3U_-pqmZY", I18n["Taiko em apresentação", "Taiko performance", "和太鼓公演"], I18n["Energia dos tambores japoneses em contexto de palco e evento.", "The energy of Japanese drums in stage and event settings.", "舞台やイベントで響く日本の太鼓のエネルギー。"]),
+        new("b7DFAQNTpAg", I18n["Desenvolvimento musical", "Musical development", "音楽的な成長"], I18n["Estudo técnico para quem começa do zero e quer evoluir com consistência.", "Technical study for beginners who want to grow with consistency.", "ゼロから始め、着実に成長したい方のための技術練習です。"])
     };
 }
 
@@ -21,16 +22,16 @@
         <div class="container-xxl px-3 px-lg-4 position-relative">
             <div class="row justify-content-center justify-content-lg-start">
                 <div class="col-12 col-lg-8 col-xl-7">
-                    <p class="institucional-kicker mb-2">A força do taiko em São Paulo</p>
+                    <p class="institucional-kicker mb-2">@I18n["A força do taiko em São Paulo", "The power of taiko in Sao Paulo", "サンパウロに響く太鼓の力"]</p>
                     <h1 class="institucional-hero-title">IKKON SPTD</h1>
                     <p class="institucional-hero-subtitle">
-                        Escola de taiko, fue e teoria musical em São Paulo, também atuando como grupo artístico para eventos, shows e apresentações culturais.
+                        @I18n["Escola de taiko, fue e teoria musical em São Paulo, também atuando como grupo artístico para eventos, shows e apresentações culturais.", "Taiko, fue, and music theory school in Sao Paulo, also performing as an artistic group for events, shows, and cultural presentations.", "サンパウロで和太鼓、篠笛、音楽理論を学べる教室です。イベント、ショー、文化公演に出演する芸能グループとしても活動しています。"]
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="/escola">Conhecer a escola</a>
-                        <a class="btn btn-outline-light btn-lg" href="/eventos">Ver apresentações</a>
+                        <a class="btn btn-danger btn-lg" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
+                        <a class="btn btn-outline-light btn-lg" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
                     </div>
-                    <div class="institucional-hero-badge mt-4">Aulas para todos e agenda aberta para eventos</div>
+                    <div class="institucional-hero-badge mt-4">@I18n["Aulas para todos e agenda aberta para eventos", "Classes for everyone and bookings open for events", "どなたでも参加できるレッスンとイベント出演のご相談を受付中"]</div>
                 </div>
             </div>
         </div>
@@ -39,21 +40,21 @@
     <section class="institucional-section public-home-paths reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">Duas frentes, uma mesma cultura</p>
-                <h2 class="institucional-section-title">Escolha o caminho que faz sentido para você</h2>
+                <p class="institucional-kicker mb-2">@I18n["Duas frentes, uma mesma cultura", "Two paths, one shared culture", "ひとつの文化から広がる二つの道"]</p>
+                <h2 class="institucional-section-title">@I18n["Escolha o caminho que faz sentido para você", "Choose the path that fits you", "あなたに合う道を選んでください"]</h2>
             </div>
             <div class="public-path-grid mt-4">
                 <article class="public-path-card public-path-card-escola">
-                    <span>Escola de Taiko</span>
-                    <h3>Aprenda taiko em São Paulo</h3>
-                    <p>Aulas, aprendizado musical, cultura japonesa e acolhimento para quem quer começar ou evoluir.</p>
-                    <a class="btn btn-dark" href="/escola">Conhecer a escola</a>
+                    <span>@I18n["Escola de Taiko", "Taiko School", "和太鼓教室"]</span>
+                    <h3>@I18n["Aprenda taiko em São Paulo", "Learn taiko in Sao Paulo", "サンパウロで和太鼓を学ぶ"]</h3>
+                    <p>@I18n["Aulas, aprendizado musical, cultura japonesa e acolhimento para quem quer começar ou evoluir.", "Classes, musical learning, Japanese culture, and a welcoming path for beginners and growing students.", "初めての方も経験者も、音楽、日本文化、あたたかな仲間の中で学べます。"]</p>
+                    <a class="btn btn-dark" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
                 </article>
                 <article class="public-path-card public-path-card-eventos">
-                    <span>Grupo artístico e eventos</span>
-                    <h3>Apresentações com energia de palco</h3>
-                    <p>Shows, festivais, eventos corporativos e apresentações especiais com tambores japoneses.</p>
-                    <a class="btn btn-danger" href="/eventos">Ver apresentações</a>
+                    <span>@I18n["Grupo artístico e eventos", "Performance group and events", "芸能グループ・イベント出演"]</span>
+                    <h3>@I18n["Apresentações com energia de palco", "Performances with stage energy", "舞台に響く力強い公演"]</h3>
+                    <p>@I18n["Shows, festivais, eventos corporativos e apresentações especiais com tambores japoneses.", "Shows, festivals, corporate events, and special performances with Japanese drums.", "日本の太鼓によるショー、フェスティバル、企業イベント、特別公演。"]</p>
+                    <a class="btn btn-danger" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
                 </article>
             </div>
         </div>
@@ -63,20 +64,20 @@
         <div class="container-xxl px-3 px-lg-4">
             <div class="row g-4 align-items-center">
                 <div class="col-12 col-lg-5">
-                    <p class="institucional-kicker mb-2">Sobre o IKKON</p>
-                    <h2 class="institucional-section-title">Tradição, disciplina e comunidade</h2>
+                    <p class="institucional-kicker mb-2">@I18n["Sobre o IKKON", "About IKKON", "IKKONについて"]</p>
+                    <h2 class="institucional-section-title">@I18n["Tradição, disciplina e comunidade", "Tradition, discipline, and community", "伝統、規律、コミュニティ"]</h2>
                 </div>
                 <div class="col-12 col-lg-7">
                     <p class="institucional-copy mb-0">
-                        O IKKON SPTD une ensino de percussão japonesa, prática musical em grupo e apresentações culturais. A escola recebe iniciantes e alunos em evolução, enquanto o grupo artístico leva a força do taiko para diferentes palcos e públicos.
+                        @I18n["O IKKON SPTD une ensino de percussão japonesa, prática musical em grupo e apresentações culturais. A escola recebe iniciantes e alunos em evolução, enquanto o grupo artístico leva a força do taiko para diferentes palcos e públicos.", "IKKON SPTD brings together Japanese percussion education, group music practice, and cultural performances. The school welcomes beginners and developing students, while the artistic group brings the power of taiko to different stages and audiences.", "IKKON SPTDは、日本の打楽器教育、グループでの音楽練習、文化公演を結びつけています。教室では初心者から成長中の生徒まで受け入れ、芸能グループとして太鼓の力をさまざまな舞台と観客に届けています。"]
                     </p>
                 </div>
             </div>
             <div class="row g-3 mt-4">
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>10 anos de trajetória</h3><p>Experiência no ensino e na difusão do taiko em São Paulo.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Ensino acessível</h3><p>Base clara para quem começa sem experiência musical.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Cultura japonesa</h3><p>Respeito à tradição com prática contemporânea e viva.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Presença de palco</h3><p>Vivência artística em eventos, shows e apresentações.</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["10 anos de trajetória", "10 years of history", "10年の歩み"]</h3><p>@I18n["Experiência no ensino e na difusão do taiko em São Paulo.", "Experience teaching and sharing taiko in Sao Paulo.", "サンパウロで太鼓を教え、広めてきた経験。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Ensino acessível", "Accessible learning", "はじめやすい指導"]</h3><p>@I18n["Base clara para quem começa sem experiência musical.", "A clear foundation for students starting with no musical experience.", "音楽経験がない方にもわかりやすい基礎。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Cultura japonesa", "Japanese culture", "日本文化"]</h3><p>@I18n["Respeito à tradição com prática contemporânea e viva.", "Respect for tradition through a living, contemporary practice.", "伝統への敬意を、現代に息づく練習として大切にしています。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Presença de palco", "Stage presence", "舞台での存在感"]</h3><p>@I18n["Vivência artística em eventos, shows e apresentações.", "Artistic experience in events, shows, and performances.", "イベント、ショー、公演での芸術的な経験。"]</p></article></div>
             </div>
         </div>
     </section>
@@ -84,8 +85,8 @@
     <section class="institucional-section public-video-section reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">Vídeos em destaque</p>
-                <h2 class="institucional-section-title">Aulas, treino e apresentações</h2>
+                <p class="institucional-kicker mb-2">@I18n["Vídeos em destaque", "Featured videos", "注目動画"]</p>
+                <h2 class="institucional-section-title">@I18n["Aulas, treino e apresentações", "Classes, training, and performances", "レッスン、練習、公演"]</h2>
             </div>
             @await Html.PartialAsync("_PublicVideoGrid", videosDestaque)
         </div>

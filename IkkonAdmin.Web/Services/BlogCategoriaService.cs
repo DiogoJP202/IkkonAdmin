@@ -84,7 +84,7 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         if (await dbContext.BlogCategories.AnyAsync(x => x.Name == normalizedName, cancellationToken))
         {
-            return BlogOperationResult.Fail("Ja existe uma categoria com esse nome.");
+            return BlogOperationResult.Fail("Já existe uma categoria com esse nome.");
         }
 
         var categoria = new BlogCategory
@@ -106,7 +106,7 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
         var categoria = await dbContext.BlogCategories.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria nao encontrada.");
+            return BlogOperationResult.Fail("Categoria não encontrada.");
         }
 
         var normalizedName = NormalizarTexto(model.Name);
@@ -114,7 +114,7 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         if (await dbContext.BlogCategories.AnyAsync(x => x.Id != id && x.Name == normalizedName, cancellationToken))
         {
-            return BlogOperationResult.Fail("Ja existe uma categoria com esse nome.");
+            return BlogOperationResult.Fail("Já existe uma categoria com esse nome.");
         }
 
         categoria.Name = normalizedName;
@@ -132,7 +132,7 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
         var categoria = await dbContext.BlogCategories.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria nao encontrada.");
+            return BlogOperationResult.Fail("Categoria não encontrada.");
         }
 
         categoria.IsActive = ativo;
@@ -150,18 +150,18 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria nao encontrada.");
+            return BlogOperationResult.Fail("Categoria não encontrada.");
         }
 
         if (categoria.Posts.Any(x => x.DeletedAtUtc == null))
         {
-            return BlogOperationResult.Fail("Esta categoria possui posts vinculados. Desative a categoria para manter o historico dos posts.");
+            return BlogOperationResult.Fail("Esta categoria possui posts vinculados. Desative a categoria para manter o histórico dos posts.");
         }
 
         dbContext.BlogCategories.Remove(categoria);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Categoria excluida com sucesso.", categoria.Id);
+        return BlogOperationResult.Ok("Categoria excluída com sucesso.", categoria.Id);
     }
 
     private async Task<string> GarantirSlugUnicoAsync(string baseSlug, int? ignorarId, CancellationToken cancellationToken)

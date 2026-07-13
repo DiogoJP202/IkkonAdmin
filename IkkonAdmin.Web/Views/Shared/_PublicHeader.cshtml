@@ -1,5 +1,12 @@
 @{
     var current = (ViewData["PublicSection"] as string ?? "home").ToLowerInvariant();
+    var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+    var japaneseLandingEnabled = ViewData["JapaneseLandingEnabled"] as bool? == true;
+    var japanesePublicEnabled = ViewData["JapanesePublicEnabled"] as bool? == true;
+    var japaneseEnabled = japaneseLandingEnabled || japanesePublicEnabled;
+    var useJapanese = japaneseEnabled && I18n.IsJapanese;
+    string T(string ptBr, string enUs, string jaJp) => useJapanese ? jaJp : I18n[ptBr, enUs];
+    string LanguageClass(string culture) => string.Equals(I18n.CurrentCulture, culture, StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty;
 }
 
 <header class="institucional-header fixed-top">
@@ -12,20 +19,42 @@
                     <small>São Paulo Taiko Dojo</small>
                 </span>
             </a>
-            <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="Alternar navegação">
+            <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="@T("Alternar navegação", "Toggle navigation", "ナビゲーションを切り替える")">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navLanding">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="/">Início</a></li>
-                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="/escola">Escola</a></li>
-                    <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="/eventos">Eventos</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="/">@T("Início", "Home", "ホーム")</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="/escola">@T("Escola", "School", "教室")</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="/eventos">@T("Eventos", "Events", "イベント")</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "blog" ? "active" : string.Empty)" href="/blog">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="/escola#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/aluno/login">Área do aluno</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/auth/login">Área interna</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/aluno/login">@T("Área do aluno", "Student area", "生徒エリア")</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auth/login">@T("Área interna", "Staff area", "スタッフエリア")</a></li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">Contato</a>
+                        <div class="institucional-language-list" aria-label="@T("Selecionar idioma", "Select language", "言語を選択")">
+                            <a class="institucional-language-link @LanguageClass("pt-BR")"
+                               asp-controller="Idioma"
+                               asp-action="Alterar"
+                               asp-route-culture="pt-BR"
+                               asp-route-returnUrl="@languageReturnUrl">PT</a>
+                            <a class="institucional-language-link @LanguageClass("en-US")"
+                               asp-controller="Idioma"
+                               asp-action="Alterar"
+                               asp-route-culture="en-US"
+                               asp-route-returnUrl="@languageReturnUrl">EN</a>
+                            @if (japaneseEnabled)
+                            {
+                                <a class="institucional-language-link @LanguageClass("ja-JP")"
+                                   asp-controller="Idioma"
+                                   asp-action="Alterar"
+                                   asp-route-culture="ja-JP"
+                                   asp-route-returnUrl="@languageReturnUrl">日本語</a>
+                            }
+                        </div>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">@T("Contato", "Contact", "お問い合わせ")</a>
                     </li>
                 </ul>
             </div>

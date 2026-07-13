@@ -1,21 +1,24 @@
-﻿@{
+@{
     var modo = (ViewData["ContactMode"] as string ?? "geral").ToLowerInvariant();
+    var japaneseEnabled = (ViewData["JapaneseLandingEnabled"] as bool? == true) || (ViewData["JapanesePublicEnabled"] as bool? == true);
+    var useJapanese = japaneseEnabled && I18n.IsJapanese;
+    string T(string ptBr, string enUs, string jaJp) => useJapanese ? jaJp : I18n[ptBr, enUs];
     var titulo = modo switch
     {
-        "escola" => "Quer começar nas aulas de taiko?",
-        "eventos" => "Quer levar o taiko para o seu evento?",
-        _ => "Quer falar com o IKKON?"
+        "escola" => T("Quer começar nas aulas de taiko?", "Ready to start taiko classes?", "和太鼓レッスンを始めてみませんか？"),
+        "eventos" => T("Quer levar o taiko para o seu evento?", "Want to bring taiko to your event?", "あなたのイベントに太鼓を届けませんか？"),
+        _ => T("Quer falar com o IKKON?", "Want to talk to IKKON?", "IKKONに問い合わせる")
     };
     var texto = modo switch
     {
-        "escola" => "Fale com a escola para agendar uma aula experimental e entender a melhor turma para começar.",
-        "eventos" => "Fale com a equipe para apresentações, shows, eventos culturais e projetos especiais.",
-        _ => "Entre em contato para aulas, apresentações e projetos especiais."
+        "escola" => T("Fale com a escola para agendar uma aula experimental e entender a melhor turma para começar.", "Talk to the school to schedule a trial class and find the best group to start with.", "体験レッスンの予約や、始めるのに合うクラスについてお気軽にご相談ください。"),
+        "eventos" => T("Fale com a equipe para apresentações, shows, eventos culturais e projetos especiais.", "Talk to the team about performances, shows, cultural events, and special projects.", "公演、ショー、文化イベント、特別企画についてチームにご相談ください。"),
+        _ => T("Entre em contato para aulas, apresentações e projetos especiais.", "Get in touch for classes, performances, and special projects.", "レッスン、公演、特別企画についてお気軽にお問い合わせください。")
     };
     var primaryHref = modo == "eventos"
         ? "https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento."
         : "https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20aula%20experimental%20na%20Ikkon%20SPTD.";
-    var primaryText = modo == "eventos" ? "Solicitar apresentação" : "Agendar aula experimental";
+    var primaryText = modo == "eventos" ? T("Solicitar apresentação", "Request a performance", "公演を依頼する") : T("Agendar aula experimental", "Schedule a trial class", "体験レッスンを予約する");
     var endereco = "Rua Domingos de Morais, 2975, São Paulo, Brazil";
     var mapsQuery = "Rua%20Domingos%20de%20Morais%2C%202975%2C%20S%C3%A3o%20Paulo%2C%20Brazil";
 }
@@ -25,30 +28,30 @@
         <div class="row g-4 align-items-stretch">
             <div class="col-12 col-lg-6">
                 <div class="institucional-contact-content h-100">
-                    <p class="institucional-kicker mb-2">Contato</p>
+                    <p class="institucional-kicker mb-2">@T("Contato", "Contact", "お問い合わせ")</p>
                     <h2 class="institucional-section-title">@titulo</h2>
                     <p class="institucional-copy mb-0">@texto</p>
                     <p class="institucional-address mt-3 mb-0">@endereco</p>
 
                     <div class="institucional-cta-box d-grid gap-2 mt-4">
                         <a class="btn btn-danger btn-lg" href="@primaryHref" target="_blank" rel="noopener">@primaryText</a>
-                        <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Entrar em contato no WhatsApp</a>
+                        <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">@T("Entrar em contato no WhatsApp", "Contact us on WhatsApp", "WhatsAppで問い合わせる")</a>
                         @if (modo == "geral")
                         {
-                            <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento." target="_blank" rel="noopener">Solicitar apresentação</a>
+                            <a class="btn btn-outline-dark btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento." target="_blank" rel="noopener">@T("Solicitar apresentação", "Request a performance", "公演を依頼する")</a>
                         }
                     </div>
                 </div>
             </div>
             <div class="col-12 col-lg-6">
-                <article class="institucional-map-card h-100" aria-label="Localização da IKKON SPTD no mapa">
+                <article class="institucional-map-card h-100" aria-label="@T("Localização da IKKON SPTD no mapa", "IKKON SPTD location on the map", "地図上のIKKON SPTD所在地")">
                     <div class="institucional-map-header">
-                        <span>Localização</span>
-                        <strong>IKKON SPTD em São Paulo</strong>
+                        <span>@T("Localização", "Location", "所在地")</span>
+                        <strong>@T("IKKON SPTD em São Paulo", "IKKON SPTD in Sao Paulo", "サンパウロのIKKON SPTD")</strong>
                     </div>
                     <div class="institucional-map-frame">
                         <iframe
-                            title="Mapa da IKKON SPTD - Rua Domingos de Morais, 2975, São Paulo"
+                            title="@T("Mapa da IKKON SPTD - Rua Domingos de Morais, 2975, São Paulo", "IKKON SPTD map - Rua Domingos de Morais, 2975, Sao Paulo", "IKKON SPTDの地図 - Rua Domingos de Morais, 2975, São Paulo")"
                             src="https://www.google.com/maps?q=@mapsQuery&output=embed"
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
@@ -56,7 +59,7 @@
                         </iframe>
                     </div>
                     <a class="institucional-map-link" href="https://www.google.com/maps/search/?api=1&query=@mapsQuery" target="_blank" rel="noopener">
-                        Abrir rota no Google Maps
+                        @T("Abrir rota no Google Maps", "Open directions on Google Maps", "Googleマップでルートを開く")
                     </a>
                 </article>
             </div>

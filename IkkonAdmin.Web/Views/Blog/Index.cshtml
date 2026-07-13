@@ -3,9 +3,10 @@
 
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = "Blog | IKKON SPTD";
+    ViewData["Title"] = I18n["Blog | IKKON SPTD", "Blog | IKKON SPTD", "ブログ | IKKON SPTD"];
     ViewData["PublicSection"] = "blog";
     ViewData["ContactMode"] = "geral";
+    ViewData["JapanesePublicEnabled"] = true;
 
     var q = Model.Filtro.Q;
     var categoria = Model.Filtro.Categoria;
@@ -13,19 +14,17 @@
 }
 
 @functions {
-    private static readonly CultureInfo PtBr = new("pt-BR");
-
     private static string FormatDate(DateTime utcDate)
     {
         try
         {
             var timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
             var localDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcDate, DateTimeKind.Utc), timeZone);
-            return localDate.ToString("dd MMM yyyy", PtBr);
+            return localDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
         }
         catch
         {
-            return utcDate.ToString("dd MMM yyyy", PtBr);
+            return utcDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
         }
     }
 
@@ -42,13 +41,13 @@
             <div class="row justify-content-center justify-content-lg-start">
                 <div class="col-12 col-lg-8 col-xl-7">
                     <p class="institucional-kicker mb-2">Blog IKKON</p>
-                    <h1 class="institucional-hero-title">Conteudos, historias e bastidores do taiko</h1>
+                    <h1 class="institucional-hero-title">@I18n["Conteúdos, histórias e bastidores do taiko", "Taiko stories, insights, and behind the scenes", "太鼓の読みもの・物語・舞台裏"]</h1>
                     <p class="institucional-hero-subtitle">
-                        Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.
+                        @I18n["Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.", "Follow school news, Japanese culture, events, studies, and records from the IKKON SPTD community.", "IKKON SPTDのニュース、日本文化、イベント、学び、コミュニティの記録をお届けします。"]
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="#posts">Ver publicacoes</a>
-                        <a class="btn btn-outline-light btn-lg" href="/escola">Conhecer a escola</a>
+                        <a class="btn btn-danger btn-lg" href="#posts">@I18n["Ver publicações", "See posts", "記事を見る"]</a>
+                        <a class="btn btn-outline-light btn-lg" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室を見る"]</a>
                     </div>
                 </div>
             </div>
@@ -61,11 +60,11 @@
             <div class="container-xxl px-3 px-lg-4">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
                     <div>
-                        <p class="institucional-kicker mb-2">Destaques</p>
-                        <h2 class="institucional-section-title">Leituras em evidencia</h2>
+                        <p class="institucional-kicker mb-2">@I18n["Destaques", "Highlights", "注目"]</p>
+                        <h2 class="institucional-section-title">@I18n["Leituras em evidência", "Featured reads", "おすすめ記事"]</h2>
                     </div>
                     <p class="institucional-copy public-blog-section-copy mb-0">
-                        Curadoria dos conteudos que merecem atencao especial no momento.
+                        @I18n["Curadoria dos conteúdos que merecem atenção especial no momento.", "A curated selection of content worth special attention right now.", "今、特に読んでほしい記事を選びました。"]
                     </p>
                 </div>
 
@@ -73,9 +72,9 @@
                     @foreach (var post in Model.FeaturedPosts)
                     {
                         <article class="public-blog-card public-blog-card-featured">
-                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="Ler @post.Title">
-                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="Imagem de capa de @post.Title" loading="lazy" />
-                                <span class="public-blog-pill">Destaque</span>
+                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
+                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title" loading="lazy" />
+                                <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
                             </a>
                             <div class="public-blog-card-body">
                                 <div class="public-blog-meta">
@@ -95,7 +94,7 @@
                                     {
                                         <a class="public-blog-taxonomy" href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
                                     }
-                                    <span>@Math.Max(1, post.ReadingTimeMinutes) min</span>
+                                    <span>@Math.Max(1, post.ReadingTimeMinutes) @I18n["min", "min", "分"]</span>
                                 </div>
                             </div>
                         </article>
@@ -111,10 +110,10 @@
             <div class="container-xxl px-3 px-lg-4">
                 <div class="row g-4 align-items-center">
                     <div class="col-12 col-lg-4">
-                        <p class="institucional-kicker mb-2">Blog da semana</p>
-                        <h2 class="institucional-section-title">Escolhas recentes da equipe</h2>
+                        <p class="institucional-kicker mb-2">@I18n["Blog da semana", "Weekly blog", "今週のブログ"]</p>
+                        <h2 class="institucional-section-title">@I18n["Escolhas recentes da equipe", "Recent team picks", "スタッフの最近のおすすめ"]</h2>
                         <p class="institucional-copy mb-0">
-                            Posts marcados no painel como leitura recomendada da semana.
+                            @I18n["Posts marcados no painel como leitura recomendada da semana.", "Posts marked in the admin panel as recommended reading for the week.", "管理画面で今週のおすすめに設定された記事です。"]
                         </p>
                     </div>
                     <div class="col-12 col-lg-8">
@@ -123,7 +122,7 @@
                             {
                                 <article class="public-blog-weekly-card">
                                     <a href="@BuildBlogUrl(post.Slug)">
-                                        <span>Blog da semana</span>
+                                        <span>@I18n["Blog da semana", "Weekly blog", "今週のブログ"]</span>
                                         <strong>@post.Title</strong>
                                         @if (!string.IsNullOrWhiteSpace(post.Summary))
                                         {
@@ -143,33 +142,33 @@
         <div class="container-xxl px-3 px-lg-4">
             <div class="public-blog-filter-panel">
                 <div>
-                    <p class="institucional-kicker mb-2">Explorar</p>
-                    <h2 class="institucional-section-title">Publicacoes do Blog</h2>
+                    <p class="institucional-kicker mb-2">@I18n["Explorar", "Explore", "探す"]</p>
+                    <h2 class="institucional-section-title">@I18n["Publicações do Blog", "Blog posts", "ブログ記事"]</h2>
                     <p class="institucional-copy mb-0">
-                        Pesquise por titulo, resumo, conteudo, categoria ou tag.
+                        @I18n["Pesquise por título, resumo, conteúdo, categoria ou tag.", "Search by title, summary, content, category, or tag.", "タイトル、概要、本文、カテゴリ、タグで検索できます。"]
                     </p>
                 </div>
 
                 <form method="get" action="/blog" class="public-blog-filter-form">
                     <div class="public-blog-search">
-                        <label for="blog-q" class="visually-hidden">Pesquisar no blog</label>
-                        <input id="blog-q" type="search" name="q" value="@q" placeholder="Buscar no blog" />
-                        <button type="submit">Pesquisar</button>
+                        <label for="blog-q" class="visually-hidden">@I18n["Pesquisar no blog", "Search the blog", "ブログ内を検索"]</label>
+                        <input id="blog-q" type="search" name="q" value="@q" placeholder="@I18n["Buscar no blog", "Search the blog", "ブログを検索"]" />
+                        <button type="submit">@I18n["Pesquisar", "Search", "検索"]</button>
                     </div>
 
                     <div class="public-blog-selects">
-                        <label class="visually-hidden" for="blog-categoria">Categoria</label>
+                        <label class="visually-hidden" for="blog-categoria">@I18n["Categoria", "Category", "カテゴリ"]</label>
                         <select id="blog-categoria" name="categoria">
-                            <option value="">Todas as categorias</option>
+                            <option value="">@I18n["Todas as categorias", "All categories", "すべてのカテゴリ"]</option>
                             @foreach (var item in Model.Categories)
                             {
                                 <option value="@item.Slug" selected="@(item.Slug == categoria)">@item.Name (@item.Count)</option>
                             }
                         </select>
 
-                        <label class="visually-hidden" for="blog-tag">Tag</label>
+                        <label class="visually-hidden" for="blog-tag">@I18n["Tag", "Tag", "タグ"]</label>
                         <select id="blog-tag" name="tag">
-                            <option value="">Todas as tags</option>
+                            <option value="">@I18n["Todas as tags", "All tags", "すべてのタグ"]</option>
                             @foreach (var item in Model.Tags)
                             {
                                 <option value="@item.Slug" selected="@(item.Slug == tag)">@item.Name (@item.Count)</option>
@@ -179,7 +178,7 @@
 
                     @if (Model.HasActiveFilter)
                     {
-                        <a class="public-blog-clear" href="/blog">Limpar filtros</a>
+                        <a class="public-blog-clear" href="/blog">@I18n["Limpar filtros", "Clear filters", "フィルターをクリア"]</a>
                     }
                 </form>
             </div>
@@ -199,8 +198,8 @@
             }
 
             <div class="public-blog-results-head">
-                <span>@Model.TotalPosts publicacao@(Model.TotalPosts == 1 ? string.Empty : "es") encontrada@(Model.TotalPosts == 1 ? string.Empty : "s")</span>
-                <span>Ordenado por mais recentes</span>
+                <span>@(Model.TotalPosts == 1 ? I18n["1 publicação encontrada", "1 post found", "1件の記事が見つかりました"] : I18n[$"{Model.TotalPosts} publicações encontradas", $"{Model.TotalPosts} posts found", $"{Model.TotalPosts}件の記事が見つかりました"])</span>
+                <span>@I18n["Ordenado por mais recentes", "Sorted by newest", "新しい順"]</span>
             </div>
 
             @if (Model.Posts.Any())
@@ -209,16 +208,16 @@
                     @foreach (var post in Model.Posts)
                     {
                         <article class="public-blog-card">
-                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="Ler @post.Title">
-                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="Imagem de capa de @post.Title" loading="lazy" />
+                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
+                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title" loading="lazy" />
                                 <span class="public-blog-pill-group">
                                     @if (post.IsFeatured)
                                     {
-                                        <span class="public-blog-pill">Destaque</span>
+                                        <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
                                     }
                                     @if (post.IsWeeklyHighlight)
                                     {
-                                        <span class="public-blog-pill public-blog-pill-weekly">Semana</span>
+                                        <span class="public-blog-pill public-blog-pill-weekly">@I18n["Semana", "Week", "週"]</span>
                                     }
                                 </span>
                             </a>
@@ -249,7 +248,7 @@
                                     {
                                         <a class="public-blog-taxonomy" href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
                                     }
-                                    <span>@Math.Max(1, post.ReadingTimeMinutes) min de leitura</span>
+                                    <span>@Math.Max(1, post.ReadingTimeMinutes) @I18n["min de leitura", "min read", "分で読めます"]</span>
                                 </div>
                             </div>
                         </article>
@@ -258,7 +257,7 @@
 
                 @if (Model.TotalPages > 1)
                 {
-                    <nav class="public-blog-pagination" aria-label="Paginacao do blog">
+                    <nav class="public-blog-pagination" aria-label="@I18n["Paginação do blog", "Blog pagination", "ブログのページ送り"]">
                         @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
                         {
                             <a class="@(pageNumber == Model.CurrentPage ? "is-active" : string.Empty)" href="@Url.Action("Index", "Blog", new { q, categoria, tag, pagina = pageNumber })">@pageNumber</a>
@@ -269,12 +268,12 @@
             else
             {
                 <div class="public-blog-empty">
-                    <span>Sem publicacoes por aqui</span>
-                    <h3>Nenhum post encontrado</h3>
-                    <p>Quando houver conteudos publicados no painel, eles aparecerao aqui automaticamente.</p>
+                    <span>@I18n["Sem publicações por aqui", "No posts here", "まだ記事がありません"]</span>
+                    <h3>@I18n["Nenhum post encontrado", "No posts found", "記事が見つかりません"]</h3>
+                    <p>@I18n["Quando houver conteúdos publicados no painel, eles aparecerão aqui automaticamente.", "When content is published from the admin panel, it will appear here automatically.", "管理画面で公開された記事は、ここに自動的に表示されます。"]</p>
                     @if (Model.HasActiveFilter)
                     {
-                        <a class="btn btn-dark" href="/blog">Ver todos os posts</a>
+                        <a class="btn btn-dark" href="/blog">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
                     }
                 </div>
             }

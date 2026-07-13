@@ -1,0 +1,110 @@
+@using IkkonAdmin.Web.Security
+@model BlogVersionOverviewViewModel
+@{
+    var canCreate = User.HasPermission(AppPermissions.BlogCreate);
+    var canEdit = User.HasPermission(AppPermissions.BlogEdit);
+    var canDelete = User.HasPermission(AppPermissions.BlogDelete);
+}
+
+@functions {
+    private static string StatusTexto(BlogPostStatusEnum? status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "Rascunho",
+            BlogPostStatusEnum.Scheduled => "Agendado",
+            BlogPostStatusEnum.Published => "Publicado",
+            BlogPostStatusEnum.Archived => "Arquivado",
+            null => "Disponível",
+            _ => status.ToString() ?? "-"
+        };
+    }
+
+    private static string StatusClasse(BlogPostStatusEnum? status)
+    {
+        return status switch
+        {
+            BlogPostStatusEnum.Draft => "is-muted",
+            BlogPostStatusEnum.Scheduled => "is-warning",
+            BlogPostStatusEnum.Published => "is-success",
+            BlogPostStatusEnum.Archived => "is-dark",
+            _ => "is-muted"
+        };
+    }
+}
+
+<div class="blog-version-modal-intro">
+    <div>
+        <p class="admin-panel-eyebrow mb-1">Versões por idioma</p>
+        <h3>@Model.SourceTitle</h3>
+        <p>Crie rascunhos traduzidos, edite versões existentes ou remova versões que não devem mais ficar disponíveis.</p>
+    </div>
+    <span class="admin-panel-badge is-info">@Model.Versions.Count(x => x.Exists) versão(ões)</span>
+</div>
+
+<div class="blog-version-list">
+    @foreach (var version in Model.Versions)
+    {
+        <article class="blog-version-item @(version.Exists ? "has-version" : "is-missing")">
+            <div class="blog-version-language">
+                <span class="blog-version-code">@version.SlugSuffix.ToUpperInvariant()</span>
+                <div>
+                    <strong>@version.LanguageLabel</strong>
+                    <small>@version.NativeLabel</small>
+                </div>
+            </div>
+
+            <div class="blog-version-copy">
+                @if (version.Exists)
+                {
+                    <strong>@version.Title</strong>
+                    <small>/blog/@version.Slug</small>
+                    <span class="admin-panel-badge @StatusClasse(version.Status)">@StatusTexto(version.Status)</span>
+                    @if (version.IsCurrent)
+                    {
+                        <span class="admin-panel-badge is-info">Atual</span>
+                    }
+                }
+                else
+                {
+                    <strong>Versão ainda não criada</strong>
+                    <small>Será criada como rascunho a partir do post atual.</small>
+                    <span class="admin-panel-badge is-muted">Faltando</span>
+                }
+            </div>
+
+            <div class="blog-version-actions">
+                @if (version.Exists && version.PostId.HasValue)
+                {
+                    @if (canEdit)
+                    {
+                        <a class="btn admin-panel-btn-table" href="@Url.Action("Edit", "BlogAdmin", new { id = version.PostId.Value })">Editar</a>
+                    }
+                    @if (canDelete && !version.IsCurrent)
+                    {
+                        <button type="button"
+                                class="btn admin-panel-btn-table is-danger"
+                                data-blog-version-delete
+                                data-version-id="@version.PostId.Value"
+                                data-language-label="@version.LanguageLabel">
+                            Excluir
+                        </button>
+                    }
+                }
+                else if (canCreate)
+                {
+                    <button type="button"
+                            class="btn admin-panel-btn-table is-primary"
+                            data-blog-version-create
+                            data-language-code="@version.LanguageCode">
+                        Criar
+                    </button>
+                }
+            </div>
+        </article>
+    }
+</div>
+
+<div class="blog-version-note">
+    Salve as alterações do post atual antes de criar uma versão, caso queira que o rascunho copie o conteúdo mais recente.
+</div>

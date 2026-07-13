@@ -6,6 +6,7 @@
     var canPublish = User.HasPermission(AppPermissions.BlogPublish);
     var canArchive = User.HasPermission(AppPermissions.BlogArchive);
     var canManageCategories = User.HasPermission(AppPermissions.BlogCategoryManage);
+    var canManageVersions = isEdit && (User.HasPermission(AppPermissions.BlogCreate) || User.HasPermission(AppPermissions.BlogEdit) || User.HasPermission(AppPermissions.BlogDelete));
 }
 
 @functions {
@@ -37,22 +38,27 @@
 <div class="admin-panel-v2-page blog-admin-page">
     <section class="admin-panel-v2-hero">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de post" : "Novo post")</span>
+            <span class="admin-panel-eyebrow">@(isEdit ? "Edição de post" : "Novo post")</span>
             <h1 class="admin-panel-title">@(isEdit ? "Editar post do Blog" : "Criar post do Blog")</h1>
             <p class="admin-panel-subtitle">
-                Use o editor para estruturar texto, imagens e videos do YouTube. O conteudo e sanitizado no backend antes de ser publicado.
+                Use o editor para estruturar texto, imagens e vídeos do YouTube. O conteúdo é sanitizado no backend antes de ser publicado.
             </p>
             <div class="admin-panel-meta">
                 <span>Status <strong>@StatusTexto(Model.CurrentStatus)</strong></span>
                 @if (isEdit)
                 {
                     <span>ID <strong>#@Model.Id</strong></span>
+                    <span>Idioma <strong>@Model.LanguageLabel</strong></span>
                 }
             </div>
         </div>
         <div class="admin-panel-hero-actions">
             @if (isEdit)
             {
+                @if (canManageVersions)
+                {
+                    <button type="button" id="blogVersionsButton" class="btn admin-panel-btn admin-panel-btn-ghost" data-bs-toggle="modal" data-bs-target="#blogVersionsModal">Versões</button>
+                }
                 <a asp-action="Preview" asp-route-id="@Model.Id" class="btn admin-panel-btn admin-panel-btn-ghost">Preview</a>
             }
             <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar para lista</a>
@@ -64,6 +70,8 @@
             <form id="blogPostForm" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="admin-panel-form-stack">
                 @Html.AntiForgeryToken()
                 <input asp-for="Id" type="hidden" />
+                <input asp-for="LanguageCode" type="hidden" />
+                <input asp-for="TranslationGroupId" type="hidden" />
                 <input asp-for="SubmissionAction" type="hidden" />
 
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger admin-panel-validation"></div>
@@ -71,14 +79,14 @@
                 <div class="admin-panel-card-header">
                     <div>
                         <h2>Dados do post</h2>
-                        <p>Identificacao editorial, SEO basico, capa e parametros de publicacao.</p>
+                        <p>Identificação editorial, SEO básico, capa e parâmetros de publicação.</p>
                     </div>
                     <span class="admin-panel-badge @StatusClasse(Model.CurrentStatus)">@StatusTexto(Model.CurrentStatus)</span>
                 </div>
 
                 <div class="admin-panel-form-grid">
                     <div class="admin-panel-field admin-panel-field-wide">
-                        <label asp-for="Title">Titulo</label>
+                        <label asp-for="Title">Título</label>
                         <input asp-for="Title" class="form-control admin-panel-control" autocomplete="off" maxlength="180" />
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
@@ -86,13 +94,13 @@
                     <div class="admin-panel-field admin-panel-field-wide">
                         <label asp-for="Slug">Slug</label>
                         <input asp-for="Slug" class="form-control admin-panel-control" autocomplete="off" maxlength="180" />
-                        <small class="admin-panel-help">Se deixar vazio, o sistema gera a partir do titulo.</small>
+                        <small class="admin-panel-help">Se deixar vazio, o sistema gera a partir do título.</small>
                         <span asp-validation-for="Slug" class="text-danger"></span>
                     </div>
 
                     <div class="admin-panel-field admin-panel-field-full">
                         <label asp-for="Summary">Resumo</label>
-                        <textarea asp-for="Summary" class="form-control admin-panel-control" rows="3" maxlength="500" placeholder="Resumo curto para cards e SEO basico."></textarea>
+                        <textarea asp-for="Summary" class="form-control admin-panel-control" rows="3" maxlength="500" placeholder="Resumo curto para cards e SEO básico."></textarea>
                         <span asp-validation-for="Summary" class="text-danger"></span>
                     </div>
 
@@ -120,7 +128,7 @@
                     </div>
 
                     <div class="admin-panel-field">
-                        <label asp-for="AuthorUserId">Autor responsavel</label>
+                        <label asp-for="AuthorUserId">Autor responsável</label>
                         <select asp-for="AuthorUserId" class="form-select admin-panel-control">
                             <option value="">Selecione</option>
                             @foreach (var autor in Model.AuthorOptions)
@@ -131,13 +139,13 @@
                     </div>
 
                     <div class="admin-panel-field">
-                        <label asp-for="PublicationDateLocal">Publicacao/agendamento</label>
+                        <label asp-for="PublicationDateLocal">Publicação/agendamento</label>
                         <input id="PublicationDateLocal"
                                name="PublicationDateLocal"
                                type="datetime-local"
                                class="form-control admin-panel-control"
                                value="@(Model.PublicationDateLocal?.ToString("yyyy-MM-ddTHH:mm"))" />
-                        <small class="admin-panel-help">Use este campo para agendar ou registrar uma data de publicacao.</small>
+                        <small class="admin-panel-help">Use este campo para agendar ou registrar uma data de publicação.</small>
                     </div>
 
                     <div class="admin-panel-field">
@@ -156,7 +164,7 @@
                                 <option value="@tag"></option>
                             }
                         </datalist>
-                        <small class="admin-panel-help">Use Enter para adicionar, clique no X para remover. O limite e de 12 tags.</small>
+                        <small class="admin-panel-help">Use Enter para adicionar, clique no X para remover. O limite é de 12 tags.</small>
                     </div>
 
                     @if (canFeature)
@@ -173,19 +181,19 @@
                     }
 
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="ContentInput">Conteudo</label>
+                        <label asp-for="ContentInput">Conteúdo</label>
                         <div class="blog-admin-editor-shell">
                             <div id="blogEditorToolbar" class="blog-admin-editor-toolbar">
                                 <span class="ql-formats">
                                     <select class="ql-header" aria-label="Formato do texto">
-                                        <option value="2">Titulo</option>
-                                        <option value="3">Subtitulo</option>
+                                        <option value="2">Título</option>
+                                        <option value="3">Subtítulo</option>
                                         <option selected>Texto</option>
                                     </select>
                                 </span>
                                 <span class="ql-formats">
                                     <button type="button" class="ql-bold" aria-label="Negrito"></button>
-                                    <button type="button" class="ql-italic" aria-label="Italico"></button>
+                                    <button type="button" class="ql-italic" aria-label="Itálico"></button>
                                 </span>
                                 <span class="ql-formats">
                                     <button type="button" class="ql-list" value="ordered" aria-label="Lista numerada"></button>
@@ -194,22 +202,22 @@
                                 <span class="ql-formats">
                                     <button type="button" class="ql-link" aria-label="Inserir link"></button>
                                     <button type="button" class="ql-image" aria-label="Inserir imagem"></button>
-                                    <button type="button" class="ql-blockquote" aria-label="Citacao"></button>
-                                    <button type="button" class="ql-video" aria-label="Inserir video do YouTube"></button>
+                                    <button type="button" class="ql-blockquote" aria-label="Citação"></button>
+                                    <button type="button" class="ql-video" aria-label="Inserir vídeo do YouTube"></button>
                                 </span>
                                 <span class="ql-formats">
-                                    <button type="button" class="ql-clean" aria-label="Limpar formatacao"></button>
+                                    <button type="button" class="ql-clean" aria-label="Limpar formatação"></button>
                                 </span>
                             </div>
                             <div id="blogContentEditor"
                                  class="blog-admin-rich-editor"
                                  data-image-upload-url="@Url.Action("UploadContentImage", "BlogAdmin")"
-                                 data-placeholder="Escreva o conteudo do post com titulos, listas, links, citacoes e videos do YouTube."></div>
+                                 data-placeholder="Escreva o conteúdo do post com títulos, listas, links, citações e vídeos do YouTube."></div>
                         </div>
                         <textarea asp-for="ContentInput" hidden></textarea>
                         <textarea asp-for="ContentHtmlInput" hidden></textarea>
                         <textarea asp-for="ContentJsonInput" hidden></textarea>
-                        <small class="admin-panel-help">O conteudo e salvo como Delta JSON, HTML sanitizado e texto limpo para busca.</small>
+                        <small class="admin-panel-help">O conteúdo é salvo como Delta JSON, HTML sanitizado e texto limpo para busca.</small>
                     </div>
 
                     <div class="admin-panel-field">
@@ -233,7 +241,7 @@
                                  class="blog-admin-cover-preview" />
                             <div class="blog-admin-cover-fields">
                                 <input asp-for="CoverImage" class="form-control admin-panel-control" type="file" accept="image/png,image/jpeg,image/webp" />
-                                <small class="admin-panel-help">JPG, PNG ou WEBP ate 3 MB.</small>
+                                <small class="admin-panel-help">JPG, PNG ou WEBP até 3 MB.</small>
                                 @if (!string.IsNullOrWhiteSpace(Model.CurrentCoverImageUrl))
                                 {
                                     <label class="admin-panel-check-card is-form-check">
@@ -299,7 +307,7 @@
                                             <small class="admin-panel-help">Opcional. Se ficar vazio, o sistema gera pelo nome.</small>
                                         </div>
                                         <div class="admin-panel-field">
-                                            <label for="blogCategoryDescription">Descricao</label>
+                                            <label for="blogCategoryDescription">Descrição</label>
                                             <textarea id="blogCategoryDescription" class="form-control admin-panel-control" rows="3" maxlength="400"></textarea>
                                         </div>
                                         <label class="admin-panel-check-card is-form-check">
@@ -329,6 +337,38 @@
                     </div>
                 </div>
             }
+            @if (canManageVersions)
+            {
+                <div class="modal fade blog-version-modal"
+                     id="blogVersionsModal"
+                     tabindex="-1"
+                     aria-labelledby="blogVersionsModalLabel"
+                     aria-hidden="true"
+                     data-versions-url="@Url.Action("Versions", "BlogAdmin", new { id = Model.Id })"
+                     data-create-url="@Url.Action("CreateVersion", "BlogAdmin", new { id = Model.Id })"
+                     data-delete-url-template="/admin/blog/@Model.Id/versoes/excluir/__id__">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content blog-version-modal-content">
+                            <div class="modal-header">
+                                <div>
+                                    <p class="admin-panel-eyebrow mb-1">Idiomas</p>
+                                    <h2 class="modal-title" id="blogVersionsModalLabel">Versões do post</h2>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="blogVersionsModalAlert" class="alert d-none" role="alert"></div>
+                                <div id="blogVersionsModalBody" class="blog-version-modal-body">
+                                    <div class="blog-admin-category-empty">Carregando versões...</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn admin-panel-btn admin-panel-btn-primary" data-bs-dismiss="modal">Concluir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </section>
 
         <aside class="admin-panel-form-stack">
@@ -336,13 +376,13 @@
                 <div class="admin-panel-card-header">
                     <div>
                         <h2>Recursos editoriais</h2>
-                        <p>Ferramentas disponiveis para montar e publicar posts do Blog.</p>
+                        <p>Ferramentas disponíveis para montar e publicar posts do Blog.</p>
                     </div>
                 </div>
                 <div class="admin-stat-list">
                     <div class="admin-stat-row"><span>Editor</span><strong>Quill com HTML sanitizado</strong></div>
-                    <div class="admin-stat-row"><span>Midia</span><strong>Capa e imagens locais</strong></div>
-                    <div class="admin-stat-row"><span>Tags</span><strong>Chips editaveis</strong></div>
+                    <div class="admin-stat-row"><span>Mídia</span><strong>Capa e imagens locais</strong></div>
+                    <div class="admin-stat-row"><span>Tags</span><strong>Chips editáveis</strong></div>
                     <div class="admin-stat-row"><span>Preview</span><strong>Administrativo</strong></div>
                 </div>
             </section>
@@ -351,14 +391,14 @@
                 <div class="admin-panel-card-header">
                     <div>
                         <h2>Checklist editorial</h2>
-                        <p>Para publicar ou agendar, o service exige os campos essenciais.</p>
+                        <p>Para publicar ou agendar, o serviço exige os campos essenciais.</p>
                     </div>
                 </div>
                 <div class="admin-panel-action-list">
-                    <div class="admin-stat-row"><span>Titulo e slug</span><strong>Obrigatorios</strong></div>
-                    <div class="admin-stat-row"><span>Resumo e conteudo</span><strong>Obrigatorios</strong></div>
-                    <div class="admin-stat-row"><span>Categoria e autor</span><strong>Obrigatorios</strong></div>
-                    <div class="admin-stat-row"><span>Imagem de capa</span><strong>Obrigatoria para publicar</strong></div>
+                    <div class="admin-stat-row"><span>Título e slug</span><strong>Obrigatórios</strong></div>
+                    <div class="admin-stat-row"><span>Resumo e conteúdo</span><strong>Obrigatórios</strong></div>
+                    <div class="admin-stat-row"><span>Categoria e autor</span><strong>Obrigatórios</strong></div>
+                    <div class="admin-stat-row"><span>Imagem de capa</span><strong>Obrigatória para publicar</strong></div>
                 </div>
             </section>
 
@@ -368,7 +408,7 @@
                     <div class="admin-panel-card-header">
                         <div>
                             <h2>Metadados</h2>
-                            <p>Historico tecnico do post atual.</p>
+                            <p>Histórico técnico do post atual.</p>
                         </div>
                     </div>
                     <div class="admin-stat-list">

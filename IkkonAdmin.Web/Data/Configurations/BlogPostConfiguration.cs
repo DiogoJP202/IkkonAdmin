@@ -15,6 +15,8 @@ public class BlogPostConfiguration : IEntityTypeConfiguration<BlogPost>
         builder.HasIndex(x => x.Slug).IsUnique();
         builder.HasIndex(x => x.CategoryId);
         builder.HasIndex(x => x.AuthorUserId);
+        builder.HasIndex(x => x.LanguageCode);
+        builder.HasIndex(x => new { x.TranslationGroupId, x.LanguageCode });
         builder.HasIndex(x => x.Status);
         builder.HasIndex(x => new { x.Status, x.PublishedAtUtc, x.DeletedAtUtc });
         builder.HasIndex(x => new { x.IsFeatured, x.PublishedAtUtc });
@@ -26,6 +28,7 @@ public class BlogPostConfiguration : IEntityTypeConfiguration<BlogPost>
         builder.Property(x => x.CoverImageUrl).HasMaxLength(300);
         builder.Property(x => x.AuthorDisplayName).HasMaxLength(200);
         builder.Property(x => x.Status).HasDefaultValue(BlogPostStatusEnum.Draft);
+        builder.Property(x => x.LanguageCode).HasMaxLength(10).HasDefaultValue("pt-BR");
         builder.Property(x => x.CreatedAtUtc).HasColumnType("datetime2");
         builder.Property(x => x.UpdatedAtUtc).HasColumnType("datetime2");
         builder.Property(x => x.PublishedAtUtc).HasColumnType("datetime2");
@@ -45,5 +48,10 @@ public class BlogPostConfiguration : IEntityTypeConfiguration<BlogPost>
             .WithMany(x => x.Posts)
             .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(x => x.TranslationGroupRoot)
+            .WithMany(x => x.TranslationVersions)
+            .HasForeignKey(x => x.TranslationGroupId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

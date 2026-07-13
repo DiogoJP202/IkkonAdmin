@@ -15,6 +15,14 @@ public class BlogService(
     IBlogMediaService blogMediaService,
     IBlogContentSanitizer blogContentSanitizer) : IBlogService
 {
+    private const string DefaultBlogLanguageCode = "pt-BR";
+    private static readonly IReadOnlyList<BlogLanguageDefinition> SupportedBlogLanguages =
+    [
+        new("pt-BR", "Português", "Português", "pt", true),
+        new("en-US", "Inglês", "English", "en", false),
+        new("ja-JP", "Japonês", "日本語", "ja", false)
+    ];
+
     public async Task<BlogAdminIndexViewModel> ListarAsync(
         BlogAdminFilterViewModel filtro,
         CancellationToken cancellationToken = default)
@@ -83,6 +91,10 @@ public class BlogService(
                 Id = x.Id,
                 Title = x.Title,
                 Slug = x.Slug,
+                LanguageCode = x.LanguageCode,
+                TranslationVersionCount = dbContext.BlogPosts.Count(v =>
+                    v.DeletedAtUtc == null &&
+                    (v.Id == (x.TranslationGroupId ?? x.Id) || v.TranslationGroupId == (x.TranslationGroupId ?? x.Id))),
                 Status = x.Status,
                 CategoryName = x.Category != null ? x.Category.Name : null,
                 AuthorName = x.AuthorDisplayName,
@@ -94,6 +106,12 @@ public class BlogService(
                 TagCount = x.PostTags.Count
             })
             .ToListAsync(cancellationToken);
+
+        foreach (var post in posts)
+        {
+            post.LanguageCode = NormalizarIdiomaBlog(post.LanguageCode);
+            post.LanguageLabel = ObterRotuloIdioma(post.LanguageCode);
+        }
 
         return new BlogAdminIndexViewModel
         {
@@ -118,6 +136,8 @@ public class BlogService(
 
         return new BlogPostFormViewModel
         {
+            LanguageCode = DefaultBlogLanguageCode,
+            LanguageLabel = ObterRotuloIdioma(DefaultBlogLanguageCode),
             AuthorUserId = autores.Any(x => x.Id == usuarioAtualId) ? usuarioAtualId : autores.FirstOrDefault()?.Id,
             CategoryOptions = categorias,
             AuthorOptions = autores,
@@ -143,6 +163,9 @@ public class BlogService(
         return new BlogPostFormViewModel
         {
             Id = post.Id,
+            LanguageCode = NormalizarIdiomaBlog(post.LanguageCode),
+            LanguageLabel = ObterRotuloIdioma(post.LanguageCode),
+            TranslationGroupId = post.TranslationGroupId,
             Title = post.Title,
             Slug = post.Slug,
             Summary = post.Summary,
@@ -179,8 +202,10 @@ public class BlogService(
         var now = DateTime.UtcNow;
         var pageSize = 9;
         var currentPage = Math.Max(1, filtro.Pagina);
+        var currentLanguage = ObterIdiomaAtualBlog();
         var query = AplicarFiltrosPublicos(CriarConsultaPublica(now), filtro);
-        var totalPosts = await query.CountAsync(cancellationToken);
+        var selectedPosts = await SelecionarVersoesPublicasAsync(query, currentLanguage, cancellationToken);
+        var totalPosts = selectedPosts.Count;
         var totalPages = Math.Max(1, (int)Math.Ceiling(totalPosts / (decimal)pageSize));
 
         if (currentPage > totalPages)
@@ -190,23 +215,32 @@ public class BlogService(
 
         filtro.Pagina = currentPage;
 
-        var posts = await SelecionarCardsPublicos(query)
+        var pageIds = selectedPosts
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(cancellationToken);
+            .Select(x => x.Id)
+            .ToList();
+        var featuredIds = (await SelecionarVersoesPublicasAsync(
+                CriarConsultaPublica(now).Where(x => x.IsFeatured),
+                currentLanguage,
+                cancellationToken))
+            .Take(3)
+            .Select(x => x.Id)
+            .ToList();
+        var weeklyIds = (await SelecionarVersoesPublicasAsync(
+                CriarConsultaPublica(now).Where(x => x.IsWeeklyHighlight),
+                currentLanguage,
+                cancellationToken))
+            .Take(2)
+            .Select(x => x.Id)
+            .ToList();
 
         return new BlogPublicIndexViewModel
         {
             Filtro = filtro,
-            FeaturedPosts = await SelecionarCardsPublicos(
-                    CriarConsultaPublica(now).Where(x => x.IsFeatured))
-                .Take(3)
-                .ToListAsync(cancellationToken),
-            WeeklyHighlights = await SelecionarCardsPublicos(
-                    CriarConsultaPublica(now).Where(x => x.IsWeeklyHighlight))
-                .Take(2)
-                .ToListAsync(cancellationToken),
-            Posts = posts,
+            FeaturedPosts = await ObterCardsPublicosPorIdsAsync(now, featuredIds, cancellationToken),
+            WeeklyHighlights = await ObterCardsPublicosPorIdsAsync(now, weeklyIds, cancellationToken),
+            Posts = await ObterCardsPublicosPorIdsAsync(now, pageIds, cancellationToken),
             Categories = await ListarCategoriasPublicasAsync(now, filtro.Categoria, cancellationToken),
             Tags = await ListarTagsPublicasAsync(now, filtro.Tag, cancellationToken),
             TotalPosts = totalPosts,
@@ -229,9 +263,32 @@ public class BlogService(
 
         var now = DateTime.UtcNow;
         var normalizedSlug = slug.Trim();
+        var currentLanguage = ObterIdiomaAtualBlog();
+
+        var source = await CriarConsultaPublica(now)
+            .Where(x => x.Slug == normalizedSlug)
+            .Select(x => new
+            {
+                x.Id,
+                x.LanguageCode,
+                x.TranslationGroupId
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (source is null)
+        {
+            return null;
+        }
+
+        var groupId = source.TranslationGroupId ?? source.Id;
+        var versionIds = await SelecionarVersoesPublicasAsync(
+            CriarConsultaPublica(now).Where(x => x.Id == groupId || x.TranslationGroupId == groupId),
+            currentLanguage,
+            cancellationToken);
+        var selectedId = versionIds.FirstOrDefault()?.Id ?? source.Id;
 
         var post = await CriarConsultaPublica(now)
-            .Where(x => x.Slug == normalizedSlug)
+            .Where(x => x.Id == selectedId)
             .Select(x => new BlogPublicDetailsViewModel
             {
                 Title = x.Title,
@@ -263,29 +320,39 @@ public class BlogService(
         }
 
         var relatedQuery = CriarConsultaPublica(now)
-            .Where(x => x.Slug != post.Slug);
+            .Where(x => (x.TranslationGroupId ?? x.Id) != groupId);
 
         if (!string.IsNullOrWhiteSpace(post.CategorySlug))
         {
             relatedQuery = relatedQuery.Where(x => x.Category != null && x.Category.Slug == post.CategorySlug);
         }
 
-        var relatedPosts = await SelecionarCardsPublicos(relatedQuery)
+        var relatedSelections = (await SelecionarVersoesPublicasAsync(relatedQuery, currentLanguage, cancellationToken))
             .Take(3)
-            .ToListAsync(cancellationToken);
+            .ToList();
+        var relatedPosts = await ObterCardsPublicosPorIdsAsync(
+            now,
+            relatedSelections.Select(x => x.Id).ToList(),
+            cancellationToken);
 
         if (relatedPosts.Count < 3)
         {
-            var excludedSlugs = relatedPosts
-                .Select(x => x.Slug)
-                .Append(post.Slug)
+            var excludedGroupIds = relatedSelections
+                .Select(x => x.GroupId)
+                .Append(groupId)
                 .ToList();
 
-            var fallbackPosts = await SelecionarCardsPublicos(
+            var fallbackSelections = (await SelecionarVersoesPublicasAsync(
                     CriarConsultaPublica(now)
-                        .Where(x => !excludedSlugs.Contains(x.Slug)))
+                        .Where(x => !excludedGroupIds.Contains(x.TranslationGroupId ?? x.Id)),
+                    currentLanguage,
+                    cancellationToken))
                 .Take(3 - relatedPosts.Count)
-                .ToListAsync(cancellationToken);
+                .ToList();
+            var fallbackPosts = await ObterCardsPublicosPorIdsAsync(
+                now,
+                fallbackSelections.Select(x => x.Id).ToList(),
+                cancellationToken);
 
             relatedPosts.AddRange(fallbackPosts);
         }
@@ -315,13 +382,87 @@ public class BlogService(
                 PublishedAtUtc = x.PublishedAtUtc,
                 IsFeatured = x.IsFeatured,
                 IsWeeklyHighlight = x.IsWeeklyHighlight,
-                ContentHtml = x.ContentHtml ?? "<p>Conteudo ainda nao informado.</p>",
+                ContentHtml = x.ContentHtml ?? "<p>Conteúdo ainda não informado.</p>",
                 Tags = x.PostTags
                     .OrderBy(t => t.BlogTag.Name)
                     .Select(t => t.BlogTag.Name)
                     .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<BlogVersionOverviewViewModel?> ObterVersoesAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var source = await dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.Id == id && x.DeletedAtUtc == null)
+            .Select(x => new
+            {
+                x.Id,
+                x.Title,
+                x.LanguageCode,
+                x.TranslationGroupId
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (source is null)
+        {
+            return null;
+        }
+
+        var groupId = source.TranslationGroupId ?? source.Id;
+        var versions = await dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.DeletedAtUtc == null &&
+                        (x.Id == groupId || x.TranslationGroupId == groupId))
+            .Select(x => new
+            {
+                x.Id,
+                x.Title,
+                x.Slug,
+                x.LanguageCode,
+                x.Status,
+                x.UpdatedAtUtc,
+                x.PublishedAtUtc,
+                x.CreatedAtUtc
+            })
+            .ToListAsync(cancellationToken);
+
+        return new BlogVersionOverviewViewModel
+        {
+            SourcePostId = source.Id,
+            TranslationGroupId = groupId,
+            SourceTitle = source.Title,
+            SourceLanguageCode = NormalizarIdiomaBlog(source.LanguageCode),
+            Versions = SupportedBlogLanguages
+                .Select(language =>
+                {
+                    var version = versions
+                        .Where(x => string.Equals(NormalizarIdiomaBlog(x.LanguageCode), language.Code, StringComparison.OrdinalIgnoreCase))
+                        .OrderByDescending(x => x.Id == source.Id)
+                        .ThenBy(x => x.Id)
+                        .FirstOrDefault();
+
+                    return new BlogVersionItemViewModel
+                    {
+                        LanguageCode = language.Code,
+                        LanguageLabel = language.Label,
+                        NativeLabel = language.NativeLabel,
+                        SlugSuffix = language.SlugSuffix,
+                        IsDefault = language.IsDefault,
+                        IsCurrent = version?.Id == source.Id,
+                        PostId = version?.Id,
+                        Title = version?.Title,
+                        Slug = version?.Slug,
+                        Status = version?.Status,
+                        UpdatedAtUtc = version?.UpdatedAtUtc ?? version?.CreatedAtUtc,
+                        PublishedAtUtc = version?.PublishedAtUtc
+                    };
+                })
+                .ToList()
+        };
     }
 
     public async Task<BlogOperationResult> CriarAsync(
@@ -361,6 +502,7 @@ public class BlogService(
         var contentHtml = GerarConteudoHtmlSeguro(model);
         var contentJson = LimparOpcional(model.ContentJsonInput);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Title), null, cancellationToken);
+        var languageCode = NormalizarIdiomaBlog(model.LanguageCode);
 
         var post = new BlogPost
         {
@@ -375,6 +517,7 @@ public class BlogService(
             AuthorDisplayName = author?.NomeExibicao ?? author?.Login ?? "Equipe Ikkon",
             CategoryId = model.CategoryId,
             Status = validacao.Status,
+            LanguageCode = languageCode,
             IsFeatured = model.IsFeatured || model.IsWeeklyHighlight,
             IsWeeklyHighlight = model.IsWeeklyHighlight,
             PublishedAtUtc = validacao.PublishedAtUtc,
@@ -399,6 +542,83 @@ public class BlogService(
             post.Id);
     }
 
+    public async Task<BlogOperationResult> CriarVersaoAsync(
+        int id,
+        string languageCode,
+        int? usuarioAtualId,
+        CancellationToken cancellationToken = default)
+    {
+        var language = ObterDefinicaoIdioma(languageCode);
+        if (language is null)
+        {
+            return BlogOperationResult.Fail("Idioma não suportado para versões do blog.");
+        }
+
+        var source = await dbContext.BlogPosts
+            .Include(x => x.PostTags)
+            .ThenInclude(x => x.BlogTag)
+            .FirstOrDefaultAsync(x => x.Id == id && x.DeletedAtUtc == null, cancellationToken);
+
+        if (source is null)
+        {
+            return BlogOperationResult.Fail("Post não encontrado.");
+        }
+
+        var groupId = source.TranslationGroupId ?? source.Id;
+        var versionExists = await dbContext.BlogPosts.AnyAsync(
+            x => x.DeletedAtUtc == null &&
+                 (x.Id == groupId || x.TranslationGroupId == groupId) &&
+                 x.LanguageCode == language.Code,
+            cancellationToken);
+
+        if (versionExists)
+        {
+            return BlogOperationResult.Fail("Já existe uma versão neste idioma.");
+        }
+
+        var now = DateTime.UtcNow;
+        var sourceSlug = string.IsNullOrWhiteSpace(source.Slug)
+            ? GerarSlug(null, source.Title)
+            : source.Slug;
+        var slug = await GarantirSlugUnicoAsync(
+            GerarSlug($"{sourceSlug}-{language.SlugSuffix}", $"{source.Title}-{language.SlugSuffix}"),
+            null,
+            cancellationToken);
+        var tagsInput = string.Join(", ", source.PostTags
+            .OrderBy(x => x.BlogTag.Name)
+            .Select(x => x.BlogTag.Name));
+
+        var version = new BlogPost
+        {
+            Title = source.Title,
+            Slug = slug,
+            Summary = source.Summary,
+            ContentHtml = source.ContentHtml,
+            ContentJson = source.ContentJson,
+            ContentText = source.ContentText,
+            CoverImageUrl = source.CoverImageUrl,
+            AuthorUserId = source.AuthorUserId ?? usuarioAtualId,
+            AuthorDisplayName = source.AuthorDisplayName,
+            CategoryId = source.CategoryId,
+            Status = BlogPostStatusEnum.Draft,
+            LanguageCode = language.Code,
+            TranslationGroupId = groupId,
+            IsFeatured = source.IsFeatured,
+            IsWeeklyHighlight = source.IsWeeklyHighlight,
+            CreatedAtUtc = now,
+            UpdatedAtUtc = now,
+            SeoTitle = source.SeoTitle,
+            SeoDescription = source.SeoDescription,
+            ReadingTimeMinutes = source.ReadingTimeMinutes
+        };
+
+        await dbContext.BlogPosts.AddAsync(version, cancellationToken);
+        await SincronizarTagsAsync(version, tagsInput, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return BlogOperationResult.Ok("Versão criada como rascunho. Revise a tradução antes de publicar.", version.Id);
+    }
+
     public async Task<BlogOperationResult> AtualizarAsync(
         int id,
         BlogPostFormViewModel model,
@@ -414,7 +634,7 @@ public class BlogService(
 
         if (post is null)
         {
-            return BlogOperationResult.Fail("Post nao encontrado.");
+            return BlogOperationResult.Fail("Post não encontrado.");
         }
 
         var author = await ObterAutorValidoAsync(model.AuthorUserId, cancellationToken);
@@ -467,6 +687,7 @@ public class BlogService(
         post.AuthorDisplayName = author?.NomeExibicao ?? author?.Login ?? post.AuthorDisplayName;
         post.CategoryId = model.CategoryId;
         post.Status = validacao.Status;
+        post.LanguageCode = NormalizarIdiomaBlog(post.LanguageCode);
         post.IsFeatured = model.IsFeatured || model.IsWeeklyHighlight;
         post.IsWeeklyHighlight = model.IsWeeklyHighlight;
         post.PublishedAtUtc = validacao.PublishedAtUtc;
@@ -496,14 +717,54 @@ public class BlogService(
         var post = await dbContext.BlogPosts.FirstOrDefaultAsync(x => x.Id == id && x.DeletedAtUtc == null, cancellationToken);
         if (post is null)
         {
-            return BlogOperationResult.Fail("Post nao encontrado.");
+            return BlogOperationResult.Fail("Post não encontrado.");
         }
 
         post.DeletedAtUtc = DateTime.UtcNow;
         post.UpdatedAtUtc = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Post excluido com sucesso.", post.Id);
+        return BlogOperationResult.Ok("Post excluído com sucesso.", post.Id);
+    }
+
+    public async Task<BlogOperationResult> ExcluirVersaoAsync(
+        int id,
+        int versionId,
+        int? usuarioAtualId,
+        CancellationToken cancellationToken = default)
+    {
+        if (id == versionId)
+        {
+            return BlogOperationResult.Fail("Use a ação principal do post para excluir a versão aberta.");
+        }
+
+        var source = await dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.Id == id && x.DeletedAtUtc == null)
+            .Select(x => new { x.Id, x.TranslationGroupId })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var version = await dbContext.BlogPosts
+            .FirstOrDefaultAsync(x => x.Id == versionId && x.DeletedAtUtc == null, cancellationToken);
+
+        if (source is null || version is null)
+        {
+            return BlogOperationResult.Fail("Versão não encontrada.");
+        }
+
+        var sourceGroupId = source.TranslationGroupId ?? source.Id;
+        var versionGroupId = version.TranslationGroupId ?? version.Id;
+        if (sourceGroupId != versionGroupId)
+        {
+            return BlogOperationResult.Fail("Esta versão não pertence ao post atual.");
+        }
+
+        var now = DateTime.UtcNow;
+        version.DeletedAtUtc = now;
+        version.UpdatedAtUtc = now;
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return BlogOperationResult.Ok("Versão excluída com sucesso.", version.Id);
     }
 
     private async Task<BlogWorkflowValidation> ValidarFluxoEditorialAsync(
@@ -535,7 +796,7 @@ public class BlogService(
         if (!string.IsNullOrWhiteSpace(model.Slug) &&
             await SlugExisteAsync(slugBase, model.Id, cancellationToken))
         {
-            return BlogWorkflowValidation.Fail("Ja existe um post com esse slug.");
+            return BlogWorkflowValidation.Fail("Já existe um post com esse slug.");
         }
 
         switch (acao)
@@ -543,7 +804,7 @@ public class BlogService(
             case "publish":
                 if (publicationDateUtc.HasValue && publicationDateUtc.Value > now)
                 {
-                    return BlogWorkflowValidation.Fail("Para data futura, use a acao Agendar.");
+                    return BlogWorkflowValidation.Fail("Para data futura, use a ação Agendar.");
                 }
 
                 var pendenciasPublicacao = ListarPendenciasPublicacao(summary, hasContent, author, hasCover, model.CategoryId);
@@ -561,7 +822,7 @@ public class BlogService(
             case "schedule":
                 if (!publicationDateUtc.HasValue || publicationDateUtc.Value <= now)
                 {
-                    return BlogWorkflowValidation.Fail("Informe uma data futura para agendar a publicacao.");
+                    return BlogWorkflowValidation.Fail("Informe uma data futura para agendar a publicação.");
                 }
 
                 var pendenciasAgendamento = ListarPendenciasPublicacao(summary, hasContent, author, hasCover, model.CategoryId);
@@ -730,6 +991,49 @@ public class BlogService(
             .ToListAsync(cancellationToken);
     }
 
+    private async Task<List<BlogPublicPostSelection>> SelecionarVersoesPublicasAsync(
+        IQueryable<BlogPost> query,
+        string languageCode,
+        CancellationToken cancellationToken)
+    {
+        var candidates = await query
+            .Select(x => new BlogPublicPostSelection(
+                x.Id,
+                x.TranslationGroupId ?? x.Id,
+                x.LanguageCode,
+                x.PublishedAtUtc,
+                x.CreatedAtUtc))
+            .ToListAsync(cancellationToken);
+
+        return candidates
+            .GroupBy(x => x.GroupId)
+            .Select(group => EscolherMelhorVersaoPublica(group, languageCode))
+            .OrderByDescending(x => x.PublishedAtUtc ?? x.CreatedAtUtc)
+            .ThenByDescending(x => x.CreatedAtUtc)
+            .ToList();
+    }
+
+    private async Task<List<BlogPublicPostCardViewModel>> ObterCardsPublicosPorIdsAsync(
+        DateTime nowUtc,
+        IReadOnlyCollection<int> ids,
+        CancellationToken cancellationToken)
+    {
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var order = ids
+            .Select((id, index) => new { id, index })
+            .ToDictionary(x => x.id, x => x.index);
+        var cards = await SelecionarCardsPublicos(CriarConsultaPublica(nowUtc).Where(x => ids.Contains(x.Id)))
+            .ToListAsync(cancellationToken);
+
+        return cards
+            .OrderBy(x => order.TryGetValue(x.Id, out var index) ? index : int.MaxValue)
+            .ToList();
+    }
+
     private IQueryable<BlogPost> CriarConsultaPublica(DateTime nowUtc)
     {
         return dbContext.BlogPosts
@@ -776,6 +1080,7 @@ public class BlogService(
     {
         return query.Select(x => new BlogPublicPostCardViewModel
         {
+            Id = x.Id,
             Title = x.Title,
             Slug = x.Slug,
             Summary = x.Summary,
@@ -902,7 +1207,7 @@ public class BlogService(
 
         if (!hasContent)
         {
-            pendencias.Add("conteudo");
+            pendencias.Add("conteúdo");
         }
 
         if (!categoryId.HasValue)
@@ -927,7 +1232,7 @@ public class BlogService(
     {
         return pendencias.Count switch
         {
-            0 => "os campos obrigatorios",
+            0 => "os campos obrigatórios",
             1 => pendencias[0],
             2 => $"{pendencias[0]} e {pendencias[1]}",
             _ => $"{string.Join(", ", pendencias.Take(pendencias.Count - 1))} e {pendencias[^1]}"
@@ -1079,6 +1384,75 @@ public class BlogService(
             return TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
         }
     }
+
+    private static BlogPublicPostSelection EscolherMelhorVersaoPublica(
+        IEnumerable<BlogPublicPostSelection> versions,
+        string languageCode)
+    {
+        var normalizedLanguage = NormalizarIdiomaBlog(languageCode);
+
+        return versions
+            .OrderByDescending(x => string.Equals(NormalizarIdiomaBlog(x.LanguageCode), normalizedLanguage, StringComparison.OrdinalIgnoreCase))
+            .ThenByDescending(x => string.Equals(NormalizarIdiomaBlog(x.LanguageCode), DefaultBlogLanguageCode, StringComparison.OrdinalIgnoreCase))
+            .ThenBy(x => x.Id == x.GroupId ? 0 : 1)
+            .ThenByDescending(x => x.PublishedAtUtc ?? x.CreatedAtUtc)
+            .First();
+    }
+
+    private static string ObterIdiomaAtualBlog()
+    {
+        var culture = CultureInfo.CurrentUICulture.Name;
+        return NormalizarIdiomaBlog(culture);
+    }
+
+    private static string NormalizarIdiomaBlog(string? languageCode)
+    {
+        if (string.IsNullOrWhiteSpace(languageCode))
+        {
+            return DefaultBlogLanguageCode;
+        }
+
+        var normalized = languageCode.Trim();
+        var exact = SupportedBlogLanguages.FirstOrDefault(x =>
+            string.Equals(x.Code, normalized, StringComparison.OrdinalIgnoreCase));
+
+        if (exact is not null)
+        {
+            return exact.Code;
+        }
+
+        var prefix = normalized.Split('-', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        var byPrefix = SupportedBlogLanguages.FirstOrDefault(x =>
+            x.Code.StartsWith($"{prefix}-", StringComparison.OrdinalIgnoreCase));
+
+        return byPrefix?.Code ?? DefaultBlogLanguageCode;
+    }
+
+    private static BlogLanguageDefinition? ObterDefinicaoIdioma(string? languageCode)
+    {
+        var normalized = NormalizarIdiomaBlog(languageCode);
+        return SupportedBlogLanguages.FirstOrDefault(x =>
+            string.Equals(x.Code, normalized, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string ObterRotuloIdioma(string? languageCode)
+    {
+        return ObterDefinicaoIdioma(languageCode)?.Label ?? "Português";
+    }
+
+    private sealed record BlogLanguageDefinition(
+        string Code,
+        string Label,
+        string NativeLabel,
+        string SlugSuffix,
+        bool IsDefault);
+
+    private sealed record BlogPublicPostSelection(
+        int Id,
+        int GroupId,
+        string LanguageCode,
+        DateTime? PublishedAtUtc,
+        DateTime CreatedAtUtc);
 
     private sealed record BlogWorkflowValidation(
         bool Success,

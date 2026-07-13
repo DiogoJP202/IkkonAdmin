@@ -41,7 +41,7 @@
             <span class="admin-panel-eyebrow">Blog interno</span>
             <h1 class="admin-panel-title">Posts, categorias e agenda editorial</h1>
             <p class="admin-panel-subtitle">
-                Gerencie rascunhos, publicacoes e destaques do Blog com um fluxo simples para a equipe administrativa.
+                Gerencie rascunhos, publicações e destaques do Blog com um fluxo simples para a equipe administrativa.
             </p>
             <div class="admin-panel-meta">
                 <span>Total <strong>@Model.TotalPosts</strong></span>
@@ -65,22 +65,22 @@
         <article class="admin-kpi-card">
             <div class="admin-kpi-top"><span>Total</span><b>Posts</b></div>
             <strong>@Model.TotalPosts</strong>
-            <small>Posts ativos no modulo, sem itens excluidos logicamente.</small>
+            <small>Posts ativos no módulo, sem itens excluídos logicamente.</small>
         </article>
         <article class="admin-kpi-card is-warning">
-            <div class="admin-kpi-top"><span>Rascunhos</span><b>Edicao</b></div>
+            <div class="admin-kpi-top"><span>Rascunhos</span><b>Edição</b></div>
             <strong>@Model.DraftCount</strong>
-            <small>Conteudos ainda nao publicados.</small>
+            <small>Conteúdos ainda não publicados.</small>
         </article>
         <article class="admin-kpi-card is-info">
             <div class="admin-kpi-top"><span>Agendados</span><b>Fila</b></div>
             <strong>@Model.ScheduledCount</strong>
-            <small>Posts com publicacao futura.</small>
+            <small>Posts com publicação futura.</small>
         </article>
         <article class="admin-kpi-card is-success">
             <div class="admin-kpi-top"><span>Publicados</span><b>No ar</b></div>
             <strong>@Model.PublishedCount</strong>
-            <small>Conteudos prontos para o site institucional.</small>
+            <small>Conteúdos prontos para o site institucional.</small>
         </article>
     </section>
 
@@ -88,7 +88,7 @@
         <div class="admin-panel-card-header">
             <div>
                 <h2>Filtrar posts</h2>
-                <p>Busque por titulo, resumo, categoria, tag, autor e status editorial.</p>
+                <p>Busque por título, resumo, categoria, tag, autor e status editorial.</p>
             </div>
         </div>
 
@@ -96,7 +96,7 @@
             <div class="admin-panel-form-grid">
                 <div class="admin-panel-field admin-panel-field-wide">
                     <label asp-for="Filtro.Busca">Busca</label>
-                    <input asp-for="Filtro.Busca" class="form-control admin-panel-control" type="search" placeholder="Titulo, resumo, conteudo, categoria ou tag" />
+                    <input asp-for="Filtro.Busca" class="form-control admin-panel-control" type="search" placeholder="Título, resumo, conteúdo, categoria ou tag" />
                 </div>
 
                 <div class="admin-panel-field">
@@ -137,7 +137,7 @@
                     <select asp-for="Filtro.IsFeatured" class="form-select admin-panel-control">
                         <option value="">Todos</option>
                         <option value="true">Em destaque</option>
-                        <option value="false">Nao destacados</option>
+                        <option value="false">Não destacados</option>
                     </select>
                 </div>
 
@@ -146,7 +146,7 @@
                     <select asp-for="Filtro.IsWeeklyHighlight" class="form-select admin-panel-control">
                         <option value="">Todos</option>
                         <option value="true">Marcados</option>
-                        <option value="false">Nao marcados</option>
+                        <option value="false">Não marcados</option>
                     </select>
                 </div>
 
@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="admin-panel-field">
-                    <label asp-for="Filtro.PublishedTo">Publicado ate</label>
+                    <label asp-for="Filtro.PublishedTo">Publicado até</label>
                     <input asp-for="Filtro.PublishedTo" class="form-control admin-panel-control" type="date" />
                 </div>
 
@@ -188,12 +188,12 @@
                         <th>Status</th>
                         <th>Categoria</th>
                         <th>Autor</th>
-                        <th>Publicacao</th>
-                        <th>Criacao</th>
+                        <th>Publicação</th>
+                        <th>Criação</th>
                         <th>Destaque</th>
                         <th>Semana</th>
                         <th>Tags</th>
-                        <th class="text-end">Acoes</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -215,7 +215,7 @@
                                 <td>
                                     <div class="admin-panel-primary-cell">
                                         <strong>@post.Title</strong>
-                                        <small>/blog/@post.Slug</small>
+                                        <small>/blog/@post.Slug · @post.LanguageLabel · @post.TranslationVersionCount versão(ões)</small>
                                     </div>
                                 </td>
                                 <td><span class="admin-panel-badge @StatusClasse(post.Status)">@StatusTexto(post.Status)</span></td>
@@ -223,8 +223,8 @@
                                 <td>@(post.AuthorName ?? "-")</td>
                                 <td>@(post.PublishedAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? post.ScheduledAtUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
                                 <td>@post.CreatedAtUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                                <td><span class="admin-panel-badge @(post.IsFeatured ? "is-warning" : "is-muted")">@(post.IsFeatured ? "Sim" : "Nao")</span></td>
-                                <td><span class="admin-panel-badge @(post.IsWeeklyHighlight ? "is-success" : "is-muted")">@(post.IsWeeklyHighlight ? "Sim" : "Nao")</span></td>
+                                <td><span class="admin-panel-badge @(post.IsFeatured ? "is-warning" : "is-muted")">@(post.IsFeatured ? "Sim" : "Não")</span></td>
+                                <td><span class="admin-panel-badge @(post.IsWeeklyHighlight ? "is-success" : "is-muted")">@(post.IsWeeklyHighlight ? "Sim" : "Não")</span></td>
                                 <td>@post.TagCount</td>
                                 <td class="text-end">
                                     <div class="admin-panel-row-actions">

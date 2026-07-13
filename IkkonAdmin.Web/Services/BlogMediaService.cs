@@ -46,7 +46,7 @@ public class BlogMediaService(IWebHostEnvironment webHostEnvironment) : IBlogMed
             ["uploads", "blog", "conteudo"],
             "/uploads/blog/conteudo",
             MaxContentImageSizeBytes,
-            "imagem do conteudo",
+            "imagem do conteúdo",
             cancellationToken);
     }
 
@@ -74,19 +74,19 @@ public class BlogMediaService(IWebHostEnvironment webHostEnvironment) : IBlogMed
     {
         if (image.Length <= 0)
         {
-            return BlogMediaSaveResult.Fail($"Selecione uma {description} valida.");
+            return BlogMediaSaveResult.Fail($"Selecione uma {description} válida.");
         }
 
         if (image.Length > maxSizeBytes)
         {
             var maxSizeMb = maxSizeBytes / 1024 / 1024;
-            return BlogMediaSaveResult.Fail($"A {description} deve ter no maximo {maxSizeMb} MB.");
+            return BlogMediaSaveResult.Fail($"A {description} deve ter no máximo {maxSizeMb} MB.");
         }
 
         var extension = Path.GetExtension(image.FileName ?? string.Empty);
         if (!AllowedImageExtensions.Contains(extension))
         {
-            return BlogMediaSaveResult.Fail("Formato de imagem invalido. Use JPG, PNG ou WEBP.");
+            return BlogMediaSaveResult.Fail("Formato de imagem inválido. Use JPG, PNG ou WEBP.");
         }
 
         return BlogMediaSaveResult.Ok(string.Empty);

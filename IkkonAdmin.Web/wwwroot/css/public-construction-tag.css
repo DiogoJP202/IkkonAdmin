@@ -1,0 +1,368 @@
+.public-hanging-tag {
+  position: fixed;
+  top: clamp(4.35rem, 7vh, 5.4rem);
+  right: clamp(0.9rem, 3vw, 2.6rem);
+  z-index: 1025;
+  width: clamp(8.45rem, 11vw, 10.8rem);
+  height: clamp(12.4rem, 15.5vw, 14.6rem);
+  pointer-events: none;
+  transform-origin: 50% 0;
+  opacity: 0;
+  transform: translate3d(0, -12rem, 0) rotate(-7deg);
+}
+
+.public-hanging-tag.is-mounted {
+  animation: publicTagDrop 2.55s cubic-bezier(0.18, 0.78, 0.24, 1) both;
+}
+
+.public-hanging-tag.is-leaving {
+  animation: publicTagPullUp 1.45s cubic-bezier(0.6, 0, 0.75, 0.26) both;
+}
+
+.public-hanging-tag.is-gone {
+  display: none;
+}
+
+.public-hanging-tag-cord {
+  position: absolute;
+  top: -0.15rem;
+  left: 50%;
+  width: 2px;
+  height: 4.35rem;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(90deg, rgba(73, 47, 29, 0.5), rgba(245, 230, 195, 0.8), rgba(54, 35, 23, 0.6));
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(38, 22, 14, 0.16);
+}
+
+.public-hanging-tag-knot {
+  position: absolute;
+  top: 4rem;
+  left: 50%;
+  width: 0.66rem;
+  height: 0.66rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(58, 35, 19, 0.5);
+  border-radius: 999px;
+  background: #d8c08f;
+  box-shadow: inset 0 0 0 2px rgba(111, 70, 39, 0.24), 0 3px 6px rgba(28, 18, 13, 0.18);
+}
+
+.public-hanging-tag-card {
+  position: absolute;
+  inset: 3.85rem 0 0;
+  display: grid;
+  place-items: center;
+  padding: 2.2rem 0.75rem 0.9rem;
+  overflow: hidden;
+  border: 1px solid #84613e;
+  border-radius: 0.62rem 0.62rem 0.36rem 0.36rem;
+  background:
+    radial-gradient(circle at 14% 10%, rgba(112, 78, 43, 0.2) 0 0.08rem, transparent 0.12rem),
+    radial-gradient(circle at 88% 16%, rgba(115, 72, 43, 0.18) 0 0.07rem, transparent 0.13rem),
+    radial-gradient(circle at 32% 72%, rgba(145, 89, 50, 0.11) 0 0.09rem, transparent 0.14rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.48), transparent 34%),
+    #eee2c2;
+  box-shadow:
+    inset 0 0 0 0.18rem rgba(255, 249, 224, 0.38),
+    inset 0 0 1.2rem rgba(94, 62, 32, 0.14),
+    0 0.95rem 1.5rem rgba(12, 10, 8, 0.22);
+  transform-origin: 50% 0.2rem;
+}
+
+.public-hanging-tag.is-mounted .public-hanging-tag-card {
+  animation: publicTagResidualSway 4.9s 2.4s ease-in-out both;
+}
+
+.public-hanging-tag.is-leaving .public-hanging-tag-card {
+  animation: publicTagPullSway 1.45s cubic-bezier(0.5, 0, 0.8, 0.28) both;
+}
+
+.public-hanging-tag-card::before {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid rgba(41, 34, 26, 0.55);
+  border-radius: 0.36rem 0.36rem 0.22rem 0.22rem;
+  opacity: 0.8;
+}
+
+.public-hanging-tag-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(74, 43, 21, 0.1), transparent 16%, transparent 84%, rgba(74, 43, 21, 0.12)),
+    repeating-linear-gradient(88deg, rgba(87, 63, 40, 0.045) 0 1px, transparent 1px 5px);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+
+.public-hanging-tag-eyelet {
+  position: absolute;
+  top: 0.52rem;
+  left: 50%;
+  z-index: 2;
+  width: 1rem;
+  height: 1rem;
+  transform: translateX(-50%);
+  border: 0.2rem solid #6a5033;
+  border-radius: 999px;
+  background: #f6edcd;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(46, 30, 18, 0.24);
+}
+
+.public-hanging-tag-stamp {
+  position: absolute;
+  right: 0.76rem;
+  bottom: 0.7rem;
+  z-index: 3;
+  display: inline-grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border: 1px solid rgba(141, 28, 30, 0.78);
+  color: rgba(141, 28, 30, 0.78);
+  font-family: "Noto Serif JP", serif;
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-7deg);
+}
+
+.public-hanging-tag-rule {
+  position: absolute;
+  top: 2.35rem;
+  left: 0.72rem;
+  right: 0.72rem;
+  z-index: 2;
+  height: 1px;
+  background: rgba(42, 33, 23, 0.58);
+}
+
+.public-hanging-tag-copy {
+  position: absolute;
+  inset: 3.02rem 0.85rem 2.35rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #201a14;
+  font-family: "Noto Serif JP", Georgia, serif;
+  line-height: 1.34;
+  text-wrap: balance;
+  transition: opacity 0.72s ease, transform 0.72s ease, filter 0.72s ease;
+}
+
+.public-hanging-tag-copy-status {
+  font-size: clamp(0.68rem, 0.76vw, 0.82rem);
+  font-weight: 700;
+}
+
+.public-hanging-tag-copy-welcome {
+  flex-direction: column;
+  gap: 0.2rem;
+  opacity: 0;
+  filter: blur(1px);
+  transform: translateY(0.22rem) rotateX(8deg);
+}
+
+.public-hanging-tag-copy-welcome span {
+  color: #6d4d35;
+  font-size: clamp(0.58rem, 0.68vw, 0.72rem);
+  font-style: italic;
+  line-height: 1;
+}
+
+.public-hanging-tag-copy-welcome strong {
+  color: #17130f;
+  font-family: "Noto Serif JP", serif;
+  font-size: clamp(1.28rem, 1.7vw, 1.72rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.public-hanging-tag.is-welcome .public-hanging-tag-copy-status {
+  opacity: 0;
+  filter: blur(1px);
+  transform: translateY(-0.18rem) rotateX(-8deg);
+}
+
+.public-hanging-tag.is-welcome .public-hanging-tag-copy-welcome {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) rotateX(0deg);
+}
+
+@keyframes publicTagDrop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10rem, 0) rotate(-7deg);
+  }
+
+  44% {
+    opacity: 1;
+    transform: translate3d(0, 0.65rem, 0) rotate(5deg);
+  }
+
+  61% {
+    transform: translate3d(0, -0.28rem, 0) rotate(-3.2deg);
+  }
+
+  75% {
+    transform: translate3d(0, 0.12rem, 0) rotate(1.55deg);
+  }
+
+  88% {
+    transform: translate3d(0, -0.04rem, 0) rotate(-0.9deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-1.2deg);
+  }
+}
+
+@keyframes publicTagResidualSway {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  24% {
+    transform: rotate(1.15deg);
+  }
+
+  48% {
+    transform: rotate(-0.75deg);
+  }
+
+  72% {
+    transform: rotate(0.35deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes publicTagPullUp {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-1.2deg);
+  }
+
+  28% {
+    transform: translate3d(0, 0.38rem, 0) rotate(1.4deg);
+  }
+
+  52% {
+    opacity: 1;
+    transform: translate3d(0, -2.6rem, 0) rotate(-2.2deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -13.5rem, 0) rotate(2.4deg);
+  }
+}
+
+@keyframes publicTagPullSway {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  24% {
+    transform: rotate(-2deg);
+  }
+
+  54% {
+    transform: rotate(1.15deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .public-hanging-tag {
+    top: 4.15rem;
+    right: 0.7rem;
+    left: auto;
+    width: 7.35rem;
+    height: 10.95rem;
+  }
+
+  .public-hanging-tag-cord {
+    height: 3.55rem;
+  }
+
+  .public-hanging-tag-knot {
+    top: 3.28rem;
+  }
+
+  .public-hanging-tag-card {
+    inset: 3.15rem 0 0;
+    padding-inline: 0.58rem;
+  }
+
+  .public-hanging-tag-eyelet {
+    width: 0.86rem;
+    height: 0.86rem;
+    border-width: 0.17rem;
+  }
+
+  .public-hanging-tag-rule {
+    top: 2.08rem;
+    left: 0.6rem;
+    right: 0.6rem;
+  }
+
+  .public-hanging-tag-copy {
+    inset: 2.68rem 0.58rem 1.9rem;
+  }
+
+  .public-hanging-tag-copy-status {
+    font-size: 0.61rem;
+  }
+
+  .public-hanging-tag-copy-welcome strong {
+    font-size: 1.18rem;
+  }
+
+  .public-hanging-tag-stamp {
+    right: 0.58rem;
+    bottom: 0.54rem;
+    width: 1.18rem;
+    height: 1.18rem;
+    font-size: 0.48rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .public-hanging-tag {
+    right: max(0.7rem, calc(100vw - 390px + 0.7rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-hanging-tag {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .public-hanging-tag.is-leaving {
+    opacity: 0;
+  }
+
+  .public-hanging-tag-card,
+  .public-hanging-tag-copy {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
+}

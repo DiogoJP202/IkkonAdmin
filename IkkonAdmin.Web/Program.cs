@@ -11,19 +11,28 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 var culturaPadrao = CultureInfo.GetCultureInfo("pt-BR");
+var culturaIngles = CultureInfo.GetCultureInfo("en-US");
+var culturaJapones = CultureInfo.GetCultureInfo("ja-JP");
 
 CultureInfo.DefaultThreadCurrentCulture = culturaPadrao;
 CultureInfo.DefaultThreadCurrentUICulture = culturaPadrao;
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<IViewTextService, ViewTextService>();
 builder.Services.AddDataProtection();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var culturasSuportadas = new[] { culturaPadrao };
+    var culturasSuportadas = new[] { culturaPadrao, culturaIngles, culturaJapones };
 
     options.DefaultRequestCulture = new RequestCulture(culturaPadrao);
     options.SupportedCultures = culturasSuportadas;
     options.SupportedUICultures = culturasSuportadas;
+    options.RequestCultureProviders =
+    [
+        new QueryStringRequestCultureProvider(),
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider()
+    ];
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

@@ -113,6 +113,45 @@ public class BlogAdminController(
         return vm is null ? NotFound() : View(vm);
     }
 
+    [HttpGet("{id:int}/versoes")]
+    [Authorize(Policy = AuthorizationPolicies.BlogEdit)]
+    public async Task<IActionResult> Versions(int id, CancellationToken cancellationToken)
+    {
+        var vm = await blogService.ObterVersoesAsync(id, cancellationToken);
+        return vm is null ? NotFound() : PartialView("_BlogPostVersionsModalBody", vm);
+    }
+
+    [HttpPost("{id:int}/versoes/criar")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.BlogCreate)]
+    public async Task<IActionResult> CreateVersion(int id, [FromForm] string languageCode, CancellationToken cancellationToken)
+    {
+        var result = await blogService.CriarVersaoAsync(id, languageCode, ObterUsuarioId(), cancellationToken);
+        return Json(new
+        {
+            success = result.Success,
+            message = result.Message,
+            entityId = result.EntityId,
+            redirectUrl = result.Success && result.EntityId.HasValue
+                ? Url.Action(nameof(Edit), new { id = result.EntityId.Value })
+                : null
+        });
+    }
+
+    [HttpPost("{id:int}/versoes/excluir/{versionId:int}")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.BlogDelete)]
+    public async Task<IActionResult> DeleteVersion(int id, int versionId, CancellationToken cancellationToken)
+    {
+        var result = await blogService.ExcluirVersaoAsync(id, versionId, ObterUsuarioId(), cancellationToken);
+        return Json(new
+        {
+            success = result.Success,
+            message = result.Message,
+            entityId = result.EntityId
+        });
+    }
+
     [HttpPost("excluir/{id:int}")]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = AuthorizationPolicies.BlogDelete)]
@@ -134,7 +173,7 @@ public class BlogAdminController(
 
         if (image is null)
         {
-            return BadRequest(new { success = false, message = "Selecione uma imagem valida." });
+            return BadRequest(new { success = false, message = "Selecione uma imagem válida." });
         }
 
         var result = await blogMediaService.SaveContentImageAsync(image, cancellationToken);

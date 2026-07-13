@@ -1,0 +1,25 @@
+@{
+    var statusMessage = I18n["Site em construção e em fase de testes", "Website under construction and testing", "サイトは現在制作・テスト中です"];
+}
+
+<div class="public-hanging-tag"
+     data-public-hanging-tag
+     data-welcome-label="Yōkoso ようこそ"
+     role="status"
+     aria-live="polite"
+     aria-label="@statusMessage">
+    <span class="public-hanging-tag-cord" aria-hidden="true"></span>
+    <span class="public-hanging-tag-knot" aria-hidden="true"></span>
+    <div class="public-hanging-tag-card">
+        <span class="public-hanging-tag-eyelet" aria-hidden="true"></span>
+        <span class="public-hanging-tag-stamp" aria-hidden="true">太鼓</span>
+        <span class="public-hanging-tag-rule" aria-hidden="true"></span>
+        <span class="public-hanging-tag-copy public-hanging-tag-copy-status" data-tag-message>
+            @statusMessage
+        </span>
+        <span class="public-hanging-tag-copy public-hanging-tag-copy-welcome" data-tag-welcome aria-hidden="true">
+            <span>Yōkoso</span>
+            <strong>ようこそ</strong>
+        </span>
+    </div>
+</div>

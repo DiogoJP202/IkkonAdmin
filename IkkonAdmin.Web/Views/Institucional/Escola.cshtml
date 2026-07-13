@@ -1,14 +1,15 @@
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = "Escola de Taiko em São Paulo | IKKON SPTD";
+    ViewData["Title"] = I18n["Escola de Taiko em São Paulo | IKKON SPTD", "Taiko School in Sao Paulo | IKKON SPTD", "サンパウロの和太鼓教室 | IKKON SPTD"];
     ViewData["PublicSection"] = "escola";
     ViewData["ContactMode"] = "escola";
+    ViewData["JapaneseLandingEnabled"] = true;
 
     var videosAulas = new List<PublicVideoCardViewModel>
     {
-        new("4iX-E6uIAXI", "Primeiros caminhos no taiko", "Prática, ritmo e presença corporal para desenvolver base com segurança."),
-        new("b7DFAQNTpAg", "Treino em grupo", "A evolução acontece com escuta coletiva, disciplina e repetição orientada."),
-        new("FlwgqLo6yBI", "Musicalidade e movimento", "Coordenação, intenção musical e conexão com a cultura japonesa.")
+        new("4iX-E6uIAXI", I18n["Primeiros caminhos no taiko", "First steps in taiko", "和太鼓の第一歩"], I18n["Prática, ritmo e presença corporal para desenvolver base com segurança.", "Practice, rhythm, and body presence to build a confident foundation.", "安心して基礎を育てるための練習、リズム、身体の使い方。"]),
+        new("b7DFAQNTpAg", I18n["Treino em grupo", "Group training", "グループ練習"], I18n["A evolução acontece com escuta coletiva, disciplina e repetição orientada.", "Growth happens through ensemble listening, discipline, and guided repetition.", "仲間の音を聴き、規律を持ち、繰り返し練習する中で成長します。"]),
+        new("FlwgqLo6yBI", I18n["Musicalidade e movimento", "Musicality and movement", "音楽性と動き"], I18n["Coordenação, intenção musical e conexão com a cultura japonesa.", "Coordination, musical intention, and connection with Japanese culture.", "コーディネーション、音楽的な意図、日本文化とのつながり。"])
     };
 }
 
@@ -21,14 +22,14 @@
         <div class="container-xxl px-3 px-lg-4 position-relative">
             <div class="row justify-content-center justify-content-lg-start">
                 <div class="col-12 col-lg-8 col-xl-7">
-                    <p class="institucional-kicker mb-2">Escola de Taiko</p>
-                    <h1 class="institucional-hero-title">Aprenda taiko em São Paulo</h1>
+                    <p class="institucional-kicker mb-2">@I18n["Escola de Taiko", "Taiko School", "和太鼓教室"]</p>
+                    <h1 class="institucional-hero-title">@I18n["Aprenda taiko em São Paulo", "Learn taiko in Sao Paulo", "サンパウロで和太鼓を学ぶ"]</h1>
                     <p class="institucional-hero-subtitle">
-                        Comece do zero, desenvolva ritmo, disciplina, musicalidade e presença em grupo com uma prática ligada à cultura japonesa.
+                        @I18n["Comece do zero, desenvolva ritmo, disciplina, musicalidade e presença em grupo com uma prática ligada à cultura japonesa.", "Start from zero and develop rhythm, discipline, musicality, and group presence through a practice connected to Japanese culture.", "ゼロから始めて、日本文化につながる練習を通じて、リズム、規律、音楽性、仲間と演奏する力を育てます。"]
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20aula%20experimental%20na%20Ikkon%20SPTD." target="_blank" rel="noopener">Agendar aula experimental</a>
-                        <a class="btn btn-outline-light btn-lg" href="#cursos">Ver cursos</a>
+                        <a class="btn btn-danger btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20agendar%20uma%20aula%20experimental%20na%20Ikkon%20SPTD." target="_blank" rel="noopener">@I18n["Agendar aula experimental", "Schedule a trial class", "体験レッスンを予約する"]</a>
+                        <a class="btn btn-outline-light btn-lg" href="#cursos">@I18n["Ver cursos", "View courses", "コースを見る"]</a>
                     </div>
                 </div>
             </div>
@@ -39,18 +40,18 @@
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-about-wrap">
                 <figure class="institucional-about-media mb-0">
-                    <img src="~/Images/AulaTaiko.png" asp-append-version="true" alt="Aula de taiko com tambores japoneses na IKKON SPTD" class="institucional-about-image" loading="lazy" />
+                    <img src="~/Images/AulaTaiko.png" asp-append-version="true" alt="@I18n["Aula de taiko com tambores japoneses na IKKON SPTD", "Taiko class with Japanese drums at IKKON SPTD", "IKKON SPTDでの日本の太鼓を使ったレッスン"]" class="institucional-about-image" loading="lazy" />
                 </figure>
                 <article class="institucional-about-content">
-                    <h2 class="institucional-about-title">Tradição e contemporaneidade em São Paulo</h2>
+                    <h2 class="institucional-about-title">@I18n["Tradição e contemporaneidade em São Paulo", "Tradition and contemporary practice in Sao Paulo", "サンパウロで伝統と現代性をつなぐ"]</h2>
                     <p class="institucional-about-text">
-                        A IKKON SPTD é uma escola dedicada ao ensino de percussão japonesa e música tradicional, com 10 anos de trajetória em São Paulo.
+                        @I18n["A IKKON SPTD é uma escola dedicada ao ensino de percussão japonesa e música tradicional, com 10 anos de trajetória em São Paulo.", "IKKON SPTD is a school dedicated to Japanese percussion and traditional music, with 10 years of history in Sao Paulo.", "IKKON SPTDは、サンパウロで10年の歩みを持つ、日本の打楽器と伝統音楽の教室です。"]
                     </p>
                     <p class="institucional-about-text">
-                        Aqui, você encontra um espaço acolhedor para desenvolver musicalidade, disciplina, expressão corporal e conexão com a cultura japonesa, seja você iniciante absoluto ou alguém que já tem experiência musical.
+                        @I18n["Aqui, você encontra um espaço acolhedor para desenvolver musicalidade, disciplina, expressão corporal e conexão com a cultura japonesa, seja você iniciante absoluto ou alguém que já tem experiência musical.", "Here you will find a welcoming space to develop musicality, discipline, body expression, and connection with Japanese culture, whether you are a complete beginner or already have musical experience.", "ここでは、まったく初めての方も音楽経験のある方も、音楽性、規律、身体表現、日本文化とのつながりを育てられるあたたかな場があります。"]
                     </p>
                     <p class="institucional-about-text mb-0">
-                        Acreditamos no poder transformador da música em grupo, na energia que surge quando tocamos juntos e no respeito profundo pela tradição que nos inspira.
+                        @I18n["Acreditamos no poder transformador da música em grupo, na energia que surge quando tocamos juntos e no respeito profundo pela tradição que nos inspira.", "We believe in the transformative power of group music, in the energy that appears when we play together, and in deep respect for the tradition that inspires us.", "私たちは、仲間と音を合わせる音楽の力、一緒に打つことで生まれるエネルギー、そして私たちを導く伝統への深い敬意を大切にしています。"]
                     </p>
                 </article>
             </div>
@@ -60,8 +61,8 @@
     <section id="cursos" class="institucional-section institucional-cursos reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">Cursos</p>
-                <h2 class="institucional-section-title">Formação musical com base cultural e prática de grupo</h2>
+                <p class="institucional-kicker mb-2">@I18n["Cursos", "Courses", "コース"]</p>
+                <h2 class="institucional-section-title">@I18n["Formação musical com base cultural e prática de grupo", "Musical training rooted in culture and group practice", "文化の基礎とグループ練習を大切にした音楽教育"]</h2>
             </div>
             <partial name="_PublicCourseCards" />
         </div>
@@ -72,23 +73,23 @@
             <div class="row g-4 align-items-center">
                 <div class="col-12 col-lg-5">
                     <div class="institucional-section-head">
-                        <p class="institucional-kicker mb-2">Para quem é</p>
-                        <h2 class="institucional-section-title">Um espaço para começar, evoluir e pertencer</h2>
+                        <p class="institucional-kicker mb-2">@I18n["Para quem é", "Who it is for", "対象"]</p>
+                        <h2 class="institucional-section-title">@I18n["Um espaço para começar, evoluir e pertencer", "A place to start, grow, and belong", "始め、成長し、仲間になるための場所"]</h2>
                     </div>
                     <p class="institucional-copy mb-0">
-                        A IKKON recebe iniciantes, pessoas sem experiência musical, crianças, jovens e adultos. Seja por hobby, por interesse cultural ou por desejo de palco, o caminho começa com orientação clara e progressão real.
+                        @I18n["A IKKON recebe iniciantes, pessoas sem experiência musical, crianças, jovens e adultos. Seja por hobby, por interesse cultural ou por desejo de palco, o caminho começa com orientação clara e progressão real.", "IKKON welcomes beginners, people with no musical experience, children, teens, and adults. Whether for a hobby, cultural interest, or performance goals, the path starts with clear guidance and real progression.", "IKKONは、初心者、音楽経験のない方、子ども、若者、大人を歓迎します。趣味として、日本文化への関心から、または舞台を目指して、明確な指導と確かなステップで始められます。"]
                     </p>
                 </div>
                 <div class="col-12 col-lg-7">
                     <div class="institucional-tags">
-                        <span>Iniciantes absolutos</span>
-                        <span>Sem experiência prévia</span>
-                        <span>Crianças, jovens e adultos</span>
-                        <span>Interesse em cultura japonesa</span>
-                        <span>Prática por hobby</span>
-                        <span>Participação em apresentações</span>
-                        <span>Disciplina e desenvolvimento pessoal</span>
-                        <span>Treino em comunidade</span>
+                        <span>@I18n["Iniciantes absolutos", "Complete beginners", "初心者歓迎"]</span>
+                        <span>@I18n["Sem experiência prévia", "No previous experience", "経験不問"]</span>
+                        <span>@I18n["Crianças, jovens e adultos", "Children, teens, and adults", "子ども・若者・大人"]</span>
+                        <span>@I18n["Interesse em cultura japonesa", "Interest in Japanese culture", "日本文化への関心"]</span>
+                        <span>@I18n["Prática por hobby", "Practice as a hobby", "趣味としての練習"]</span>
+                        <span>@I18n["Participação em apresentações", "Performance participation", "公演への参加"]</span>
+                        <span>@I18n["Disciplina e desenvolvimento pessoal", "Discipline and personal development", "規律と自己成長"]</span>
+                        <span>@I18n["Treino em comunidade", "Community training", "コミュニティでの練習"]</span>
                     </div>
                 </div>
             </div>
@@ -98,14 +99,14 @@
     <section class="institucional-section institucional-diferenciais reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">Diferenciais</p>
-                <h2 class="institucional-section-title">Por que aprender na IKKON SPTD</h2>
+                <p class="institucional-kicker mb-2">@I18n["Diferenciais", "Highlights", "特長"]</p>
+                <h2 class="institucional-section-title">@I18n["Por que aprender na IKKON SPTD", "Why learn at IKKON SPTD", "IKKON SPTDで学ぶ理由"]</h2>
             </div>
             <div class="row g-3 mt-1">
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Ensino do zero</h3><p>Metodologia acessível para quem está começando sem base musical.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Ambiente acolhedor</h3><p>Disciplina com escuta, respeito e integração entre os alunos.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Cultura japonesa</h3><p>Contato com repertório, prática coletiva e respeito à tradição.</p></article></div>
-                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>Vivência em grupo</h3><p>Escuta coletiva, presença, cooperação e possibilidade de palco.</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Ensino do zero", "Beginner-friendly teaching", "ゼロから学べる"]</h3><p>@I18n["Metodologia acessível para quem está começando sem base musical.", "An accessible method for students starting without a musical background.", "音楽の基礎がない方にも取り組みやすい方法。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Ambiente acolhedor", "Welcoming environment", "あたたかな環境"]</h3><p>@I18n["Disciplina com escuta, respeito e integração entre os alunos.", "Discipline with listening, respect, and integration among students.", "聴く姿勢、敬意、生徒同士のつながりを大切にした規律。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Cultura japonesa", "Japanese culture", "日本文化"]</h3><p>@I18n["Contato com repertório, prática coletiva e respeito à tradição.", "Contact with repertoire, collective practice, and respect for tradition.", "レパートリー、集団練習、伝統への敬意に触れます。"]</p></article></div>
+                <div class="col-12 col-md-6 col-xl-3"><article class="institucional-pillar"><h3>@I18n["Vivência em grupo", "Group experience", "グループでの体験"]</h3><p>@I18n["Escuta coletiva, presença, cooperação e possibilidade de palco.", "Ensemble listening, presence, cooperation, and performance opportunities.", "仲間の音を聴く力、存在感、協力、舞台への機会。"]</p></article></div>
             </div>
         </div>
     </section>
@@ -113,8 +114,8 @@
     <section class="institucional-section public-video-section reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">Vídeos de aulas</p>
-                <h2 class="institucional-section-title">Um pouco da prática na escola</h2>
+                <p class="institucional-kicker mb-2">@I18n["Vídeos de aulas", "Class videos", "レッスン動画"]</p>
+                <h2 class="institucional-section-title">@I18n["Um pouco da prática na escola", "A look at school practice", "教室での練習の様子"]</h2>
             </div>
             @await Html.PartialAsync("_PublicVideoGrid", videosAulas)
         </div>
@@ -124,7 +125,7 @@
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
                 <p class="institucional-kicker mb-2">FAQ</p>
-                <h2 class="institucional-section-title">Dúvidas frequentes de alunos</h2>
+                <h2 class="institucional-section-title">@I18n["Dúvidas frequentes de alunos", "Student frequently asked questions", "生徒からよくある質問"]</h2>
             </div>
             <partial name="_PublicFaqAlunos" />
         </div>

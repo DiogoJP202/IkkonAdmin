@@ -6,7 +6,7 @@ namespace IkkonAdmin.Web.Services;
 
 public partial class BlogContentSanitizer : IBlogContentSanitizer
 {
-    private const string EmptyContentHtml = "<p>Conteudo ainda nao informado.</p>";
+    private const string EmptyContentHtml = "<p>Conteúdo ainda não informado.</p>";
 
     public string ConvertPlainTextToSafeHtml(string? content)
     {

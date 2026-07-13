@@ -6,9 +6,9 @@
 <div class="admin-panel-v2-page blog-admin-page">
     <section class="admin-panel-v2-hero is-compact">
         <div class="admin-panel-hero-copy">
-            <span class="admin-panel-eyebrow">@(isEdit ? "Edicao de categoria" : "Nova categoria")</span>
+            <span class="admin-panel-eyebrow">@(isEdit ? "Edição de categoria" : "Nova categoria")</span>
             <h1 class="admin-panel-title">@(isEdit ? "Editar categoria do Blog" : "Criar categoria do Blog")</h1>
-            <p class="admin-panel-subtitle">Categorias organizam filtros, cards e navegacao do Blog publico nas proximas fases.</p>
+            <p class="admin-panel-subtitle">Categorias organizam filtros, cards e navegação do Blog público nas próximas fases.</p>
         </div>
         <div class="admin-panel-hero-actions">
             <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Voltar para categorias</a>
@@ -26,7 +26,7 @@
                 <div class="admin-panel-card-header">
                     <div>
                         <h2>Dados da categoria</h2>
-                        <p>Nome, slug e descricao usados no fluxo editorial.</p>
+                        <p>Nome, slug e descrição usados no fluxo editorial.</p>
                     </div>
                 </div>
 
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="admin-panel-field admin-panel-field-full">
-                        <label asp-for="Description">Descricao</label>
+                        <label asp-for="Description">Descrição</label>
                         <textarea asp-for="Description" class="form-control admin-panel-control" rows="4" maxlength="400"></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
@@ -66,13 +66,13 @@
             <section class="admin-panel-card-v2">
                 <div class="admin-panel-card-header">
                     <div>
-                        <h2>Boas praticas</h2>
-                        <p>Padronizacoes uteis para o Blog.</p>
+                        <h2>Boas práticas</h2>
+                        <p>Padronizações úteis para o Blog.</p>
                     </div>
                 </div>
                 <div class="admin-stat-list">
                     <div class="admin-stat-row"><span>Nomes</span><strong>Claros e curtos</strong></div>
-                    <div class="admin-stat-row"><span>Slug</span><strong>URL amigavel</strong></div>
+                    <div class="admin-stat-row"><span>Slug</span><strong>URL amigável</strong></div>
                     <div class="admin-stat-row"><span>Status</span><strong>Prefira desativar</strong></div>
                 </div>
             </section>

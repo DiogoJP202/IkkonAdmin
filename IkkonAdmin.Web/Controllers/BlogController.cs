@@ -7,18 +7,22 @@ namespace IkkonAdmin.Web.Controllers;
 
 [AllowAnonymous]
 [Route("blog")]
-public class BlogController(IBlogService blogService) : Controller
+public class BlogController(IBlogService blogService, IViewTextService i18n) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index(
         [FromQuery] BlogPublicFilterViewModel filtro,
         CancellationToken cancellationToken)
     {
-        ViewData["Title"] = "Blog | IKKON SPTD";
-        ViewData["Description"] = "Conteudos, novidades e bastidores do IKKON SPTD, escola de taiko em Sao Paulo.";
+        ViewData["Title"] = i18n["Blog | IKKON SPTD", "Blog | IKKON SPTD", "ブログ | IKKON SPTD"];
+        ViewData["Description"] = i18n[
+            "Conteúdos, novidades e bastidores do IKKON SPTD, escola de taiko em São Paulo.",
+            "Content, news, and behind the scenes from IKKON SPTD, a taiko school in Sao Paulo.",
+            "サンパウロの和太鼓教室IKKON SPTDの読みもの、ニュース、舞台裏をお届けします。"];
         ViewData["CanonicalUrl"] = Url.Action(nameof(Index), "Blog", values: null, protocol: Request.Scheme);
         ViewData["OgType"] = "website";
         ViewData["PublicSection"] = "blog";
+        ViewData["JapanesePublicEnabled"] = true;
 
         var viewModel = await blogService.ListarPublicoAsync(filtro, cancellationToken);
         return View(viewModel);
@@ -38,7 +42,10 @@ public class BlogController(IBlogService blogService) : Controller
             : $"{viewModel.Title} | Blog IKKON SPTD";
         var description = !string.IsNullOrWhiteSpace(viewModel.SeoDescription)
             ? viewModel.SeoDescription
-            : viewModel.Summary ?? "Conteudo do Blog IKKON SPTD sobre taiko, cultura japonesa e comunidade.";
+            : viewModel.Summary ?? i18n[
+                "Conteúdo do Blog IKKON SPTD sobre taiko, cultura japonesa e comunidade.",
+                "IKKON SPTD blog content about taiko, Japanese culture, and community.",
+                "太鼓、日本文化、コミュニティに関するIKKON SPTDブログの記事です。"];
 
         ViewData["Title"] = title;
         ViewData["Description"] = description;
@@ -50,6 +57,7 @@ public class BlogController(IBlogService blogService) : Controller
                               ?? ToAbsolutePublicUrl(Url.Content("~/Images/Ikkon_Icon.png"));
         ViewData["PublicSection"] = "blog";
         ViewData["ContactMode"] = "geral";
+        ViewData["JapanesePublicEnabled"] = true;
 
         return View(viewModel);
     }

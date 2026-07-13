@@ -23,6 +23,9 @@
     const categoryIsActive = document.getElementById("blogCategoryIsActive");
     const categorySaveButton = document.getElementById("blogCategorySaveButton");
     const categoryClearButton = document.getElementById("blogCategoryClearButton");
+    const versionsModal = document.getElementById("blogVersionsModal");
+    const versionsModalBody = document.getElementById("blogVersionsModalBody");
+    const versionsModalAlert = document.getElementById("blogVersionsModalAlert");
     const tagsInput = document.getElementById("TagsInput");
     const tagPicker = document.getElementById("blogTagPicker");
     const tagList = document.getElementById("blogTagList");
@@ -90,10 +93,23 @@
         }
 
         if (!response.ok || !payload || payload.success === false) {
-            throw new Error(payload && payload.message ? payload.message : "Nao foi possivel concluir a operacao.");
+            throw new Error(payload && payload.message ? payload.message : "Não foi possível concluir a operação.");
         }
 
         return payload;
+    };
+
+    const requestHtml = async function (url) {
+        const response = await fetch(url, {
+            method: "GET",
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error("Não foi possível carregar as versões do post.");
+        }
+
+        return await response.text();
     };
 
     const showCategoryAlert = function (message, type) {
@@ -178,7 +194,7 @@
             meta.textContent = (category.slug ? "/" + category.slug : "sem slug") + " - " + (category.totalPosts || 0) + " post(s)";
 
             const description = document.createElement("span");
-            description.textContent = category.description || "Sem descricao.";
+            description.textContent = category.description || "Sem descrição.";
 
             const badge = document.createElement("em");
             badge.className = "admin-panel-badge " + (category.isActive ? "is-success" : "is-muted");
@@ -262,7 +278,7 @@
             showCategoryAlert(payload.message, "success");
             clearCategoryForm();
         } catch (error) {
-            showCategoryAlert(error && error.message ? error.message : "Nao foi possivel salvar a categoria.", "error");
+            showCategoryAlert(error && error.message ? error.message : "Não foi possível salvar a categoria.", "error");
         } finally {
             categorySaveButton.disabled = false;
         }
@@ -283,7 +299,7 @@
             applyCategoryPayload(payload, categorySelect ? categorySelect.value : null);
             showCategoryAlert(payload.message, "success");
         } catch (error) {
-            showCategoryAlert(error && error.message ? error.message : "Nao foi possivel atualizar a categoria.", "error");
+            showCategoryAlert(error && error.message ? error.message : "Não foi possível atualizar a categoria.", "error");
         }
     };
 
@@ -303,7 +319,75 @@
             showCategoryAlert(payload.message, "success");
             if (categoryEditId && String(categoryEditId.value) === String(id)) clearCategoryForm();
         } catch (error) {
-            showCategoryAlert(error && error.message ? error.message : "Nao foi possivel excluir a categoria.", "error");
+            showCategoryAlert(error && error.message ? error.message : "Não foi possível excluir a categoria.", "error");
+        }
+    };
+
+    const showVersionsAlert = function (message, type) {
+        if (!versionsModalAlert) return;
+
+        versionsModalAlert.className = "alert " + (type === "success" ? "alert-success" : "alert-danger");
+        versionsModalAlert.textContent = message || "";
+        versionsModalAlert.classList.toggle("d-none", !message);
+    };
+
+    const loadVersions = async function () {
+        if (!versionsModal || !versionsModalBody) return;
+
+        const url = versionsModal.getAttribute("data-versions-url");
+        if (!url) return;
+
+        versionsModalBody.innerHTML = '<div class="blog-admin-category-empty">Carregando versões...</div>';
+        const html = await requestHtml(url);
+        versionsModalBody.innerHTML = html;
+    };
+
+    const createVersion = async function (button) {
+        if (!versionsModal || !button) return;
+
+        const url = versionsModal.getAttribute("data-create-url");
+        const languageCode = button.getAttribute("data-language-code");
+        if (!url || !languageCode) return;
+
+        const body = createFormData();
+        body.append("languageCode", languageCode);
+
+        button.disabled = true;
+        try {
+            const payload = await requestJson(url, { method: "POST", body });
+            showVersionsAlert(payload.message, "success");
+            if (payload.redirectUrl) {
+                window.location.href = payload.redirectUrl;
+                return;
+            }
+
+            await loadVersions();
+        } catch (error) {
+            showVersionsAlert(error && error.message ? error.message : "Não foi possível criar a versão.", "error");
+        } finally {
+            button.disabled = false;
+        }
+    };
+
+    const deleteVersion = async function (button) {
+        if (!versionsModal || !button) return;
+
+        const versionId = button.getAttribute("data-version-id");
+        const languageLabel = button.getAttribute("data-language-label") || "esta versão";
+        if (!versionId || !window.confirm("Excluir a versão " + languageLabel + "?")) return;
+
+        const url = buildUrlFromTemplate(versionsModal.getAttribute("data-delete-url-template"), versionId);
+        const body = createFormData();
+
+        button.disabled = true;
+        try {
+            const payload = await requestJson(url, { method: "POST", body });
+            showVersionsAlert(payload.message, "success");
+            await loadVersions();
+        } catch (error) {
+            showVersionsAlert(error && error.message ? error.message : "Não foi possível excluir a versão.", "error");
+        } finally {
+            button.disabled = false;
         }
     };
 
@@ -415,7 +499,7 @@
         }
 
         if (!response.ok || !payload || !payload.success || !payload.url) {
-            throw new Error(payload && payload.message ? payload.message : "Nao foi possivel enviar a imagem.");
+            throw new Error(payload && payload.message ? payload.message : "Não foi possível enviar a imagem.");
         }
 
         return payload.url;
@@ -486,7 +570,7 @@
                     editor.setSelection(range.index + 1, 0, "silent");
                     syncEditorFields();
                 } catch (error) {
-                    window.alert(error && error.message ? error.message : "Nao foi possivel enviar a imagem.");
+                    window.alert(error && error.message ? error.message : "Não foi possível enviar a imagem.");
                 }
             });
 
@@ -511,7 +595,7 @@
         categoryModal.addEventListener("shown.bs.modal", function () {
             showCategoryAlert("", "success");
             loadCategories(categorySelect ? categorySelect.value : null).catch(function (error) {
-                showCategoryAlert(error && error.message ? error.message : "Nao foi possivel carregar categorias.", "error");
+                showCategoryAlert(error && error.message ? error.message : "Não foi possível carregar categorias.", "error");
             });
         });
     }
@@ -521,6 +605,31 @@
         showCategoryAlert("", "success");
         clearCategoryForm();
     });
+
+    if (versionsModal) {
+        versionsModal.addEventListener("shown.bs.modal", function () {
+            showVersionsAlert("", "success");
+            loadVersions().catch(function (error) {
+                showVersionsAlert(error && error.message ? error.message : "Não foi possível carregar as versões.", "error");
+            });
+        });
+
+        versionsModal.addEventListener("click", function (event) {
+            const target = event.target instanceof Element ? event.target : null;
+            if (!target) return;
+
+            const createButton = target.closest("[data-blog-version-create]");
+            if (createButton) {
+                createVersion(createButton);
+                return;
+            }
+
+            const deleteButton = target.closest("[data-blog-version-delete]");
+            if (deleteButton) {
+                deleteVersion(deleteButton);
+            }
+        });
+    }
 
     initializeTags();
 

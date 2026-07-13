@@ -5,6 +5,7 @@
     Layout = "_PublicLayout";
     ViewData["PublicSection"] = "blog";
     ViewData["ContactMode"] = "geral";
+    ViewData["JapanesePublicEnabled"] = true;
 
     var canonicalUrl = ViewData["CanonicalUrl"]?.ToString() ?? $"/blog/{Model.Slug}";
     var encodedShareUrl = Uri.EscapeDataString(canonicalUrl);
@@ -12,19 +13,17 @@
 }
 
 @functions {
-    private static readonly CultureInfo PtBr = new("pt-BR");
-
     private static string FormatDate(DateTime utcDate)
     {
         try
         {
             var timeZone = GetSaoPauloTimeZone();
             var localDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcDate, DateTimeKind.Utc), timeZone);
-            return localDate.ToString("dd MMM yyyy", PtBr);
+            return localDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
         }
         catch
         {
-            return utcDate.ToString("dd MMM yyyy", PtBr);
+            return utcDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
         }
     }
 
@@ -58,7 +57,7 @@
                         {
                             <span>@Model.AuthorName</span>
                         }
-                        <span>@Math.Max(1, Model.ReadingTimeMinutes) min de leitura</span>
+                        <span>@Math.Max(1, Model.ReadingTimeMinutes) @I18n["min de leitura", "min read", "分で読めます"]</span>
                     </div>
 
                     @if (!string.IsNullOrWhiteSpace(Model.CategoryName))
@@ -90,7 +89,7 @@
         {
             <section class="public-blog-detail-cover-section">
                 <div class="container-xxl px-3 px-lg-4">
-                    <img class="public-blog-detail-cover" src="@Model.CoverImageUrl" alt="Imagem de capa de @Model.Title" />
+                    <img class="public-blog-detail-cover" src="@Model.CoverImageUrl" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @Model.Title" />
                 </div>
             </section>
         }
@@ -98,27 +97,27 @@
         <section class="public-blog-detail-body">
             <div class="container-xxl px-3 px-lg-4">
                 <div class="public-blog-detail-layout">
-                    <aside class="public-blog-detail-aside" aria-label="Informacoes do post">
+                    <aside class="public-blog-detail-aside" aria-label="@I18n["Informações do post", "Post information", "記事情報"]">
                         <div>
-                            <span>Publicado em</span>
+                            <span>@I18n["Publicado em", "Published on", "公開日"]</span>
                             <strong>@FormatDate(Model.PublishedAtUtc)</strong>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(Model.CategoryName))
                         {
                             <div>
-                                <span>Categoria</span>
+                                <span>@I18n["Categoria", "Category", "カテゴリ"]</span>
                                 <a href="@Url.Action("Index", "Blog", new { categoria = Model.CategorySlug })">@Model.CategoryName</a>
                             </div>
                         }
                         @if (!string.IsNullOrWhiteSpace(Model.AuthorName))
                         {
                             <div>
-                                <span>Autor</span>
+                                <span>@I18n["Autor", "Author", "著者"]</span>
                                 <strong>@Model.AuthorName</strong>
                             </div>
                         }
                         <div>
-                            <span>Compartilhar</span>
+                            <span>@I18n["Compartilhar", "Share", "共有"]</span>
                             <div class="public-blog-share-links">
                                 <a href="https://wa.me/?text=@encodedShareText" target="_blank" rel="noopener noreferrer">WhatsApp</a>
                                 <a href="https://www.linkedin.com/sharing/share-offsite/?url=@encodedShareUrl" target="_blank" rel="noopener noreferrer">LinkedIn</a>
@@ -140,18 +139,18 @@
             <div class="container-xxl px-3 px-lg-4">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
                     <div>
-                        <p class="institucional-kicker mb-2">Continuar lendo</p>
-                        <h2 class="institucional-section-title">Posts relacionados</h2>
+                        <p class="institucional-kicker mb-2">@I18n["Continuar lendo", "Keep reading", "続きを読む"]</p>
+                        <h2 class="institucional-section-title">@I18n["Posts relacionados", "Related posts", "関連記事"]</h2>
                     </div>
-                    <a class="public-blog-clear" href="/blog">Ver todos os posts</a>
+                    <a class="public-blog-clear" href="/blog">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
                 </div>
 
                 <div class="public-blog-grid">
                     @foreach (var post in Model.RelatedPosts)
                     {
                         <article class="public-blog-card">
-                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="Ler @post.Title">
-                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="Imagem de capa de @post.Title" loading="lazy" />
+                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
+                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title" loading="lazy" />
                             </a>
                             <div class="public-blog-card-body">
                                 <div class="public-blog-meta">
@@ -171,7 +170,7 @@
                                     {
                                         <a class="public-blog-taxonomy" href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
                                     }
-                                    <span>@Math.Max(1, post.ReadingTimeMinutes) min</span>
+                                    <span>@Math.Max(1, post.ReadingTimeMinutes) @I18n["min de leitura", "min read", "分で読めます"]</span>
                                 </div>
                             </div>
                         </article>
