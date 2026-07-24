@@ -107,10 +107,12 @@ IkkonAdmin
 │   ├── Models
 │   │   ├── Entities
 │   │   └── ViewModels
+│   ├── Infrastructure
 │   ├── Security
 │   ├── Services
 │   ├── Views
 │   └── wwwroot
+├── IkkonAdmin.Tests
 ├── docs
 ├── DEPLOYMENT.md
 ├── GOOGLE_AGENDA_SETUP.md
@@ -130,9 +132,12 @@ Stack principal:
 Princípios usados:
 
 - regras de negócio concentradas em services;
+- services de consulta separados dos comandos nos módulos maiores;
+- retornos de comandos padronizados com `OperationResult`;
+- infraestrutura transversal para tempo, usuário atual, storage e auditoria;
 - ViewModels por tela;
 - Entity Framework Core com configurations por entidade;
-- policies e claims para autorização granular;
+- policies e claims para autorização granular, com registro centralizado;
 - separação clara entre site público, painel administrativo e portal do aluno;
 - migrations versionadas.
 
@@ -232,6 +237,7 @@ Resumo:
 Documentação técnica e funcional separada:
 
 - [Arquitetura e convenções](./docs/ARQUITETURA.md)
+- [Padrões de serviços e operações](./docs/PADROES_DE_SERVICOS_E_OPERACOES.md)
 - [Área do Aluno](./docs/AREA_DO_ALUNO.md)
 - [Blog e idiomas](./docs/BLOG_E_IDIOMAS.md)
 - [Módulos administrativos e permissões](./docs/MODULOS_ADMINISTRATIVOS.md)

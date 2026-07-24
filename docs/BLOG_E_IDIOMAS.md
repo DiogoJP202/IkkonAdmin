@@ -61,6 +61,26 @@ Categorias editoriais do blog.
 
 Tags associadas aos posts.
 
+## Arquitetura interna
+
+O blog foi dividido em services menores para separar consulta, workflow editorial, idioma e mídia:
+
+- `BlogService`: fachada principal usada pelo controller administrativo.
+- `BlogAdminQueryService`: listagem, formulários, detalhes e modal de versões no admin.
+- `BlogPublicService`: listagem e detalhes públicos, com seleção da melhor versão por idioma.
+- `BlogLanguageService`: definição de idiomas suportados e cultura atual.
+- `BlogWorkflowService`: regras de rascunho, agendamento, publicação, arquivamento e exclusão.
+- `BlogWorkflowValidation`: validações obrigatórias para publicar/agendar.
+- `BlogVersionService`: criação e exclusão de versões por idioma.
+- `BlogSlugService`: normalização e unicidade de slug.
+- `BlogTagService`: criação, normalização e vínculo de tags.
+- `BlogLookupService`: categorias, autores e dados auxiliares.
+- `BlogTextService`: resumo, texto limpo e tempo de leitura.
+- `BlogDateTimeService`: datas de publicação/agendamento.
+- `BlogMediaService`: upload de capa e imagens do conteúdo.
+
+O retorno operacional do blog ainda usa `BlogOperationResult`. A migração para `OperationResult` deve preservar o comportamento editorial existente e pode ser feita em uma etapa própria.
+
 ## Idiomas de post
 
 Idiomas suportados para versões do blog:
@@ -277,4 +297,6 @@ Isso habilita interface japonesa e seletor `日本語` no blog, sem acionar a ta
 - Manter slugs únicos entre todos os idiomas.
 - Lembrar que categorias e tags ainda são globais, não traduzidas por idioma.
 - Ao mexer em textos fixos do blog público, usar overload trilíngue do `IViewTextService`.
+- Ao adicionar texto fixo novo no blog público, validar português, inglês e japonês.
+- A tag decorativa japonesa pertence apenas à landing; o blog em japonês não deve carregá-la.
 - Imagens de blog são públicas; não usar esse módulo para arquivos sensíveis.

@@ -1,6 +1,6 @@
 # Contexto rápido para novo chat Codex
 
-O IkkonAdmin é um sistema ASP.NET Core MVC para a IKKON SPTD / Escola de Taiko. Ele tem site público institucional, painel administrativo interno e base inicial para Área do Aluno.
+O IkkonAdmin é um sistema ASP.NET Core MVC para a IKKON SPTD / Escola de Taiko. Ele tem site público institucional, painel administrativo interno, Área do Aluno e blog público multilíngue.
 
 Stack principal:
 
@@ -20,13 +20,18 @@ Estrutura:
 - `IkkonAdmin.Web/Data/ApplicationDbContext.cs`.
 - `IkkonAdmin.Web/Data/Configurations`.
 - `IkkonAdmin.Web/Data/Migrations`.
+- `IkkonAdmin.Web/Infrastructure`.
 - `IkkonAdmin.Web/Security`.
 - `IkkonAdmin.Web/Views`.
+- `IkkonAdmin.Tests`.
 
 Padrões:
 
 - Controllers finos chamam Services.
 - Services usam `ApplicationDbContext` direto; não há repositories.
+- Módulos maiores separam `*QueryService` para leitura e `*Service` para comandos.
+- Comandos devem retornar `OperationResult` ou `OperationResult<T>` quando forem fluxos esperados de domínio.
+- Infraestrutura transversal: `IClock`, `ICurrentUserService`, `IFileStorageService`, `IAuditLogger`.
 - Views usam ViewModels.
 - Layout admin: `_Layout.cshtml`.
 - Layout público: `_PublicLayout.cshtml`.
@@ -37,22 +42,22 @@ Permissões:
 
 - Roles: `ROLE_ADMIN`, `ROLE_FUNCIONARIO`, `ROLE_ALUNO`.
 - Permissões em `AppPermissions.cs`.
-- Policies em `AuthorizationPolicies.cs` e `Program.cs`.
+- Policies em `AuthorizationPolicies.cs` e `AuthorizationPolicyRegistration.cs`; `Program.cs` chama `AddIkkonPolicies()`.
 - Banco: `UsuariosSistema`, `RolesSistema`, `PermissoesSistema`, `UsuariosRoles`, `RolesPermissoes`, `UsuariosPermissoes`.
 - Admin passa em tudo; funcionário depende de claims; aluno usa policy própria.
 
 Uploads:
 
-- Upload real identificado: foto de perfil em `UserSettingsService`.
-- Salva em `wwwroot/uploads/perfis`.
-- Extensões: JPG/JPEG/PNG/WEBP.
-- Máximo: 2 MB.
-- Salva URL relativa, ex: `/uploads/perfis/{arquivo}`.
+- Uploads passam por `IFileStorageService` / `LocalFileStorageService`.
+- Foto de perfil em `UserSettingsService`: `wwwroot/uploads/perfis`, até 2 MB.
+- Blog em `BlogMediaService`: `wwwroot/uploads/blog/capas` e `wwwroot/uploads/blog/conteudo`.
+- Documentos do aluno: `App_Data/uploads/documentos`, fora de `wwwroot`, até 10 MB.
+- Extensões comuns: JPG/JPEG/PNG/WEBP; documentos também aceitam PDF.
 - Não há media library genérica.
 
 Rotas:
 
-- Público: `/`, `/escola`, `/eventos`.
+- Público: `/`, `/escola`, `/eventos`, `/blog`, `/blog/{slug}`.
 - Login admin: `/auth/login`.
 - Admin: `/admin`.
 - Painel admin: `/admin/painel`.
@@ -61,6 +66,7 @@ Rotas:
 - Configurações: `/configuracoes`.
 - Login aluno: `/aluno/login`.
 - Portal aluno: `/area-do-aluno`.
+- Portal aluno também possui `/area-do-aluno/aulas`, `/frequencia`, `/documentos`, `/comunicados`, `/eventos` e `/conquistas`.
 
 Cuidados:
 
@@ -71,4 +77,5 @@ Cuidados:
 - Não commitar credenciais reais.
 - Evitar queries paralelas no mesmo `DbContext`.
 - Implementar features novas em fases pequenas e seguindo padrões existentes.
+- Consultar `docs/PADROES_DE_SERVICOS_E_OPERACOES.md` antes de criar serviços novos.
 

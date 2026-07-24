@@ -14,6 +14,7 @@ IkkonAdmin.Web
 ├── Models
 │   ├── Entities      # Modelo persistido no banco
 │   └── ViewModels    # Modelos específicos para telas/formulários
+├── Infrastructure    # Operações, tempo, storage, usuário atual e auditoria
 ├── Security          # Roles, permissões, claims e policies
 ├── Services          # Regras de negócio e consultas
 ├── Views             # Razor Views
@@ -39,17 +40,30 @@ Exemplos:
 
 Services concentram regras de negócio e consultas. A preferência do projeto é usar services específicos por módulo, em vez de repositories genéricos.
 
+Nos módulos maiores, o projeto separa leitura e escrita:
+
+- `*QueryService`: monta listas, detalhes, filtros e dashboards, preferencialmente com `AsNoTracking()`.
+- `*Service`: executa comandos, valida regras de negócio, altera o banco e retorna `OperationResult` ou `OperationResult<T>`.
+
 Exemplos:
 
-- `AreaAlunoService`
-- `AreaAlunoAdminService`
+- `AlunoQueryService` e `AlunoService`
+- `TurmaQueryService` e `TurmaService`
+- `FinanceiroQueryService` e `FinanceiroService`
+- `InventarioQueryService` e `InventarioService`
+- `AreaAlunoService` e services especializados do portal
+- `AreaAlunoAdminService` e services administrativos especializados
 - `BlogService`
-- `BlogCategoriaService`
-- `BlogMediaService`
+- `BlogAdminQueryService`
+- `BlogPublicService`
+- `BlogWorkflowService`
+- `BlogVersionService`
+- `BlogCategoriaService` e `BlogMediaService`
 - `DashboardService`
-- `FinanceiroService`
 - `GoogleAgendaService`
 - `UserSettingsService`
+
+Detalhes do padrão: [Padrões de serviços e operações](./PADROES_DE_SERVICOS_E_OPERACOES.md).
 
 ### ViewModels
 
@@ -134,12 +148,43 @@ Roles principais:
 
 Permissões são claims do tipo definido em `AppClaimTypes.Permissao`.
 
+O registro das policies fica centralizado em:
+
+```text
+AuthorizationPolicyRegistration.AddIkkonPolicies()
+```
+
+Tipos de apoio:
+
+- `PermissionPolicyDefinition`;
+- `PermissionPolicyScope`;
+- `AppPermissionEvaluator`;
+- `IBlogPostActionAuthorizer`.
+
 Regras gerais:
 
 - `Admin` passa por todas as policies administrativas.
 - Funcionário precisa da permissão específica do módulo.
 - `Aluno` acessa somente o portal do aluno.
 - O portal do aluno nunca deve confiar em `AlunoId` vindo por rota para dados sensíveis.
+
+## Infraestrutura transversal
+
+Pasta:
+
+```text
+IkkonAdmin.Web/Infrastructure
+```
+
+Componentes principais:
+
+- `IClock`: fonte de tempo injetável para regras e testes.
+- `ICurrentUserService`: usuário autenticado atual sem espalhar leitura de claims pelos controllers/services.
+- `IFileStorageService`: gravação de arquivos em storage local controlado.
+- `IAuditLogger`: registro de ações sensíveis em `AuditoriaLog`.
+- `OperationResult`: contrato padronizado de sucesso, validação e item não encontrado.
+
+Essas abstrações devem ser preferidas em novas features para reduzir acoplamento com HTTP, filesystem e relógio do sistema.
 
 ## Internacionalização
 
@@ -176,8 +221,10 @@ Principais grupos de entidades:
 ## Convenções de manutenção
 
 - Adicionar novas regras em services, não diretamente nas views.
+- Separar `QueryService` de comandos quando a tela tiver consultas complexas ou o service começar a acumular responsabilidades.
+- Retornar `OperationResult` em operações esperadas de criação, edição, exclusão, aprovação, envio e confirmação.
 - Criar ViewModel dedicado para telas com combinação de dados.
-- Adicionar permissão em `AppPermissions`, policy em `AuthorizationPolicies`/`Program.cs` e seed quando houver novo módulo protegido.
+- Adicionar permissão em `AppPermissions`, policy em `AuthorizationPolicies`/`AuthorizationPolicyRegistration` e seed quando houver novo módulo protegido.
 - Preferir migrations pequenas e nomeadas pelo comportamento.
 - Evitar expor arquivos privados em `wwwroot`.
 - Usar `TempData["Success"]` e `TempData["Error"]` para feedback simples de formulários.

@@ -2,7 +2,11 @@
 
 ## Estado atual
 
-O upload identificado no projeto atual é o upload de foto de perfil do usuário em `UserSettingsService`.
+Uploads reais no projeto:
+
+- foto de perfil do usuário;
+- imagens públicas do blog;
+- documentos privados do aluno.
 
 Arquivos estáticos institucionais ficam em:
 
@@ -12,28 +16,46 @@ Uploads de perfil são salvos em:
 
 - `IkkonAdmin.Web/wwwroot/uploads/perfis`.
 
+Imagens do blog são salvas em:
+
+- `IkkonAdmin.Web/wwwroot/uploads/blog/capas`;
+- `IkkonAdmin.Web/wwwroot/uploads/blog/conteudo`.
+
+Documentos do aluno são salvos fora do `wwwroot`:
+
+- `IkkonAdmin.Web/App_Data/uploads/documentos`.
+
 O caminho público salvo no banco segue o formato:
 
 - `/uploads/perfis/{fileName}`.
 
 ## Implementação atual de upload
 
-Arquivo:
+Abstração de infraestrutura:
 
-- `IkkonAdmin.Web/Services/UserSettingsService.cs`.
+- `IFileStorageService`;
+- `LocalFileStorageService`.
 
-Entrada:
+Services responsáveis:
 
-- `IFormFile FotoPerfil` em `UpdateAccountInfoRequest`.
+- `UserSettingsService`;
+- `BlogMediaService`;
+- `AreaAlunoDocumentosService`;
+- `AreaAlunoDocumentoAdminService`.
+
+Entradas comuns:
+
+- `IFormFile FotoPerfil` em configurações de conta;
+- `IFormFile` de capa e imagem de conteúdo no blog;
+- `IFormFile` de documento solicitado no portal do aluno.
 
 Validações:
 
-- Extensões permitidas: `.jpg`, `.jpeg`, `.png`, `.webp`.
-- Tamanho máximo: 2 MB.
-- Nome gerado com `{user.Id}-{Guid:N}{extension}`.
-- Usa `IWebHostEnvironment.WebRootPath`.
-- Cria diretório com `Directory.CreateDirectory`.
-- Apaga foto anterior quando o caminho começa com `/uploads/perfis/`.
+- extensões permitidas por módulo;
+- tamanho máximo por módulo;
+- nome gerado pelo sistema;
+- pasta controlada por `IFileStorageService`;
+- exclusão do arquivo anterior somente quando o caminho pertence ao prefixo esperado.
 
 ## Mídia pública atual
 
@@ -65,7 +87,6 @@ Credenciais reais não devem ser commitadas.
 
 ## Limitações atuais
 
-- Não existe serviço genérico de mídia.
 - Não existe biblioteca de imagens ou media manager.
 - Não foi identificado processamento de imagem, thumbnail ou compressão.
 - Não foi identificado antivírus ou verificação MIME profunda.
@@ -77,7 +98,8 @@ Credenciais reais não devem ser commitadas.
 - Validar extensão e tamanho no backend.
 - Não confiar apenas em `accept` do input.
 - Gerar nome seguro; nunca usar nome original diretamente.
-- Salvar apenas dentro de `wwwroot/uploads/...`.
+- Salvar arquivos públicos em `wwwroot/uploads/...`.
+- Salvar arquivos privados fora de `wwwroot`, como `App_Data/uploads/documentos`.
 - Salvar no banco apenas URL pública relativa, não caminho físico.
 - Não permitir sobrescrita de arquivos existentes.
 - Evitar renderizar uploads como HTML executável.
@@ -88,13 +110,13 @@ Credenciais reais não devem ser commitadas.
 
 Para um novo módulo com upload:
 
-1. Criar pasta específica em `wwwroot/uploads/{modulo}`.
+1. Definir se o arquivo é público ou privado.
 2. Usar `IFormFile`.
 3. Validar extensão permitida.
 4. Definir limite de tamanho explícito.
 5. Gerar nome com `Guid`.
-6. Salvar com `FileStream`.
-7. Persistir URL pública relativa.
+6. Salvar com `IFileStorageService`.
+7. Persistir URL pública relativa apenas quando o arquivo for público.
 8. Apagar arquivo anterior somente se ele pertencer ao diretório esperado.
 9. Não implementar upload de vídeo local sem uma estratégia dedicada.
 

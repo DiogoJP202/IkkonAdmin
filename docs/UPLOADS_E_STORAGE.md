@@ -4,10 +4,20 @@ Este documento descreve onde o sistema salva arquivos enviados e quais cuidados 
 
 ## Tipos de arquivo
 
-Atualmente existem dois grupos principais:
+Atualmente existem três grupos principais:
 
 1. imagens públicas do blog;
-2. documentos privados enviados por alunos.
+2. fotos públicas de perfil;
+3. documentos privados enviados por alunos.
+
+O padrão de infraestrutura para novos uploads é:
+
+```text
+IFileStorageService
+LocalFileStorageService
+```
+
+Services novos devem depender da interface, não de paths montados manualmente.
 
 ## Blog
 
@@ -68,13 +78,48 @@ Limite:
 
 Arquivos do blog ficam em `wwwroot`, portanto são públicos. Não usar o upload do blog para documentos privados, comprovantes ou qualquer dado sensível.
 
+## Fotos de perfil
+
+Serviço responsável:
+
+```text
+UserSettingsService
+```
+
+Pasta:
+
+```text
+IkkonAdmin.Web/wwwroot/uploads/perfis
+```
+
+URL pública:
+
+```text
+/uploads/perfis/<arquivo>
+```
+
+Limite:
+
+```text
+2 MB
+```
+
+Formatos aceitos:
+
+- `.jpg`
+- `.jpeg`
+- `.png`
+- `.webp`
+
+Fotos de perfil são públicas porque aparecem na interface autenticada e podem ser servidas diretamente pelo app.
+
 ## Documentos do aluno
 
 Serviços responsáveis:
 
 ```text
-AreaAlunoService
-AreaAlunoAdminService
+AreaAlunoDocumentosService
+AreaAlunoDocumentoAdminService
 ```
 
 Pasta:
@@ -119,6 +164,7 @@ Se novas pastas de upload forem adicionadas, confirme que estão cobertas por `.
 Em desenvolvimento, storage local é suficiente:
 
 - imagens do blog em `wwwroot/uploads`;
+- fotos de perfil em `wwwroot/uploads/perfis`;
 - documentos em `App_Data/uploads/documentos`.
 
 Ao limpar `bin/obj`, não apagar uploads reais do ambiente local sem querer.

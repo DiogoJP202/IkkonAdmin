@@ -49,6 +49,35 @@ POLICY_ALUNO -> ROLE_ALUNO
 | `/admin/area-aluno/eventos` | Eventos internos do portal |
 | `/admin/area-aluno/conquistas` | Insígnias e atribuições |
 
+## Arquitetura do módulo
+
+O portal do aluno usa um serviço de fachada para manter compatibilidade com os controllers e services menores para cada responsabilidade.
+
+Contexto seguro:
+
+- `AreaAlunoContextService`: resolve o aluno pelo usuário autenticado e pelo vínculo `UsuarioSistema.AlunoId`.
+
+Services do aluno:
+
+- `AreaAlunoPerfilService`;
+- `AreaAlunoFinanceiroService`;
+- `AreaAlunoTurmasService`;
+- `AreaAlunoFrequenciaService`;
+- `AreaAlunoEventosService`;
+- `AreaAlunoDocumentosService`;
+- `AreaAlunoComunicadosService`;
+- `AreaAlunoConquistasService`.
+
+Services administrativos:
+
+- `AreaAlunoAulasAdminService`;
+- `AreaAlunoDocumentoAdminService`;
+- `AreaAlunoComunicadoAdminService`;
+- `AreaAlunoEventoAdminService`;
+- `AreaAlunoConquistaAdminService`.
+
+Operações administrativas e envio de documentos usam `OperationResult`. Consultas retornam ViewModels específicos para evitar exposição de entidades completas.
+
 ## Telas do aluno
 
 ### Dashboard
@@ -293,12 +322,14 @@ Submódulos:
 ## Regras de segurança
 
 - O aluno acessa apenas dados resolvidos pelo usuário autenticado.
+- `AlunoId` recebido por rota ou formulário não deve ser usado em consultas sensíveis do portal do aluno.
 - Download de documento do aluno deve validar solicitação e vínculo.
 - Download administrativo deve validar permissão.
 - Documentos ficam fora de `wwwroot`.
 - Financeiro do aluno não deve ser exposto em rotas administrativas genéricas sem permissão financeira.
 - Comunicados e eventos devem filtrar por alvo: todos, turma ou aluno.
 - Operações sensíveis devem usar antiforgery token.
+- Services devem receber o usuário atual via `ICurrentUserService` ou parâmetro controlado pelo controller, nunca por campo editável pelo usuário.
 
 ## Pontos de evolução
 

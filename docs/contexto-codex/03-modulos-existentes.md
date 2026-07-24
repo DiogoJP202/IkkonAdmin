@@ -127,12 +127,12 @@
 - Na agenda interna, eventos são registros integrados ao Google Agenda em `/admin/agenda`.
 - São conceitos diferentes: eventos públicos de apresentação/contratação versus eventos operacionais da agenda.
 
-## Futuro portal do aluno
+## Área do Aluno
 
-- Função: permitir que o aluno consulte informações próprias.
+- Função: permitir que o aluno consulte informações próprias e interaja com documentos, comunicados, eventos e conquistas.
 - Controllers: `AlunoAuthController`, `AlunoAreaController`.
-- Service: `AreaAlunoService`.
-- Views: `AlunoAuth/Login`, `AlunoArea/Index`, `Perfil`, `Financeiro`, `Turmas`, `AcessoIndisponivel`.
+- Services: `AreaAlunoService` como fachada e services especializados por perfil, financeiro, turmas, aulas, frequência, documentos, comunicados, eventos e conquistas.
+- Views: `AlunoAuth/Login`, `AlunoArea/Index`, `Perfil`, `Financeiro`, `Turmas`, `Aulas`, `Frequencia`, `Documentos`, `Comunicados`, `Eventos`, `Conquistas`, `AcessoIndisponivel`.
 - Layout: `_AlunoLayout.cshtml`.
 - Regra central: busca dados pelo usuário logado e vínculo `UsuarioSistema.AlunoId`; não deve expor dados de outros alunos.
 

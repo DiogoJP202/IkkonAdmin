@@ -19,6 +19,7 @@ Arquivos de entrada relevantes:
 - `Enums`: enums de status, tipos e preferências.
 - `Data`: `ApplicationDbContext`, migrations, seed, bootstrap e configurations.
 - `Data/Configurations`: configurações Fluent API por entidade.
+- `Infrastructure`: operações, tempo, storage, usuário atual e auditoria.
 - `Services`: regras de aplicação e consultas por módulo.
 - `Security`: roles, permissões, policies, claims e helpers.
 - `Views`: Razor Views organizadas por controller.
@@ -88,17 +89,30 @@ As migrations ficam em `IkkonAdmin.Web/Data/Migrations`.
 - garantia do schema `AlunosTurmas`;
 - `SeedData.Initialize`.
 
-## Services e repositories
+## Services, queries e operações
 
 O projeto usa Services diretamente com EF Core. Não há camada de repositories separada no estado atual.
 
-Services existentes:
+Padrão atual:
+
+- `*QueryService` para consultas, listas, filtros e detalhes.
+- `*Service` para comandos e regras que alteram estado.
+- `OperationResult` ou `OperationResult<T>` para sucesso, validação e `NotFound`.
+- `IClock`, `ICurrentUserService`, `IFileStorageService` e `IAuditLogger` para infraestrutura transversal.
+
+Services existentes por módulo:
 
 - `AlunoService`, `TurmaService`, `FinanceiroService`.
 - `AdmissaoService`, `DesligamentoService`, `GraduacaoService`.
 - `DashboardService`, `ConfiguracaoService`.
 - `AuthService`, `AreaAlunoService`, `AdminPainelService`.
 - `InventarioService`, `GoogleAgendaService`, `UserSettingsService`.
+- `BlogService` e services auxiliares de workflow, idioma, versão, mídia, slug e tags.
+
+Contratos específicos ainda pendentes de migração para `OperationResult`:
+
+- `BlogOperationResult`.
+- `AdminOperationResult`.
 
 ## Separação entre público e administrativo
 
@@ -113,7 +127,7 @@ Services existentes:
 - Manter regras de aplicação em Services.
 - Usar `AsNoTracking()` em consultas somente leitura.
 - Usar `DateOnly` para datas de negócio quando apropriado.
-- Usar `DateTime.UtcNow` para auditoria e timestamps técnicos.
+- Usar `IClock.UtcNow` para auditoria e timestamps técnicos em código novo.
 - Proteger actions administrativas no backend, não apenas ocultar botões na UI.
 - Usar classes CSS por módulo, como `financeiro-v2-*`, `agenda-*`, `inventario-v2-*`.
 

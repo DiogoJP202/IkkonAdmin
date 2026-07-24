@@ -8,14 +8,15 @@ O IkkonAdmin é um sistema web em ASP.NET Core MVC para apoiar a operação admi
 
 - Site público institucional: apresenta a escola, cursos, eventos, vídeos, localização, FAQ e contato.
 - Painel administrativo: área interna para funcionários e administradores operarem alunos, turmas, financeiro, processos e configurações.
-- Área do Aluno: portal separado e ainda inicial, voltado para o próprio aluno consultar dados pessoais, financeiro e turmas.
-- Integrações e módulos de apoio: Google Agenda, inventário, configurações e controle de acesso.
+- Área do Aluno: portal separado para o aluno consultar dashboard, perfil, financeiro, turmas, aulas, frequência, documentos, comunicados, eventos e conquistas.
+- Integrações e módulos de apoio: Google Agenda, inventário, blog, configurações, auditoria e controle de acesso.
 
 ## Separação conceitual
 
 - Site público não exige login e usa `InstitucionalController`, `_PublicLayout.cshtml` e views em `Views/Institucional`.
 - Painel administrativo exige autenticação de funcionário/admin e usa o layout principal `_Layout.cshtml`, com sidebar e topbar.
 - Área do Aluno exige role de aluno e usa `AlunoAreaController`, `AlunoAuthController` e `_AlunoLayout.cshtml`.
+- Área do Aluno resolve dados pelo usuário autenticado e pelo vínculo `UsuarioSistema.AlunoId`.
 
 ## Principais módulos existentes
 
@@ -34,6 +35,7 @@ O IkkonAdmin é um sistema web em ASP.NET Core MVC para apoiar a operação admi
 - Agenda/Google Agenda.
 - Site institucional público.
 - Área do Aluno.
+- Blog público e administrativo com versões `pt-BR`, `en-US` e `ja-JP`.
 
 ## Objetivo geral
 
@@ -48,6 +50,8 @@ Centralizar dados e processos da escola para reduzir erro humano, melhorar visib
 - SQL Server.
 - Cookie Authentication.
 - Authorization Policies / Claims.
+- `OperationResult` para comandos de domínio.
+- Services de consulta separados em módulos maiores.
 - Bootstrap 5.
 - CSS customizado em `wwwroot/css/site.css`.
 - JavaScript leve em `wwwroot/js/site.js`, `landing.js` e `configuracoes.js`.

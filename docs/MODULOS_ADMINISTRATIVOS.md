@@ -11,6 +11,20 @@ O painel administrativo fica sob `/admin` e exige usuário com role:
 
 Admins passam por todas as policies administrativas. Funcionários dependem das claims de permissão atribuídas diretamente ou por cargo.
 
+## Padrão de implementação
+
+Módulos administrativos devem seguir o padrão atual:
+
+- controller fino para HTTP, autorização e feedback;
+- `*QueryService` para listas, detalhes, filtros e dashboards;
+- service de comando para criar, atualizar, excluir, registrar ou confirmar;
+- `OperationResult` ou `OperationResult<T>` para fluxos esperados de sucesso, validação e item não encontrado;
+- ViewModels por tela e formulário;
+- antiforgery em POSTs;
+- permissões no backend e na UI.
+
+Detalhes: [Padrões de serviços e operações](./PADROES_DE_SERVICOS_E_OPERACOES.md).
+
 ## Dashboard
 
 Rota principal:
@@ -197,6 +211,8 @@ Funcionalidades:
 - movimentações;
 - baixa/inativação preservando histórico.
 
+O módulo usa `InventarioQueryService` para consultas e `InventarioService` para comandos. Criação, edição e baixa retornam `OperationResult<int>`.
+
 ## Google Agenda
 
 Rota:
@@ -310,6 +326,8 @@ Funcionalidades:
 - preferências de notificação;
 - histórico de acessos;
 - informações de perfil e permissões.
+
+A troca de idioma não fica em Configurações. Idioma público é controlado pelo seletor das páginas públicas via cookie de cultura.
 
 ## Administração do sistema
 

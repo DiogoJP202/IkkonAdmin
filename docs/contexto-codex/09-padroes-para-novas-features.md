@@ -21,7 +21,7 @@ Padrão atual:
 - Usar propriedades claras e tipos adequados.
 - Usar enums em `Enums` quando houver status/tipo fechado.
 - Usar navegações EF Core explícitas.
-- Usar `DateOnly` para datas de negócio e `DateTime.UtcNow` para timestamps técnicos.
+- Usar `DateOnly` para datas de negócio e `IClock.UtcNow` para timestamps técnicos em services novos.
 
 ## Configuração EF
 
@@ -52,11 +52,15 @@ Não alterar migrations antigas já versionadas.
 
 Padrão atual:
 
-- Criar interface `INomeService`.
+- Criar interface `INomeQueryService` para consultas quando houver listagem, filtros ou detalhes complexos.
+- Criar implementação `NomeQueryService`.
+- Criar interface `INomeService` para comandos.
 - Criar implementação `NomeService`.
 - Registrar no DI em `Program.cs`.
 - Usar `ApplicationDbContext` diretamente no service.
 - Evitar repositories se não houver necessidade clara.
+- Retornar `OperationResult` ou `OperationResult<T>` em comandos.
+- Usar `IClock` para datas técnicas, `ICurrentUserService` para usuário atual e `IFileStorageService` para uploads.
 
 ## Controllers
 
@@ -68,6 +72,7 @@ Padrão:
 - `CancellationToken`.
 - `ModelState` para validação de formulário.
 - `TempData` para feedback.
+- `result.AddToModelState(ModelState)` e `result.AddToTempData(TempData)` quando o service retornar `OperationResult`.
 - `[ValidateAntiForgeryToken]` em POSTs.
 - `[Authorize(Policy = ...)]` em controller/action.
 
@@ -149,4 +154,5 @@ Criar prefixo CSS próprio, por exemplo:
 - Migrations revisadas.
 - Seed atualizado somente se necessário.
 - Documentar rotas e permissões novas quando a feature for grande.
+- Atualizar [Padrões de serviços e operações](../PADROES_DE_SERVICOS_E_OPERACOES.md) quando introduzir um padrão novo.
 
