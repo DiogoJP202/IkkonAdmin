@@ -1,5 +1,5 @@
 using IkkonAdmin.Web.Data;
-using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Files;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +10,8 @@ namespace IkkonAdmin.Web.Services;
 public class UserSettingsService(
     ApplicationDbContext dbContext,
     IPasswordHasher<UsuarioSistema> passwordHasher,
-    IWebHostEnvironment webHostEnvironment) : IUserSettingsService
+    IFileStorageService fileStorageService,
+    IUserSettingsQueryService queryService) : IUserSettingsService
 {
     private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -22,56 +23,9 @@ public class UserSettingsService(
 
     private const long MaxImageSizeBytes = 2 * 1024 * 1024;
 
-    public async Task<UserSettingsPageViewModel?> GetPageAsync(int userId, CancellationToken cancellationToken = default)
+    public Task<UserSettingsPageViewModel?> GetPageAsync(int userId, CancellationToken cancellationToken = default)
     {
-        var user = await dbContext.UsuariosSistema
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
-
-        if (user is null)
-        {
-            return null;
-        }
-
-        var historicoAcessos = await dbContext.AuditoriaLogs
-            .AsNoTracking()
-            .Where(x => x.UsuarioAfetadoId == userId && x.Acao == "LOGIN_SUCESSO")
-            .OrderByDescending(x => x.DataEventoUtc)
-            .Take(10)
-            .Select(x => new HistoricoAcessoViewModel
-            {
-                DataAcessoUtc = x.DataEventoUtc,
-                EnderecoIp = x.EnderecoIp,
-                Descricao = x.Descricao ?? "Login realizado com sucesso."
-            })
-            .ToListAsync(cancellationToken);
-
-        return new UserSettingsPageViewModel
-        {
-            AccountInfo = new AccountInfoViewModel
-            {
-                NomeCompleto = user.NomeExibicao,
-                Email = user.Email ?? string.Empty,
-                Telefone = user.Telefone,
-                FotoPerfilUrl = user.FotoPerfilUrl,
-                ContaAtiva = user.Ativo
-            },
-            SecurityStatus = new SecurityStatusViewModel
-            {
-                ContaAtiva = user.Ativo,
-                TwoFactorEnabled = false,
-                UltimoLoginUtc = user.UltimoLoginUtc,
-                HistoricoAcessos = historicoAcessos
-            },
-            Preferences = new PreferencesViewModel
-            {
-                TemaPreferencia = user.TemaPreferencia,
-                IdiomaPreferencia = user.IdiomaPreferencia,
-                NotificarEmail = user.NotificarEmail,
-                NotificarSistema = user.NotificarSistema
-            },
-            AccountType = BuildAccountType(user.TipoAcesso)
-        };
+        return queryService.GetPageAsync(userId, cancellationToken);
     }
 
     public async Task<UserSettingsOperationResult> UpdateAccountInfoAsync(
@@ -189,29 +143,30 @@ public class UserSettingsService(
             return UserSettingsOperationResult.Fail("Formato de imagem inválido. Use JPG, PNG ou WEBP.");
         }
 
-        var uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "uploads", "perfis");
-        Directory.CreateDirectory(uploadsFolder);
-
         if (!string.IsNullOrWhiteSpace(user.FotoPerfilUrl) &&
             user.FotoPerfilUrl.StartsWith("/uploads/perfis/", StringComparison.OrdinalIgnoreCase))
         {
-            var oldFileName = Path.GetFileName(user.FotoPerfilUrl);
-            var oldFilePath = Path.Combine(uploadsFolder, oldFileName);
-            if (File.Exists(oldFilePath))
+            var oldFilePath = fileStorageService.GetPublicFilePath(
+                user.FotoPerfilUrl,
+                "/uploads/perfis/",
+                "uploads",
+                "perfis");
+
+            if (oldFilePath is not null)
             {
-                File.Delete(oldFilePath);
+                fileStorageService.DeleteIfExists(oldFilePath);
             }
         }
 
         var fileName = $"{user.Id}-{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
-        var filePath = Path.Combine(uploadsFolder, fileName);
+        var result = await fileStorageService.SaveToWebRootAsync(
+            photo,
+            ["uploads", "perfis"],
+            "/uploads/perfis",
+            fileName,
+            cancellationToken);
 
-        await using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await photo.CopyToAsync(stream, cancellationToken);
-        }
-
-        user.FotoPerfilUrl = $"/uploads/perfis/{fileName}";
+        user.FotoPerfilUrl = result.PublicUrl ?? $"/uploads/perfis/{fileName}";
         return UserSettingsOperationResult.Ok("Foto atualizada.");
     }
 
@@ -228,52 +183,6 @@ public class UserSettingsService(
         var hasSymbol = password.Any(ch => !char.IsLetterOrDigit(ch));
 
         return hasUpper && hasLower && hasDigit && hasSymbol;
-    }
-
-    private static AccountTypeInfoViewModel BuildAccountType(TipoAcessoEnum tipoAcesso)
-    {
-        return tipoAcesso switch
-        {
-            TipoAcessoEnum.Admin => new AccountTypeInfoViewModel
-            {
-                TipoAcesso = tipoAcesso,
-                NomeTipoConta = "Administrador",
-                PermissoesBasicas = new[]
-                {
-                    "Acesso total ao painel administrativo",
-                    "Gestão de usuários e permissões",
-                    "Controle de configurações e auditoria"
-                }
-            },
-            TipoAcessoEnum.Funcionario => new AccountTypeInfoViewModel
-            {
-                TipoAcesso = tipoAcesso,
-                NomeTipoConta = "Funcionário",
-                PermissoesBasicas = new[]
-                {
-                    "Acesso ao painel administrativo interno",
-                    "Gestão de alunos, turmas e financeiro",
-                    "Visualização de indicadores operacionais"
-                }
-            },
-            TipoAcessoEnum.Aluno => new AccountTypeInfoViewModel
-            {
-                TipoAcesso = tipoAcesso,
-                NomeTipoConta = "Aluno",
-                PermissoesBasicas = new[]
-                {
-                    "Acesso à área exclusiva do aluno",
-                    "Consulta de dados e histórico pessoal",
-                    "Recebimento de notificações e comunicados"
-                }
-            },
-            _ => new AccountTypeInfoViewModel
-            {
-                TipoAcesso = tipoAcesso,
-                NomeTipoConta = "Conta",
-                PermissoesBasicas = Array.Empty<string>()
-            }
-        };
     }
 
     private static string Normalize(string value)

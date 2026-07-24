@@ -1,4 +1,5 @@
-using System.Security.Claims;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -9,7 +10,9 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Route("admin/area-aluno")]
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
-public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminService) : Controller
+public class AreaAlunoAdminController(
+    IAreaAlunoAdminService areaAlunoAdminService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet("")]
     [Authorize(Policy = AuthorizationPolicies.AreaAlunoView)]
@@ -35,7 +38,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarHorarioAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horário.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do horário.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -48,7 +51,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarHorarioAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do horário.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do horário.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -70,7 +73,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.VincularInstrutorAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do instrutor.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do instrutor.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -83,7 +86,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarInstrutorAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do instrutor.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do instrutor.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -105,7 +108,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarAulaAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da aula.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados da aula.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -118,7 +121,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarAulaAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da aula.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados da aula.")));
 
         return RedirectToAction(nameof(Aulas));
     }
@@ -175,7 +178,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarDocumentoTipoAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise o tipo de documento.")));
+                : Task.FromResult(OperationResult.Fail("Revise o tipo de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -188,7 +191,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarDocumentoTipoAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise o tipo de documento.")));
+                : Task.FromResult(OperationResult.Fail("Revise o tipo de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -210,7 +213,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.SolicitarDocumentoAsync(model, ObterUsuarioId(), cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitação de documento.")));
+                : Task.FromResult(OperationResult.Fail("Revise a solicitação de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -223,7 +226,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarDocumentoSolicitacaoAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a solicitação de documento.")));
+                : Task.FromResult(OperationResult.Fail("Revise a solicitação de documento.")));
 
         return RedirectToAction(nameof(Documentos));
     }
@@ -278,7 +281,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarComunicadoAsync(model, ObterUsuarioId(), cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do comunicado.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do comunicado.")));
 
         return RedirectToAction(nameof(Comunicados));
     }
@@ -291,7 +294,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarComunicadoAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do comunicado.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do comunicado.")));
 
         return RedirectToAction(nameof(Comunicados));
     }
@@ -321,7 +324,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarEventoAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do evento.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do evento.")));
 
         return RedirectToAction(nameof(Eventos));
     }
@@ -334,7 +337,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarEventoAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados do evento.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados do evento.")));
 
         return RedirectToAction(nameof(Eventos));
     }
@@ -364,7 +367,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.CriarInsigniaAsync(model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insígnia.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados da insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -377,7 +380,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarInsigniaAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise os dados da insígnia.")));
+                : Task.FromResult(OperationResult.Fail("Revise os dados da insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -399,7 +402,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtribuirInsigniaAsync(model, ObterUsuarioId(), cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a atribuição de insígnia.")));
+                : Task.FromResult(OperationResult.Fail("Revise a atribuição de insígnia.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -412,7 +415,7 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         await ExecutarOperacaoAsync(
             ModelState.IsValid
                 ? areaAlunoAdminService.AtualizarAlunoInsigniaAsync(id, model, cancellationToken)
-                : Task.FromResult(AreaAlunoOperacaoResult.Falha("Revise a conquista.")));
+                : Task.FromResult(OperationResult.Fail("Revise a conquista.")));
 
         return RedirectToAction(nameof(Conquistas));
     }
@@ -426,15 +429,14 @@ public class AreaAlunoAdminController(IAreaAlunoAdminService areaAlunoAdminServi
         return RedirectToAction(nameof(Conquistas));
     }
 
-    private async Task ExecutarOperacaoAsync(Task<AreaAlunoOperacaoResult> operacao)
+    private async Task ExecutarOperacaoAsync(Task<OperationResult> operacao)
     {
         var resultado = await operacao;
-        TempData[resultado.Sucesso ? "Success" : "Error"] = resultado.Mensagem;
+        resultado.AddToTempData(TempData);
     }
 
     private int? ObterUsuarioId()
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out var userId) ? userId : null;
+        return currentUserService.UserId;
     }
 }

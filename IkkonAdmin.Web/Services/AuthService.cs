@@ -1,5 +1,8 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Auditing;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Security;
 using Microsoft.AspNetCore.Identity;
@@ -7,9 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<UsuarioSistema> passwordHasher) : IAuthService
+public class AuthService(
+    ApplicationDbContext dbContext,
+    IPasswordHasher<UsuarioSistema> passwordHasher,
+    IClock clock,
+    IAuditLogger auditLogger) : IAuthService
 {
-    public async Task<AuthResult> AutenticarAsync(
+    private const string CredenciaisInvalidasMessage = "Credenciais inválidas.";
+
+    public async Task<OperationResult<AuthSession>> AutenticarAsync(
         string loginOuEmail,
         string senha,
         TipoAcessoEnum tipoAcesso,
@@ -19,7 +28,7 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
         var loginNormalizado = Normalizar(loginOuEmail);
         if (string.IsNullOrWhiteSpace(loginNormalizado) || string.IsNullOrWhiteSpace(senha))
         {
-            return AuthResult.Falha();
+            return OperationResult<AuthSession>.Fail(CredenciaisInvalidasMessage);
         }
 
         var usuario = await dbContext.UsuariosSistema
@@ -31,13 +40,13 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
 
         if (usuario is null)
         {
-            return AuthResult.Falha();
+            return OperationResult<AuthSession>.Fail(CredenciaisInvalidasMessage);
         }
 
         var verificationResult = passwordHasher.VerifyHashedPassword(usuario, usuario.SenhaHash, senha);
         if (verificationResult == PasswordVerificationResult.Failed)
         {
-            return AuthResult.Falha();
+            return OperationResult<AuthSession>.Fail(CredenciaisInvalidasMessage);
         }
 
         if (verificationResult == PasswordVerificationResult.SuccessRehashNeeded)
@@ -45,9 +54,9 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
             usuario.SenhaHash = passwordHasher.HashPassword(usuario, senha);
         }
 
-        usuario.UltimoLoginUtc = DateTime.UtcNow;
+        usuario.UltimoLoginUtc = clock.UtcNow;
 
-        await dbContext.AuditoriaLogs.AddAsync(new AuditoriaLog
+        await auditLogger.LogAsync(new AuditLogEntry
         {
             UsuarioResponsavelId = usuario.Id,
             UsuarioAfetadoId = usuario.Id,
@@ -55,19 +64,18 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
             Entidade = nameof(UsuarioSistema),
             EntidadeId = usuario.Id.ToString(),
             Descricao = "Login realizado com sucesso.",
-            EnderecoIp = LimparIp(enderecoIp),
-            DataEventoUtc = DateTime.UtcNow
+            EnderecoIp = enderecoIp
         }, cancellationToken);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
 
         var roles = await ObterRolesAsync(usuario, cancellationToken);
         var permissoes = await ObterPermissoesAsync(usuario.Id, roles, cancellationToken);
 
-        return AuthResult.Ok(usuario, roles, permissoes);
+        return OperationResult<AuthSession>.Ok(
+            new AuthSession(usuario, roles, permissoes),
+            "Sessão autenticada.");
     }
 
-    public async Task<AuthResult> RecarregarSessaoAsync(
+    public async Task<OperationResult<AuthSession>> RecarregarSessaoAsync(
         int usuarioId,
         CancellationToken cancellationToken = default)
     {
@@ -76,13 +84,15 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
 
         if (usuario is null)
         {
-            return AuthResult.Falha();
+            return OperationResult<AuthSession>.NotFound("Usuário não encontrado.");
         }
 
         var roles = await ObterRolesAsync(usuario, cancellationToken);
         var permissoes = await ObterPermissoesAsync(usuario.Id, roles, cancellationToken);
 
-        return AuthResult.Ok(usuario, roles, permissoes);
+        return OperationResult<AuthSession>.Ok(
+            new AuthSession(usuario, roles, permissoes),
+            "Sessão recarregada.");
     }
 
     private static string? Normalizar(string? valor)
@@ -90,12 +100,6 @@ public class AuthService(ApplicationDbContext dbContext, IPasswordHasher<Usuario
         return string.IsNullOrWhiteSpace(valor)
             ? null
             : valor.Trim().ToUpperInvariant();
-    }
-
-    private static string? LimparIp(string? ip)
-    {
-        var valor = ip?.Trim();
-        return string.IsNullOrWhiteSpace(valor) ? null : valor;
     }
 
     private async Task<IReadOnlyCollection<string>> ObterRolesAsync(

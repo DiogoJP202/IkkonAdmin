@@ -1,64 +1,29 @@
 using IkkonAdmin.Web.Data;
-using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class ConfiguracaoService(ApplicationDbContext dbContext) : IConfiguracaoService
+public class ConfiguracaoService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IConfiguracaoSistemaProvider configuracaoProvider,
+    IConfiguracaoQueryService queryService) : IConfiguracaoService
 {
-    public async Task<ConfiguracoesIndexViewModel> ObterPainelAsync(CancellationToken cancellationToken = default)
+    public Task<ConfiguracoesIndexViewModel> ObterPainelAsync(CancellationToken cancellationToken = default)
     {
-        var form = await ObterFormularioAsync(cancellationToken);
-        var hoje = DateOnly.FromDateTime(DateTime.Today);
-        var limite = hoje.AddDays(30);
-
-        var resumo = new ConfiguracoesResumoViewModel
-        {
-            AlunosAtivos = await dbContext.Alunos.CountAsync(x => x.Status == StatusAlunoEnum.Ativo, cancellationToken),
-            TurmasAtivas = await dbContext.Turmas.CountAsync(x => x.Ativa, cancellationToken),
-            MensalidadesAtrasadas = await dbContext.Mensalidades.CountAsync(x => x.Status == StatusMensalidadeEnum.Atrasado, cancellationToken),
-            DesligamentosEmAberto = await dbContext.Desligamentos.CountAsync(x => !x.DataConfirmacao.HasValue, cancellationToken),
-            ExamesProximos30Dias = await dbContext.ExamesGraduacao.CountAsync(x => x.DataExame >= hoje && x.DataExame <= limite, cancellationToken)
-        };
-
-        return new ConfiguracoesIndexViewModel
-        {
-            Form = form,
-            Resumo = resumo
-        };
+        return queryService.ObterPainelAsync(cancellationToken);
     }
 
-    public async Task<ConfiguracoesFormViewModel> ObterFormularioAsync(CancellationToken cancellationToken = default)
+    public Task<ConfiguracoesFormViewModel> ObterFormularioAsync(CancellationToken cancellationToken = default)
     {
-        var config = await ObterOuCriarAsync(cancellationToken);
-
-        return new ConfiguracoesFormViewModel
-        {
-            NomeEscola = config.NomeEscola,
-            EmailFinanceiro = config.EmailFinanceiro,
-            TelefoneContato = config.TelefoneContato,
-            ValorMensalidadePadrao = config.ValorMensalidadePadrao,
-            DiaVencimentoPadrao = config.DiaVencimentoPadrao,
-            DiasToleranciaAtraso = config.DiasToleranciaAtraso,
-            PercentualMultaAtraso = config.PercentualMultaAtraso,
-            PercentualJurosMes = config.PercentualJurosMes,
-            AplicarMultaJurosAutomaticamente = config.AplicarMultaJurosAutomaticamente,
-            GerarMensalidadesAutomaticamente = config.GerarMensalidadesAutomaticamente,
-            EnviarLembreteCobranca = config.EnviarLembreteCobranca,
-            DiasAntecedenciaLembrete = config.DiasAntecedenciaLembrete,
-            MensagemBoasVindasPadrao = config.MensagemBoasVindasPadrao,
-            ChecklistAdmissaoPadrao = config.ChecklistAdmissaoPadrao,
-            PermitirDesligamentoComPendencia = config.PermitirDesligamentoComPendencia,
-            AtualizarNivelAutomaticamenteNaGraduacao = config.AtualizarNivelAutomaticamenteNaGraduacao,
-            UltimaAtualizacaoUtc = config.UltimaAtualizacaoUtc
-        };
+        return queryService.ObterFormularioAsync(cancellationToken);
     }
 
     public async Task SalvarAsync(ConfiguracoesFormViewModel form, CancellationToken cancellationToken = default)
     {
-        var config = await ObterOuCriarAsync(cancellationToken);
+        var config = await configuracaoProvider.ObterOuCriarAsync(cancellationToken);
 
         config.NomeEscola = LimparOuDefault(form.NomeEscola, "Escola de Taiko Ikkon");
         config.EmailFinanceiro = LimparOpcional(form.EmailFinanceiro);
@@ -76,14 +41,14 @@ public class ConfiguracaoService(ApplicationDbContext dbContext) : IConfiguracao
         config.ChecklistAdmissaoPadrao = LimparOpcional(form.ChecklistAdmissaoPadrao);
         config.PermitirDesligamentoComPendencia = form.PermitirDesligamentoComPendencia;
         config.AtualizarNivelAutomaticamenteNaGraduacao = form.AtualizarNivelAutomaticamenteNaGraduacao;
-        config.UltimaAtualizacaoUtc = DateTime.UtcNow;
+        config.UltimaAtualizacaoUtc = clock.UtcNow;
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task RestaurarPadraoAsync(CancellationToken cancellationToken = default)
     {
-        var config = await ObterOuCriarAsync(cancellationToken);
+        var config = await configuracaoProvider.ObterOuCriarAsync(cancellationToken);
 
         config.NomeEscola = "Escola de Taiko Ikkon";
         config.EmailFinanceiro = null;
@@ -101,23 +66,14 @@ public class ConfiguracaoService(ApplicationDbContext dbContext) : IConfiguracao
         config.ChecklistAdmissaoPadrao = null;
         config.PermitirDesligamentoComPendencia = true;
         config.AtualizarNivelAutomaticamenteNaGraduacao = true;
-        config.UltimaAtualizacaoUtc = DateTime.UtcNow;
+        config.UltimaAtualizacaoUtc = clock.UtcNow;
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<ConfiguracaoSistema> ObterOuCriarAsync(CancellationToken cancellationToken = default)
+    public Task<ConfiguracaoSistema> ObterOuCriarAsync(CancellationToken cancellationToken = default)
     {
-        var config = await dbContext.ConfiguracoesSistema.FirstOrDefaultAsync(cancellationToken);
-        if (config is not null)
-        {
-            return config;
-        }
-
-        config = new ConfiguracaoSistema();
-        await dbContext.ConfiguracoesSistema.AddAsync(config, cancellationToken);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        return config;
+        return configuracaoProvider.ObterOuCriarAsync(cancellationToken);
     }
 
     private static string? LimparOpcional(string? valor)

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -12,7 +13,9 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.BlogView)]
 public class BlogAdminController(
     IBlogService blogService,
-    IBlogMediaService blogMediaService) : Controller
+    IBlogMediaService blogMediaService,
+    ICurrentUserService currentUserService,
+    IBlogPostActionAuthorizer blogPostActionAuthorizer) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index([FromQuery] BlogAdminFilterViewModel filtro, CancellationToken cancellationToken)
@@ -166,7 +169,7 @@ public class BlogAdminController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadContentImage(IFormFile? image, CancellationToken cancellationToken)
     {
-        if (!User.HasAnyPermission(AppPermissions.BlogCreate, AppPermissions.BlogEdit))
+        if (!blogPostActionAuthorizer.CanUploadContentImage(User))
         {
             return Forbid();
         }
@@ -203,25 +206,11 @@ public class BlogAdminController(
 
     private bool PodeExecutarAcao(BlogPostFormViewModel model)
     {
-        var action = (model.SubmissionAction ?? "Draft").Trim().ToLowerInvariant();
-
-        if ((model.IsFeatured || model.IsWeeklyHighlight) && !User.HasPermission(AppPermissions.BlogFeature))
-        {
-            return false;
-        }
-
-        return action switch
-        {
-            "publish" => User.HasPermission(AppPermissions.BlogPublish),
-            "schedule" => User.HasPermission(AppPermissions.BlogPublish),
-            "archive" => User.HasPermission(AppPermissions.BlogArchive),
-            _ => true
-        };
+        return blogPostActionAuthorizer.CanSubmit(User, model);
     }
 
     private int? ObterUsuarioId()
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out var userId) ? userId : null;
+        return currentUserService.UserId;
     }
 }

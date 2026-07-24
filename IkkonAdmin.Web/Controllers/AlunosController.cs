@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
@@ -80,18 +81,6 @@ public class AlunosController(IAlunoService alunoService) : Controller
     [Authorize(Policy = AuthorizationPolicies.AlunosCreate)]
     public async Task<IActionResult> Create(AlunoFormViewModel model, CancellationToken cancellationToken)
     {
-        model.CPF = SomenteDigitos(model.CPF);
-
-        if (model.CPF.Length != 11)
-        {
-            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF válido com 11 dígitos.");
-        }
-
-        if (await alunoService.ExisteCpfAsync(model.CPF, cancellationToken: cancellationToken))
-        {
-            ModelState.AddModelError(nameof(model.CPF), "Já existe um aluno cadastrado com este CPF.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Novo Aluno";
@@ -101,24 +90,31 @@ public class AlunosController(IAlunoService alunoService) : Controller
 
         var aluno = new Aluno
         {
-            NomeCompleto = model.NomeCompleto.Trim(),
+            NomeCompleto = model.NomeCompleto,
             CPF = model.CPF,
-            RG = LimparOpcional(model.RG),
+            RG = model.RG,
             DataNascimento = model.DataNascimento,
-            Endereco = LimparOpcional(model.Endereco),
-            Celular = LimparOpcional(model.Celular),
-            Email = LimparOpcional(model.Email),
-            ContatoEmergencia = LimparOpcional(model.ContatoEmergencia),
+            Endereco = model.Endereco,
+            Celular = model.Celular,
+            Email = model.Email,
+            ContatoEmergencia = model.ContatoEmergencia,
             DataEntrada = model.DataEntrada,
             TurmaId = model.TurmaId,
             Status = model.Status,
-            Observacoes = LimparOpcional(model.Observacoes)
+            Observacoes = model.Observacoes
         };
 
-        await alunoService.AdicionarAsync(aluno, cancellationToken);
+        var result = await alunoService.CriarAsync(aluno, cancellationToken);
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
+            ViewData["Title"] = "Novo Aluno";
+            await PopularTurmasAsync(model.TurmaId, cancellationToken);
+            return View(model);
+        }
 
-        TempData["Success"] = "Aluno cadastrado com sucesso.";
-        return RedirectToAction(nameof(Details), new { id = aluno.Id });
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id = result.Value });
     }
 
     [HttpGet]
@@ -164,18 +160,6 @@ public class AlunosController(IAlunoService alunoService) : Controller
             return BadRequest();
         }
 
-        model.CPF = SomenteDigitos(model.CPF);
-
-        if (model.CPF.Length != 11)
-        {
-            ModelState.AddModelError(nameof(model.CPF), "Informe um CPF válido com 11 dígitos.");
-        }
-
-        if (await alunoService.ExisteCpfAsync(model.CPF, model.Id, cancellationToken))
-        {
-            ModelState.AddModelError(nameof(model.CPF), "Já existe um aluno cadastrado com este CPF.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Editar Aluno";
@@ -183,29 +167,38 @@ public class AlunosController(IAlunoService alunoService) : Controller
             return View(model);
         }
 
-        var aluno = await alunoService.ObterParaEdicaoAsync(id, cancellationToken);
-        if (aluno is null)
+        var aluno = new Aluno
+        {
+            NomeCompleto = model.NomeCompleto,
+            CPF = model.CPF,
+            RG = model.RG,
+            DataNascimento = model.DataNascimento,
+            Endereco = model.Endereco,
+            Celular = model.Celular,
+            Email = model.Email,
+            ContatoEmergencia = model.ContatoEmergencia,
+            DataEntrada = model.DataEntrada,
+            TurmaId = model.TurmaId,
+            Status = model.Status,
+            Observacoes = model.Observacoes
+        };
+
+        var result = await alunoService.AtualizarAsync(id, aluno, cancellationToken);
+        if (result.Status == OperationResultStatus.NotFound)
         {
             return NotFound();
         }
 
-        aluno.NomeCompleto = model.NomeCompleto.Trim();
-        aluno.CPF = model.CPF;
-        aluno.RG = LimparOpcional(model.RG);
-        aluno.DataNascimento = model.DataNascimento;
-        aluno.Endereco = LimparOpcional(model.Endereco);
-        aluno.Celular = LimparOpcional(model.Celular);
-        aluno.Email = LimparOpcional(model.Email);
-        aluno.ContatoEmergencia = LimparOpcional(model.ContatoEmergencia);
-        aluno.DataEntrada = model.DataEntrada;
-        aluno.TurmaId = model.TurmaId;
-        aluno.Status = model.Status;
-        aluno.Observacoes = LimparOpcional(model.Observacoes);
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
+            ViewData["Title"] = "Editar Aluno";
+            await PopularTurmasAsync(model.TurmaId, cancellationToken);
+            return View(model);
+        }
 
-        await alunoService.SalvarAlteracoesAsync(cancellationToken);
-
-        TempData["Success"] = "Aluno atualizado com sucesso.";
-        return RedirectToAction(nameof(Details), new { id = aluno.Id });
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpGet]
@@ -276,13 +269,13 @@ public class AlunosController(IAlunoService alunoService) : Controller
     [Authorize(Policy = AuthorizationPolicies.AlunosEdit)]
     public async Task<IActionResult> AlterarStatus(int id, StatusAlunoEnum status, string? returnUrl, CancellationToken cancellationToken)
     {
-        var alterado = await alunoService.AlterarStatusAsync(id, status, cancellationToken);
-        if (!alterado)
+        var result = await alunoService.AlterarStatusAsync(id, status, cancellationToken);
+        if (result.Status == OperationResultStatus.NotFound)
         {
             return NotFound();
         }
 
-        TempData["Success"] = "Status do aluno atualizado.";
+        result.AddToTempData(TempData);
 
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
@@ -296,22 +289,6 @@ public class AlunosController(IAlunoService alunoService) : Controller
     {
         var turmas = await alunoService.ListarTurmasAsync(cancellationToken);
         ViewBag.Turmas = new SelectList(turmas, nameof(Turma.Id), nameof(Turma.Nome), turmaSelecionada);
-    }
-
-    private static string SomenteDigitos(string? valor)
-    {
-        if (string.IsNullOrWhiteSpace(valor))
-        {
-            return string.Empty;
-        }
-
-        return new string(valor.Where(char.IsDigit).ToArray());
-    }
-
-    private static string? LimparOpcional(string? valor)
-    {
-        var texto = valor?.Trim();
-        return string.IsNullOrWhiteSpace(texto) ? null : texto;
     }
 
     private static int NormalizarTamanhoPagina(int tamanhoPagina)

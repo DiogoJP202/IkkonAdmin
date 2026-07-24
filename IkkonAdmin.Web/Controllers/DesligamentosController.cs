@@ -1,3 +1,4 @@
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
@@ -82,19 +83,17 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
             Observacoes = model.Observacoes
         };
 
-        try
+        var result = await desligamentoService.CriarAsync(desligamento, cancellationToken);
+        if (!result.Success)
         {
-            var id = await desligamentoService.CriarAsync(desligamento, cancellationToken);
-            TempData["Success"] = "Solicitação de desligamento criada com sucesso.";
-            return RedirectToAction(nameof(Details), new { id });
-        }
-        catch (InvalidOperationException ex)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
+            result.AddToModelState(ModelState);
             ViewData["Title"] = "Novo Desligamento";
             await PopularAlunosDisponiveisAsync(model, cancellationToken);
             return View(model);
         }
+
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id = result.Value });
     }
 
     [HttpGet]
@@ -124,7 +123,7 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
 
         var novoTotal = await desligamentoService.CalcularPendenciasAsync(detalhes.AlunoId, cancellationToken);
 
-        await desligamentoService.AtualizarAsync(
+        var result = await desligamentoService.AtualizarAsync(
             id,
             detalhes.Motivo,
             novoTotal,
@@ -134,7 +133,15 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
             detalhes.Observacoes,
             cancellationToken);
 
-        TempData["Success"] = $"Pendências recalculadas: {novoTotal:C}.";
+        if (result.Status == OperationResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        result.AddToTempData(
+            TempData,
+            successMessage: $"Pendências recalculadas: {novoTotal:C}.");
+
         return RedirecionarLocal(returnUrl, id);
     }
 
@@ -154,7 +161,7 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
             return View("Details", model);
         }
 
-        var atualizado = await desligamentoService.AtualizarAsync(
+        var result = await desligamentoService.AtualizarAsync(
             id,
             model.Motivo,
             model.PendenciaFinanceira,
@@ -164,9 +171,12 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
             model.Observacoes,
             cancellationToken);
 
-        TempData[atualizado ? "Success" : "Error"] = atualizado
-            ? "Processo de desligamento atualizado."
-            : "Não foi possível atualizar o desligamento.";
+        if (result.Status == OperationResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        result.AddToTempData(TempData);
 
         return RedirecionarLocal(returnUrl, id);
     }
@@ -176,15 +186,20 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
     [Authorize(Policy = AuthorizationPolicies.DesligamentosEdit)]
     public async Task<IActionResult> Confirmar(int id, bool encerrarCobrancasFuturas, string? returnUrl, CancellationToken cancellationToken)
     {
-        var resultado = await desligamentoService.ConfirmarAsync(id, encerrarCobrancasFuturas, cancellationToken);
+        var result = await desligamentoService.ConfirmarAsync(id, encerrarCobrancasFuturas, cancellationToken);
 
-        if (!resultado.Sucesso)
+        if (result.Status == OperationResultStatus.NotFound)
         {
-            TempData["Error"] = resultado.Erro ?? "Não foi possível confirmar o desligamento.";
+            return NotFound();
+        }
+
+        if (!result.Success)
+        {
+            result.AddToTempData(TempData);
             return RedirecionarLocal(returnUrl, id);
         }
 
-        TempData["Success"] = $"Desligamento confirmado. Cobranças futuras canceladas: {resultado.CobrancasCanceladas}.";
+        TempData["Success"] = $"Desligamento confirmado. Cobranças futuras canceladas: {result.Value?.CobrancasCanceladas ?? 0}.";
         return RedirecionarLocal(returnUrl, id);
     }
 

@@ -1,3 +1,4 @@
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 
@@ -13,17 +14,11 @@ public interface IAreaAlunoService
     Task<AreaAlunoFrequenciaViewModel?> ObterFrequenciaAsync(int usuarioId, DateOnly? inicio, DateOnly? fim, CancellationToken cancellationToken = default);
     Task<AreaAlunoEventosViewModel?> ObterEventosAsync(int usuarioId, CancellationToken cancellationToken = default);
     Task<AreaAlunoDocumentosViewModel?> ObterDocumentosAsync(int usuarioId, CancellationToken cancellationToken = default);
-    Task<AreaAlunoOperacaoResult> EnviarDocumentoAsync(int usuarioId, int solicitacaoId, IFormFile arquivo, CancellationToken cancellationToken = default);
+    Task<OperationResult> EnviarDocumentoAsync(int usuarioId, int solicitacaoId, IFormFile arquivo, CancellationToken cancellationToken = default);
     Task<AreaAlunoDocumentoDownload?> ObterDocumentoParaDownloadAsync(int usuarioId, int envioId, CancellationToken cancellationToken = default);
     Task<AreaAlunoComunicadosViewModel?> ObterComunicadosAsync(int usuarioId, CancellationToken cancellationToken = default);
     Task<bool> MarcarComunicadoComoLidoAsync(int usuarioId, int comunicadoId, CancellationToken cancellationToken = default);
     Task<AreaAlunoConquistasViewModel?> ObterConquistasAsync(int usuarioId, CancellationToken cancellationToken = default);
-}
-
-public sealed record AreaAlunoOperacaoResult(bool Sucesso, string Mensagem)
-{
-    public static AreaAlunoOperacaoResult Ok(string mensagem) => new(true, mensagem);
-    public static AreaAlunoOperacaoResult Falha(string mensagem) => new(false, mensagem);
 }
 
 public sealed record AreaAlunoDocumentoDownload(

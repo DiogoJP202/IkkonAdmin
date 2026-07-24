@@ -1,5 +1,8 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Services;
@@ -40,7 +43,8 @@ public class AreaAlunoAdminServiceTests
 
         var resultado = await service.ExcluirAulaAsync(aula.Id);
 
-        Assert.True(resultado.Sucesso);
+        Assert.True(resultado.Success);
+        Assert.Equal(OperationResultStatus.Success, resultado.Status);
         Assert.Equal(StatusAulaEnum.Cancelada, (await dbContext.Aulas.FindAsync(aula.Id))!.Status);
     }
 
@@ -63,7 +67,8 @@ public class AreaAlunoAdminServiceTests
 
         var resultado = await service.ExcluirAulaAsync(aula.Id);
 
-        Assert.True(resultado.Sucesso);
+        Assert.True(resultado.Success);
+        Assert.Equal(OperationResultStatus.Success, resultado.Status);
         Assert.Empty(dbContext.Aulas);
     }
 
@@ -89,7 +94,8 @@ public class AreaAlunoAdminServiceTests
 
         var resultado = await service.ExcluirDocumentoTipoAsync(tipo.Id);
 
-        Assert.True(resultado.Sucesso);
+        Assert.True(resultado.Success);
+        Assert.Equal(OperationResultStatus.Success, resultado.Status);
         Assert.False((await dbContext.DocumentoTipos.FindAsync(tipo.Id))!.Ativo);
     }
 
@@ -127,7 +133,8 @@ public class AreaAlunoAdminServiceTests
 
         var resultado = await service.ExcluirDocumentoSolicitacaoAsync(solicitacao.Id);
 
-        Assert.False(resultado.Sucesso);
+        Assert.False(resultado.Success);
+        Assert.Equal(OperationResultStatus.ValidationError, resultado.Status);
         Assert.NotNull(await dbContext.DocumentoSolicitacoes.FindAsync(solicitacao.Id));
     }
 
@@ -165,7 +172,8 @@ public class AreaAlunoAdminServiceTests
             .Include(x => x.Alvos)
             .FirstAsync(x => x.Id == comunicado.Id);
 
-        Assert.True(resultado.Sucesso);
+        Assert.True(resultado.Success);
+        Assert.Equal(OperationResultStatus.Success, resultado.Status);
         Assert.True(atualizado.Ativo);
         Assert.True(atualizado.Importante);
         Assert.Single(atualizado.Alvos);
@@ -199,7 +207,8 @@ public class AreaAlunoAdminServiceTests
 
         var resultado = await service.ExcluirComunicadoAsync(comunicado.Id);
 
-        Assert.True(resultado.Sucesso);
+        Assert.True(resultado.Success);
+        Assert.Equal(OperationResultStatus.Success, resultado.Status);
         Assert.False((await dbContext.Comunicados.FindAsync(comunicado.Id))!.Ativo);
     }
 
@@ -232,7 +241,8 @@ public class AreaAlunoAdminServiceTests
                 TurmaId = 999
             });
 
-        Assert.False(resultado.Sucesso);
+        Assert.False(resultado.Success);
+        Assert.Equal(OperationResultStatus.ValidationError, resultado.Status);
         Assert.True((await dbContext.EventosAlunoPortal.FindAsync(evento.Id))!.Ativo);
     }
 
@@ -262,7 +272,8 @@ public class AreaAlunoAdminServiceTests
                 InsigniaId = primeira.Id
             });
 
-        Assert.False(resultado.Sucesso);
+        Assert.False(resultado.Success);
+        Assert.Equal(OperationResultStatus.ValidationError, resultado.Status);
         Assert.Equal(segunda.Id, (await dbContext.AlunoInsignias.FindAsync(alvo.Id))!.InsigniaId);
     }
 
@@ -277,7 +288,33 @@ public class AreaAlunoAdminServiceTests
 
     private static AreaAlunoAdminService CriarService(ApplicationDbContext dbContext)
     {
-        return new AreaAlunoAdminService(dbContext, new TestWebHostEnvironment());
+        var environment = new TestWebHostEnvironment();
+        var clock = new TestClock();
+        var fileStorageService = new LocalFileStorageService(environment);
+        var aulasAdminService = new AreaAlunoAulasAdminService(
+            dbContext,
+            clock);
+        var documentoAdminService = new AreaAlunoDocumentoAdminService(
+            dbContext,
+            clock,
+            fileStorageService);
+        var comunicadoAdminService = new AreaAlunoComunicadoAdminService(
+            dbContext,
+            clock);
+        var eventoAdminService = new AreaAlunoEventoAdminService(
+            dbContext,
+            clock);
+        var conquistaAdminService = new AreaAlunoConquistaAdminService(
+            dbContext,
+            clock);
+
+        return new AreaAlunoAdminService(
+            clock,
+            aulasAdminService,
+            documentoAdminService,
+            comunicadoAdminService,
+            eventoAdminService,
+            conquistaAdminService);
     }
 
     private static Turma CriarTurma()
@@ -309,5 +346,13 @@ public class AreaAlunoAdminServiceTests
         public string EnvironmentName { get; set; } = "Testing";
         public string WebRootPath { get; set; } = Path.Combine(Path.GetTempPath(), "ikkon-tests", "wwwroot");
         public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
+    }
+
+    private sealed class TestClock : IClock
+    {
+        public DateTime UtcNow { get; } = new(2026, 7, 13, 12, 0, 0, DateTimeKind.Utc);
+        public DateTime Now { get; } = new(2026, 7, 13, 9, 0, 0, DateTimeKind.Local);
+        public DateTime Today => Now.Date;
+        public DateOnly TodayDate => DateOnly.FromDateTime(Today);
     }
 }

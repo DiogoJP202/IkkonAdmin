@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -10,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace IkkonAdmin.Web.Controllers;
 
 [Route("aluno")]
-public class AlunoAuthController(IAuthService authService) : Controller
+public class AlunoAuthController(
+    IAuthService authService,
+    ICurrentUserService currentUserService) : Controller
 {
     [AllowAnonymous]
     [HttpGet("login")]
@@ -51,16 +54,17 @@ public class AlunoAuthController(IAuthService authService) : Controller
             model.LoginOuEmail,
             model.Senha,
             TipoAcessoEnum.Aluno,
-            HttpContext.Connection.RemoteIpAddress?.ToString(),
+            currentUserService.RemoteIpAddress,
             cancellationToken);
 
-        if (!authResult.Sucesso || authResult.Usuario is null)
+        if (!authResult.Success || authResult.Value is null)
         {
             ModelState.AddModelError(string.Empty, "Credenciais inválidas para a Área do Aluno.");
             return View(model);
         }
 
-        if (!authResult.Usuario.AlunoId.HasValue)
+        var authSession = authResult.Value;
+        if (!authSession.Usuario.AlunoId.HasValue)
         {
             ModelState.AddModelError(string.Empty, "Sua conta de aluno ainda não está vinculada a um cadastro ativo.");
             return View(model);
@@ -68,7 +72,7 @@ public class AlunoAuthController(IAuthService authService) : Controller
 
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            AuthClaimsFactory.CriarPrincipal(authResult),
+            AuthClaimsFactory.CriarPrincipal(authSession),
             new AuthenticationProperties
             {
                 IsPersistent = false,

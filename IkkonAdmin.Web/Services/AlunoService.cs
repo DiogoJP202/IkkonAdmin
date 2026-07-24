@@ -1,13 +1,18 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class AlunoService(ApplicationDbContext dbContext) : IAlunoService
+public class AlunoService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IAlunoQueryService queryService) : IAlunoService
 {
-    public async Task<(IReadOnlyList<Aluno> Itens, int TotalRegistros)> ListarAsync(
+    public Task<(IReadOnlyList<Aluno> Itens, int TotalRegistros)> ListarAsync(
         string? busca = null,
         StatusAlunoEnum? status = null,
         int? turmaId = null,
@@ -15,64 +20,12 @@ public class AlunoService(ApplicationDbContext dbContext) : IAlunoService
         int tamanhoPagina = 20,
         CancellationToken cancellationToken = default)
     {
-        pagina = Math.Max(1, pagina);
-        tamanhoPagina = Math.Clamp(tamanhoPagina, 5, 100);
-
-        var query = dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            var buscaTexto = busca.Trim();
-            var buscaDigitos = SomenteDigitos(buscaTexto);
-            var temBuscaDigitos = !string.IsNullOrWhiteSpace(buscaDigitos);
-
-            query = query.Where(x =>
-                x.NomeCompleto.Contains(buscaTexto) ||
-                x.CPF.Contains(buscaTexto) ||
-                (x.Celular != null && x.Celular.Contains(buscaTexto)) ||
-                (temBuscaDigitos &&
-                 (x.CPF.Replace(".", string.Empty).Replace("-", string.Empty).Contains(buscaDigitos) ||
-                  (x.Celular != null &&
-                   x.Celular
-                       .Replace("(", string.Empty)
-                       .Replace(")", string.Empty)
-                       .Replace("-", string.Empty)
-                       .Replace(" ", string.Empty)
-                       .Contains(buscaDigitos)))));
-        }
-
-        if (status.HasValue)
-        {
-            query = query.Where(x => x.Status == status.Value);
-        }
-
-        if (turmaId.HasValue)
-        {
-            query = query.Where(x =>
-                x.TurmaId == turmaId.Value ||
-                x.AlunoTurmas.Any(t => t.TurmaId == turmaId.Value));
-        }
-
-        var totalRegistros = await query.CountAsync(cancellationToken);
-
-        var itens = await query
-            .OrderBy(x => x.NomeCompleto)
-            .Skip((pagina - 1) * tamanhoPagina)
-            .Take(tamanhoPagina)
-            .ToListAsync(cancellationToken);
-
-        return (itens, totalRegistros);
+        return queryService.ListarAsync(busca, status, turmaId, pagina, tamanhoPagina, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.Turmas
-            .AsNoTracking()
-            .OrderBy(x => x.Nome)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarTurmasAsync(cancellationToken);
     }
 
     public Task<Aluno?> ObterParaEdicaoAsync(int id, CancellationToken cancellationToken = default)
@@ -83,96 +36,155 @@ public class AlunoService(ApplicationDbContext dbContext) : IAlunoService
 
     public Task<Aluno?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .Include(x => x.Mensalidades)
-            .Include(x => x.Pagamentos)
-            .Include(x => x.Historicos)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return queryService.ObterDetalhesAsync(id, cancellationToken);
     }
 
     public Task<bool> ExisteCpfAsync(string cpf, int? ignorarAlunoId = null, CancellationToken cancellationToken = default)
     {
-        var cpfNormalizado = SomenteDigitos(cpf);
-
-        if (string.IsNullOrWhiteSpace(cpfNormalizado))
-        {
-            return Task.FromResult(false);
-        }
-
-        var query = dbContext.Alunos.AsQueryable();
-
-        if (ignorarAlunoId.HasValue)
-        {
-            query = query.Where(x => x.Id != ignorarAlunoId.Value);
-        }
-
-        return query.AnyAsync(x =>
-            x.CPF == cpfNormalizado ||
-            x.CPF.Replace(".", string.Empty).Replace("-", string.Empty) == cpfNormalizado, cancellationToken);
+        return queryService.ExisteCpfAsync(cpf, ignorarAlunoId, cancellationToken);
     }
 
-    public async Task AdicionarAsync(Aluno aluno, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> CriarAsync(Aluno aluno, CancellationToken cancellationToken = default)
     {
+        NormalizarAluno(aluno);
+
+        var cpfValidation = await ValidarCpfAsync(aluno.CPF, null, cancellationToken);
+        if (!cpfValidation.Success)
+        {
+            return OperationResult<int>.Fail(cpfValidation.Message, cpfValidation.Errors);
+        }
+
         if (aluno.TurmaId.HasValue && !aluno.AlunoTurmas.Any(x => x.TurmaId == aluno.TurmaId.Value))
         {
             aluno.AlunoTurmas.Add(new AlunoTurma
             {
                 TurmaId = aluno.TurmaId.Value,
-                DataVinculo = DateTime.UtcNow
+                DataVinculo = clock.UtcNow
             });
         }
 
         await dbContext.Alunos.AddAsync(aluno, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        return OperationResult<int>.Ok(aluno.Id, "Aluno cadastrado com sucesso.");
     }
 
-    public async Task SalvarAlteracoesAsync(CancellationToken cancellationToken = default)
+    public async Task<OperationResult> AtualizarAsync(
+        int id,
+        Aluno alunoAtualizado,
+        CancellationToken cancellationToken = default)
     {
-        var alunosComTurmaAlterada = dbContext.ChangeTracker
-            .Entries<Aluno>()
-            .Where(x => x.State is EntityState.Modified or EntityState.Added)
-            .Select(x => x.Entity)
-            .Where(x => x.TurmaId.HasValue)
-            .ToList();
+        var aluno = await dbContext.Alunos
+            .Include(x => x.AlunoTurmas)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-        foreach (var aluno in alunosComTurmaAlterada)
+        if (aluno is null)
         {
-            var turmaId = aluno.TurmaId!.Value;
-            var possuiVinculo = await dbContext.AlunosTurmas
-                .AnyAsync(x => x.AlunoId == aluno.Id && x.TurmaId == turmaId, cancellationToken);
-
-            if (!possuiVinculo)
-            {
-                dbContext.AlunosTurmas.Add(new AlunoTurma
-                {
-                    AlunoId = aluno.Id,
-                    TurmaId = turmaId,
-                    DataVinculo = DateTime.UtcNow
-                });
-            }
+            return OperationResult.NotFound("Aluno não encontrado.");
         }
 
+        NormalizarAluno(alunoAtualizado);
+
+        var cpfValidation = await ValidarCpfAsync(alunoAtualizado.CPF, id, cancellationToken);
+        if (!cpfValidation.Success)
+        {
+            return cpfValidation;
+        }
+
+        aluno.NomeCompleto = alunoAtualizado.NomeCompleto;
+        aluno.CPF = alunoAtualizado.CPF;
+        aluno.RG = alunoAtualizado.RG;
+        aluno.DataNascimento = alunoAtualizado.DataNascimento;
+        aluno.Endereco = alunoAtualizado.Endereco;
+        aluno.Celular = alunoAtualizado.Celular;
+        aluno.Email = alunoAtualizado.Email;
+        aluno.ContatoEmergencia = alunoAtualizado.ContatoEmergencia;
+        aluno.DataEntrada = alunoAtualizado.DataEntrada;
+        aluno.TurmaId = alunoAtualizado.TurmaId;
+        aluno.Status = alunoAtualizado.Status;
+        aluno.Observacoes = alunoAtualizado.Observacoes;
+
+        GarantirVinculoTurmaPrincipal(aluno);
+
         await dbContext.SaveChangesAsync(cancellationToken);
+        return OperationResult.Ok("Aluno atualizado com sucesso.");
     }
 
-    public async Task<bool> AlterarStatusAsync(int id, StatusAlunoEnum status, CancellationToken cancellationToken = default)
+    public async Task<OperationResult> AlterarStatusAsync(
+        int id,
+        StatusAlunoEnum status,
+        CancellationToken cancellationToken = default)
     {
         var aluno = await dbContext.Alunos.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (aluno is null)
         {
-            return false;
+            return OperationResult.NotFound("Aluno não encontrado.");
         }
 
         aluno.Status = status;
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Status do aluno atualizado.");
     }
 
-    private static string SomenteDigitos(string valor)
+    private async Task<OperationResult> ValidarCpfAsync(
+        string cpf,
+        int? ignorarAlunoId,
+        CancellationToken cancellationToken)
     {
+        if (cpf.Length != 11)
+        {
+            return OperationResult.Fail("Informe um CPF válido com 11 dígitos.", nameof(Aluno.CPF));
+        }
+
+        if (await queryService.ExisteCpfAsync(cpf, ignorarAlunoId, cancellationToken))
+        {
+            return OperationResult.Fail("Já existe um aluno cadastrado com este CPF.", nameof(Aluno.CPF));
+        }
+
+        return OperationResult.Ok("CPF válido.");
+    }
+
+    private void GarantirVinculoTurmaPrincipal(Aluno aluno)
+    {
+        if (!aluno.TurmaId.HasValue || aluno.AlunoTurmas.Any(x => x.TurmaId == aluno.TurmaId.Value))
+        {
+            return;
+        }
+
+        dbContext.AlunosTurmas.Add(new AlunoTurma
+        {
+            AlunoId = aluno.Id,
+            TurmaId = aluno.TurmaId.Value,
+            DataVinculo = clock.UtcNow
+        });
+    }
+
+    private static void NormalizarAluno(Aluno aluno)
+    {
+        aluno.NomeCompleto = aluno.NomeCompleto?.Trim() ?? string.Empty;
+        aluno.CPF = SomenteDigitos(aluno.CPF);
+        aluno.RG = LimparOpcional(aluno.RG);
+        aluno.Endereco = LimparOpcional(aluno.Endereco);
+        aluno.Celular = LimparOpcional(aluno.Celular);
+        aluno.Email = LimparOpcional(aluno.Email);
+        aluno.ContatoEmergencia = LimparOpcional(aluno.ContatoEmergencia);
+        aluno.Observacoes = LimparOpcional(aluno.Observacoes);
+    }
+
+    private static string SomenteDigitos(string? valor)
+    {
+        if (string.IsNullOrWhiteSpace(valor))
+        {
+            return string.Empty;
+        }
+
         return new string(valor.Where(char.IsDigit).ToArray());
+    }
+
+    private static string? LimparOpcional(string? valor)
+    {
+        var texto = valor?.Trim();
+        return string.IsNullOrWhiteSpace(texto) ? null : texto;
     }
 }

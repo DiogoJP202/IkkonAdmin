@@ -1,77 +1,53 @@
 using IkkonAdmin.Web.Data;
-using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
+public class TurmaService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    ITurmaQueryService queryService) : ITurmaService
 {
-    public async Task<IReadOnlyList<Turma>> ListarAsync(
+    public Task<IReadOnlyList<Turma>> ListarAsync(
         string? busca = null,
         bool? ativa = null,
         CancellationToken cancellationToken = default)
     {
-        var query = dbContext.Turmas
-            .AsNoTracking()
-            .Include(x => x.AlunoTurmas)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            var textoBusca = busca.Trim();
-            query = query.Where(x =>
-                x.Nome.Contains(textoBusca) ||
-                x.Modalidade.Contains(textoBusca) ||
-                (x.Horario != null && x.Horario.Contains(textoBusca)));
-        }
-
-        if (ativa.HasValue)
-        {
-            query = query.Where(x => x.Ativa == ativa.Value);
-        }
-
-        return await query
-            .OrderBy(x => x.Nome)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAsync(busca, ativa, cancellationToken);
     }
 
     public Task<Turma?> ObterComAlunosAsync(int id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Turmas
-            .AsNoTracking()
-            .Include(x => x.AlunoTurmas)
-            .ThenInclude(x => x.Aluno)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return queryService.ObterComAlunosAsync(id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Aluno>> ListarAlunosVinculaveisAsync(int? turmaIdAtual = null, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Aluno>> ListarAlunosVinculaveisAsync(
+        int? turmaIdAtual = null,
+        CancellationToken cancellationToken = default)
     {
-        return await dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .Include(x => x.AlunoTurmas)
-            .ThenInclude(x => x.Turma)
-            .Where(x => x.Status != StatusAlunoEnum.Desligado || x.AlunoTurmas.Any(t => t.TurmaId == turmaIdAtual))
-            .OrderBy(x => x.NomeCompleto)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAlunosVinculaveisAsync(turmaIdAtual, cancellationToken);
     }
 
     public Task<bool> ExisteNomeAsync(string nome, int? ignorarTurmaId = null, CancellationToken cancellationToken = default)
     {
-        var nomeNormalizado = nome.Trim();
-        var query = dbContext.Turmas.AsQueryable();
-
-        if (ignorarTurmaId.HasValue)
-        {
-            query = query.Where(x => x.Id != ignorarTurmaId.Value);
-        }
-
-        return query.AnyAsync(x => x.Nome == nomeNormalizado, cancellationToken);
+        return queryService.ExisteNomeAsync(nome, ignorarTurmaId, cancellationToken);
     }
 
-    public async Task<int> CriarAsync(Turma turma, IReadOnlyCollection<int> alunosIds, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> CriarAsync(
+        Turma turma,
+        IReadOnlyCollection<int> alunosIds,
+        CancellationToken cancellationToken = default)
     {
+        NormalizarTurma(turma);
+
+        if (await queryService.ExisteNomeAsync(turma.Nome, cancellationToken: cancellationToken))
+        {
+            return OperationResult<int>.Fail("Já existe uma turma com esse nome.", nameof(Turma.Nome));
+        }
+
         await dbContext.Turmas.AddAsync(turma, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -91,7 +67,7 @@ public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
                     {
                         AlunoId = aluno.Id,
                         TurmaId = turma.Id,
-                        DataVinculo = DateTime.UtcNow
+                        DataVinculo = clock.UtcNow
                     });
                 }
 
@@ -105,10 +81,10 @@ public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        return turma.Id;
+        return OperationResult<int>.Ok(turma.Id, "Turma criada com sucesso.");
     }
 
-    public async Task<bool> AtualizarAsync(
+    public async Task<OperationResult> AtualizarAsync(
         int id,
         Turma turmaAtualizada,
         IReadOnlyCollection<int> alunosIds,
@@ -121,7 +97,14 @@ public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
 
         if (turma is null)
         {
-            return false;
+            return OperationResult.NotFound("Turma não encontrada.");
+        }
+
+        NormalizarTurma(turmaAtualizada);
+
+        if (await queryService.ExisteNomeAsync(turmaAtualizada.Nome, id, cancellationToken))
+        {
+            return OperationResult.Fail("Já existe uma turma com esse nome.", nameof(Turma.Nome));
         }
 
         turma.Nome = turmaAtualizada.Nome;
@@ -158,7 +141,7 @@ public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
                     {
                         AlunoId = aluno.Id,
                         TurmaId = turma.Id,
-                        DataVinculo = DateTime.UtcNow
+                        DataVinculo = clock.UtcNow
                     });
                 }
 
@@ -197,6 +180,20 @@ public class TurmaService(ApplicationDbContext dbContext) : ITurmaService
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Turma atualizada com sucesso.");
+    }
+
+    private static void NormalizarTurma(Turma turma)
+    {
+        turma.Nome = turma.Nome.Trim();
+        turma.Modalidade = turma.Modalidade.Trim();
+        turma.Horario = LimparOpcional(turma.Horario);
+        turma.Observacoes = LimparOpcional(turma.Observacoes);
+    }
+
+    private static string? LimparOpcional(string? texto)
+    {
+        var valor = texto?.Trim();
+        return string.IsNullOrWhiteSpace(valor) ? null : valor;
     }
 }

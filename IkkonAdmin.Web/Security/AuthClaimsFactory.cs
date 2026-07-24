@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -7,14 +6,14 @@ namespace IkkonAdmin.Web.Security;
 
 public static class AuthClaimsFactory
 {
-    public static ClaimsPrincipal CriarPrincipal(AuthResult authResult)
+    public static ClaimsPrincipal CriarPrincipal(AuthSession authSession)
     {
-        if (authResult.Usuario is null)
+        if (authSession.Usuario is null)
         {
-            throw new ArgumentException("Resultado de autenticação sem usuário.", nameof(authResult));
+            throw new ArgumentException("Resultado de autenticação sem usuário.", nameof(authSession));
         }
 
-        var usuario = authResult.Usuario;
+        var usuario = authSession.Usuario;
         var rolePrincipal = AppRoles.FromTipoAcesso(usuario.TipoAcesso);
         var claims = new List<Claim>
         {
@@ -39,17 +38,17 @@ public static class AuthClaimsFactory
             claims.Add(new Claim(AppClaimTypes.AlunoId, usuario.AlunoId.Value.ToString()));
         }
 
-        foreach (var role in authResult.Roles.Distinct(StringComparer.OrdinalIgnoreCase))
+        foreach (var role in authSession.Roles.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        if (!authResult.Roles.Contains(rolePrincipal, StringComparer.OrdinalIgnoreCase))
+        if (!authSession.Roles.Contains(rolePrincipal, StringComparer.OrdinalIgnoreCase))
         {
             claims.Add(new Claim(ClaimTypes.Role, rolePrincipal));
         }
 
-        foreach (var permissao in authResult.Permissoes.Distinct(StringComparer.OrdinalIgnoreCase))
+        foreach (var permissao in authSession.Permissoes.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             claims.Add(new Claim(AppClaimTypes.Permissao, permissao));
         }

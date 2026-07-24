@@ -1,4 +1,8 @@
 using IkkonAdmin.Web.Data;
+using IkkonAdmin.Web.Infrastructure.Auditing;
+using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Security;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -19,6 +23,12 @@ CultureInfo.DefaultThreadCurrentUICulture = culturaPadrao;
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IViewTextService, ViewTextService>();
+builder.Services.AddSingleton<IClock, SystemClock>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, HttpCurrentUserService>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IAuditLogger, EfAuditLogger>();
+builder.Services.AddSingleton<IBlogPostActionAuthorizer, BlogPostActionAuthorizer>();
 builder.Services.AddDataProtection();
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
@@ -65,158 +75,64 @@ builder.Services
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    static void AddFuncionarioPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, params string[] permissoes)
-    {
-        options.AddPolicy(
-            policyName,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireAssertion(context =>
-                    context.User.IsInRole(AppRoles.Admin) ||
-                    (context.User.IsInRole(AppRoles.Funcionario) &&
-                     permissoes.Any(permissao => context.User.HasClaim(AppClaimTypes.Permissao, permissao)))));
-    }
+builder.Services.AddAuthorization(options => options.AddIkkonPolicies());
 
-    static void AddAuthenticatedPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, string permissao)
-    {
-        options.AddPolicy(
-            policyName,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireAssertion(context =>
-                    context.User.IsInRole(AppRoles.Admin) ||
-                    context.User.HasClaim(AppClaimTypes.Permissao, permissao)));
-    }
-
-    static void AddAdminPermissionPolicy(Microsoft.AspNetCore.Authorization.AuthorizationOptions options, string policyName, string permissao)
-    {
-        options.AddPolicy(
-            policyName,
-            policy => policy
-                .RequireRole(AppRoles.Admin));
-    }
-
-    options.AddPolicy(
-        AuthorizationPolicies.Funcionario,
-        policy => policy.RequireRole(AppRoles.Funcionario, AppRoles.Admin));
-
-    options.AddPolicy(
-        AuthorizationPolicies.Aluno,
-        policy => policy.RequireRole(AppRoles.Aluno));
-
-    options.AddPolicy(
-        AuthorizationPolicies.Admin,
-        policy => policy.RequireRole(AppRoles.Admin));
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DashboardView, AppPermissions.DashboardView);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AlunosView, AppPermissions.AlunosView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AlunosCreate, AppPermissions.AlunosCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AlunosEdit, AppPermissions.AlunosEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AlunosDelete, AppPermissions.AlunosDelete);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.TurmasView, AppPermissions.TurmasView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.TurmasCreate, AppPermissions.TurmasCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.TurmasEdit, AppPermissions.TurmasEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.TurmasDelete, AppPermissions.TurmasDelete);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FinanceiroView, AppPermissions.FinanceiroView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FinanceiroCreate, AppPermissions.FinanceiroCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FinanceiroEdit, AppPermissions.FinanceiroEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FinanceiroDelete, AppPermissions.FinanceiroDelete);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AdmissoesView, AppPermissions.AdmissoesView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AdmissoesCreate, AppPermissions.AdmissoesCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AdmissoesEdit, AppPermissions.AdmissoesEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AdmissoesDelete, AppPermissions.AdmissoesDelete);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DesligamentosView, AppPermissions.DesligamentosView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DesligamentosCreate, AppPermissions.DesligamentosCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DesligamentosEdit, AppPermissions.DesligamentosEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DesligamentosDelete, AppPermissions.DesligamentosDelete);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GraduacoesView, AppPermissions.GraduacoesView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GraduacoesCreate, AppPermissions.GraduacoesCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GraduacoesEdit, AppPermissions.GraduacoesEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GraduacoesDelete, AppPermissions.GraduacoesDelete);
-
-    AddAuthenticatedPermissionPolicy(options, AuthorizationPolicies.ConfiguracoesView, AppPermissions.ConfiguracoesView);
-    AddAuthenticatedPermissionPolicy(options, AuthorizationPolicies.ConfiguracoesEdit, AppPermissions.ConfiguracoesEdit);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaView, AppPermissions.GoogleAgendaView, AppPermissions.GoogleAgendaManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaCreate, AppPermissions.GoogleAgendaCreate, AppPermissions.GoogleAgendaManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaEdit, AppPermissions.GoogleAgendaEdit, AppPermissions.GoogleAgendaManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaDelete, AppPermissions.GoogleAgendaDelete, AppPermissions.GoogleAgendaManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.GoogleAgendaManage, AppPermissions.GoogleAgendaManage);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioView, AppPermissions.InventarioView, AppPermissions.InventarioManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioCreate, AppPermissions.InventarioCreate, AppPermissions.InventarioManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioEdit, AppPermissions.InventarioEdit, AppPermissions.InventarioManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioDelete, AppPermissions.InventarioDelete, AppPermissions.InventarioManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.InventarioManage, AppPermissions.InventarioManage);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogView, AppPermissions.BlogView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogCreate, AppPermissions.BlogCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogEdit, AppPermissions.BlogEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogPublish, AppPermissions.BlogPublish);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogArchive, AppPermissions.BlogArchive);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogDelete, AppPermissions.BlogDelete);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogFeature, AppPermissions.BlogFeature);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogCategoryManage, AppPermissions.BlogCategoryManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.BlogTagManage, AppPermissions.BlogTagManage);
-
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AreaAlunoView, AppPermissions.AreaAlunoView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AreaAlunoManage, AppPermissions.AreaAlunoManage);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaView, AppPermissions.FrequenciaView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaCreate, AppPermissions.FrequenciaCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.FrequenciaEdit, AppPermissions.FrequenciaEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosView, AppPermissions.DocumentosView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosCreate, AppPermissions.DocumentosCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosEdit, AppPermissions.DocumentosEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.DocumentosApprove, AppPermissions.DocumentosApprove);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosView, AppPermissions.ComunicadosView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosCreate, AppPermissions.ComunicadosCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosEdit, AppPermissions.ComunicadosEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ComunicadosDelete, AppPermissions.ComunicadosDelete);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoView, AppPermissions.EventosAlunoView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoCreate, AppPermissions.EventosAlunoCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoEdit, AppPermissions.EventosAlunoEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.EventosAlunoDelete, AppPermissions.EventosAlunoDelete);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasView, AppPermissions.ConquistasView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasCreate, AppPermissions.ConquistasCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.ConquistasEdit, AppPermissions.ConquistasEdit);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasView, AppPermissions.AulasView);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasCreate, AppPermissions.AulasCreate);
-    AddFuncionarioPermissionPolicy(options, AuthorizationPolicies.AulasEdit, AppPermissions.AulasEdit);
-
-    AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarUsuarios, AppPermissions.GerenciarUsuarios);
-    AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarCargos, AppPermissions.GerenciarCargos);
-    AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminEditarPermissoes, AppPermissions.EditarPermissoes);
-    AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminVisualizarDados, AppPermissions.VisualizarDados);
-    AddAdminPermissionPolicy(options, AuthorizationPolicies.AdminGerenciarSistema, AppPermissions.GerenciarSistema);
-});
-
+builder.Services.AddScoped<IAlunoQueryService, AlunoQueryService>();
 builder.Services.AddScoped<IAlunoService, AlunoService>();
+builder.Services.AddScoped<ITurmaQueryService, TurmaQueryService>();
 builder.Services.AddScoped<ITurmaService, TurmaService>();
+builder.Services.AddScoped<IFinanceiroQueryService, FinanceiroQueryService>();
 builder.Services.AddScoped<IFinanceiroService, FinanceiroService>();
+builder.Services.AddScoped<IAdmissaoQueryService, AdmissaoQueryService>();
 builder.Services.AddScoped<IAdmissaoService, AdmissaoService>();
+builder.Services.AddScoped<IDesligamentoQueryService, DesligamentoQueryService>();
 builder.Services.AddScoped<IDesligamentoService, DesligamentoService>();
+builder.Services.AddScoped<IGraduacaoQueryService, GraduacaoQueryService>();
 builder.Services.AddScoped<IGraduacaoService, GraduacaoService>();
+builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IConfiguracaoSistemaProvider, ConfiguracaoSistemaProvider>();
+builder.Services.AddScoped<IConfiguracaoQueryService, ConfiguracaoQueryService>();
 builder.Services.AddScoped<IConfiguracaoService, ConfiguracaoService>();
+builder.Services.AddScoped<IAdminPainelQueryService, AdminPainelQueryService>();
 builder.Services.AddScoped<IAdminPainelService, AdminPainelService>();
+builder.Services.AddScoped<IUserSettingsQueryService, UserSettingsQueryService>();
 builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAreaAlunoContextService, AreaAlunoContextService>();
+builder.Services.AddScoped<IAreaAlunoPerfilService, AreaAlunoPerfilService>();
+builder.Services.AddScoped<IAreaAlunoFinanceiroService, AreaAlunoFinanceiroService>();
+builder.Services.AddScoped<IAreaAlunoTurmasService, AreaAlunoTurmasService>();
+builder.Services.AddScoped<IAreaAlunoFrequenciaService, AreaAlunoFrequenciaService>();
+builder.Services.AddScoped<IAreaAlunoEventosService, AreaAlunoEventosService>();
+builder.Services.AddScoped<IAreaAlunoDocumentosService, AreaAlunoDocumentosService>();
+builder.Services.AddScoped<IAreaAlunoComunicadosService, AreaAlunoComunicadosService>();
+builder.Services.AddScoped<IAreaAlunoConquistasService, AreaAlunoConquistasService>();
+builder.Services.AddScoped<IAreaAlunoAulasAdminService, AreaAlunoAulasAdminService>();
+builder.Services.AddScoped<IAreaAlunoDocumentoAdminService, AreaAlunoDocumentoAdminService>();
+builder.Services.AddScoped<IAreaAlunoComunicadoAdminService, AreaAlunoComunicadoAdminService>();
+builder.Services.AddScoped<IAreaAlunoEventoAdminService, AreaAlunoEventoAdminService>();
+builder.Services.AddScoped<IAreaAlunoConquistaAdminService, AreaAlunoConquistaAdminService>();
 builder.Services.AddScoped<IAreaAlunoService, AreaAlunoService>();
 builder.Services.AddScoped<IAreaAlunoAdminService, AreaAlunoAdminService>();
+builder.Services.AddScoped<IInventarioQueryService, InventarioQueryService>();
 builder.Services.AddScoped<IInventarioService, InventarioService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IBlogAdminQueryService, BlogAdminQueryService>();
+builder.Services.AddScoped<IBlogLanguageService, BlogLanguageService>();
+builder.Services.AddScoped<IBlogDateTimeService, BlogDateTimeService>();
+builder.Services.AddScoped<IBlogTextService, BlogTextService>();
+builder.Services.AddScoped<IBlogLookupService, BlogLookupService>();
+builder.Services.AddScoped<IBlogSlugService, BlogSlugService>();
+builder.Services.AddScoped<IBlogTagService, BlogTagService>();
+builder.Services.AddScoped<IBlogWorkflowService, BlogWorkflowService>();
+builder.Services.AddScoped<IBlogPublicService, BlogPublicService>();
+builder.Services.AddScoped<IBlogVersionService, BlogVersionService>();
 builder.Services.AddScoped<IBlogCategoriaService, BlogCategoriaService>();
 builder.Services.AddScoped<IBlogMediaService, BlogMediaService>();
 builder.Services.AddScoped<IBlogContentSanitizer, BlogContentSanitizer>();
 builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection("GoogleAgenda"));
+builder.Services.AddScoped<IGoogleAgendaConnectionService, GoogleAgendaConnectionService>();
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
 

@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
@@ -94,8 +95,8 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
             Observacoes = model.Observacoes
         };
 
-        await graduacaoService.CriarExameAsync(exame, cancellationToken);
-        TempData["Success"] = "Exame de graduação criado com sucesso.";
+        var result = await graduacaoService.CriarExameAsync(exame, cancellationToken);
+        result.AddToTempData(TempData);
         return RedirectToAction(nameof(Index));
     }
 
@@ -116,11 +117,6 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
     [Authorize(Policy = AuthorizationPolicies.GraduacoesCreate)]
     public async Task<IActionResult> Create(GraduacaoViewModel model, CancellationToken cancellationToken)
     {
-        if (!model.ExameGraduacaoId.HasValue && !model.DataExameNovo.HasValue)
-        {
-            ModelState.AddModelError(nameof(model.ExameGraduacaoId), "Selecione um exame existente ou informe a data para criar um novo exame.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Registrar Resultado";
@@ -145,16 +141,16 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
 
         var resultado = await graduacaoService.RegistrarResultadoAsync(input, cancellationToken);
 
-        if (!resultado.Sucesso || !resultado.GraduacaoId.HasValue)
+        if (!resultado.Success || resultado.Value is null)
         {
-            ModelState.AddModelError(string.Empty, resultado.Erro ?? "Não foi possível registrar o resultado.");
+            resultado.AddToModelState(ModelState);
             ViewData["Title"] = "Registrar Resultado";
             await PopularDadosFormularioAsync(model, cancellationToken);
             return View(model);
         }
 
-        TempData["Success"] = "Resultado de graduação registrado com sucesso.";
-        return RedirectToAction(nameof(Details), new { id = resultado.GraduacaoId.Value });
+        resultado.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id = resultado.Value.GraduacaoId });
     }
 
     [HttpGet]

@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -90,16 +91,16 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
             return View(model);
         }
 
-        var sucesso = await financeiroService.RegistrarPagamentoAsync(model, cancellationToken);
-        if (!sucesso)
+        var result = await financeiroService.RegistrarPagamentoAsync(model, cancellationToken);
+        if (!result.Success)
         {
-            ModelState.AddModelError(string.Empty, "Não foi possível registrar o pagamento para a mensalidade informada.");
+            ModelState.AddModelError(string.Empty, result.Message);
             ViewData["Title"] = "Registrar Pagamento";
             await RecarregarContextoPagamentoAsync(model, cancellationToken);
             return View(model);
         }
 
-        TempData["Success"] = "Pagamento registrado com sucesso.";
+        result.AddToTempData(TempData);
         return RedirecionarLocal(model.ReturnUrl, nameof(Index));
     }
 
@@ -108,16 +109,8 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     [Authorize(Policy = AuthorizationPolicies.FinanceiroEdit)]
     public async Task<IActionResult> AtualizarValorFinal(int mensalidadeId, decimal valorFinal, string? returnUrl, CancellationToken cancellationToken)
     {
-        if (valorFinal < 0)
-        {
-            TempData["Error"] = "Valor final não pode ser negativo.";
-            return RedirecionarLocal(returnUrl, nameof(Index));
-        }
-
-        var atualizado = await financeiroService.AtualizarValorFinalAsync(mensalidadeId, valorFinal, cancellationToken);
-        TempData[atualizado ? "Success" : "Error"] = atualizado
-            ? "Valor final atualizado."
-            : "Mensalidade não encontrada para atualizar valor.";
+        var result = await financeiroService.AtualizarValorFinalAsync(mensalidadeId, valorFinal, cancellationToken);
+        result.AddToTempData(TempData);
 
         return RedirecionarLocal(returnUrl, nameof(Index));
     }
@@ -131,10 +124,8 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
         string? returnUrl,
         CancellationToken cancellationToken)
     {
-        var atualizado = await financeiroService.AlterarStatusMensalidadeAsync(mensalidadeId, status, cancellationToken);
-        TempData[atualizado ? "Success" : "Error"] = atualizado
-            ? "Status da mensalidade atualizado."
-            : "Mensalidade não encontrada para alterar status.";
+        var result = await financeiroService.AlterarStatusMensalidadeAsync(mensalidadeId, status, cancellationToken);
+        result.AddToTempData(TempData);
 
         return RedirecionarLocal(returnUrl, nameof(Index));
     }

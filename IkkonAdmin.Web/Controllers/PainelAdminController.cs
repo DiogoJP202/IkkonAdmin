@@ -1,5 +1,5 @@
-using System.Security.Claims;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -11,7 +11,8 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.Admin)]
 public class PainelAdminController(
     IAdminPainelService adminPainelService,
-    IConfiguracaoService configuracaoService) : Controller
+    IConfiguracaoService configuracaoService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet]
     [Authorize(Policy = AuthorizationPolicies.AdminVisualizarDados)]
@@ -502,12 +503,18 @@ public class PainelAdminController(
 
     private bool TryGetCurrentUserId(out int userId)
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out userId);
+        if (currentUserService.UserId is int currentUserId)
+        {
+            userId = currentUserId;
+            return true;
+        }
+
+        userId = 0;
+        return false;
     }
 
     private string? ObterIpRequisicao()
     {
-        return HttpContext.Connection.RemoteIpAddress?.ToString();
+        return currentUserService.RemoteIpAddress;
     }
 }

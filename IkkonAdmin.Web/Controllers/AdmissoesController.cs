@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
@@ -56,11 +57,6 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
     [Authorize(Policy = AuthorizationPolicies.AdmissoesCreate)]
     public async Task<IActionResult> Create(AdmissaoViewModel model, CancellationToken cancellationToken)
     {
-        if (model.Status == StatusAdmissaoEnum.Matriculado)
-        {
-            ModelState.AddModelError(nameof(model.Status), "Use o status Matriculado somente após criar a matrícula.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Nova Admissão";
@@ -78,10 +74,16 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
             ChecklistObservacoes = model.ChecklistObservacoes
         };
 
-        var id = await admissaoService.CriarAsync(admissao, cancellationToken);
+        var result = await admissaoService.CriarAsync(admissao, cancellationToken);
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
+            ViewData["Title"] = "Nova Admissão";
+            return View(model);
+        }
 
-        TempData["Success"] = "Admissão registrada com sucesso.";
-        return RedirectToAction(nameof(Details), new { id });
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id = result.Value });
     }
 
     [HttpGet]
@@ -111,19 +113,7 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
         string? returnUrl,
         CancellationToken cancellationToken)
     {
-        var admissao = await admissaoService.ObterDetalhesAsync(id, cancellationToken);
-        if (admissao is null)
-        {
-            return NotFound();
-        }
-
-        if (status == StatusAdmissaoEnum.Matriculado && !admissao.AlunoId.HasValue)
-        {
-            TempData["Error"] = "Crie a matrícula antes de definir o status Matriculado.";
-            return RedirecionarLocal(returnUrl, id);
-        }
-
-        var atualizado = await admissaoService.AtualizarProcessoAsync(
+        var result = await admissaoService.AtualizarProcessoAsync(
             id,
             status,
             contratoAssinado,
@@ -132,9 +122,12 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
             checklistObservacoes,
             cancellationToken);
 
-        TempData[atualizado ? "Success" : "Error"] = atualizado
-            ? "Processo de admissão atualizado."
-            : "Não foi possível atualizar o processo de admissão.";
+        if (result.Status == OperationResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        result.AddToTempData(TempData);
 
         return RedirecionarLocal(returnUrl, id);
     }
@@ -170,11 +163,16 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
             ObservacoesAluno = model.ObservacoesAluno
         };
 
-        var resultado = await admissaoService.CriarMatriculaAsync(id, input, cancellationToken);
+        var result = await admissaoService.CriarMatriculaAsync(id, input, cancellationToken);
 
-        if (!resultado.Sucesso)
+        if (result.Status == OperationResultStatus.NotFound)
         {
-            ModelState.AddModelError(string.Empty, resultado.Erro ?? "Não foi possível criar a matrícula.");
+            return NotFound();
+        }
+
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
             ViewData["Title"] = "Detalhes da Admissão";
 
             var vmErro = await ConstruirDetalhesViewModelAsync(id, model, cancellationToken);
@@ -186,7 +184,7 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
             return View("Details", vmErro);
         }
 
-        TempData["Success"] = "Matrícula criada com sucesso e vinculada à admissão.";
+        result.AddToTempData(TempData);
         return RedirectToAction(nameof(Details), new { id });
     }
 

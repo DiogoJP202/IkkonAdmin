@@ -1,12 +1,17 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroService
+public class FinanceiroService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IFinanceiroQueryService queryService) : IFinanceiroService
 {
     private const decimal ValorBasePadraoMensalidade = 260m;
     private const int DiaPadraoVencimento = 10;
@@ -18,153 +23,36 @@ public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroServ
         int tamanhoPagina = 20,
         CancellationToken cancellationToken = default)
     {
-        pagina = Math.Max(1, pagina);
-        tamanhoPagina = Math.Clamp(tamanhoPagina, 5, 100);
-
         await AtualizarAtrasosAsync(cancellationToken);
-
-        var hoje = DateOnly.FromDateTime(DateTime.Today);
-        var inicioMesAtual = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-        var inicioMesSeguinte = inicioMesAtual.AddMonths(1);
-
-        var pendentes = await dbContext.Mensalidades
-            .CountAsync(x => x.Status == StatusMensalidadeEnum.Pendente, cancellationToken);
-
-        var atrasadas = await dbContext.Mensalidades
-            .CountAsync(x => x.Status == StatusMensalidadeEnum.Atrasado, cancellationToken);
-
-        var valorRecebidoMes = await dbContext.Pagamentos
-            .Where(x => x.DataPagamento >= inicioMesAtual && x.DataPagamento < inicioMesSeguinte)
-            .SumAsync(x => (decimal?)x.ValorPago, cancellationToken) ?? 0m;
-
-        var valorEmAberto = await dbContext.Mensalidades
-            .Where(x => x.Status == StatusMensalidadeEnum.Pendente || x.Status == StatusMensalidadeEnum.Atrasado)
-            .SumAsync(x => (decimal?)x.ValorFinal, cancellationToken) ?? 0m;
-
-        var mensalidadesQuery = dbContext.Mensalidades
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(buscaAluno))
-        {
-            var buscaTexto = buscaAluno.Trim();
-            mensalidadesQuery = mensalidadesQuery.Where(x =>
-                x.Aluno != null &&
-                (x.Aluno.NomeCompleto.Contains(buscaTexto) ||
-                 x.Aluno.CPF.Contains(buscaTexto) ||
-                 (x.Aluno.Celular != null && x.Aluno.Celular.Contains(buscaTexto))));
-        }
-
-        if (statusFiltro.HasValue)
-        {
-            mensalidadesQuery = mensalidadesQuery.Where(x => x.Status == statusFiltro.Value);
-        }
-
-        var totalRegistros = await mensalidadesQuery.CountAsync(cancellationToken);
-
-        var mensalidades = await mensalidadesQuery
-            .OrderByDescending(x => x.Competencia)
-            .ThenBy(x => x.DataVencimento)
-            .ThenBy(x => x.Aluno!.NomeCompleto)
-            .Skip((pagina - 1) * tamanhoPagina)
-            .Take(tamanhoPagina)
-            .Select(x => new FinanceiroMensalidadeItemViewModel
-            {
-                MensalidadeId = x.Id,
-                AlunoId = x.AlunoId,
-                Aluno = x.Aluno!.NomeCompleto,
-                Competencia = x.Competencia,
-                DataVencimento = x.DataVencimento,
-                DataPagamento = x.DataPagamento,
-                ValorBase = x.ValorBase,
-                ValorFinal = x.ValorFinal,
-                Status = x.Status
-            })
-            .ToListAsync(cancellationToken);
-
-        return new FinanceiroIndexViewModel
-        {
-            Pendentes = pendentes,
-            Atrasadas = atrasadas,
-            ValorRecebidoMes = valorRecebidoMes,
-            ValorEmAberto = valorEmAberto,
-            BuscaAluno = buscaAluno,
-            StatusFiltro = statusFiltro,
-            PaginaAtual = pagina,
-            TamanhoPagina = tamanhoPagina,
-            TotalRegistros = totalRegistros,
-            MesCompetenciaGeracao = hoje.Month,
-            AnoCompetenciaGeracao = hoje.Year,
-            Mensalidades = mensalidades
-        };
+        return await queryService.ObterResumoAsync(buscaAluno, statusFiltro, pagina, tamanhoPagina, cancellationToken);
     }
 
     public async Task<FinanceiroAtrasadosViewModel> ObterAtrasadosAsync(CancellationToken cancellationToken = default)
     {
         await AtualizarAtrasosAsync(cancellationToken);
-
-        var hoje = DateOnly.FromDateTime(DateTime.Today);
-
-        var itens = await dbContext.Mensalidades
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .Where(x => x.Status == StatusMensalidadeEnum.Atrasado)
-            .OrderBy(x => x.DataVencimento)
-            .ThenBy(x => x.Aluno!.NomeCompleto)
-            .Select(x => new FinanceiroAtrasadoItemViewModel
-            {
-                MensalidadeId = x.Id,
-                AlunoId = x.AlunoId,
-                Aluno = x.Aluno!.NomeCompleto,
-                Competencia = x.Competencia,
-                DataVencimento = x.DataVencimento,
-                DiasAtraso = hoje.DayNumber - x.DataVencimento.DayNumber,
-                ValorFinal = x.ValorFinal
-            })
-            .ToListAsync(cancellationToken);
-
-        return new FinanceiroAtrasadosViewModel
-        {
-            TotalEmAtraso = itens.Sum(x => x.ValorFinal),
-            Itens = itens
-        };
+        return await queryService.ObterAtrasadosAsync(cancellationToken);
     }
 
-    public async Task<RegistrarPagamentoViewModel?> ObterFormularioPagamentoAsync(int mensalidadeId, CancellationToken cancellationToken = default)
+    public Task<RegistrarPagamentoViewModel?> ObterFormularioPagamentoAsync(int mensalidadeId, CancellationToken cancellationToken = default)
     {
-        var mensalidade = await dbContext.Mensalidades
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .FirstOrDefaultAsync(x => x.Id == mensalidadeId, cancellationToken);
-
-        if (mensalidade is null)
-        {
-            return null;
-        }
-
-        return new RegistrarPagamentoViewModel
-        {
-            MensalidadeId = mensalidade.Id,
-            AlunoId = mensalidade.AlunoId,
-            AlunoNome = mensalidade.Aluno?.NomeCompleto,
-            Competencia = mensalidade.Competencia,
-            DataVencimento = mensalidade.DataVencimento,
-            ValorMensalidadeAtual = mensalidade.ValorFinal,
-            StatusMensalidadeAtual = mensalidade.Status,
-            DataPagamento = DateTime.Now,
-            ValorPago = mensalidade.ValorFinal
-        };
+        return queryService.ObterFormularioPagamentoAsync(mensalidadeId, cancellationToken);
     }
 
-    public async Task<bool> RegistrarPagamentoAsync(RegistrarPagamentoViewModel model, CancellationToken cancellationToken = default)
+    public async Task<OperationResult> RegistrarPagamentoAsync(
+        RegistrarPagamentoViewModel model,
+        CancellationToken cancellationToken = default)
     {
         var mensalidade = await dbContext.Mensalidades
             .FirstOrDefaultAsync(x => x.Id == model.MensalidadeId, cancellationToken);
 
-        if (mensalidade is null || mensalidade.AlunoId != model.AlunoId)
+        if (mensalidade is null)
         {
-            return false;
+            return OperationResult.NotFound("Mensalidade não encontrada para registrar pagamento.");
+        }
+
+        if (mensalidade.AlunoId != model.AlunoId)
+        {
+            return OperationResult.Fail("A mensalidade informada não pertence ao aluno selecionado.");
         }
 
         var pagamento = new Pagamento
@@ -183,7 +71,7 @@ public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroServ
         mensalidade.DataPagamento = DateOnly.FromDateTime(model.DataPagamento.Date);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Pagamento registrado com sucesso.");
     }
 
     public async Task<FinanceiroGeracaoResultadoViewModel> GerarMensalidadesAsync(int ano, int mes, CancellationToken cancellationToken = default)
@@ -297,22 +185,30 @@ public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroServ
         };
     }
 
-    public async Task<bool> AtualizarValorFinalAsync(int mensalidadeId, decimal valorFinal, CancellationToken cancellationToken = default)
+    public async Task<OperationResult> AtualizarValorFinalAsync(
+        int mensalidadeId,
+        decimal valorFinal,
+        CancellationToken cancellationToken = default)
     {
+        if (valorFinal < 0)
+        {
+            return OperationResult.Fail("Valor final não pode ser negativo.", nameof(Mensalidade.ValorFinal));
+        }
+
         var mensalidade = await dbContext.Mensalidades
             .FirstOrDefaultAsync(x => x.Id == mensalidadeId, cancellationToken);
 
         if (mensalidade is null)
         {
-            return false;
+            return OperationResult.NotFound("Mensalidade não encontrada para atualizar valor.");
         }
 
         mensalidade.ValorFinal = decimal.Round(valorFinal, 2);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Valor final atualizado.");
     }
 
-    public async Task<bool> AlterarStatusMensalidadeAsync(
+    public async Task<OperationResult> AlterarStatusMensalidadeAsync(
         int mensalidadeId,
         StatusMensalidadeEnum status,
         CancellationToken cancellationToken = default)
@@ -322,14 +218,14 @@ public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroServ
 
         if (mensalidade is null)
         {
-            return false;
+            return OperationResult.NotFound("Mensalidade não encontrada para alterar status.");
         }
 
         mensalidade.Status = status;
 
         if (status == StatusMensalidadeEnum.Pago)
         {
-            mensalidade.DataPagamento ??= DateOnly.FromDateTime(DateTime.Today);
+            mensalidade.DataPagamento ??= DateOnly.FromDateTime(clock.Today);
         }
         else if (status == StatusMensalidadeEnum.Pendente || status == StatusMensalidadeEnum.Cancelado)
         {
@@ -337,77 +233,19 @@ public class FinanceiroService(ApplicationDbContext dbContext) : IFinanceiroServ
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Status da mensalidade atualizado.");
     }
 
     public async Task<FinanceiroHistoricoAlunoViewModel?> ObterHistoricoAlunoAsync(int alunoId, CancellationToken cancellationToken = default)
     {
         await AtualizarAtrasosAsync(cancellationToken);
-
-        var aluno = await dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .FirstOrDefaultAsync(x => x.Id == alunoId, cancellationToken);
-
-        if (aluno is null)
-        {
-            return null;
-        }
-
-        var mensalidades = await dbContext.Mensalidades
-            .AsNoTracking()
-            .Where(x => x.AlunoId == alunoId)
-            .OrderByDescending(x => x.Competencia)
-            .ThenByDescending(x => x.DataVencimento)
-            .Select(x => new FinanceiroMensalidadeItemViewModel
-            {
-                MensalidadeId = x.Id,
-                AlunoId = x.AlunoId,
-                Aluno = aluno.NomeCompleto,
-                Competencia = x.Competencia,
-                DataVencimento = x.DataVencimento,
-                DataPagamento = x.DataPagamento,
-                ValorBase = x.ValorBase,
-                ValorFinal = x.ValorFinal,
-                Status = x.Status
-            })
-            .ToListAsync(cancellationToken);
-
-        var pagamentos = await dbContext.Pagamentos
-            .AsNoTracking()
-            .Include(x => x.Mensalidade)
-            .Where(x => x.AlunoId == alunoId)
-            .OrderByDescending(x => x.DataPagamento)
-            .Select(x => new FinanceiroPagamentoItemViewModel
-            {
-                PagamentoId = x.Id,
-                MensalidadeId = x.MensalidadeId,
-                Competencia = x.Mensalidade!.Competencia,
-                DataPagamento = x.DataPagamento,
-                ValorPago = x.ValorPago,
-                FormaPagamento = x.FormaPagamento,
-                Observacoes = x.Observacoes
-            })
-            .ToListAsync(cancellationToken);
-
-        return new FinanceiroHistoricoAlunoViewModel
-        {
-            AlunoId = aluno.Id,
-            AlunoNome = aluno.NomeCompleto,
-            Turma = aluno.Turma?.Nome,
-            TotalPago = pagamentos.Sum(x => x.ValorPago),
-            TotalEmAberto = mensalidades
-                .Where(x => x.Status == StatusMensalidadeEnum.Pendente || x.Status == StatusMensalidadeEnum.Atrasado)
-                .Sum(x => x.ValorFinal),
-            Mensalidades = mensalidades,
-            Pagamentos = pagamentos
-        };
+        return await queryService.ObterHistoricoAlunoAsync(alunoId, cancellationToken);
     }
 
     private async Task AtualizarAtrasosAsync(CancellationToken cancellationToken)
     {
         var config = await ObterConfiguracaoFinanceiraAsync(cancellationToken);
-        var hoje = DateOnly.FromDateTime(DateTime.Today);
+        var hoje = DateOnly.FromDateTime(clock.Today);
         var diasTolerancia = Math.Clamp(config?.DiasToleranciaAtraso ?? 0, 0, 15);
         var limite = hoje.AddDays(-diasTolerancia);
 

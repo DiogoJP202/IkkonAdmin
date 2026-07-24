@@ -3,12 +3,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
-using IkkonAdmin.Web.Models.Entities;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.ViewModels;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace IkkonAdmin.Web.Services;
@@ -18,13 +15,11 @@ public class GoogleAgendaService(
     IOptions<GoogleAgendaOptions> options,
     IWebHostEnvironment environment,
     ILogger<GoogleAgendaService> logger,
-    ApplicationDbContext dbContext,
-    IDataProtectionProvider dataProtectionProvider) : IGoogleAgendaService
+    IGoogleAgendaConnectionService connectionService,
+    IClock clock) : IGoogleAgendaService
 {
-    private const string CalendarScope = "https://www.googleapis.com/auth/calendar";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly GoogleAgendaOptions options = options.Value;
-    private readonly IDataProtector refreshTokenProtector = dataProtectionProvider.CreateProtector("IkkonAdmin.GoogleAgenda.RefreshToken.v1");
 
     private string? accessToken;
     private DateTimeOffset accessTokenExpiresAt;
@@ -33,9 +28,7 @@ public class GoogleAgendaService(
 
     public Task<bool> PossuiConexaoOAuthAsync(CancellationToken cancellationToken = default)
     {
-        return dbContext.GoogleAgendaConexoes
-            .AsNoTracking()
-            .AnyAsync(x => x.Ativa, cancellationToken);
+        return connectionService.PossuiConexaoOAuthAsync(cancellationToken);
     }
 
     public async Task<string> GerarUrlAutorizacaoAsync(
@@ -60,7 +53,7 @@ public class GoogleAgendaService(
             ["client_id"] = client.ClientId ?? string.Empty,
             ["redirect_uri"] = callback,
             ["response_type"] = "code",
-            ["scope"] = CalendarScope,
+            ["scope"] = GoogleAgendaConstants.CalendarScope,
             ["access_type"] = "offline",
             ["prompt"] = "consent",
             ["state"] = state
@@ -114,42 +107,16 @@ public class GoogleAgendaService(
             throw new GoogleAgendaConfigurationException("O Google não retornou refresh token. Revogue o acesso anterior no Google ou reconecte usando prompt=consent.");
         }
 
-        var conexoesAtivas = await dbContext.GoogleAgendaConexoes
-            .Where(x => x.Ativa)
-            .ToListAsync(cancellationToken);
-
-        foreach (var conexaoAtiva in conexoesAtivas)
-        {
-            conexaoAtiva.Ativa = false;
-            conexaoAtiva.AtualizadoEmUtc = DateTime.UtcNow;
-        }
-
-        await dbContext.GoogleAgendaConexoes.AddAsync(new GoogleAgendaConexao
-        {
-            ContaEmail = null,
-            RefreshTokenProtegido = refreshTokenProtector.Protect(tokenPayload.RefreshToken),
-            Escopos = tokenPayload.Scope ?? CalendarScope,
-            Ativa = true,
-            CriadoEmUtc = DateTime.UtcNow,
-            ConectadoPorUsuarioId = usuarioId
-        }, cancellationToken);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await connectionService.SubstituirConexaoAtivaAsync(
+            tokenPayload.RefreshToken,
+            tokenPayload.Scope ?? GoogleAgendaConstants.CalendarScope,
+            usuarioId,
+            cancellationToken);
     }
 
     public async Task DesconectarOAuthAsync(int? usuarioId, CancellationToken cancellationToken = default)
     {
-        var conexoesAtivas = await dbContext.GoogleAgendaConexoes
-            .Where(x => x.Ativa)
-            .ToListAsync(cancellationToken);
-
-        foreach (var conexao in conexoesAtivas)
-        {
-            conexao.Ativa = false;
-            conexao.AtualizadoEmUtc = DateTime.UtcNow;
-        }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await connectionService.DesconectarOAuthAsync(usuarioId, cancellationToken);
         accessToken = null;
         accessTokenExpiresAt = DateTimeOffset.MinValue;
     }
@@ -254,7 +221,7 @@ public class GoogleAgendaService(
 
     private async Task EnsureAuthorizationAsync(CancellationToken cancellationToken)
     {
-        if (accessToken is not null && accessTokenExpiresAt > DateTimeOffset.UtcNow.AddMinutes(2))
+        if (accessToken is not null && accessTokenExpiresAt > new DateTimeOffset(clock.UtcNow).AddMinutes(2))
         {
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             return;
@@ -301,18 +268,13 @@ public class GoogleAgendaService(
 
     private async Task AutorizarComOAuthAsync(GoogleOAuthClientCredentials credentials, CancellationToken cancellationToken)
     {
-        var conexao = await dbContext.GoogleAgendaConexoes
-            .AsNoTracking()
-            .Where(x => x.Ativa)
-            .OrderByDescending(x => x.CriadoEmUtc)
-            .FirstOrDefaultAsync(cancellationToken);
+        var refreshToken = await connectionService.ObterRefreshTokenAtivoAsync(cancellationToken);
 
-        if (conexao is null)
+        if (string.IsNullOrWhiteSpace(refreshToken))
         {
             throw new GoogleAgendaConfigurationException("Conecte o Google Agenda pelo botão 'Conectar Google Agenda' antes de carregar eventos.");
         }
 
-        var refreshToken = refreshTokenProtector.Unprotect(conexao.RefreshTokenProtegido);
         var tokenUri = string.IsNullOrWhiteSpace(credentials.TokenUri)
             ? "https://oauth2.googleapis.com/token"
             : credentials.TokenUri;
@@ -343,7 +305,7 @@ public class GoogleAgendaService(
     private void AplicarAccessToken(GoogleTokenResponse tokenPayload)
     {
         accessToken = tokenPayload.AccessToken;
-        accessTokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(Math.Max(60, tokenPayload.ExpiresIn - 60));
+        accessTokenExpiresAt = new DateTimeOffset(clock.UtcNow).AddSeconds(Math.Max(60, tokenPayload.ExpiresIn - 60));
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     }
 
@@ -406,14 +368,14 @@ public class GoogleAgendaService(
             : redirectUri;
     }
 
-    private static string CriarJwtAssertion(GoogleServiceAccountCredentials credentials, string tokenUri)
+    private string CriarJwtAssertion(GoogleServiceAccountCredentials credentials, string tokenUri)
     {
-        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var now = new DateTimeOffset(clock.UtcNow).ToUnixTimeSeconds();
         var header = new { alg = "RS256", typ = "JWT" };
         var payload = new
         {
             iss = credentials.ClientEmail,
-            scope = CalendarScope,
+            scope = GoogleAgendaConstants.CalendarScope,
             aud = tokenUri,
             exp = now + 3600,
             iat = now

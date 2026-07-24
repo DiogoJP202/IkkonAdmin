@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -11,7 +12,9 @@ namespace IkkonAdmin.Web.Controllers;
 [Route("admin/agenda")]
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.GoogleAgendaView)]
-public class GoogleAgendaController(IGoogleAgendaService googleAgendaService) : Controller
+public class GoogleAgendaController(
+    IGoogleAgendaService googleAgendaService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index([FromQuery] GoogleAgendaFiltroViewModel filtro, CancellationToken cancellationToken)
@@ -238,8 +241,7 @@ public class GoogleAgendaController(IGoogleAgendaService googleAgendaService) : 
 
     private int? ObterUsuarioId()
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out var userId) ? userId : null;
+        return currentUserService.UserId;
     }
 
     private static void AplicarIntervaloDaVisualizacao(GoogleAgendaFiltroViewModel filtro)

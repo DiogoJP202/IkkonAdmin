@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using IkkonAdmin.Web.Models.ViewModels;
+using IkkonAdmin.Web.Infrastructure.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IkkonAdmin.Web.Services;
@@ -13,7 +14,8 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.ConfiguracoesView)]
 public class ConfiguracoesController(
     IUserSettingsService userSettingsService,
-    IAuthService authService) : Controller
+    IAuthService authService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -134,7 +136,7 @@ public class ConfiguracoesController(
     private async Task<bool> RenovarSessaoAsync(int userId, CancellationToken cancellationToken)
     {
         var sessionResult = await authService.RecarregarSessaoAsync(userId, cancellationToken);
-        if (!sessionResult.Sucesso)
+        if (!sessionResult.Success || sessionResult.Value is null)
         {
             return false;
         }
@@ -148,7 +150,7 @@ public class ConfiguracoesController(
 
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            AuthClaimsFactory.CriarPrincipal(sessionResult),
+            AuthClaimsFactory.CriarPrincipal(sessionResult.Value),
             properties);
 
         return true;
@@ -156,8 +158,14 @@ public class ConfiguracoesController(
 
     private bool TryGetCurrentUserId(out int userId)
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out userId);
+        if (currentUserService.UserId is int currentUserId)
+        {
+            userId = currentUserId;
+            return true;
+        }
+
+        userId = 0;
+        return false;
     }
 
     private Dictionary<string, string[]> BuildModelErrors()

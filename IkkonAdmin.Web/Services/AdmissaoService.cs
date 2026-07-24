@@ -1,74 +1,54 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
+public class AdmissaoService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IAdmissaoQueryService queryService,
+    IAlunoQueryService alunoQueryService) : IAdmissaoService
 {
-    public async Task<IReadOnlyList<Admissao>> ListarAsync(
+    public Task<IReadOnlyList<Admissao>> ListarAsync(
         string? busca = null,
         StatusAdmissaoEnum? status = null,
         CancellationToken cancellationToken = default)
     {
-        var query = dbContext.Admissoes
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            var buscaTexto = busca.Trim();
-            query = query.Where(x =>
-                x.NomeInteressado.Contains(buscaTexto) ||
-                (x.Aluno != null && x.Aluno.NomeCompleto.Contains(buscaTexto)));
-        }
-
-        if (status.HasValue)
-        {
-            query = query.Where(x => x.Status == status.Value);
-        }
-
-        return await query
-            .OrderByDescending(x => x.DataAulaExperimental)
-            .ThenBy(x => x.NomeInteressado)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAsync(busca, status, cancellationToken);
     }
 
     public Task<Admissao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Admissoes
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return queryService.ObterDetalhesAsync(id, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.Turmas
-            .AsNoTracking()
-            .Where(x => x.Ativa)
-            .OrderBy(x => x.Nome)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarTurmasAsync(cancellationToken);
     }
 
-    public async Task<int> CriarAsync(Admissao admissao, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> CriarAsync(Admissao admissao, CancellationToken cancellationToken = default)
     {
         admissao.NomeInteressado = admissao.NomeInteressado.Trim();
         admissao.ChecklistObservacoes = LimparOpcional(admissao.ChecklistObservacoes);
 
         if (admissao.Status == StatusAdmissaoEnum.Matriculado)
         {
-            admissao.Status = StatusAdmissaoEnum.EmAndamento;
+            return OperationResult<int>.Fail(
+                "Use o status Matriculado somente após criar a matrícula.",
+                nameof(Admissao.Status));
         }
 
         await dbContext.Admissoes.AddAsync(admissao, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return admissao.Id;
+        return OperationResult<int>.Ok(admissao.Id, "Admissão registrada com sucesso.");
     }
 
-    public async Task<bool> AtualizarProcessoAsync(
+    public async Task<OperationResult> AtualizarProcessoAsync(
         int id,
         StatusAdmissaoEnum status,
         bool contratoAssinado,
@@ -82,12 +62,14 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
 
         if (admissao is null)
         {
-            return false;
+            return OperationResult.NotFound("Admissão não encontrada.");
         }
 
         if (status == StatusAdmissaoEnum.Matriculado && !admissao.AlunoId.HasValue)
         {
-            return false;
+            return OperationResult.Fail(
+                "Crie a matrícula antes de definir o status Matriculado.",
+                nameof(Admissao.Status));
         }
 
         admissao.Status = status;
@@ -97,10 +79,10 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
         admissao.ChecklistObservacoes = LimparOpcional(checklistObservacoes);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Processo de admissão atualizado.");
     }
 
-    public async Task<AdmissaoMatriculaResultado> CriarMatriculaAsync(
+    public async Task<OperationResult<AdmissaoMatriculaResultado>> CriarMatriculaAsync(
         int admissaoId,
         AdmissaoMatriculaInput input,
         CancellationToken cancellationToken = default)
@@ -110,26 +92,27 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
 
         if (admissao is null)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Admissão não encontrada." };
+            return OperationResult<AdmissaoMatriculaResultado>.NotFound("Admissão não encontrada.");
         }
 
         if (admissao.AlunoId.HasValue)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Esta admissão já possui matrícula vinculada." };
+            return OperationResult<AdmissaoMatriculaResultado>.Fail("Esta admissão já possui matrícula vinculada.");
         }
 
         var cpf = SomenteDigitos(input.CPF);
         if (cpf.Length != 11)
         {
-            return new AdmissaoMatriculaResultado { Erro = "Informe um CPF valido com 11 digitos." };
+            return OperationResult<AdmissaoMatriculaResultado>.Fail(
+                "Informe um CPF válido com 11 dígitos.",
+                nameof(AdmissaoMatriculaInput.CPF));
         }
 
-        var cpfJaExiste = await dbContext.Alunos
-            .AnyAsync(x => x.CPF == cpf || x.CPF.Replace(".", string.Empty).Replace("-", string.Empty) == cpf, cancellationToken);
-
-        if (cpfJaExiste)
+        if (await alunoQueryService.ExisteCpfAsync(cpf, cancellationToken: cancellationToken))
         {
-            return new AdmissaoMatriculaResultado { Erro = "Já existe um aluno cadastrado com esse CPF." };
+            return OperationResult<AdmissaoMatriculaResultado>.Fail(
+                "Já existe um aluno cadastrado com esse CPF.",
+                nameof(AdmissaoMatriculaInput.CPF));
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -144,7 +127,7 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
             Celular = LimparOpcional(input.Celular),
             Email = LimparOpcional(input.Email),
             ContatoEmergencia = LimparOpcional(input.ContatoEmergencia),
-            DataEntrada = DateOnly.FromDateTime(DateTime.Today),
+            DataEntrada = clock.TodayDate,
             TurmaId = input.TurmaId,
             Status = StatusAlunoEnum.Ativo,
             Observacoes = LimparOpcional(input.ObservacoesAluno)
@@ -159,18 +142,18 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
             {
                 AlunoId = novoAluno.Id,
                 TurmaId = novoAluno.TurmaId.Value,
-                DataVinculo = DateTime.UtcNow
+                DataVinculo = clock.UtcNow
             });
         }
 
         admissao.AlunoId = novoAluno.Id;
-        admissao.DataMatricula = DateOnly.FromDateTime(DateTime.Today);
+        admissao.DataMatricula = clock.TodayDate;
         admissao.Status = StatusAdmissaoEnum.Matriculado;
 
         dbContext.HistoricosAlunos.Add(new HistoricoAluno
         {
             AlunoId = novoAluno.Id,
-            DataEvento = DateTime.Now,
+            DataEvento = clock.Now,
             TipoEvento = "Admissao",
             Descricao = $"Matricula criada a partir da admissao #{admissao.Id}."
         });
@@ -178,11 +161,12 @@ public class AdmissaoService(ApplicationDbContext dbContext) : IAdmissaoService
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return new AdmissaoMatriculaResultado
-        {
-            Sucesso = true,
-            AlunoId = novoAluno.Id
-        };
+        return OperationResult<AdmissaoMatriculaResultado>.Ok(
+            new AdmissaoMatriculaResultado
+            {
+                AlunoId = novoAluno.Id
+            },
+            "Matrícula criada com sucesso e vinculada à admissão.");
     }
 
     private static string SomenteDigitos(string? valor)

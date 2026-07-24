@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 
 namespace IkkonAdmin.Web.Services;
@@ -12,8 +13,8 @@ public interface IAdmissaoService
 
     Task<Admissao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default);
-    Task<int> CriarAsync(Admissao admissao, CancellationToken cancellationToken = default);
-    Task<bool> AtualizarProcessoAsync(
+    Task<OperationResult<int>> CriarAsync(Admissao admissao, CancellationToken cancellationToken = default);
+    Task<OperationResult> AtualizarProcessoAsync(
         int id,
         StatusAdmissaoEnum status,
         bool contratoAssinado,
@@ -22,7 +23,7 @@ public interface IAdmissaoService
         string? checklistObservacoes,
         CancellationToken cancellationToken = default);
 
-    Task<AdmissaoMatriculaResultado> CriarMatriculaAsync(
+    Task<OperationResult<AdmissaoMatriculaResultado>> CriarMatriculaAsync(
         int admissaoId,
         AdmissaoMatriculaInput input,
         CancellationToken cancellationToken = default);
@@ -43,7 +44,5 @@ public sealed class AdmissaoMatriculaInput
 
 public sealed class AdmissaoMatriculaResultado
 {
-    public bool Sucesso { get; set; }
-    public string? Erro { get; set; }
-    public int? AlunoId { get; set; }
+    public int AlunoId { get; set; }
 }

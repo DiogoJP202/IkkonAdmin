@@ -1,77 +1,41 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamentoService
+public class DesligamentoService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IDesligamentoQueryService queryService) : IDesligamentoService
 {
-    public async Task<IReadOnlyList<Desligamento>> ListarAsync(
+    public Task<IReadOnlyList<Desligamento>> ListarAsync(
         string? busca = null,
         bool? confirmado = null,
         CancellationToken cancellationToken = default)
     {
-        var query = dbContext.Desligamentos
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .ThenInclude(x => x!.Turma)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            var buscaTexto = busca.Trim();
-            query = query.Where(x =>
-                x.Aluno != null &&
-                (x.Aluno.NomeCompleto.Contains(buscaTexto) ||
-                 x.Aluno.CPF.Contains(buscaTexto)));
-        }
-
-        if (confirmado.HasValue)
-        {
-            query = confirmado.Value
-                ? query.Where(x => x.DataConfirmacao.HasValue)
-                : query.Where(x => !x.DataConfirmacao.HasValue);
-        }
-
-        return await query
-            .OrderByDescending(x => x.DataSolicitacao)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAsync(busca, confirmado, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Aluno>> ListarAlunosElegiveisAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Aluno>> ListarAlunosElegiveisAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .Where(x => x.Status == StatusAlunoEnum.Ativo || x.Status == StatusAlunoEnum.Inativo)
-            .OrderBy(x => x.NomeCompleto)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAlunosElegiveisAsync(cancellationToken);
     }
 
     public Task<Desligamento?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Desligamentos
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .ThenInclude(x => x!.Turma)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return queryService.ObterDetalhesAsync(id, cancellationToken);
     }
 
-    public async Task<decimal> CalcularPendenciasAsync(int alunoId, CancellationToken cancellationToken = default)
+    public Task<decimal> CalcularPendenciasAsync(int alunoId, CancellationToken cancellationToken = default)
     {
-        var hoje = DateOnly.FromDateTime(DateTime.Today);
-
-        var totalPendencias = await dbContext.Mensalidades
-            .Where(x => x.AlunoId == alunoId &&
-                        (x.Status == StatusMensalidadeEnum.Atrasado ||
-                         (x.Status == StatusMensalidadeEnum.Pendente && x.DataVencimento <= hoje)))
-            .SumAsync(x => (decimal?)x.ValorFinal, cancellationToken) ?? 0m;
-
-        return decimal.Round(totalPendencias, 2);
+        return queryService.CalcularPendenciasAsync(alunoId, cancellationToken);
     }
 
-    public async Task<int> CriarAsync(
+    public async Task<OperationResult<int>> CriarAsync(
         Desligamento desligamento,
         CancellationToken cancellationToken = default)
     {
@@ -83,16 +47,16 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
 
         if (existeAberto)
         {
-            throw new InvalidOperationException("Já existe um processo de desligamento em aberto para este aluno.");
+            return OperationResult<int>.Fail("Já existe um processo de desligamento em aberto para este aluno.");
         }
 
         await dbContext.Desligamentos.AddAsync(desligamento, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return desligamento.Id;
+        return OperationResult<int>.Ok(desligamento.Id, "Solicitação de desligamento criada com sucesso.");
     }
 
-    public async Task<bool> AtualizarAsync(
+    public async Task<OperationResult> AtualizarAsync(
         int id,
         string motivo,
         decimal pendenciaFinanceira,
@@ -107,7 +71,7 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
 
         if (desligamento is null)
         {
-            return false;
+            return OperationResult.NotFound("Desligamento não encontrado.");
         }
 
         desligamento.Motivo = motivo.Trim();
@@ -118,10 +82,10 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
         desligamento.Observacoes = LimparOpcional(observacoes);
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+        return OperationResult.Ok("Processo de desligamento atualizado.");
     }
 
-    public async Task<DesligamentoConfirmacaoResultado> ConfirmarAsync(
+    public async Task<OperationResult<DesligamentoConfirmacaoResultado>> ConfirmarAsync(
         int id,
         bool encerrarCobrancasFuturas,
         CancellationToken cancellationToken = default)
@@ -132,17 +96,17 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
 
         if (desligamento is null)
         {
-            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento não encontrado." };
+            return OperationResult<DesligamentoConfirmacaoResultado>.NotFound("Desligamento não encontrado.");
         }
 
         if (desligamento.DataConfirmacao.HasValue)
         {
-            return new DesligamentoConfirmacaoResultado { Erro = "Desligamento já confirmado.", AlunoId = desligamento.AlunoId };
+            return OperationResult<DesligamentoConfirmacaoResultado>.Fail("Desligamento já confirmado.");
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        desligamento.DataConfirmacao = DateOnly.FromDateTime(DateTime.Today);
+        desligamento.DataConfirmacao = clock.TodayDate;
 
         if (desligamento.Aluno is not null)
         {
@@ -158,7 +122,7 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
         dbContext.HistoricosAlunos.Add(new HistoricoAluno
         {
             AlunoId = desligamento.AlunoId,
-            DataEvento = DateTime.Now,
+            DataEvento = clock.Now,
             TipoEvento = "Desligamento",
             Descricao =
                 $"Desligamento confirmado. Pendencia: {desligamento.PendenciaFinanceira:C}. Multa: {desligamento.MultaRescisoria:C}. Cobrancas futuras canceladas: {cobrancasCanceladas}."
@@ -167,17 +131,19 @@ public class DesligamentoService(ApplicationDbContext dbContext) : IDesligamento
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return new DesligamentoConfirmacaoResultado
-        {
-            Sucesso = true,
-            CobrancasCanceladas = cobrancasCanceladas,
-            AlunoId = desligamento.AlunoId
-        };
+        return OperationResult<DesligamentoConfirmacaoResultado>.Ok(
+            new DesligamentoConfirmacaoResultado
+            {
+                CobrancasCanceladas = cobrancasCanceladas,
+                AlunoId = desligamento.AlunoId
+            },
+            "Desligamento confirmado.");
     }
 
     private async Task<int> EncerrarCobrancasFuturasAsync(int alunoId, CancellationToken cancellationToken)
     {
-        var competenciaAtual = new DateOnly(DateTime.Today.Year, DateTime.Today.Month, 1);
+        var hoje = clock.TodayDate;
+        var competenciaAtual = new DateOnly(hoje.Year, hoje.Month, 1);
 
         var futuras = await dbContext.Mensalidades
             .Where(x => x.AlunoId == alunoId &&

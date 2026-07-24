@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Models.ViewModels;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
@@ -11,7 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace IkkonAdmin.Web.Controllers;
 
 [Route("auth")]
-public class AuthController(IAuthService authService) : Controller
+public class AuthController(
+    IAuthService authService,
+    ICurrentUserService currentUserService) : Controller
 {
     [AllowAnonymous]
     [HttpGet("")]
@@ -62,17 +65,18 @@ public class AuthController(IAuthService authService) : Controller
             model.LoginOuEmail,
             model.Senha,
             model.TipoAcesso,
-            HttpContext.Connection.RemoteIpAddress?.ToString(),
+            currentUserService.RemoteIpAddress,
             cancellationToken);
 
-        if (!authResult.Sucesso || authResult.Usuario is null)
+        if (!authResult.Success || authResult.Value is null)
         {
             ModelState.AddModelError(string.Empty, "Credenciais inv\u00E1lidas para o tipo de acesso selecionado.");
             return View(model);
         }
 
-        var rolePrincipal = AppRoles.FromTipoAcesso(authResult.Usuario.TipoAcesso);
-        var claimsPrincipal = AuthClaimsFactory.CriarPrincipal(authResult);
+        var authSession = authResult.Value;
+        var rolePrincipal = AppRoles.FromTipoAcesso(authSession.Usuario.TipoAcesso);
+        var claimsPrincipal = AuthClaimsFactory.CriarPrincipal(authSession);
 
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,

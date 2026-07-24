@@ -14,7 +14,6 @@ public class InventarioFiltroViewModel
     public int PaginaAtual { get; set; } = 1;
     public int TamanhoPagina { get; set; } = 20;
 }
-
 public class InventarioIndexViewModel
 {
     public InventarioFiltroViewModel Filtro { get; set; } = new();
@@ -149,10 +148,4 @@ public class InventarioFormViewModel : IValidatableObject
                 new[] { nameof(Tipo) });
         }
     }
-}
-
-public sealed record InventarioOperationResult(bool Success, string Message, int? EntityId = null)
-{
-    public static InventarioOperationResult Ok(string message, int? entityId = null) => new(true, message, entityId);
-    public static InventarioOperationResult Fail(string message) => new(false, message);
 }

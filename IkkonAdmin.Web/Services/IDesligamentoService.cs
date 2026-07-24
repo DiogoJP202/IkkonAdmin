@@ -1,3 +1,4 @@
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 
 namespace IkkonAdmin.Web.Services;
@@ -12,8 +13,8 @@ public interface IDesligamentoService
     Task<IReadOnlyList<Aluno>> ListarAlunosElegiveisAsync(CancellationToken cancellationToken = default);
     Task<Desligamento?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default);
     Task<decimal> CalcularPendenciasAsync(int alunoId, CancellationToken cancellationToken = default);
-    Task<int> CriarAsync(Desligamento desligamento, CancellationToken cancellationToken = default);
-    Task<bool> AtualizarAsync(
+    Task<OperationResult<int>> CriarAsync(Desligamento desligamento, CancellationToken cancellationToken = default);
+    Task<OperationResult> AtualizarAsync(
         int id,
         string motivo,
         decimal pendenciaFinanceira,
@@ -23,7 +24,7 @@ public interface IDesligamentoService
         string? observacoes,
         CancellationToken cancellationToken = default);
 
-    Task<DesligamentoConfirmacaoResultado> ConfirmarAsync(
+    Task<OperationResult<DesligamentoConfirmacaoResultado>> ConfirmarAsync(
         int id,
         bool encerrarCobrancasFuturas,
         CancellationToken cancellationToken = default);
@@ -31,8 +32,6 @@ public interface IDesligamentoService
 
 public sealed class DesligamentoConfirmacaoResultado
 {
-    public bool Sucesso { get; set; }
-    public string? Erro { get; set; }
     public int CobrancasCanceladas { get; set; }
-    public int? AlunoId { get; set; }
+    public int AlunoId { get; set; }
 }

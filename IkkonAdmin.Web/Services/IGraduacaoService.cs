@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 
 namespace IkkonAdmin.Web.Services;
@@ -14,9 +15,9 @@ public interface IGraduacaoService
     Task<IReadOnlyList<Aluno>> ListarAlunosAptosAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<ExameGraduacao>> ListarExamesAsync(CancellationToken cancellationToken = default);
     Task<Graduacao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default);
-    Task<int> CriarExameAsync(ExameGraduacao exame, CancellationToken cancellationToken = default);
+    Task<OperationResult<int>> CriarExameAsync(ExameGraduacao exame, CancellationToken cancellationToken = default);
 
-    Task<GraduacaoRegistroResultado> RegistrarResultadoAsync(
+    Task<OperationResult<GraduacaoRegistroResultado>> RegistrarResultadoAsync(
         GraduacaoRegistroInput input,
         CancellationToken cancellationToken = default);
 }
@@ -38,8 +39,6 @@ public sealed class GraduacaoRegistroInput
 
 public sealed class GraduacaoRegistroResultado
 {
-    public bool Sucesso { get; set; }
-    public string? Erro { get; set; }
-    public int? GraduacaoId { get; set; }
+    public int GraduacaoId { get; set; }
     public int? ExameGraduacaoId { get; set; }
 }

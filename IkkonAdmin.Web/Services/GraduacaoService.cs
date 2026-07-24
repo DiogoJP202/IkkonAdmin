@@ -1,86 +1,50 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IkkonAdmin.Web.Services;
 
-public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoService
+public class GraduacaoService(
+    ApplicationDbContext dbContext,
+    IClock clock,
+    IGraduacaoQueryService queryService) : IGraduacaoService
 {
-    public async Task<IReadOnlyList<Graduacao>> ListarAsync(
+    public Task<IReadOnlyList<Graduacao>> ListarAsync(
         string? busca = null,
         bool? somenteAprovados = null,
         CancellationToken cancellationToken = default)
     {
-        var query = dbContext.Graduacoes
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .ThenInclude(x => x!.Turma)
-            .Include(x => x.ExameGraduacao)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(busca))
-        {
-            var buscaTexto = busca.Trim();
-            query = query.Where(x =>
-                x.Aluno != null &&
-                (x.Aluno.NomeCompleto.Contains(buscaTexto) ||
-                 x.Aluno.CPF.Contains(buscaTexto)));
-        }
-
-        if (somenteAprovados.HasValue)
-        {
-            query = query.Where(x => x.ResultadoAprovado == somenteAprovados.Value);
-        }
-
-        return await query
-            .OrderByDescending(x => x.DataResultado)
-            .ThenByDescending(x => x.Id)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAsync(busca, somenteAprovados, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Graduacao>> ListarHistoricoAlunoAsync(int alunoId, CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Graduacao>> ListarHistoricoAlunoAsync(
+        int alunoId,
+        CancellationToken cancellationToken = default)
     {
-        return await dbContext.Graduacoes
-            .AsNoTracking()
-            .Include(x => x.ExameGraduacao)
-            .Where(x => x.AlunoId == alunoId)
-            .OrderByDescending(x => x.DataResultado)
-            .ThenByDescending(x => x.Id)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarHistoricoAlunoAsync(alunoId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Aluno>> ListarAlunosAptosAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<Aluno>> ListarAlunosAptosAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.Alunos
-            .AsNoTracking()
-            .Include(x => x.Turma)
-            .Where(x => x.Status == StatusAlunoEnum.Ativo)
-            .OrderBy(x => x.NomeCompleto)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarAlunosAptosAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<ExameGraduacao>> ListarExamesAsync(CancellationToken cancellationToken = default)
+    public Task<IReadOnlyList<ExameGraduacao>> ListarExamesAsync(CancellationToken cancellationToken = default)
     {
-        return await dbContext.ExamesGraduacao
-            .AsNoTracking()
-            .Include(x => x.Graduacoes)
-            .OrderByDescending(x => x.DataExame)
-            .ThenByDescending(x => x.Id)
-            .ToListAsync(cancellationToken);
+        return queryService.ListarExamesAsync(cancellationToken);
     }
 
     public Task<Graduacao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
     {
-        return dbContext.Graduacoes
-            .AsNoTracking()
-            .Include(x => x.Aluno)
-            .ThenInclude(x => x!.Turma)
-            .Include(x => x.ExameGraduacao)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return queryService.ObterDetalhesAsync(id, cancellationToken);
     }
 
-    public async Task<int> CriarExameAsync(ExameGraduacao exame, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> CriarExameAsync(
+        ExameGraduacao exame,
+        CancellationToken cancellationToken = default)
     {
         exame.Local = LimparOpcional(exame.Local);
         exame.Observacoes = LimparOpcional(exame.Observacoes);
@@ -88,10 +52,10 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
         await dbContext.ExamesGraduacao.AddAsync(exame, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return exame.Id;
+        return OperationResult<int>.Ok(exame.Id, "Exame de graduação criado com sucesso.");
     }
 
-    public async Task<GraduacaoRegistroResultado> RegistrarResultadoAsync(
+    public async Task<OperationResult<GraduacaoRegistroResultado>> RegistrarResultadoAsync(
         GraduacaoRegistroInput input,
         CancellationToken cancellationToken = default)
     {
@@ -101,17 +65,28 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
 
         if (aluno is null)
         {
-            return new GraduacaoRegistroResultado { Erro = "Aluno não encontrado." };
+            return OperationResult<GraduacaoRegistroResultado>.NotFound("Aluno não encontrado.");
         }
 
         if (aluno.Status != StatusAlunoEnum.Ativo)
         {
-            return new GraduacaoRegistroResultado { Erro = "Somente alunos ativos podem receber registro de graduacao." };
+            return OperationResult<GraduacaoRegistroResultado>.Fail(
+                "Somente alunos ativos podem receber registro de graduação.",
+                nameof(GraduacaoRegistroInput.AlunoId));
         }
 
         if (input.ResultadoAprovado && !input.NivelNovo.HasValue)
         {
-            return new GraduacaoRegistroResultado { Erro = "Informe o nivel novo para registrar resultado aprovado." };
+            return OperationResult<GraduacaoRegistroResultado>.Fail(
+                "Informe o nível novo para registrar resultado aprovado.",
+                nameof(GraduacaoRegistroInput.NivelNovo));
+        }
+
+        if (!input.ExameGraduacaoId.HasValue && !input.DataExameNovo.HasValue)
+        {
+            return OperationResult<GraduacaoRegistroResultado>.Fail(
+                "Selecione um exame existente ou informe a data para criar um novo exame.",
+                nameof(GraduacaoRegistroInput.ExameGraduacaoId));
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -127,7 +102,7 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
 
             if (!exameExiste)
             {
-                return new GraduacaoRegistroResultado { Erro = "Exame informado não encontrado." };
+                return OperationResult<GraduacaoRegistroResultado>.NotFound("Exame informado não encontrado.");
             }
         }
         else if (input.DataExameNovo.HasValue)
@@ -142,7 +117,7 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
             await dbContext.ExamesGraduacao.AddAsync(exameNovo, cancellationToken);
         }
 
-        var nivelAnterior = await ObterNivelAtualAsync(input.AlunoId, cancellationToken);
+        var nivelAnterior = await queryService.ObterNivelAtualAsync(input.AlunoId, cancellationToken);
 
         var nivelNovo = input.ResultadoAprovado
             ? input.NivelNovo
@@ -150,10 +125,9 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
 
         if (input.ResultadoAprovado && nivelNovo!.Value <= nivelAnterior)
         {
-            return new GraduacaoRegistroResultado
-            {
-                Erro = "O nivel novo precisa ser maior que o nivel anterior para um resultado aprovado."
-            };
+            return OperationResult<GraduacaoRegistroResultado>.Fail(
+                "O nível novo precisa ser maior que o nível anterior para um resultado aprovado.",
+                nameof(GraduacaoRegistroInput.NivelNovo));
         }
 
         var graduacao = new Graduacao
@@ -175,7 +149,7 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
         dbContext.HistoricosAlunos.Add(new HistoricoAluno
         {
             AlunoId = input.AlunoId,
-            DataEvento = DateTime.Now,
+            DataEvento = clock.Now,
             TipoEvento = "Graduacao",
             Descricao = MontarDescricaoHistorico(graduacao.NivelAnterior, graduacao.NivelNovo, graduacao.ResultadoAprovado)
         });
@@ -183,25 +157,13 @@ public class GraduacaoService(ApplicationDbContext dbContext) : IGraduacaoServic
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return new GraduacaoRegistroResultado
-        {
-            Sucesso = true,
-            GraduacaoId = graduacao.Id,
-            ExameGraduacaoId = graduacao.ExameGraduacaoId ?? exameNovo?.Id
-        };
-    }
-
-    private async Task<NivelGraduacaoEnum> ObterNivelAtualAsync(int alunoId, CancellationToken cancellationToken)
-    {
-        var nivelAtual = await dbContext.Graduacoes
-            .AsNoTracking()
-            .Where(x => x.AlunoId == alunoId && x.ResultadoAprovado)
-            .OrderByDescending(x => x.DataResultado)
-            .ThenByDescending(x => x.Id)
-            .Select(x => (NivelGraduacaoEnum?)(x.NivelNovo ?? x.NivelAnterior))
-            .FirstOrDefaultAsync(cancellationToken);
-
-        return nivelAtual ?? NivelGraduacaoEnum.Iniciante;
+        return OperationResult<GraduacaoRegistroResultado>.Ok(
+            new GraduacaoRegistroResultado
+            {
+                GraduacaoId = graduacao.Id,
+                ExameGraduacaoId = graduacao.ExameGraduacaoId ?? exameNovo?.Id
+            },
+            "Resultado de graduação registrado com sucesso.");
     }
 
     private static string MontarDescricaoHistorico(

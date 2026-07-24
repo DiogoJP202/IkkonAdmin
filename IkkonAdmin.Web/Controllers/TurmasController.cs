@@ -1,5 +1,6 @@
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -60,11 +61,6 @@ public class TurmasController(ITurmaService turmaService) : Controller
     {
         model.AlunosIds ??= [];
 
-        if (await turmaService.ExisteNomeAsync(model.Nome, cancellationToken: cancellationToken))
-        {
-            ModelState.AddModelError(nameof(model.Nome), "Já existe uma turma com esse nome.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Nova Turma";
@@ -74,17 +70,24 @@ public class TurmasController(ITurmaService turmaService) : Controller
 
         var turma = new Turma
         {
-            Nome = model.Nome.Trim(),
-            Modalidade = model.Modalidade.Trim(),
-            Horario = LimparOpcional(model.Horario),
+            Nome = model.Nome,
+            Modalidade = model.Modalidade,
+            Horario = model.Horario,
             Ativa = model.Ativa,
-            Observacoes = LimparOpcional(model.Observacoes)
+            Observacoes = model.Observacoes
         };
 
-        await turmaService.CriarAsync(turma, model.AlunosIds, cancellationToken);
+        var result = await turmaService.CriarAsync(turma, model.AlunosIds, cancellationToken);
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
+            ViewData["Title"] = "Nova Turma";
+            await PopularAlunosAsync(model, null, cancellationToken);
+            return View(model);
+        }
 
-        TempData["Success"] = "Turma criada com sucesso.";
-        return RedirectToAction(nameof(Edit), new { id = turma.Id });
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Edit), new { id = result.Value });
     }
 
     [HttpGet]
@@ -129,11 +132,6 @@ public class TurmasController(ITurmaService turmaService) : Controller
             return BadRequest();
         }
 
-        if (await turmaService.ExisteNomeAsync(model.Nome, model.Id, cancellationToken))
-        {
-            ModelState.AddModelError(nameof(model.Nome), "Já existe uma turma com esse nome.");
-        }
-
         if (!ModelState.IsValid)
         {
             ViewData["Title"] = "Editar Turma";
@@ -143,20 +141,28 @@ public class TurmasController(ITurmaService turmaService) : Controller
 
         var turmaAtualizada = new Turma
         {
-            Nome = model.Nome.Trim(),
-            Modalidade = model.Modalidade.Trim(),
-            Horario = LimparOpcional(model.Horario),
+            Nome = model.Nome,
+            Modalidade = model.Modalidade,
+            Horario = model.Horario,
             Ativa = model.Ativa,
-            Observacoes = LimparOpcional(model.Observacoes)
+            Observacoes = model.Observacoes
         };
 
-        var atualizada = await turmaService.AtualizarAsync(id, turmaAtualizada, model.AlunosIds, cancellationToken);
-        if (!atualizada)
+        var result = await turmaService.AtualizarAsync(id, turmaAtualizada, model.AlunosIds, cancellationToken);
+        if (result.Status == OperationResultStatus.NotFound)
         {
             return NotFound();
         }
 
-        TempData["Success"] = "Turma atualizada com sucesso.";
+        if (!result.Success)
+        {
+            result.AddToModelState(ModelState);
+            ViewData["Title"] = "Editar Turma";
+            await PopularAlunosAsync(model, id, cancellationToken);
+            return View(model);
+        }
+
+        result.AddToTempData(TempData);
         return RedirectToAction(nameof(Index));
     }
 
@@ -177,11 +183,5 @@ public class TurmasController(ITurmaService turmaService) : Controller
                         .OrderBy(nome => nome))
             })
             .ToList();
-    }
-
-    private static string? LimparOpcional(string? texto)
-    {
-        var valor = texto?.Trim();
-        return string.IsNullOrWhiteSpace(valor) ? null : valor;
     }
 }

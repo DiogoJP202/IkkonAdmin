@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.ViewModels;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +12,9 @@ namespace IkkonAdmin.Web.Controllers;
 [Route("admin/inventario")]
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.InventarioView)]
-public class InventarioController(IInventarioService inventarioService) : Controller
+public class InventarioController(
+    IInventarioService inventarioService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index([FromQuery] InventarioFiltroViewModel filtro, CancellationToken cancellationToken)
@@ -54,14 +58,14 @@ public class InventarioController(IInventarioService inventarioService) : Contro
         var result = await inventarioService.CriarAsync(model, ObterUsuarioId(), cancellationToken);
         if (!result.Success)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            result.AddToModelState(ModelState);
             var form = await inventarioService.ObterFormCriacaoAsync(cancellationToken);
             model.TiposSugeridos = form.TiposSugeridos;
             return View(model);
         }
 
-        TempData["Success"] = result.Message;
-        return RedirectToAction(nameof(Details), new { id = result.EntityId });
+        result.AddToTempData(TempData);
+        return RedirectToAction(nameof(Details), new { id = result.Value });
     }
 
     [HttpGet("editar/{id:int}")]
@@ -93,15 +97,20 @@ public class InventarioController(IInventarioService inventarioService) : Contro
         }
 
         var result = await inventarioService.AtualizarAsync(id, model, ObterUsuarioId(), cancellationToken);
+        if (result.Status == OperationResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+
         if (!result.Success)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            result.AddToModelState(ModelState);
             var form = await inventarioService.ObterFormEdicaoAsync(id, cancellationToken);
             model.TiposSugeridos = form?.TiposSugeridos ?? [];
             return View(model);
         }
 
-        TempData["Success"] = result.Message;
+        result.AddToTempData(TempData);
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -111,13 +120,12 @@ public class InventarioController(IInventarioService inventarioService) : Contro
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var result = await inventarioService.InativarAsync(id, ObterUsuarioId(), cancellationToken);
-        TempData[result.Success ? "Success" : "Error"] = result.Message;
+        result.AddToTempData(TempData);
         return RedirectToAction(nameof(Index));
     }
 
     private int? ObterUsuarioId()
     {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(value, out var userId) ? userId : null;
+        return currentUserService.UserId;
     }
 }

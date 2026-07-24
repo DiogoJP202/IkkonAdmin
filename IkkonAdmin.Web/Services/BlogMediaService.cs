@@ -1,8 +1,9 @@
+using IkkonAdmin.Web.Infrastructure.Files;
 using IkkonAdmin.Web.Models.ViewModels;
 
 namespace IkkonAdmin.Web.Services;
 
-public class BlogMediaService(IWebHostEnvironment webHostEnvironment) : IBlogMediaService
+public class BlogMediaService(IFileStorageService fileStorageService) : IBlogMediaService
 {
     private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -58,13 +59,16 @@ public class BlogMediaService(IWebHostEnvironment webHostEnvironment) : IBlogMed
             return Task.CompletedTask;
         }
 
-        var coversFolder = Path.Combine(webHostEnvironment.WebRootPath, "uploads", "blog", "capas");
-        var fileName = Path.GetFileName(currentCoverUrl);
-        var filePath = Path.Combine(coversFolder, fileName);
+        var filePath = fileStorageService.GetPublicFilePath(
+            currentCoverUrl,
+            "/uploads/blog/capas/",
+            "uploads",
+            "blog",
+            "capas");
 
-        if (File.Exists(filePath))
+        if (filePath is not null)
         {
-            File.Delete(filePath);
+            fileStorageService.DeleteIfExists(filePath);
         }
 
         return Task.CompletedTask;
@@ -107,17 +111,14 @@ public class BlogMediaService(IWebHostEnvironment webHostEnvironment) : IBlogMed
         }
 
         var extension = Path.GetExtension(image.FileName ?? string.Empty).ToLowerInvariant();
-        var folder = Path.Combine(new[] { webHostEnvironment.WebRootPath }.Concat(relativeFolderSegments).ToArray());
-        Directory.CreateDirectory(folder);
-
         var fileName = $"{Guid.NewGuid():N}{extension}";
-        var filePath = Path.Combine(folder, fileName);
+        var result = await fileStorageService.SaveToWebRootAsync(
+            image,
+            relativeFolderSegments,
+            publicBaseUrl,
+            fileName,
+            cancellationToken);
 
-        await using (var stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-        {
-            await image.CopyToAsync(stream, cancellationToken);
-        }
-
-        return BlogMediaSaveResult.Ok($"{publicBaseUrl}/{fileName}");
+        return BlogMediaSaveResult.Ok(result.PublicUrl ?? $"{publicBaseUrl}/{fileName}");
     }
 }

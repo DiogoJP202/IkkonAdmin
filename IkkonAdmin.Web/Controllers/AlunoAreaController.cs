@@ -1,4 +1,5 @@
-using System.Security.Claims;
+using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Aluno)]
-public class AlunoAreaController(IAreaAlunoService areaAlunoService) : Controller
+public class AlunoAreaController(
+    IAreaAlunoService areaAlunoService,
+    ICurrentUserService currentUserService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -141,7 +144,7 @@ public class AlunoAreaController(IAreaAlunoService areaAlunoService) : Controlle
         }
 
         var resultado = await areaAlunoService.EnviarDocumentoAsync(usuarioId.Value, solicitacaoId, arquivo, cancellationToken);
-        TempData[resultado.Sucesso ? "Success" : "Error"] = resultado.Mensagem;
+        resultado.AddToTempData(TempData);
         return RedirectToAction(nameof(Documentos));
     }
 
@@ -219,7 +222,6 @@ public class AlunoAreaController(IAreaAlunoService areaAlunoService) : Controlle
 
     private int? ObterUsuarioId()
     {
-        var valor = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return int.TryParse(valor, out var usuarioId) ? usuarioId : null;
+        return currentUserService.UserId;
     }
 }
