@@ -1,0 +1,81 @@
+@model PublicBlogCardPartialViewModel
+
+@{
+    var post = Model.Post;
+    var postUrl = PublicViewFormatter.BuildBlogUrl(post.Slug);
+    var cardClass = Model.IsFeaturedLayout
+        ? "public-blog-card public-blog-card-featured"
+        : "public-blog-card";
+    var coverImageUrl = string.IsNullOrWhiteSpace(post.CoverImageUrl)
+        ? Url.Content("~/design-ikkon/assets/emblema-mitsudomoe.png")
+        : post.CoverImageUrl;
+}
+
+<article class="@cardClass">
+    <a class="public-blog-card-media"
+       href="@postUrl"
+       aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
+        <img src="@coverImageUrl"
+             alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title"
+             loading="lazy" />
+
+        @if (Model.IsFeaturedLayout)
+        {
+            <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
+        }
+        else if (Model.ShowBadges && (post.IsFeatured || post.IsWeeklyHighlight))
+        {
+            <span class="public-blog-pill-group">
+                @if (post.IsFeatured)
+                {
+                    <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
+                }
+                @if (post.IsWeeklyHighlight)
+                {
+                    <span class="public-blog-pill public-blog-pill-weekly">@I18n["Semana", "Week", "週"]</span>
+                }
+            </span>
+        }
+    </a>
+
+    <div class="public-blog-card-body">
+        <div class="public-blog-meta">
+            <span>@PublicViewFormatter.FormatBlogDate(post.PublishedAtUtc)</span>
+            @if (!string.IsNullOrWhiteSpace(post.AuthorName))
+            {
+                <span>@post.AuthorName</span>
+            }
+        </div>
+
+        <h3><a href="@postUrl">@post.Title</a></h3>
+
+        @if (!string.IsNullOrWhiteSpace(post.Summary))
+        {
+            <p>@post.Summary</p>
+        }
+
+        @if (Model.ShowTags && post.Tags.Any())
+        {
+            <div class="public-blog-tag-row">
+                @foreach (var postTag in post.Tags)
+                {
+                    <a href="@Url.Action("Index", "Blog", new { tag = postTag.Slug })">#@postTag.Name</a>
+                }
+            </div>
+        }
+
+        <div class="public-blog-card-footer">
+            @if (!string.IsNullOrWhiteSpace(post.CategoryName))
+            {
+                <a class="public-blog-taxonomy"
+                   href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
+            }
+            <span>
+                @Math.Max(1, post.ReadingTimeMinutes)
+                @(Model.UseCompactReadingLabel
+                    ? I18n["min", "min", "分"]
+                    : I18n["min de leitura", "min read", "分で読めます"])
+            </span>
+        </div>
+    </div>
+</article>

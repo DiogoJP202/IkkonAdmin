@@ -1,0 +1,73 @@
+@{
+    var mode = (ViewData["HeroCarouselMode"] as string ?? "home").ToLowerInvariant();
+
+    var slides = mode switch
+    {
+        "escola" => new[]
+        {
+            "/design-ikkon/photos/hero-aulas-6.webp",
+            "/design-ikkon/photos/hero-aulas.webp",
+            "/design-ikkon/photos/gateway-aulas.webp",
+            "/design-ikkon/photos/home-circulo-1.webp",
+            "/design-ikkon/photos/home-circulo-2.webp",
+            "/design-ikkon/photos/home-circulo-3.webp"
+        },
+        "eventos" => new[]
+        {
+            "/design-ikkon/photos/hero-ensemble-6.webp",
+            "/design-ikkon/photos/gateway-shows.webp",
+            "/design-ikkon/photos/galeria-1.webp",
+            "/design-ikkon/photos/galeria-2.webp",
+            "/design-ikkon/photos/galeria-3.webp",
+            "/design-ikkon/photos/galeria-4.webp"
+        },
+        "blog" => new[]
+        {
+            "/design-ikkon/photos/hero-sobre-6.webp",
+            "/design-ikkon/photos/hero-galeria-6.webp",
+            "/design-ikkon/photos/galeria-2.webp",
+            "/design-ikkon/photos/galeria-4.webp",
+            "/design-ikkon/photos/galeria-5.webp",
+            "/design-ikkon/photos/galeria-6.webp"
+        },
+        _ => new[]
+        {
+            "/design-ikkon/photos/hero-home-6.webp",
+            "/design-ikkon/photos/hero-sobre-6.webp",
+            "/design-ikkon/photos/hero-aulas-6.webp",
+            "/design-ikkon/photos/hero-ensemble-6.webp",
+            "/design-ikkon/photos/hero-galeria-6.webp",
+            "/design-ikkon/photos/hero-contato.webp"
+        }
+    };
+}
+
+<section class="ikkon-hero-carousel ikkon-hero-carousel-@mode"
+         data-ikkon-carousel
+         data-carousel-interval="4300"
+         aria-roledescription="@I18n["carrossel", "carousel", "カルーセル"]"
+         aria-label="@I18n["Galeria em destaque", "Featured gallery", "注目ギャラリー"]">
+    <div class="ikkon-hero-carousel-track">
+        @for (var index = 0; index < slides.Length; index++)
+        {
+            <img class="ikkon-hero-carousel-slide @(index == 0 ? "is-active" : string.Empty)"
+                 src="@slides[index]"
+                 alt="@I18n[$"Foto em destaque {index + 1}", $"Featured photo {index + 1}", $"注目写真 {index + 1}"]"
+                 aria-hidden="@(index == 0 ? "false" : "true")"
+                 loading="@(index == 0 ? "eager" : "lazy")" />
+        }
+    </div>
+    <div class="ikkon-hero-carousel-shade" aria-hidden="true"></div>
+    <div class="ikkon-hero-carousel-dots" role="tablist" aria-label="@I18n["Selecionar foto", "Select photo", "写真を選択"]">
+        @for (var index = 0; index < slides.Length; index++)
+        {
+            <button type="button"
+                    class="ikkon-hero-carousel-dot @(index == 0 ? "is-active" : string.Empty)"
+                    data-carousel-index="@index"
+                    role="tab"
+                    aria-selected="@(index == 0 ? "true" : "false")"
+                    aria-label="@I18n[$"Exibir foto {index + 1}", $"Show photo {index + 1}", $"写真{index + 1}を表示"]"></button>
+        }
+    </div>
+    <img class="ikkon-hero-carousel-seal" src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" aria-hidden="true" />
+</section>

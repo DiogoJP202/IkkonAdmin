@@ -4,7 +4,8 @@
     ViewData["PublicSection"] = "home";
     ViewData["ContactMode"] = "geral";
     ViewData["JapaneseLandingEnabled"] = true;
-    ViewData["PublicConstructionTagEnabled"] = true;
+    ViewData["PublicConstructionTagEnabled"] = false;
+    ViewData["HeroCarouselMode"] = "home";
 
     var videosDestaque = new List<PublicVideoCardViewModel>
     {
@@ -16,24 +17,35 @@
 
 <div class="institucional-page public-home-page">
     <partial name="_PublicHeader" />
+    <partial name="_PublicGateway" />
+    <partial name="_PublicHeroCarousel" />
 
-    <section class="institucional-hero reveal">
-        <div class="institucional-hero-media" aria-hidden="true"></div>
-        <div class="institucional-hero-overlay"></div>
-        <div class="container-xxl px-3 px-lg-4 position-relative">
-            <div class="row justify-content-center justify-content-lg-start">
-                <div class="col-12 col-lg-8 col-xl-7">
-                    <p class="institucional-kicker mb-2">@I18n["A força do taiko em São Paulo", "The power of taiko in Sao Paulo", "サンパウロに響く太鼓の力"]</p>
-                    <h1 class="institucional-hero-title">IKKON SPTD</h1>
-                    <p class="institucional-hero-subtitle">
-                        @I18n["Escola de taiko, fue e teoria musical em São Paulo, também atuando como grupo artístico para eventos, shows e apresentações culturais.", "Taiko, fue, and music theory school in Sao Paulo, also performing as an artistic group for events, shows, and cultural presentations.", "サンパウロで和太鼓、篠笛、音楽理論を学べる教室です。イベント、ショー、文化公演に出演する芸能グループとしても活動しています。"]
+    <section id="site-home" class="ikkon-home-intro reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="ikkon-home-intro-grid">
+                <div class="ikkon-home-intro-copy">
+                    <p class="institucional-kicker mb-2">@I18n["São Paulo Taiko Dojo · Desde 2015", "Sao Paulo Taiko Dojo · Since 2015", "サンパウロ太鼓道場・2015年設立"]</p>
+                    <h1>IKKON</h1>
+                    <p class="ikkon-home-display-subtitle">@I18n["A arte dos tambores japoneses", "The art of Japanese drums", "和太鼓の芸術"]</p>
+                    <p class="institucional-copy">
+                        @I18n["Uma escola e grupo artístico dedicados ao taiko, unindo tradição japonesa, formação musical, disciplina e a energia de tocar em conjunto.", "A school and performance group dedicated to taiko, bringing together Japanese tradition, musical education, discipline, and the energy of playing together.", "日本の伝統、音楽教育、規律、そして仲間と演奏する力を結ぶ、和太鼓の教室・芸能グループです。"]
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-4">
                         <a class="btn btn-danger btn-lg" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
-                        <a class="btn btn-outline-light btn-lg" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
+                        <a class="btn btn-outline-dark btn-lg" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
                     </div>
-                    <div class="institucional-hero-badge mt-4">@I18n["Aulas para todos e agenda aberta para eventos", "Classes for everyone and bookings open for events", "どなたでも参加できるレッスンとイベント出演のご相談を受付中"]</div>
                 </div>
+                <div class="ikkon-home-photo-composition" aria-label="@I18n["Momentos de aulas e apresentações de taiko", "Moments from taiko classes and performances", "和太鼓のレッスンと公演の様子"]">
+                    <img class="ikkon-home-circle ikkon-home-circle-one" src="~/design-ikkon/photos/home-circulo-1.webp" alt="" loading="eager" />
+                    <img class="ikkon-home-circle ikkon-home-circle-two" src="~/design-ikkon/photos/home-circulo-2.webp" alt="" loading="lazy" />
+                    <img class="ikkon-home-circle ikkon-home-circle-three" src="~/design-ikkon/photos/home-circulo-3.webp" alt="" loading="lazy" />
+                </div>
+            </div>
+            <div class="ikkon-home-stats">
+                <div><strong>11+</strong><span>@I18n["Anos de história", "Years of history", "年の歩み"]</span></div>
+                <div><strong>120+</strong><span>@I18n["Alunos formados", "Students taught", "受講生"]</span></div>
+                <div><strong>2</strong><span>@I18n["Unidades", "Locations", "拠点"]</span></div>
+                <div><strong>@I18n["SEG–SÁB", "MON–SAT", "月〜土"]</strong><span>@I18n["Aulas na semana", "Classes every week", "毎週レッスン"]</span></div>
             </div>
         </div>
     </section>

@@ -1,0 +1,722 @@
+/* Public entrance, carousel, and editorial composition layer. */
+
+body.ikkon-gateway-open {
+  overflow: hidden;
+}
+
+html:has(.ikkon-gateway:not(.is-hidden)),
+body:has(.ikkon-gateway:not(.is-hidden)) {
+  overflow: hidden;
+}
+
+.ikkon-gateway {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: 1.5rem clamp(1.25rem, 4vw, 4rem) 1.25rem;
+  background: var(--ikkon-cream);
+  color: var(--ikkon-navy);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ikkon-gateway::before,
+.ikkon-gateway::after {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-position: center;
+  background-size: cover;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+.ikkon-gateway::before {
+  right: 50%;
+  background-image: url("/design-ikkon/photos/gateway-aulas.webp");
+}
+
+.ikkon-gateway::after {
+  left: 50%;
+  background-image: url("/design-ikkon/photos/gateway-shows.webp");
+}
+
+.ikkon-gateway.is-school-hover::before,
+.ikkon-gateway.is-events-hover::after {
+  opacity: 0.14;
+}
+
+.ikkon-gateway.is-hidden {
+  display: none;
+}
+
+.ikkon-gateway-language {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+.ikkon-gateway-language a {
+  border-bottom: 1px solid transparent;
+  color: rgba(0, 32, 62, 0.58);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-language a:hover,
+.ikkon-gateway-language a:focus,
+.ikkon-gateway-language a.is-active {
+  border-color: var(--ikkon-red);
+  color: var(--ikkon-navy);
+}
+
+.ikkon-gateway-brand {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 0.15rem;
+  text-align: center;
+}
+
+.ikkon-gateway-emblem {
+  position: relative;
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+}
+
+.ikkon-gateway-emblem img:first-child {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+}
+
+.ikkon-gateway-emblem img:last-child {
+  position: absolute;
+  right: -9px;
+  bottom: -3px;
+  width: 19px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.ikkon-gateway-brand > strong {
+  margin-top: 0.45rem;
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  line-height: 1;
+}
+
+.ikkon-gateway-brand > span:not(.ikkon-gateway-emblem) {
+  margin-top: 0.25rem;
+  color: var(--ikkon-red);
+  font-size: 0.59rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-brand h2 {
+  margin: 0.7rem 0 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-body);
+  font-size: clamp(0.78rem, 1vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-paths {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  width: min(100%, 1080px);
+  min-height: 0;
+  margin: 0.9rem auto 0;
+}
+
+.ikkon-gateway-divider {
+  align-self: stretch;
+  background: rgba(0, 32, 62, 0.17);
+}
+
+.ikkon-gateway-path {
+  display: grid;
+  grid-template-rows: auto auto 4.25rem 4.35rem auto;
+  min-width: 0;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+  padding: 0.5rem clamp(1rem, 4vw, 4rem);
+  color: var(--ikkon-navy);
+  text-align: center;
+  text-decoration: none;
+}
+
+.ikkon-gateway-path:hover,
+.ikkon-gateway-path:focus {
+  color: var(--ikkon-navy);
+}
+
+.ikkon-gateway-photo {
+  position: relative;
+  display: grid;
+  width: min(clamp(190px, 24vw, 286px), 32vh);
+  aspect-ratio: 1;
+  place-items: center;
+}
+
+.ikkon-gateway-ring {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  object-fit: contain;
+  transition: rotate 500ms ease, scale 500ms ease;
+}
+
+.ikkon-gateway-image {
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: saturate(0.88) contrast(1.04);
+  object-fit: cover;
+  transition: filter 400ms ease, scale 400ms ease;
+}
+
+.ikkon-gateway-path:hover .ikkon-gateway-ring,
+.ikkon-gateway-path:focus .ikkon-gateway-ring {
+  rotate: 8deg;
+  scale: 1.04;
+}
+
+.ikkon-gateway-path:hover .ikkon-gateway-image,
+.ikkon-gateway-path:focus .ikkon-gateway-image {
+  filter: saturate(1) contrast(1.08);
+  scale: 1.025;
+}
+
+.ikkon-gateway-path small {
+  margin-top: 0.35rem;
+  color: var(--ikkon-red);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-path > strong {
+  display: grid;
+  width: 100%;
+  max-width: 27ch;
+  height: 4.25rem;
+  align-items: center;
+  margin-top: 0.28rem;
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.ikkon-gateway-path p {
+  display: grid;
+  max-width: 42ch;
+  height: 4.35rem;
+  align-items: center;
+  margin: 0;
+  color: rgba(0, 32, 62, 0.67);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.ikkon-gateway-cta {
+  margin-top: 0.7rem;
+  border-bottom: 1px solid var(--ikkon-red);
+  color: var(--ikkon-red);
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-skip {
+  width: fit-content;
+  margin: 0.5rem auto 0;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 32, 62, 0.32);
+  background: transparent;
+  color: rgba(0, 32, 62, 0.68);
+  font: 700 0.66rem/1.4 var(--ikkon-font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ikkon-gateway-skip:hover,
+.ikkon-gateway-skip:focus {
+  border-color: var(--ikkon-red);
+  color: var(--ikkon-red);
+}
+
+.ikkon-hero-carousel {
+  position: relative;
+  height: clamp(330px, 35vw, 440px);
+  background: var(--ikkon-navy-dark);
+  overflow: hidden;
+}
+
+.ikkon-hero-carousel-track,
+.ikkon-hero-carousel-slide,
+.ikkon-hero-carousel-shade {
+  position: absolute;
+  inset: 0;
+}
+
+.ikkon-hero-carousel-slide {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transform: scale(1.018);
+  transition: opacity 850ms ease, transform 6.8s ease;
+  will-change: opacity, transform;
+}
+
+.ikkon-hero-carousel-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ikkon-hero-carousel-shade {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(0, 22, 42, 0.16), transparent 42%, rgba(0, 22, 42, 0.18)),
+    linear-gradient(0deg, rgba(0, 22, 42, 0.42), transparent 45%);
+  pointer-events: none;
+}
+
+.ikkon-hero-carousel-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.05rem;
+  translate: -50% 0;
+}
+
+.ikkon-hero-carousel-dot {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ikkon-radius-pill);
+  background: transparent;
+  color: var(--ikkon-cream);
+  place-items: center;
+}
+
+.ikkon-hero-carousel-dot:focus-visible {
+  outline: 2px solid var(--ikkon-red);
+  outline-offset: 1px;
+}
+
+.ikkon-hero-carousel-dot::before {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--ikkon-cream);
+  border-radius: 50%;
+  background: transparent;
+  content: "";
+  transition: background-color 180ms ease, border-color 180ms ease, scale 180ms ease;
+}
+
+.ikkon-hero-carousel-dot.is-active {
+  background: transparent;
+  border-color: transparent;
+  scale: 1;
+}
+
+.ikkon-hero-carousel-dot.is-active::before {
+  border-color: var(--ikkon-red);
+  background: var(--ikkon-red);
+  scale: 1.4;
+}
+
+.ikkon-hero-carousel-seal {
+  position: absolute;
+  right: clamp(1.25rem, 4vw, 4rem);
+  bottom: 1rem;
+  z-index: 3;
+  width: 31px;
+  height: auto;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.28));
+}
+
+.ikkon-hero-carousel-home .ikkon-hero-carousel-slide:nth-child(1),
+.ikkon-hero-carousel-eventos .ikkon-hero-carousel-slide:nth-child(1) {
+  object-position: center 44%;
+}
+
+.ikkon-hero-carousel-home .ikkon-hero-carousel-slide:nth-child(2),
+.ikkon-hero-carousel-blog .ikkon-hero-carousel-slide:nth-child(1) {
+  object-position: center 40%;
+}
+
+.ikkon-hero-carousel-escola .ikkon-hero-carousel-slide:nth-child(1),
+.ikkon-hero-carousel-escola .ikkon-hero-carousel-slide:nth-child(2) {
+  object-position: center 46%;
+}
+
+.ikkon-hero-carousel-eventos .ikkon-hero-carousel-slide:nth-child(2) {
+  object-position: center 48%;
+}
+
+.ikkon-page-intro {
+  padding-block: clamp(4.5rem, 8vw, 7rem);
+  border-bottom: 1px solid var(--ikkon-line);
+  background:
+    radial-gradient(circle at 86% 25%, rgba(231, 52, 57, 0.06), transparent 25%),
+    var(--ikkon-cream);
+  text-align: center;
+}
+
+.ikkon-page-intro .institucional-hero-title {
+  max-width: 15ch;
+  margin-inline: auto;
+  color: var(--ikkon-navy);
+  font-size: clamp(2.8rem, 6vw, 5.6rem);
+  text-wrap: balance;
+}
+
+.ikkon-page-intro .institucional-hero-subtitle {
+  max-width: 66ch;
+  margin: 1.25rem auto 0;
+  color: var(--ikkon-copy);
+}
+
+.ikkon-page-intro .d-flex {
+  justify-content: center;
+}
+
+.ikkon-home-intro {
+  padding-block: clamp(5rem, 9vw, 8rem) 0;
+  border-bottom: 1px solid var(--ikkon-line);
+  background:
+    url("/design-ikkon/assets/textura-pontos.png") center / cover,
+    var(--ikkon-cream);
+}
+
+.ikkon-home-intro-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(380px, 1.08fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+}
+
+.ikkon-home-intro-copy h1 {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(4.3rem, 9vw, 7.8rem);
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  line-height: 0.9;
+}
+
+.ikkon-home-display-subtitle {
+  margin: 1rem 0 1.25rem;
+  color: var(--ikkon-red);
+  font-family: var(--ikkon-font-display);
+  font-size: clamp(1.25rem, 2.1vw, 2rem);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.ikkon-home-intro-copy .institucional-copy {
+  max-width: 57ch;
+}
+
+.ikkon-home-photo-composition {
+  position: relative;
+  min-height: 470px;
+}
+
+.ikkon-home-circle {
+  position: absolute;
+  border: 7px solid var(--ikkon-cream);
+  border-radius: 50%;
+  box-shadow: var(--ikkon-shadow);
+  object-fit: cover;
+}
+
+.ikkon-home-circle-one {
+  top: 0;
+  right: 9%;
+  width: 60%;
+  aspect-ratio: 1;
+}
+
+.ikkon-home-circle-two {
+  bottom: 1%;
+  left: 2%;
+  width: 46%;
+  aspect-ratio: 1;
+}
+
+.ikkon-home-circle-three {
+  right: 0;
+  bottom: 3%;
+  width: 36%;
+  aspect-ratio: 1;
+}
+
+.ikkon-home-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: clamp(3rem, 7vw, 6rem);
+  border-top: 1px solid var(--ikkon-line);
+}
+
+.ikkon-home-stats > div {
+  display: flex;
+  min-height: 130px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem;
+  border-right: 1px solid var(--ikkon-line);
+  text-align: center;
+}
+
+.ikkon-home-stats > div:last-child {
+  border-right: 0;
+}
+
+.ikkon-home-stats strong {
+  color: var(--ikkon-red);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.65rem, 3vw, 2.75rem);
+  line-height: 1;
+}
+
+.ikkon-home-stats span {
+  margin-top: 0.55rem;
+  color: var(--ikkon-copy);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ikkon-method-section {
+  border-block: 1px solid var(--ikkon-line);
+  background: #efeada;
+}
+
+.ikkon-level-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 3rem;
+  border-top: 2px solid var(--ikkon-red);
+  border-left: 1px solid rgba(231, 52, 57, 0.45);
+}
+
+.ikkon-level-card {
+  min-height: 300px;
+  padding: clamp(1.5rem, 3vw, 2.6rem);
+  border-right: 1px solid rgba(231, 52, 57, 0.45);
+  border-bottom: 1px solid rgba(231, 52, 57, 0.45);
+  background: rgba(247, 244, 231, 0.72);
+}
+
+.ikkon-level-card > span {
+  color: rgba(231, 52, 57, 0.5);
+  font-family: var(--ikkon-font-brand);
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.ikkon-level-card > p:first-of-type {
+  margin: 2.2rem 0 0.35rem;
+  color: var(--ikkon-red);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.ikkon-level-card h3 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+}
+
+.ikkon-level-card > p:last-child {
+  margin: 1rem 0 0;
+  color: var(--ikkon-copy);
+}
+
+.ikkon-ensemble-section {
+  padding-top: 1rem;
+}
+
+.ikkon-ensemble-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
+  min-height: 500px;
+  background:
+    linear-gradient(rgba(0, 32, 62, 0.9), rgba(0, 22, 42, 0.95)),
+    url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  color: var(--ikkon-cream);
+}
+
+.ikkon-ensemble-copy {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 5rem);
+}
+
+.ikkon-ensemble-copy h2 {
+  max-width: 11ch;
+  margin: 0;
+  color: var(--ikkon-cream);
+  font-size: clamp(2.4rem, 4.5vw, 4.5rem);
+  line-height: 1.02;
+}
+
+.ikkon-ensemble-copy > p:not(.institucional-kicker) {
+  max-width: 53ch;
+  margin: 1.4rem 0 2rem;
+  color: rgba(247, 244, 231, 0.76);
+}
+
+.ikkon-ensemble-photo {
+  min-height: 430px;
+  overflow: hidden;
+}
+
+.ikkon-ensemble-photo img {
+  width: 100%;
+  height: 100%;
+  filter: saturate(0.86) contrast(1.08);
+  object-fit: cover;
+}
+
+.ikkon-gallery-copy {
+  max-width: 48ch;
+}
+
+.ikkon-gallery-grid {
+  display: grid;
+  grid-auto-rows: 260px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ikkon-gallery-grid figure {
+  margin: 0;
+  background: var(--ikkon-navy);
+  overflow: hidden;
+}
+
+.ikkon-gallery-grid figure:nth-child(1),
+.ikkon-gallery-grid figure:nth-child(5) {
+  grid-row: span 2;
+}
+
+.ikkon-gallery-grid img {
+  width: 100%;
+  height: 100%;
+  filter: saturate(0.88);
+  object-fit: cover;
+  transition: filter 400ms ease, scale 650ms ease;
+}
+
+.ikkon-gallery-grid figure:hover img {
+  filter: saturate(1.05);
+  scale: 1.035;
+}
+
+.ikkon-footer-inner {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.ikkon-footer-inner .institucional-footer-logo {
+  width: min(78vw, 270px);
+}
+
+.ikkon-footer-inner > p {
+  margin: 1rem 0 0;
+  color: rgba(247, 244, 231, 0.68);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+
+.ikkon-footer-links,
+.ikkon-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem 1.35rem;
+}
+
+.ikkon-footer-links {
+  margin-top: 1.8rem;
+}
+
+.ikkon-footer-social {
+  margin-top: 0.85rem;
+}
+
+.ikkon-footer-links a,
+.ikkon-footer-social a {
+  color: rgba(247, 244, 231, 0.76);
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ikkon-footer-social a {
+  color: var(--ikkon-red);
+}
+
+.ikkon-footer-links a:hover,
+.ikkon-footer-links a:focus,
+.ikkon-footer-social a:hover,
+.ikkon-footer-social a:focus {
+  color: var(--ikkon-cream);
+}
+
+.ikkon-footer-inner small {
+  margin-top: 2rem;
+  color: rgba(247, 244, 231, 0.42);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

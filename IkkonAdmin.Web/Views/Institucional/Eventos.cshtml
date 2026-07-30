@@ -4,6 +4,7 @@
     ViewData["PublicSection"] = "eventos";
     ViewData["ContactMode"] = "eventos";
     ViewData["JapaneseLandingEnabled"] = true;
+    ViewData["HeroCarouselMode"] = "eventos";
 
     var videosEventos = new List<PublicVideoCardViewModel>
     {
@@ -11,30 +12,23 @@
         new("ts0OQIXZ5m4", I18n["Taiko em palco", "Taiko on stage", "舞台の太鼓"], I18n["Performance artística com tambores japoneses e movimento coletivo.", "Artistic performance with Japanese drums and collective movement.", "日本の太鼓と集団の動きによる芸術的なパフォーマンス。"]),
         new("2IDfcF9q_Wc", I18n["Evento especial", "Special event", "特別イベント"], I18n["Repertório e formato adaptados para diferentes contextos de apresentação.", "Repertoire and format adapted to different performance contexts.", "さまざまな公演の場に合わせて、演目と形式を調整します。"])
     };
+
+    var pageIntro = new PublicPageIntroViewModel(
+        I18n["Grupo artístico e eventos", "Performance group and events", "芸能グループ・イベント出演"],
+        I18n["Apresentações de taiko para eventos", "Taiko performances for events", "イベント向け和太鼓公演"],
+        I18n["Impacto visual, energia dos tambores japoneses, cultura e presença de palco para eventos culturais, corporativos e ações especiais.", "Visual impact, the energy of Japanese drums, culture, and stage presence for cultural events, corporate events, and special activations.", "文化イベント、企業イベント、特別企画に、視覚的な迫力、日本の太鼓のエネルギー、文化、舞台での存在感を届けます。"],
+        new(
+            I18n["Solicitar apresentação", "Request a performance", "公演を依頼する"],
+            "https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento.",
+            "btn btn-danger btn-lg",
+            OpensInNewWindow: true),
+        new(I18n["Ver galeria", "View gallery", "ギャラリーを見る"], "#galeria", "btn btn-outline-dark btn-lg"));
 }
 
 <div class="institucional-page public-eventos-page">
     <partial name="_PublicHeader" />
-
-    <section class="institucional-hero public-area-hero public-eventos-hero reveal">
-        <div class="institucional-hero-media" aria-hidden="true"></div>
-        <div class="institucional-hero-overlay"></div>
-        <div class="container-xxl px-3 px-lg-4 position-relative">
-            <div class="row justify-content-center justify-content-lg-start">
-                <div class="col-12 col-lg-8 col-xl-7">
-                    <p class="institucional-kicker mb-2">@I18n["Grupo artístico e eventos", "Performance group and events", "芸能グループ・イベント出演"]</p>
-                    <h1 class="institucional-hero-title">@I18n["Apresentações de taiko para eventos", "Taiko performances for events", "イベント向け和太鼓公演"]</h1>
-                    <p class="institucional-hero-subtitle">
-                        @I18n["Impacto visual, energia dos tambores japoneses, cultura e presença de palco para eventos culturais, corporativos e ações especiais.", "Visual impact, the energy of Japanese drums, culture, and stage presence for cultural events, corporate events, and special activations.", "文化イベント、企業イベント、特別企画に、視覚的な迫力、日本の太鼓のエネルギー、文化、舞台での存在感を届けます。"]
-                    </p>
-                    <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento." target="_blank" rel="noopener">@I18n["Solicitar apresentação", "Request a performance", "公演を依頼する"]</a>
-                        <a class="btn btn-outline-light btn-lg" href="#galeria">@I18n["Ver galeria", "View gallery", "ギャラリーを見る"]</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicPageIntro" model="pageIntro" />
 
     <section class="institucional-section public-eventos-intro reveal">
         <div class="container-xxl px-3 px-lg-4">
@@ -48,6 +42,22 @@
                         @I18n["Além da escola, o IKKON atua com apresentações culturais e artísticas. Levamos a força do taiko para eventos, shows e celebrações, com presença de palco, disciplina musical e impacto cultural.", "Beyond the school, IKKON performs in cultural and artistic presentations. We bring the power of taiko to events, shows, and celebrations with stage presence, musical discipline, and cultural impact.", "教室としての活動に加え、IKKONは文化・芸術公演も行っています。舞台での存在感、音楽的な規律、文化的なインパクトとともに、イベント、ショー、祝祭に太鼓の力を届けます。"]
                     </p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section ikkon-ensemble-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="ikkon-ensemble-panel">
+                <div class="ikkon-ensemble-copy">
+                    <p class="institucional-kicker mb-2">@I18n["IKKON Ensemble", "IKKON Ensemble", "IKKON演奏チーム"]</p>
+                    <h2>@I18n["A energia do taiko em cena", "The energy of taiko on stage", "舞台に響く太鼓の力"]</h2>
+                    <p>@I18n["Nosso grupo artístico transforma a força dos tambores japoneses em experiências marcantes. Criamos apresentações para festivais, celebrações, encontros corporativos e projetos culturais.", "Our performance group transforms the power of Japanese drums into memorable experiences. We create performances for festivals, celebrations, corporate gatherings, and cultural projects.", "芸能グループは、日本の太鼓の力を心に残る体験へと変えます。祭り、祝典、企業イベント、文化プロジェクトに向けた公演を行います。"]</p>
+                    <a class="btn btn-danger btn-lg" href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20apresenta%C3%A7%C3%A3o%20da%20Ikkon%20SPTD%20para%20evento." target="_blank" rel="noopener">@I18n["Levar o IKKON ao seu evento", "Bring IKKON to your event", "イベント出演を相談する"]</a>
+                </div>
+                <figure class="ikkon-ensemble-photo mb-0">
+                    <img src="~/design-ikkon/photos/ensemble-foto.webp" alt="@I18n["Grupo IKKON em apresentação de taiko", "IKKON group performing taiko", "IKKONの和太鼓公演"]" loading="lazy" />
+                </figure>
             </div>
         </div>
     </section>
@@ -103,6 +113,26 @@
                 </div>
 
                 <partial name="_PublicEventosGallery" />
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section ikkon-gallery-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+                <div>
+                    <p class="institucional-kicker mb-2">@I18n["Galeria", "Gallery", "ギャラリー"]</p>
+                    <h2 class="institucional-section-title">@I18n["O taiko em movimento", "Taiko in motion", "躍動する和太鼓"]</h2>
+                </div>
+                <p class="institucional-copy ikkon-gallery-copy mb-0">@I18n["Aulas, ensaios e apresentações que revelam a intensidade de tocar juntos.", "Classes, rehearsals, and performances that reveal the intensity of playing together.", "共に打つ力が伝わる、レッスン、稽古、公演の記録です。"]</p>
+            </div>
+            <div class="ikkon-gallery-grid">
+                @for (var photoNumber = 1; photoNumber <= 6; photoNumber++)
+                {
+                    <figure>
+                        <img src="~/design-ikkon/photos/galeria-@(photoNumber).webp" alt="@I18n[$"Registro de taiko {photoNumber}", $"Taiko moment {photoNumber}", $"和太鼓の記録 {photoNumber}"]" loading="lazy" />
+                    </figure>
+                }
             </div>
         </div>
     </section>

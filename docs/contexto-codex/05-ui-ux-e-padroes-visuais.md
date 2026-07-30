@@ -65,7 +65,17 @@ Estrutura:
 
 ## Padrões de CSS
 
-O CSS principal fica em `wwwroot/css/site.css`.
+O CSS fica em `wwwroot/css/ikkon-*.css`. Os layouts carregam apenas as camadas necessárias:
+
+- público: fundação, tokens, editorial, composições e responsividade;
+- autenticação: fundação interna e `ikkon-auth.css`;
+- painel: fundação interna, `ikkon-admin-core.css`, módulos do controller e temas;
+- aluno: fundação interna, `ikkon-aluno.css` e temas;
+- configurações: acrescenta `ikkon-account.css` no layout correspondente ao perfil.
+
+A ordem detalhada está em `docs/frontend-public/INTERNAL_CSS_ARCHITECTURE.md`.
+
+O mapeamento das rotas administrativas fica em `Helpers/AdminCssModuleResolver.cs`. Ao criar um controller do painel, registrar seus módulos nesse resolver e manter a sequência `core → domínio → temas`.
 
 Há blocos por módulo, com prefixos específicos:
 
@@ -78,6 +88,7 @@ Há blocos por módulo, com prefixos específicos:
 - `configuracoes-v2-*`.
 - `institucional-*`.
 - `public-*`.
+- `aluno-portal-*`.
 
 Ao criar nova tela, preferir um prefixo próprio do módulo para evitar colisões.
 
@@ -116,4 +127,3 @@ Boas práticas já usadas:
 - Manter ações principais no topo.
 - Evitar páginas muito densas sem seções.
 - Garantir acessibilidade mínima: labels, foco, contraste, botões claros e textos de estado vazio.
-

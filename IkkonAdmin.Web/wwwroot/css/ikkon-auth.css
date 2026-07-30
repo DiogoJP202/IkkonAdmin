@@ -1,0 +1,129 @@
+/*
+ * Tela de autenticação de funcionários e alunos.
+ * Mantém a ordem relativa das regras extraídas do antigo site.css.
+ */
+
+body.auth-body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Zen Kaku Gothic New", "Segoe UI", sans-serif;
+  background: #ece9e3;
+}
+
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(1.6rem, 3vw, 2.8rem);
+}
+
+.auth-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 320px at -5% -10%, rgba(123, 25, 29, 0.24), transparent 57%),
+    radial-gradient(920px 300px at 110% -20%, rgba(45, 65, 91, 0.22), transparent 58%),
+    linear-gradient(180deg, rgba(11, 16, 24, 0.67), rgba(11, 16, 24, 0.75)),
+    url("/Images/Apresenta%C3%A7%C3%A3o1.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.auth-card {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 40px rgba(10, 14, 22, 0.2);
+  backdrop-filter: blur(4px);
+  padding: clamp(1.2rem, 2.8vw, 1.8rem);
+}
+
+.auth-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.auth-logo {
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  border: 1px solid #ddd5cb;
+}
+
+.auth-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: #8b1e21;
+}
+
+.auth-title {
+  font-family: "Noto Serif JP", "Georgia", serif;
+  color: #111b32;
+  font-size: clamp(1.3rem, 3.2vw, 1.72rem);
+}
+
+.auth-subtitle {
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
+  color: #4a5d74;
+}
+
+.auth-role-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.auth-role-tab {
+  border: 1px solid #d6deea;
+  border-radius: 0.7rem;
+  background: #f5f8fd;
+  color: #2b4059;
+  font-weight: 600;
+  padding: 0.5rem 0.8rem;
+}
+
+.btn-check:checked + .auth-role-tab {
+  color: #fff;
+  background: #8b1e21;
+  border-color: #8b1e21;
+}
+
+.auth-input {
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+}
+
+.auth-input:focus {
+  border-color: #6486aa;
+  box-shadow: 0 0 0 0.2rem rgba(77, 119, 161, 0.16);
+}
+
+.auth-submit {
+  min-height: 2.8rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+}
+
+.auth-footer-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+}
+
+
+@media (max-width: 768px) {
+
+  .auth-footer-links {
+    flex-direction: column;
+  }
+
+}

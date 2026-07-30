@@ -9,7 +9,7 @@ Stack principal:
 - Entity Framework Core + SQL Server.
 - Cookie Authentication.
 - Authorization Policies + Claims.
-- Bootstrap 5 + CSS customizado em `wwwroot/css/site.css`.
+- Bootstrap 5 + CSS modular em `wwwroot/css/ikkon-*.css`.
 
 Estrutura:
 
@@ -37,6 +37,7 @@ Padrões:
 - Layout público: `_PublicLayout.cshtml`.
 - Layout aluno: `_AlunoLayout.cshtml`.
 - CSS usa prefixos por módulo.
+- O painel carrega `ikkon-admin-core.css` e módulos por controller via `AdminCssModuleResolver`; novas rotas precisam entrar nesse mapeamento.
 
 Permissões:
 

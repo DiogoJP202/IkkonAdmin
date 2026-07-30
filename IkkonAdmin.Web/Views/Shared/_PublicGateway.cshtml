@@ -1,0 +1,74 @@
+@{
+    var languageReturnUrl = "/?entrada=1";
+    string LanguageClass(string culture) => string.Equals(I18n.CurrentCulture, culture, StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty;
+}
+
+<section class="ikkon-gateway" data-ikkon-gateway aria-labelledby="ikkon-gateway-title">
+    <div class="ikkon-gateway-language" aria-label="@I18n["Selecionar idioma", "Select language", "言語を選択"]">
+        <a class="@LanguageClass("pt-BR")"
+           asp-controller="Idioma"
+           asp-action="Alterar"
+           asp-route-culture="pt-BR"
+           asp-route-returnUrl="@languageReturnUrl">PT</a>
+        <a class="@LanguageClass("en-US")"
+           asp-controller="Idioma"
+           asp-action="Alterar"
+           asp-route-culture="en-US"
+           asp-route-returnUrl="@languageReturnUrl">EN</a>
+        <a class="@LanguageClass("ja-JP")"
+           asp-controller="Idioma"
+           asp-action="Alterar"
+           asp-route-culture="ja-JP"
+           asp-route-returnUrl="@languageReturnUrl">日本語</a>
+    </div>
+
+    <div class="ikkon-gateway-brand">
+        <span class="ikkon-gateway-emblem">
+            <img src="~/design-ikkon/assets/emblema-mitsudomoe.png" asp-append-version="true" alt="" />
+            <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" />
+        </span>
+        <strong>IKKON</strong>
+        <span>@I18n["São Paulo Taiko Dojo", "Sao Paulo Taiko Dojo", "サンパウロ太鼓道場"]</span>
+        <h2 id="ikkon-gateway-title">@I18n["O que você procura?", "What are you looking for?", "何をお探しですか？"]</h2>
+    </div>
+
+    <div class="ikkon-gateway-paths">
+        <a class="ikkon-gateway-path ikkon-gateway-path-school"
+           href="/escola"
+           data-gateway-choice="school">
+            <span class="ikkon-gateway-photo">
+                <img class="ikkon-gateway-ring" src="~/design-ikkon/assets/aro-enso-azul.png" asp-append-version="true" alt="" />
+                <img class="ikkon-gateway-image" src="~/design-ikkon/photos/gateway-aulas.webp" asp-append-version="true" alt="@I18n["Aula de taiko", "Taiko class", "和太鼓のレッスン"]" />
+            </span>
+            <small>Ikkon Taiko Dojo</small>
+            <strong>@I18n["Aulas de Taiko", "Classes", "クラス"]</strong>
+            <p>@I18n[
+                "Aprenda taiko na nossa escola: turmas para todas as idades e níveis, com método pedagógico próprio.",
+                "Learn taiko at our school: groups for all ages and levels, with our own teaching method.",
+                "独自の指導法で、あらゆる年齢とレベルのクラスをご用意しています。"]</p>
+            <span class="ikkon-gateway-cta">@I18n["Conhecer a escola", "Discover the school", "道場について"] ⟶</span>
+        </a>
+
+        <span class="ikkon-gateway-divider" aria-hidden="true"></span>
+
+        <a class="ikkon-gateway-path ikkon-gateway-path-events"
+           href="/eventos"
+           data-gateway-choice="events">
+            <span class="ikkon-gateway-photo">
+                <img class="ikkon-gateway-ring" src="~/design-ikkon/assets/aro-enso-preto.png" asp-append-version="true" alt="" />
+                <img class="ikkon-gateway-image" src="~/design-ikkon/photos/gateway-shows.webp" asp-append-version="true" alt="@I18n["Ensemble de taiko no palco", "Taiko ensemble on stage", "舞台の太鼓アンサンブル"]" />
+            </span>
+            <small>Ikkon Taiko Arts Ensemble</small>
+            <strong>@I18n["Shows e apresentações de Taiko", "Shows & performances", "公演・パフォーマンス"]</strong>
+            <p>@I18n[
+                "Leve a energia do IKKON Taiko Ensemble para o seu evento, festival ou empresa.",
+                "Bring the energy of the IKKON Taiko Ensemble to your event, festival, or company.",
+                "IKKON太鼓アンサンブルのエネルギーを、イベント・フェスティバル・企業行事へ。"]</p>
+            <span class="ikkon-gateway-cta">@I18n["Conhecer o ensemble", "Discover the ensemble", "アンサンブルについて"] ⟶</span>
+        </a>
+    </div>
+
+    <button type="button" class="ikkon-gateway-skip" data-gateway-dismiss>
+        @I18n["Acessar o site completo", "Enter the full website", "サイト全体を見る"]
+    </button>
+</section>

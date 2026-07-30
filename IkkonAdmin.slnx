@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="IkkonAdmin.Web/IkkonAdmin.Web.csproj" />
   <Project Path="IkkonAdmin.Tests/IkkonAdmin.Tests.csproj" />
+  <Project Path="IkkonAdmin.VisualTests/IkkonAdmin.VisualTests.csproj" />
 </Solution>

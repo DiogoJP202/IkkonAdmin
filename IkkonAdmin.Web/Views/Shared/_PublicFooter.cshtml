@@ -1,43 +1,22 @@
-@{
-    var japaneseEnabled = (ViewData["JapaneseLandingEnabled"] as bool? == true) || (ViewData["JapanesePublicEnabled"] as bool? == true);
-    var useJapanese = japaneseEnabled && I18n.IsJapanese;
-    string T(string ptBr, string enUs, string jaJp) => useJapanese ? jaJp : I18n[ptBr, enUs];
-}
-
 <footer class="institucional-footer">
     <div class="container-xxl px-3 px-lg-4">
-        <div class="row g-4">
-            <div class="col-12 col-lg-4">
-                <div class="institucional-footer-brand">
-                    <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON SPTD" class="institucional-footer-logo" />
-                    <div>
-                        <h2>IKKON SPTD | São Paulo Taiko Dojo</h2>
-                        <p class="mb-0">@T("Escola de taiko e grupo artístico em São Paulo.", "Taiko school and performance group in Sao Paulo.", "サンパウロの和太鼓教室・芸能グループ。")</p>
-                    </div>
-                </div>
+        <div class="ikkon-footer-inner">
+            <img src="~/design-ikkon/assets/logo-horizontal-branco.png" asp-append-version="true" alt="IKKON SPTD | São Paulo Taiko Dojo" class="institucional-footer-logo" />
+            <p>@I18n["Escola de taiko em São Paulo · desde 2015", "Taiko school in Sao Paulo · since 2015", "サンパウロの太鼓教室 · 2015年設立"]</p>
+            <nav class="ikkon-footer-links" aria-label="@I18n["Navegação do rodapé", "Footer navigation", "フッターナビゲーション"]">
+                <a href="/">Home</a>
+                <a href="/escola">@I18n["Escola", "School", "教室"]</a>
+                <a href="/eventos">@I18n["Eventos", "Events", "イベント"]</a>
+                <a href="/blog">Blog</a>
+                <a href="/#contato">@I18n["Contato", "Contact", "お問い合わせ"]</a>
+            </nav>
+            <div class="ikkon-footer-social">
+                <a href="https://wa.me/5511937799916" target="_blank" rel="noopener">WhatsApp</a>
+                <a href="https://www.instagram.com/ikkontaiko/" target="_blank" rel="noopener">Instagram</a>
+                <a href="mailto:contato@ikkontaiko.com">E-mail</a>
+                <a href="/aluno/login">@I18n["Área do aluno", "Student area", "生徒エリア"]</a>
             </div>
-            <div class="col-12 col-sm-6 col-lg-4">
-                <h3>@T("Contato", "Contact", "お問い合わせ")</h3>
-                <ul class="list-unstyled mb-0 institucional-footer-nav">
-                    <li><a href="https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">WhatsApp: +55 11 93779-9916</a></li>
-                    <li><a href="mailto:contato@ikkontaiko.com">E-mail: contato@ikkontaiko.com</a></li>
-                    <li><a href="https://www.instagram.com/ikkontaiko/" target="_blank" rel="noopener">Instagram</a></li>
-                    <li><a href="https://www.tiktok.com/%40ikkontaiko" target="_blank" rel="noopener">TikTok</a></li>
-                    <li><a href="https://web.facebook.com/ikkontaiko/?_rdc=1&_rdr#" target="_blank" rel="noopener">Facebook</a></li>
-                    <li>Rua Domingos de Morais, 2975, São Paulo, Brazil</li>
-                </ul>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-4">
-                <h3>@T("Navegação", "Navigation", "ナビゲーション")</h3>
-                <ul class="list-unstyled mb-0 institucional-footer-nav">
-                    <li><a href="/">@T("Início", "Home", "ホーム")</a></li>
-                    <li><a href="/escola">@T("Escola", "School", "教室")</a></li>
-                    <li><a href="/eventos">@T("Eventos", "Events", "イベント")</a></li>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/#contato">@T("Contato", "Contact", "お問い合わせ")</a></li>
-                    <li><a href="/auth/login">@T("Área interna", "Staff area", "スタッフエリア")</a></li>
-                </ul>
-            </div>
+            <small>© 2026 Ikkon São Paulo Taiko Dojo</small>
         </div>
     </div>
 </footer>

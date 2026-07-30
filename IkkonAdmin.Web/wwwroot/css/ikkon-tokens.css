@@ -1,0 +1,107 @@
+/*
+ * IKKON public frontend — fonts and design tokens.
+ *
+ * This file contains only shared visual decisions. Component and page rules belong
+ * in ikkon-editorial.css; responsive adjustments belong in ikkon-responsive.css.
+ */
+
+@font-face {
+  font-family: "Korosu";
+  src: url("/design-ikkon/fonts/Korosu.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cinzel";
+  src: url("/design-ikkon/fonts/Cinzel-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cinzel";
+  src: url("/design-ikkon/fonts/Cinzel-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cinzel";
+  src: url("/design-ikkon/fonts/Cinzel-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/design-ikkon/fonts/Lato-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/design-ikkon/fonts/Lato-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/design-ikkon/fonts/Lato-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/design-ikkon/fonts/Lato-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Brand palette */
+  --ikkon-navy: #00203e;
+  --ikkon-navy-dark: #00162a;
+  --ikkon-red: #e73439;
+  --ikkon-red-dark: #ae272b;
+  --ikkon-cream: #f7f4e7;
+  --ikkon-white: #ffffff;
+
+  /* Semantic color aliases */
+  --ikkon-ink: var(--ikkon-navy);
+  --ikkon-copy: #33506a;
+  --ikkon-surface: var(--ikkon-white);
+  --ikkon-line: rgba(0, 32, 62, 0.18);
+  --ikkon-line-dark: rgba(247, 244, 231, 0.25);
+
+  /* Typography */
+  --ikkon-font-display: "Korosu", "Lato", sans-serif;
+  --ikkon-font-brand: "Cinzel", "Noto Serif JP", serif;
+  --ikkon-font-body: "Lato", "Zen Kaku Gothic New", sans-serif;
+
+  /* Spacing scale */
+  --ikkon-space-1: 0.25rem;
+  --ikkon-space-2: 0.5rem;
+  --ikkon-space-3: 0.75rem;
+  --ikkon-space-4: 1rem;
+  --ikkon-space-6: 1.5rem;
+  --ikkon-space-8: 2rem;
+  --ikkon-space-12: 3rem;
+  --ikkon-space-16: 4rem;
+
+  /* Shape, interaction, and elevation */
+  --ikkon-radius-pill: 999px;
+  --ikkon-touch-target: 44px;
+  --ikkon-shadow: 0 12px 34px rgba(0, 22, 42, 0.09);
+  --ikkon-shadow-hover: 0 18px 42px rgba(0, 22, 42, 0.14);
+  --ikkon-focus-ring: 0 0 0 3px rgba(231, 52, 57, 0.14);
+}

@@ -4,35 +4,36 @@
     var japaneseLandingEnabled = ViewData["JapaneseLandingEnabled"] as bool? == true;
     var japanesePublicEnabled = ViewData["JapanesePublicEnabled"] as bool? == true;
     var japaneseEnabled = japaneseLandingEnabled || japanesePublicEnabled;
-    var useJapanese = japaneseEnabled && I18n.IsJapanese;
-    string T(string ptBr, string enUs, string jaJp) => useJapanese ? jaJp : I18n[ptBr, enUs];
     string LanguageClass(string culture) => string.Equals(I18n.CurrentCulture, culture, StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty;
 }
 
 <header class="institucional-header fixed-top">
     <nav class="navbar navbar-expand-lg">
         <div class="container-xxl px-3 px-lg-4">
-            <a class="navbar-brand institucional-brand" href="/">
-                <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON SPTD" class="institucional-brand-logo" />
+            <a class="navbar-brand institucional-brand" href="/?entrada=1">
+                <span class="institucional-brand-mark" aria-hidden="true">
+                    <img src="~/design-ikkon/assets/emblema-mitsudomoe.png" asp-append-version="true" alt="" class="institucional-brand-logo" />
+                    <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" class="institucional-brand-seal" />
+                </span>
                 <span class="institucional-brand-lines">
-                    <strong>IKKON SPTD</strong>
+                    <strong>IKKON</strong>
                     <small>São Paulo Taiko Dojo</small>
                 </span>
             </a>
-            <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="@T("Alternar navegação", "Toggle navigation", "ナビゲーションを切り替える")">
+            <button class="navbar-toggler institucional-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding" aria-controls="navLanding" aria-expanded="false" aria-label="@I18n["Alternar navegação", "Toggle navigation", "ナビゲーションを切り替える"]">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navLanding">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="/">@T("Início", "Home", "ホーム")</a></li>
-                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="/escola">@T("Escola", "School", "教室")</a></li>
-                    <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="/eventos">@T("Eventos", "Events", "イベント")</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="/">@I18n["Início", "Home", "ホーム"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="/escola">@I18n["Escola", "School", "教室"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="/eventos">@I18n["Eventos", "Events", "イベント"]</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "blog" ? "active" : string.Empty)" href="/blog">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="/escola#faq">FAQ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/aluno/login">@T("Área do aluno", "Student area", "生徒エリア")</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/auth/login">@T("Área interna", "Staff area", "スタッフエリア")</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/aluno/login">@I18n["Área do aluno", "Student area", "生徒エリア"]</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/auth/login">@I18n["Área interna", "Staff area", "スタッフエリア"]</a></li>
                     <li class="nav-item ms-lg-2">
-                        <div class="institucional-language-list" aria-label="@T("Selecionar idioma", "Select language", "言語を選択")">
+                        <div class="institucional-language-list" aria-label="@I18n["Selecionar idioma", "Select language", "言語を選択"]">
                             <a class="institucional-language-link @LanguageClass("pt-BR")"
                                asp-controller="Idioma"
                                asp-action="Alterar"
@@ -54,7 +55,7 @@
                         </div>
                     </li>
                     <li class="nav-item ms-lg-2">
-                        <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">@T("Contato", "Contact", "お問い合わせ")</a>
+                        <a class="btn btn-sm btn-danger institucional-nav-cta" href="#contato">@I18n["Contato", "Contact", "お問い合わせ"]</a>
                     </li>
                 </ul>
             </div>

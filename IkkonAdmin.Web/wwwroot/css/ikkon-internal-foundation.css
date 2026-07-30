@@ -1,0 +1,36 @@
+/*
+ * Tokens e fundamentos compartilhados pelos layouts internos.
+ * Mantém a ordem relativa das regras extraídas do antigo site.css.
+ */
+
+:root {
+  --admin-sidebar-bg: #243447;
+  --admin-sidebar-hover: #334c67;
+  --admin-sidebar-active: #3f5e7f;
+  --admin-bg: #f3f5f8;
+  --admin-border: #dde3ea;
+  --admin-text: #1f2b3a;
+
+  --brand-primary: #2f4f6f;
+  --brand-secondary: #816241;
+  --brand-surface: #ffffff;
+  --brand-surface-soft: #f6f8fb;
+  --brand-title: #17202b;
+  --brand-body: #334155;
+
+  --status-success: #2e7d4f;
+  --status-warning: #b27f2e;
+  --status-danger: #b23f3f;
+  --status-info: #3d6f96;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+.table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

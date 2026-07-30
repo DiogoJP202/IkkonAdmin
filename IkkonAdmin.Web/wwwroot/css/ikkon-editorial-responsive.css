@@ -1,0 +1,223 @@
+/* Responsive compatibility layer for the editorial components declared before compositions. */
+
+/* Responsive */
+
+@media (max-width: 1199.98px) {
+  .institucional-header .nav-link {
+    font-size: 0.62rem;
+    letter-spacing: 0.07em;
+  }
+
+  .institucional-header .navbar-nav {
+    column-gap: 0.3rem !important;
+  }
+
+  .institucional-brand-lines small {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .institucional-header,
+  .institucional-header.is-scrolled {
+    background: var(--ikkon-cream);
+  }
+
+  .institucional-header .navbar-collapse {
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--ikkon-line);
+    padding: 0.8rem 0 0.5rem;
+  }
+
+  .institucional-header .nav-link {
+    width: fit-content;
+    padding: 0.55rem 0;
+    font-size: 0.72rem;
+  }
+
+  .institucional-language-list {
+    margin-block: 0.35rem;
+  }
+
+  .institucional-nav-cta {
+    margin-top: 0.35rem;
+  }
+
+  .institucional-hero,
+  .public-area-hero,
+  .public-home-page .institucional-hero {
+    min-height: 520px;
+  }
+
+  .institucional-about-wrap,
+  .institucional-eventos-wrap,
+  .public-blog-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .institucional-about-media {
+    min-height: 27rem;
+  }
+
+  .institucional-about-image {
+    width: 72%;
+  }
+
+  .institucional-eventos-media-card {
+    min-height: 28rem;
+  }
+
+  .public-blog-detail-aside {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 2rem;
+  }
+
+  .public-blog-detail-aside > div {
+    margin: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .institucional-header .navbar {
+    min-height: 64px;
+  }
+
+  .institucional-brand-mark {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .institucional-brand-logo {
+    width: 37px;
+    height: 37px;
+  }
+
+  .institucional-brand-lines strong {
+    font-size: 1.18rem;
+  }
+
+  .institucional-section {
+    padding-block: 4rem;
+  }
+
+  .institucional-kicker {
+    letter-spacing: 0.18em;
+  }
+
+  .institucional-hero,
+  .public-area-hero,
+  .public-home-page .institucional-hero {
+    min-height: 500px;
+    padding-block: 3.8rem;
+  }
+
+  .institucional-hero-overlay,
+  .public-escola-hero .institucional-hero-overlay,
+  .public-eventos-hero .institucional-hero-overlay,
+  .public-blog-hero .institucional-hero-overlay {
+    background:
+      linear-gradient(90deg, rgba(0, 22, 42, 0.94), rgba(0, 32, 62, 0.72)),
+      linear-gradient(0deg, rgba(0, 22, 42, 0.36), transparent);
+  }
+
+  .institucional-hero-title,
+  .public-area-hero .institucional-hero-title {
+    font-size: clamp(2.15rem, 12vw, 3.7rem);
+  }
+
+  .institucional-hero::after {
+    right: 16px;
+    bottom: 14px;
+  }
+
+  .public-path-grid,
+  .public-event-type-grid,
+  .public-video-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .public-path-card {
+    min-height: 19rem;
+  }
+
+  .institucional-about-media {
+    min-height: 22rem;
+  }
+
+  .institucional-about-image {
+    width: 94%;
+  }
+
+  .institucional-about-content {
+    padding-top: 0;
+  }
+
+  .institucional-eventos-media-card {
+    min-height: 21rem;
+  }
+
+  .public-blog-filter-panel {
+    padding: 1.35rem;
+  }
+
+  .public-blog-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border: 0;
+    gap: 0.55rem;
+    background: transparent;
+  }
+
+  .public-blog-search input {
+    border: 1px solid var(--ikkon-line);
+    background: var(--ikkon-cream);
+  }
+
+  .public-blog-results-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .public-blog-card-featured:first-child .public-blog-card-media {
+    min-height: auto;
+  }
+
+  .public-blog-detail-heading h1 {
+    font-size: clamp(2.1rem, 11vw, 3.5rem);
+  }
+
+  .public-blog-detail-cover {
+    border-width: 4px;
+  }
+
+  .public-blog-detail-aside {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .institucional-footer {
+    padding-bottom: 4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .institucional-page *,
+  .institucional-page *::before,
+  .institucional-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

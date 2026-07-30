@@ -53,7 +53,7 @@ Centralizar dados e processos da escola para reduzir erro humano, melhorar visib
 - `OperationResult` para comandos de domínio.
 - Services de consulta separados em módulos maiores.
 - Bootstrap 5.
-- CSS customizado em `wwwroot/css/site.css`.
+- CSS customizado modular em `wwwroot/css/ikkon-*.css`, separado entre frontend público, autenticação, painel, aluno, conta e temas.
 - JavaScript leve em `wwwroot/js/site.js`, `landing.js` e `configuracoes.js`.
 - Google Calendar API via `HttpClient`, OAuth e Data Protection.
 

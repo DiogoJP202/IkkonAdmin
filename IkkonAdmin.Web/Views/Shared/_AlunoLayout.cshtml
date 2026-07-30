@@ -7,6 +7,10 @@
     var themeName = isDarkTheme ? "dark" : "light";
     var htmlLang = I18n.IsEnglish ? "en" : "pt-BR";
     var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+    var isAccountPage = string.Equals(
+        ViewContext.RouteData.Values["controller"]?.ToString(),
+        "Configuracoes",
+        StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="@htmlLang">
@@ -16,7 +20,13 @@
     <title>@ViewData["Title"] - @I18n["Área do Aluno IKKON", "IKKON Student Area"]</title>
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ikkon-internal-foundation.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ikkon-aluno.css" asp-append-version="true" />
+    @if (isAccountPage)
+    {
+        <link rel="stylesheet" href="~/css/ikkon-account.css" asp-append-version="true" />
+    }
+    <link rel="stylesheet" href="~/css/ikkon-internal-themes.css" asp-append-version="true" />
 </head>
 <body class="aluno-portal-body @themeClass" data-theme="@themeName">
     <div class="aluno-portal-shell">

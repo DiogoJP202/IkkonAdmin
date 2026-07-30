@@ -1,14 +1,9 @@
-@{
-    var useJapanese = (ViewData["JapaneseLandingEnabled"] as bool? == true) && I18n.IsJapanese;
-    string T(string ptBr, string enUs, string jaJp) => useJapanese ? jaJp : I18n[ptBr, enUs];
-}
-
 <div class="row g-3 g-lg-4 mt-1">
     <div class="col-12 col-md-6 col-xl-4">
         <article class="institucional-card">
             <h3>Taiko</h3>
             <p>
-                @T("Técnica de golpes, postura, precisão rítmica e construção de presença. O aluno desenvolve força, coordenação, escuta coletiva e impacto de palco.", "Strike technique, posture, rhythmic precision, and stage presence. Students develop strength, coordination, ensemble listening, and performance impact.", "打ち方、姿勢、リズムの正確さ、舞台での存在感を学びます。力、コーディネーション、仲間の音を聴く力、表現の迫力を育てます。")
+                @I18n["Técnica de golpes, postura, precisão rítmica e construção de presença. O aluno desenvolve força, coordenação, escuta coletiva e impacto de palco.", "Strike technique, posture, rhythmic precision, and stage presence. Students develop strength, coordination, ensemble listening, and performance impact.", "打ち方、姿勢、リズムの正確さ、舞台での存在感を学びます。力、コーディネーション、仲間の音を聴く力、表現の迫力を育てます。"]
             </p>
         </article>
     </div>
@@ -16,15 +11,15 @@
         <article class="institucional-card">
             <h3>Fue</h3>
             <p>
-                @T("Desenvolvimento de respiração, afinação, fraseado e controle sonoro. O estudo do fue amplia musicalidade e sensibilidade dentro do repertório japonês.", "Breath, tuning, phrasing, and sound control. Studying fue expands musicality and sensitivity within the Japanese repertoire.", "呼吸、音程、フレーズ、音のコントロールを育てます。篠笛の学びは、日本のレパートリーの中で音楽性と感受性を広げます。")
+                @I18n["Desenvolvimento de respiração, afinação, fraseado e controle sonoro. O estudo do fue amplia musicalidade e sensibilidade dentro do repertório japonês.", "Breath, tuning, phrasing, and sound control. Studying fue expands musicality and sensitivity within the Japanese repertoire.", "呼吸、音程、フレーズ、音のコントロールを育てます。篠笛の学びは、日本のレパートリーの中で音楽性と感受性を広げます。"]
             </p>
         </article>
     </div>
     <div class="col-12 col-md-12 col-xl-4">
         <article class="institucional-card">
-            <h3>@T("Teoria Musical", "Music Theory", "音楽理論")</h3>
+            <h3>@I18n["Teoria Musical", "Music Theory", "音楽理論"]</h3>
             <p>
-                @T("Leitura rítmica, estrutura musical e compreensão de arranjos. A teoria dá autonomia para evoluir com segurança e consistência.", "Rhythmic reading, musical structure, and arrangement understanding. Theory gives students autonomy to grow with confidence and consistency.", "リズムの読み方、音楽構造、アレンジの理解を学びます。理論は、安心して継続的に成長するための自立した力になります。")
+                @I18n["Leitura rítmica, estrutura musical e compreensão de arranjos. A teoria dá autonomia para evoluir com segurança e consistência.", "Rhythmic reading, musical structure, and arrangement understanding. Theory gives students autonomy to grow with confidence and consistency.", "リズムの読み方、音楽構造、アレンジの理解を学びます。理論は、安心して継続的に成長するための自立した力になります。"]
             </p>
         </article>
     </div>

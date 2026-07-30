@@ -1,0 +1,23 @@
+@model PublicPageIntroViewModel
+
+<section class="ikkon-page-intro reveal">
+    <div class="container-xxl px-3 px-lg-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-7">
+                <p class="institucional-kicker mb-2">@Model.Kicker</p>
+                <h1 class="institucional-hero-title">@Model.Title</h1>
+                <p class="institucional-hero-subtitle">@Model.Description</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a class="@Model.PrimaryAction.CssClass"
+                       href="@Model.PrimaryAction.Href"
+                       target="@(Model.PrimaryAction.OpensInNewWindow ? "_blank" : null)"
+                       rel="@(Model.PrimaryAction.OpensInNewWindow ? "noopener" : null)">@Model.PrimaryAction.Label</a>
+                    <a class="@Model.SecondaryAction.CssClass"
+                       href="@Model.SecondaryAction.Href"
+                       target="@(Model.SecondaryAction.OpensInNewWindow ? "_blank" : null)"
+                       rel="@(Model.SecondaryAction.OpensInNewWindow ? "noopener" : null)">@Model.SecondaryAction.Label</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,268 @@
+/*
+ * Primitivos compartilhados entre Agenda e Inventário.
+ * Extraído sem alterar declarações ou ordem interna das regras.
+ */
+
+/* Agenda e inventário */
+
+.agenda-page,
+
+.inventory-page {
+
+    animation: adminFadeUp .22s ease-out both;
+
+}
+
+
+
+.agenda-hero,
+
+.inventory-hero {
+
+    border: 0;
+
+    background: linear-gradient(135deg, rgba(127, 29, 29, .08), rgba(15, 23, 42, .04));
+
+}
+
+
+
+.agenda-eyebrow,
+
+.inventory-eyebrow {
+
+    display: inline-flex;
+
+    margin-bottom: .45rem;
+
+    color: #991b1b;
+
+    font-size: .75rem;
+
+    font-weight: 800;
+
+    letter-spacing: .12em;
+
+    text-transform: uppercase;
+
+}
+
+
+
+.inventory-kpi-card {
+
+    height: 100%;
+
+    padding: 1rem;
+
+    border: 1px solid rgba(15, 23, 42, .08);
+
+    border-radius: 1rem;
+
+    background: #fff;
+
+    box-shadow: 0 12px 32px rgba(15, 23, 42, .06);
+
+}
+
+
+
+.inventory-kpi-card span,
+
+.inventory-kpi-card small {
+
+    display: block;
+
+    color: #64748b;
+
+}
+
+
+
+.inventory-kpi-card strong {
+
+    display: block;
+
+    margin: .35rem 0;
+
+    color: #0f172a;
+
+    font-size: 2rem;
+
+    line-height: 1;
+
+}
+
+
+
+.inventory-kpi-success strong {
+
+    color: #047857;
+
+}
+
+
+
+.inventory-kpi-warning strong {
+
+    color: #b45309;
+
+}
+
+
+
+.inventory-kpi-danger strong {
+
+    color: #b91c1c;
+
+}
+
+
+
+.inventory-status,
+
+.agenda-type {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    border-radius: 999px;
+
+    padding: .25rem .55rem;
+
+    font-size: .75rem;
+
+    font-weight: 700;
+
+    background: #eef2f7;
+
+    color: #334155;
+
+}
+
+
+
+.inventory-status-disponivel {
+
+    background: #dcfce7;
+
+    color: #166534;
+
+}
+
+
+
+.inventory-status-emuso {
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+}
+
+
+
+.inventory-status-manutencao {
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+}
+
+
+
+.inventory-status-indisponivel,
+
+.inventory-status-baixado {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+}
+
+
+
+.inventory-switch-box {
+
+    border: 1px solid rgba(15, 23, 42, .08);
+
+    border-radius: .9rem;
+
+    padding: .8rem 1rem;
+
+    background: #f8fafc;
+
+}
+
+
+
+.inventory-note {
+
+    border-left: 4px solid #991b1b;
+
+    border-radius: .5rem;
+
+    padding: 1rem;
+
+    background: #fff7ed;
+
+    color: #334155;
+
+}
+
+
+
+.inventory-details-list dt {
+
+    color: #64748b;
+
+}
+
+
+
+.inventory-side-card,
+
+.agenda-side-card {
+
+    border: 0;
+
+    background: #0f172a;
+
+    color: #f8fafc;
+
+}
+
+
+
+.inventory-side-card h2,
+
+.agenda-side-card h2 {
+
+    color: #fff;
+
+}
+
+
+
+.inventory-side-card li,
+
+.agenda-side-card li {
+
+    margin-bottom: .5rem;
+
+    color: rgba(248, 250, 252, .78);
+
+}
+
+
+
+.agenda-type {
+
+    background: #fef2f2;
+
+    color: #991b1b;
+
+}

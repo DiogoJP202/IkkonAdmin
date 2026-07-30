@@ -1,5 +1,4 @@
 @model BlogPublicIndexViewModel
-@using System.Globalization
 
 @{
     Layout = "_PublicLayout";
@@ -7,52 +6,24 @@
     ViewData["PublicSection"] = "blog";
     ViewData["ContactMode"] = "geral";
     ViewData["JapanesePublicEnabled"] = true;
+    ViewData["HeroCarouselMode"] = "blog";
 
     var q = Model.Filtro.Q;
     var categoria = Model.Filtro.Categoria;
     var tag = Model.Filtro.Tag;
-}
 
-@functions {
-    private static string FormatDate(DateTime utcDate)
-    {
-        try
-        {
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
-            var localDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utcDate, DateTimeKind.Utc), timeZone);
-            return localDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
-        }
-        catch
-        {
-            return utcDate.ToString("dd MMM yyyy", CultureInfo.CurrentUICulture);
-        }
-    }
-
-    private static string BuildBlogUrl(string slug) => $"/blog/{slug}";
+    var pageIntro = new PublicPageIntroViewModel(
+        "Blog IKKON",
+        I18n["Conteúdos, histórias e bastidores do taiko", "Taiko stories, insights, and behind the scenes", "太鼓の読みもの・物語・舞台裏"],
+        I18n["Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.", "Follow school news, Japanese culture, events, studies, and records from the IKKON SPTD community.", "IKKON SPTDのニュース、日本文化、イベント、学び、コミュニティの記録をお届けします。"],
+        new(I18n["Ver publicações", "See posts", "記事を見る"], "#posts", "btn btn-danger btn-lg"),
+        new(I18n["Conhecer a escola", "Discover the school", "教室を見る"], "/escola", "btn btn-outline-dark btn-lg"));
 }
 
 <div class="institucional-page public-blog-page">
     <partial name="_PublicHeader" />
-
-    <section class="institucional-hero public-area-hero public-blog-hero reveal">
-        <div class="institucional-hero-media" aria-hidden="true"></div>
-        <div class="institucional-hero-overlay"></div>
-        <div class="container-xxl px-3 px-lg-4 position-relative">
-            <div class="row justify-content-center justify-content-lg-start">
-                <div class="col-12 col-lg-8 col-xl-7">
-                    <p class="institucional-kicker mb-2">Blog IKKON</p>
-                    <h1 class="institucional-hero-title">@I18n["Conteúdos, histórias e bastidores do taiko", "Taiko stories, insights, and behind the scenes", "太鼓の読みもの・物語・舞台裏"]</h1>
-                    <p class="institucional-hero-subtitle">
-                        @I18n["Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.", "Follow school news, Japanese culture, events, studies, and records from the IKKON SPTD community.", "IKKON SPTDのニュース、日本文化、イベント、学び、コミュニティの記録をお届けします。"]
-                    </p>
-                    <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="#posts">@I18n["Ver publicações", "See posts", "記事を見る"]</a>
-                        <a class="btn btn-outline-light btn-lg" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室を見る"]</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicPageIntro" model="pageIntro" />
 
     @if (Model.FeaturedPosts.Any())
     {
@@ -71,33 +42,11 @@
                 <div class="public-blog-feature-grid">
                     @foreach (var post in Model.FeaturedPosts)
                     {
-                        <article class="public-blog-card public-blog-card-featured">
-                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
-                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title" loading="lazy" />
-                                <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
-                            </a>
-                            <div class="public-blog-card-body">
-                                <div class="public-blog-meta">
-                                    <span>@FormatDate(post.PublishedAtUtc)</span>
-                                    @if (!string.IsNullOrWhiteSpace(post.AuthorName))
-                                    {
-                                        <span>@post.AuthorName</span>
-                                    }
-                                </div>
-                                <h3><a href="@BuildBlogUrl(post.Slug)">@post.Title</a></h3>
-                                @if (!string.IsNullOrWhiteSpace(post.Summary))
-                                {
-                                    <p>@post.Summary</p>
-                                }
-                                <div class="public-blog-card-footer">
-                                    @if (!string.IsNullOrWhiteSpace(post.CategoryName))
-                                    {
-                                        <a class="public-blog-taxonomy" href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
-                                    }
-                                    <span>@Math.Max(1, post.ReadingTimeMinutes) @I18n["min", "min", "分"]</span>
-                                </div>
-                            </div>
-                        </article>
+                        <partial name="_PublicBlogCard"
+                                 model="@(new PublicBlogCardPartialViewModel(
+                                     post,
+                                     IsFeaturedLayout: true,
+                                     UseCompactReadingLabel: true))" />
                     }
                 </div>
             </div>
@@ -121,7 +70,7 @@
                             @foreach (var post in Model.WeeklyHighlights)
                             {
                                 <article class="public-blog-weekly-card">
-                                    <a href="@BuildBlogUrl(post.Slug)">
+                                    <a href="@PublicViewFormatter.BuildBlogUrl(post.Slug)">
                                         <span>@I18n["Blog da semana", "Weekly blog", "今週のブログ"]</span>
                                         <strong>@post.Title</strong>
                                         @if (!string.IsNullOrWhiteSpace(post.Summary))
@@ -207,51 +156,11 @@
                 <div class="public-blog-grid">
                     @foreach (var post in Model.Posts)
                     {
-                        <article class="public-blog-card">
-                            <a class="public-blog-card-media" href="@BuildBlogUrl(post.Slug)" aria-label="@I18n["Ler", "Read", "読む"] @post.Title">
-                                <img src="@(string.IsNullOrWhiteSpace(post.CoverImageUrl) ? Url.Content("~/Images/Ikkon_Icon.png") : post.CoverImageUrl)" alt="@I18n["Imagem de capa de", "Cover image for", "カバー画像:"] @post.Title" loading="lazy" />
-                                <span class="public-blog-pill-group">
-                                    @if (post.IsFeatured)
-                                    {
-                                        <span class="public-blog-pill">@I18n["Destaque", "Featured", "注目"]</span>
-                                    }
-                                    @if (post.IsWeeklyHighlight)
-                                    {
-                                        <span class="public-blog-pill public-blog-pill-weekly">@I18n["Semana", "Week", "週"]</span>
-                                    }
-                                </span>
-                            </a>
-                            <div class="public-blog-card-body">
-                                <div class="public-blog-meta">
-                                    <span>@FormatDate(post.PublishedAtUtc)</span>
-                                    @if (!string.IsNullOrWhiteSpace(post.AuthorName))
-                                    {
-                                        <span>@post.AuthorName</span>
-                                    }
-                                </div>
-                                <h3><a href="@BuildBlogUrl(post.Slug)">@post.Title</a></h3>
-                                @if (!string.IsNullOrWhiteSpace(post.Summary))
-                                {
-                                    <p>@post.Summary</p>
-                                }
-                                @if (post.Tags.Any())
-                                {
-                                    <div class="public-blog-tag-row">
-                                        @foreach (var postTag in post.Tags)
-                                        {
-                                            <a href="@Url.Action("Index", "Blog", new { tag = postTag.Slug })">#@postTag.Name</a>
-                                        }
-                                    </div>
-                                }
-                                <div class="public-blog-card-footer">
-                                    @if (!string.IsNullOrWhiteSpace(post.CategoryName))
-                                    {
-                                        <a class="public-blog-taxonomy" href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
-                                    }
-                                    <span>@Math.Max(1, post.ReadingTimeMinutes) @I18n["min de leitura", "min read", "分で読めます"]</span>
-                                </div>
-                            </div>
-                        </article>
+                        <partial name="_PublicBlogCard"
+                                 model="@(new PublicBlogCardPartialViewModel(
+                                     post,
+                                     ShowBadges: true,
+                                     ShowTags: true))" />
                     }
                 </div>
 

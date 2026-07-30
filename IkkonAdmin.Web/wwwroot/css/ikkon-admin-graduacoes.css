@@ -1,0 +1,1296 @@
+/*
+ * Gestão de graduações.
+ * Extraído sem alterar declarações ou ordem interna das regras.
+ */
+
+/* Graduacoes module */
+.graduacoes-page {
+  font-family: "Noto Sans JP", "Segoe UI Variable", "Trebuchet MS", sans-serif;
+}
+
+.graduacoes-page .btn {
+  border-radius: 0.62rem;
+  font-weight: 600;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.graduacoes-page .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(35, 56, 79, 0.12);
+}
+
+.graduacoes-page .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 7px rgba(35, 56, 79, 0.12);
+}
+
+.graduacoes-page .btn:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(61, 111, 150, 0.24);
+}
+
+.graduacoes-page .form-control,
+.graduacoes-page .form-select {
+  border-radius: 0.62rem;
+  border-color: #ccd8e4;
+  min-height: 2.6rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.graduacoes-page .form-control::placeholder {
+  color: #8b9bb0;
+}
+
+.graduacoes-page .form-control:hover,
+.graduacoes-page .form-select:hover {
+  border-color: #b9c9d9;
+}
+
+.graduacoes-page .form-control:focus,
+.graduacoes-page .form-select:focus {
+  border-color: #5d86aa;
+  box-shadow: 0 0 0 0.2rem rgba(61, 111, 150, 0.16);
+}
+
+.graduacoes-hero {
+  border: 1px solid var(--admin-border);
+  background:
+    radial-gradient(980px 260px at -10% -20%, rgba(47, 79, 111, 0.16), transparent 50%),
+    radial-gradient(760px 220px at 110% -20%, rgba(129, 98, 65, 0.13), transparent 55%),
+    var(--brand-surface);
+  box-shadow: 0 8px 24px rgba(21, 34, 49, 0.05);
+  animation: graduacoes-fade-up 220ms ease-out;
+}
+
+.graduacoes-eyebrow {
+  color: var(--brand-primary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.graduacoes-title {
+  color: var(--brand-title);
+  font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+  font-weight: 700;
+}
+
+.graduacoes-subtitle {
+  color: #516173;
+  max-width: 72ch;
+}
+
+.graduacoes-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.graduacoes-quick-actions .btn:first-child {
+  grid-column: span 2;
+}
+
+.graduacoes-kpi-card {
+  border-radius: 0.85rem;
+  border: 1px solid var(--admin-border);
+  background: var(--brand-surface);
+  min-height: 7rem;
+  padding: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  animation: graduacoes-fade-up 240ms ease-out;
+}
+
+.graduacoes-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(22, 36, 50, 0.08);
+}
+
+.graduacoes-kpi-highlight {
+  border-top: 3px solid var(--brand-primary);
+}
+
+.graduacoes-kpi-warning {
+  border-top: 3px solid var(--status-warning);
+}
+
+.graduacoes-kpi-danger {
+  border-top: 3px solid var(--status-danger);
+}
+
+.graduacoes-kpi-success {
+  border-top: 3px solid var(--status-success);
+}
+
+.graduacoes-kpi-info {
+  border-top: 3px solid var(--status-info);
+}
+
+.graduacoes-kpi-label {
+  color: #5d6b7d;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.graduacoes-kpi-value {
+  color: var(--brand-title);
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.graduacoes-kpi-foot {
+  color: #6f7f92;
+  font-size: 0.76rem;
+}
+
+.graduacoes-filter-card,
+.graduacoes-table-card,
+.graduacoes-form-card,
+.graduacoes-side-card {
+  border: 1px solid var(--admin-border);
+  background: var(--brand-surface);
+  box-shadow: 0 4px 15px rgba(24, 34, 48, 0.045);
+  animation: graduacoes-fade-up 260ms ease-out;
+}
+
+.graduacoes-filter-card .card-body,
+.graduacoes-side-card .card-body {
+  padding: 1rem;
+}
+
+.graduacoes-table-card .card-header,
+.graduacoes-form-card .card-header,
+.graduacoes-side-card .card-header {
+  border-bottom: 1px solid #e2e8ef;
+  background: var(--brand-surface);
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.graduacoes-section-title {
+  color: var(--brand-title);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.graduacoes-section-subtitle {
+  color: #68788b;
+  font-size: 0.83rem;
+}
+
+.graduacoes-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.graduacoes-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.graduacoes-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #d6e0eb;
+  background: #eff5fb;
+  color: #2d4d69;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.22rem 0.62rem;
+}
+
+.graduacoes-table thead th {
+  font-size: 0.72rem;
+  color: #65758a;
+  border-bottom-width: 1px;
+}
+
+.graduacoes-table td {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.graduacoes-table tbody tr {
+  transition: background-color 0.16s ease;
+}
+
+.graduacoes-table tbody tr:hover {
+  background: #f6faff;
+}
+
+.graduacoes-row-attention {
+  background: rgba(252, 244, 227, 0.28);
+}
+
+.graduacoes-name-cell {
+  display: grid;
+  line-height: 1.25;
+}
+
+.graduacoes-name {
+  color: #1d2a3a;
+  font-weight: 600;
+}
+
+.graduacoes-meta {
+  color: #728397;
+  font-size: 0.72rem;
+}
+
+.graduacoes-status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.23rem 0.62rem;
+  border: 1px solid transparent;
+}
+
+.graduacoes-status-success {
+  background: #e9f7ee;
+  color: #1d7142;
+  border-color: #b9dfc9;
+}
+
+.graduacoes-status-danger {
+  background: #fdecec;
+  color: #a53636;
+  border-color: #efc1c1;
+}
+
+.graduacoes-action-btn {
+  min-width: 5.1rem;
+}
+
+.graduacoes-empty-state {
+  max-width: 29rem;
+  margin: 0 auto;
+}
+
+.graduacoes-empty-state h4 {
+  font-size: 1.03rem;
+  font-weight: 700;
+  color: #2d3b4d;
+  margin-bottom: 0.35rem;
+}
+
+.graduacoes-empty-state p {
+  color: #6e7e91;
+}
+
+.graduacoes-check .form-check-input {
+  margin-top: 0.22rem;
+}
+
+.graduacoes-form-id {
+  border: 1px solid #d6e0eb;
+  background: #f2f7fc;
+  color: #2d4d69;
+  font-size: 0.74rem;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-weight: 700;
+}
+
+.graduacoes-form-section {
+  border: 1px solid #e3e9f0;
+  border-radius: 0.8rem;
+  padding: 0.9rem;
+  background: #fbfcfe;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.graduacoes-form-section:focus-within {
+  border-color: #c8d6e5;
+  box-shadow: 0 0 0 0.2rem rgba(61, 111, 150, 0.08);
+}
+
+.graduacoes-form-section-title {
+  margin: 0 0 0.7rem;
+  color: #2d3f53;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.graduacoes-form-actions {
+  border-top: 1px solid #e3e9f0;
+  padding-top: 0.95rem;
+}
+
+.graduacoes-priority-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.graduacoes-priority-list li {
+  border: 1px solid #e3e9f0;
+  border-radius: 0.72rem;
+  padding: 0.72rem 0.75rem;
+  background: #fbfcff;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.graduacoes-priority-list strong {
+  color: #2a3c4f;
+  font-size: 0.9rem;
+}
+
+.graduacoes-priority-list span {
+  color: #647489;
+  font-size: 0.83rem;
+}
+
+@keyframes graduacoes-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* Graduações operacional */
+.graduacoes-v2-page {
+    --graduacoes-ink: #111827;
+    --graduacoes-muted: #667085;
+    --graduacoes-border: rgba(17, 24, 39, .1);
+    --graduacoes-surface: #ffffff;
+    --graduacoes-soft: #f8fafc;
+    --graduacoes-red: #991b1b;
+    --graduacoes-red-dark: #7f1d1d;
+    --graduacoes-amber: #b45309;
+    --graduacoes-green: #047857;
+    --graduacoes-blue: #1d4ed8;
+    --graduacoes-focus: rgba(153, 27, 27, .18);
+    color: var(--graduacoes-ink);
+    animation: adminFadeUp 220ms ease-out;
+}
+
+.graduacoes-v2-hero,
+.graduacoes-v2-form-hero,
+.graduacoes-v2-profile-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    border: 1px solid var(--graduacoes-border);
+    border-radius: 1.35rem;
+    padding: 1.45rem;
+    background:
+        radial-gradient(circle at top left, rgba(153, 27, 27, .12), transparent 34rem),
+        linear-gradient(135deg, #fff 0%, #f8fafc 58%, #fff7ed 100%);
+    box-shadow: 0 18px 55px rgba(15, 23, 42, .08);
+}
+
+.graduacoes-v2-profile-hero {
+    align-items: center;
+}
+
+.graduacoes-v2-hero-copy {
+    max-width: 820px;
+}
+
+.graduacoes-v2-eyebrow {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: .55rem;
+    color: var(--graduacoes-red);
+    font-size: .76rem;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.graduacoes-v2-hero h1,
+.graduacoes-v2-form-hero h1,
+.graduacoes-v2-profile-hero h1,
+.graduacoes-v2-card-heading h2,
+.graduacoes-v2-panel-heading h2,
+.graduacoes-v2-section-title h2,
+.graduacoes-v2-side-card h2,
+.graduacoes-v2-assist-card h2 {
+    margin: 0;
+    color: var(--graduacoes-ink);
+    font-weight: 850;
+    letter-spacing: -.045em;
+}
+
+.graduacoes-v2-hero h1,
+.graduacoes-v2-form-hero h1,
+.graduacoes-v2-profile-hero h1 {
+    margin-bottom: .45rem;
+    font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+}
+
+.graduacoes-v2-hero p,
+.graduacoes-v2-form-hero p,
+.graduacoes-v2-card-heading p,
+.graduacoes-v2-panel-heading p,
+.graduacoes-v2-section-title p,
+.graduacoes-v2-side-card p {
+    margin: .35rem 0 0;
+    color: var(--graduacoes-muted);
+    line-height: 1.65;
+}
+
+.graduacoes-v2-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .65rem;
+}
+
+.graduacoes-v2-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
+    margin-top: 1rem;
+}
+
+.graduacoes-v2-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    min-height: 2rem;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 999px;
+    padding: .38rem .72rem;
+    background: rgba(255, 255, 255, .78);
+    color: #475467;
+    font-size: .84rem;
+}
+
+.graduacoes-v2-meta strong {
+    color: var(--graduacoes-ink);
+    font-weight: 900;
+}
+
+.graduacoes-v2-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.6rem;
+    border-radius: .85rem;
+    padding: .62rem 1rem;
+    font-size: .9rem;
+    font-weight: 800;
+    line-height: 1;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+}
+
+.graduacoes-v2-btn:hover {
+    transform: translateY(-1px);
+}
+
+.graduacoes-v2-btn-primary {
+    border-color: var(--graduacoes-red);
+    background: linear-gradient(135deg, var(--graduacoes-red), var(--graduacoes-red-dark));
+    color: #fff;
+    box-shadow: 0 12px 25px rgba(153, 27, 27, .22);
+}
+
+.graduacoes-v2-btn-primary:hover,
+.graduacoes-v2-btn-primary:focus {
+    border-color: var(--graduacoes-red-dark);
+    background: var(--graduacoes-red-dark);
+    color: #fff;
+}
+
+.graduacoes-v2-btn-ghost {
+    border-color: var(--graduacoes-border);
+    background: rgba(255, 255, 255, .82);
+    color: #344054;
+}
+
+.graduacoes-v2-btn-ghost:hover,
+.graduacoes-v2-btn-ghost:focus {
+    border-color: rgba(15, 23, 42, .18);
+    background: #fff;
+    color: #111827;
+}
+
+.graduacoes-v2-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.graduacoes-v2-kpi-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 8.4rem;
+    border: 1px solid var(--graduacoes-border);
+    border-radius: 1.1rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, .06);
+}
+
+.graduacoes-v2-kpi-card::after {
+    content: "";
+    position: absolute;
+    right: -.8rem;
+    bottom: -.8rem;
+    width: 4.5rem;
+    height: 4.5rem;
+    border-radius: 50%;
+    background: rgba(153, 27, 27, .07);
+}
+
+.graduacoes-v2-kpi-card.is-success::after {
+    background: rgba(4, 120, 87, .1);
+}
+
+.graduacoes-v2-kpi-card.is-warning::after {
+    background: rgba(180, 83, 9, .11);
+}
+
+.graduacoes-v2-kpi-card.is-danger::after {
+    background: rgba(185, 28, 28, .1);
+}
+
+.graduacoes-v2-kpi-top {
+    display: flex;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.graduacoes-v2-kpi-top span,
+.graduacoes-v2-kpi-top b,
+.graduacoes-v2-kpi-card small {
+    display: block;
+    color: var(--graduacoes-muted);
+}
+
+.graduacoes-v2-kpi-top span {
+    font-size: .78rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.graduacoes-v2-kpi-top b {
+    border-radius: 999px;
+    padding: .22rem .5rem;
+    background: #f2f4f7;
+    font-size: .7rem;
+    font-weight: 850;
+}
+
+.graduacoes-v2-kpi-card strong {
+    display: block;
+    margin: .48rem 0;
+    color: var(--graduacoes-ink);
+    font-size: clamp(1.35rem, 1.65vw, 2.05rem);
+    line-height: 1.1;
+}
+
+.graduacoes-v2-kpi-card.is-success strong {
+    color: var(--graduacoes-green);
+}
+
+.graduacoes-v2-kpi-card.is-warning strong {
+    color: var(--graduacoes-amber);
+}
+
+.graduacoes-v2-kpi-card.is-danger strong {
+    color: #b91c1c;
+}
+
+.graduacoes-v2-filter-card,
+.graduacoes-v2-table-panel,
+.graduacoes-v2-form-panel,
+.graduacoes-v2-side-card {
+    border: 1px solid var(--graduacoes-border);
+    border-radius: 1.2rem;
+    background: var(--graduacoes-surface);
+    box-shadow: 0 14px 38px rgba(15, 23, 42, .06);
+}
+
+.graduacoes-v2-filter-card {
+    padding: 1rem;
+}
+
+.graduacoes-v2-card-heading,
+.graduacoes-v2-panel-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.graduacoes-v2-filter-card .graduacoes-v2-card-heading {
+    padding: 0 0 1rem;
+}
+
+.graduacoes-v2-panel-heading {
+    border-bottom: 1px solid rgba(15, 23, 42, .08);
+}
+
+.graduacoes-v2-card-heading h2,
+.graduacoes-v2-panel-heading h2,
+.graduacoes-v2-section-title h2,
+.graduacoes-v2-side-card h2,
+.graduacoes-v2-assist-card h2 {
+    font-size: 1.08rem;
+}
+
+.graduacoes-v2-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(190px, .42fr) auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.graduacoes-v2-field label {
+    margin-bottom: .42rem;
+    color: #344054;
+    font-size: .82rem;
+    font-weight: 800;
+}
+
+.graduacoes-v2-control {
+    min-height: 2.85rem;
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: .85rem;
+    background-color: #fff;
+    color: #101828;
+    font-size: .94rem;
+}
+
+textarea.graduacoes-v2-control {
+    min-height: 7rem;
+}
+
+.graduacoes-v2-control::placeholder {
+    color: #98a2b3;
+}
+
+.graduacoes-v2-control:hover {
+    border-color: rgba(15, 23, 42, .22);
+}
+
+.graduacoes-v2-control:focus {
+    border-color: rgba(153, 27, 27, .55);
+    box-shadow: 0 0 0 .25rem var(--graduacoes-focus);
+}
+
+.graduacoes-v2-filter-actions,
+.graduacoes-v2-form-actions,
+.graduacoes-v2-action-stack {
+    display: flex;
+    gap: .55rem;
+}
+
+.graduacoes-v2-form-actions {
+    justify-content: flex-end;
+    padding-top: 1.1rem;
+}
+
+.graduacoes-v2-action-stack {
+    flex-direction: column;
+    margin-top: 1rem;
+}
+
+.graduacoes-v2-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
+    margin-top: 1rem;
+}
+
+.graduacoes-v2-active-filters span {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    border: 1px solid rgba(153, 27, 27, .15);
+    border-radius: 999px;
+    padding: .35rem .68rem;
+    background: #fff7ed;
+    color: #7c2d12;
+    font-size: .82rem;
+}
+
+.graduacoes-v2-main-grid,
+.graduacoes-v2-details-grid,
+.graduacoes-v2-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(330px, .75fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.graduacoes-v2-table-panel,
+.graduacoes-v2-form-panel {
+    overflow: hidden;
+}
+
+.graduacoes-v2-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.graduacoes-v2-table thead th {
+    border-bottom: 1px solid var(--graduacoes-border);
+    background: #fafafa;
+    color: #667085;
+    font-size: .74rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.graduacoes-v2-table tbody td {
+    border-bottom: 1px solid rgba(15, 23, 42, .06);
+    color: #344054;
+    vertical-align: middle;
+}
+
+.graduacoes-v2-table tbody tr {
+    transition: background-color .16s ease;
+}
+
+.graduacoes-v2-table tbody tr:hover {
+    background: #fff7ed;
+}
+
+.graduacoes-v2-table tbody tr.is-attention {
+    background: #fffbeb;
+}
+
+.graduacoes-v2-table tbody tr.is-current {
+    background: #eff6ff;
+}
+
+.graduacoes-v2-person-cell,
+.graduacoes-v2-profile-title {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.graduacoes-v2-person-cell {
+    min-width: 250px;
+}
+
+.graduacoes-v2-person-cell > span,
+.graduacoes-v2-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: .95rem;
+    background: #111827;
+    color: #fff;
+    font-weight: 900;
+}
+
+.graduacoes-v2-person-cell > span {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: .82rem;
+}
+
+.graduacoes-v2-avatar {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 1.25rem;
+    font-size: 1.35rem;
+    box-shadow: 0 14px 28px rgba(17, 24, 39, .18);
+}
+
+.graduacoes-v2-person-cell strong,
+.graduacoes-v2-link {
+    display: block;
+    color: var(--graduacoes-ink);
+    font-weight: 850;
+    text-decoration: none;
+}
+
+.graduacoes-v2-link:hover {
+    color: var(--graduacoes-red);
+}
+
+.graduacoes-v2-person-cell small,
+.graduacoes-v2-date-small {
+    display: block;
+    color: var(--graduacoes-muted);
+    font-size: .78rem;
+}
+
+.graduacoes-v2-status-pill,
+.graduacoes-v2-count-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: .35rem .68rem;
+    font-size: .76rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.graduacoes-v2-status-pill.is-success {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.graduacoes-v2-status-pill.is-warning {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.graduacoes-v2-status-pill.is-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.graduacoes-v2-count-pill {
+    background: #f8fafc;
+    color: #475467;
+}
+
+.graduacoes-v2-level-flow {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    color: #344054;
+    font-size: .88rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.graduacoes-v2-level-flow b {
+    color: var(--graduacoes-red);
+}
+
+.graduacoes-v2-mini-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+
+.graduacoes-v2-mini-checks span {
+    border-radius: 999px;
+    padding: .28rem .55rem;
+    font-size: .72rem;
+    font-weight: 850;
+}
+
+.graduacoes-v2-mini-checks .is-ok {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.graduacoes-v2-mini-checks .is-pending {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.graduacoes-v2-btn-table {
+    min-height: 2.1rem;
+    border: 1px solid rgba(15, 23, 42, .12);
+    border-radius: .7rem;
+    padding: .45rem .65rem;
+    background: #fff;
+    color: #344054;
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.graduacoes-v2-btn-table:hover,
+.graduacoes-v2-btn-table:focus {
+    border-color: rgba(153, 27, 27, .28);
+    background: #fff7ed;
+    color: var(--graduacoes-red);
+}
+
+.graduacoes-v2-btn-table-primary {
+    border-color: rgba(153, 27, 27, .24);
+    color: var(--graduacoes-red);
+}
+
+.graduacoes-v2-empty-state {
+    display: grid;
+    place-items: center;
+    gap: .35rem;
+    padding: 2.6rem 1rem;
+    text-align: center;
+}
+
+.graduacoes-v2-empty-compact {
+    padding: 2rem 1rem;
+}
+
+.graduacoes-v2-empty-state strong {
+    color: var(--graduacoes-ink);
+    font-size: 1rem;
+}
+
+.graduacoes-v2-empty-state span {
+    max-width: 450px;
+    color: var(--graduacoes-muted);
+    font-size: .9rem;
+}
+
+.graduacoes-v2-side-stack {
+    display: grid;
+    gap: 1rem;
+}
+
+.graduacoes-v2-side-card {
+    padding: 1.2rem;
+}
+
+.graduacoes-v2-quick-form,
+.graduacoes-v2-list-card {
+    display: grid;
+    gap: .85rem;
+    margin-top: 1rem;
+}
+
+.graduacoes-v2-list-card article {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: .75rem;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: .95rem;
+    padding: .85rem;
+    background: #f8fafc;
+}
+
+.graduacoes-v2-list-card strong,
+.graduacoes-v2-list-card span {
+    display: block;
+}
+
+.graduacoes-v2-list-card span,
+.graduacoes-v2-list-card small {
+    color: var(--graduacoes-muted);
+    font-size: .82rem;
+}
+
+.graduacoes-v2-list-card b {
+    display: grid;
+    place-items: center;
+    min-width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: #111827;
+    color: #fff;
+    font-size: .78rem;
+}
+
+.graduacoes-v2-form {
+    padding: 1.15rem;
+}
+
+.graduacoes-v2-validation-summary {
+    color: #b91c1c;
+}
+
+.graduacoes-v2-form-section {
+    padding: 1.15rem 0;
+    border-bottom: 1px solid rgba(15, 23, 42, .08);
+}
+
+.graduacoes-v2-form-section:first-of-type {
+    padding-top: 0;
+}
+
+.graduacoes-v2-form-section:last-of-type {
+    border-bottom: 0;
+}
+
+.graduacoes-v2-section-title {
+    display: flex;
+    gap: .85rem;
+    margin-bottom: 1rem;
+}
+
+.graduacoes-v2-section-title > span {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: .75rem;
+    background: #111827;
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.graduacoes-v2-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.graduacoes-v2-field-span-2 {
+    grid-column: span 2;
+}
+
+.graduacoes-v2-field-span-3 {
+    grid-column: 1 / -1;
+}
+
+.graduacoes-v2-result-note {
+    display: grid;
+    align-content: center;
+    gap: .35rem;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: .95rem;
+    padding: .9rem;
+    background: #f8fafc;
+}
+
+.graduacoes-v2-result-note span {
+    color: #667085;
+    font-size: .76rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.graduacoes-v2-result-note strong {
+    color: var(--graduacoes-red);
+    font-size: 1rem;
+}
+
+.graduacoes-v2-result-note small {
+    color: var(--graduacoes-muted);
+}
+
+.graduacoes-v2-check-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.graduacoes-v2-check-card {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: .95rem;
+    padding: .9rem;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+}
+
+.graduacoes-v2-check-card:hover {
+    border-color: rgba(153, 27, 27, .25);
+    background: #fff7ed;
+    transform: translateY(-1px);
+}
+
+.graduacoes-v2-check-card input[type="checkbox"] {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: .2rem;
+    border-color: rgba(15, 23, 42, .22);
+}
+
+.graduacoes-v2-check-card input[type="checkbox"]:checked {
+    border-color: var(--graduacoes-red);
+    background-color: var(--graduacoes-red);
+}
+
+.graduacoes-v2-check-card strong,
+.graduacoes-v2-check-card small {
+    display: block;
+}
+
+.graduacoes-v2-check-card strong {
+    color: var(--graduacoes-ink);
+    font-size: .92rem;
+}
+
+.graduacoes-v2-check-card small {
+    margin-top: .18rem;
+    color: var(--graduacoes-muted);
+    line-height: 1.45;
+}
+
+.graduacoes-v2-assist-card {
+    position: sticky;
+    top: 1rem;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 1.2rem;
+    padding: 1.2rem;
+    background:
+        linear-gradient(135deg, rgba(15, 23, 42, .98), rgba(41, 37, 36, .96)),
+        radial-gradient(circle at top right, rgba(153, 27, 27, .24), transparent 22rem);
+    color: #f8fafc;
+    box-shadow: 0 14px 38px rgba(15, 23, 42, .1);
+}
+
+.graduacoes-v2-assist-card .graduacoes-v2-eyebrow {
+    color: #fecaca;
+}
+
+.graduacoes-v2-assist-card h2 {
+    color: #fff;
+}
+
+.graduacoes-v2-assist-card ul {
+    margin: 1rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.graduacoes-v2-assist-card li {
+    margin-bottom: .65rem;
+    color: rgba(248, 250, 252, .78);
+    line-height: 1.5;
+}
+
+.graduacoes-v2-detail-body {
+    padding: 1.15rem;
+}
+
+.graduacoes-v2-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.graduacoes-v2-detail-grid article,
+.graduacoes-v2-note-box,
+.graduacoes-v2-detail-list > div,
+.graduacoes-v2-alert-card {
+    display: grid;
+    gap: .35rem;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: .95rem;
+    padding: .9rem;
+    background: #f8fafc;
+}
+
+.graduacoes-v2-detail-grid span,
+.graduacoes-v2-note-box span,
+.graduacoes-v2-detail-list span {
+    color: #667085;
+    font-size: .76rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.graduacoes-v2-detail-grid strong,
+.graduacoes-v2-detail-list strong {
+    color: var(--graduacoes-ink);
+    font-weight: 900;
+}
+
+.graduacoes-v2-note-box {
+    margin-top: .85rem;
+}
+
+.graduacoes-v2-note-box p {
+    margin: 0;
+    color: #344054;
+    line-height: 1.65;
+}
+
+.graduacoes-v2-detail-list {
+    display: grid;
+    gap: .75rem;
+    margin-top: 1rem;
+}
+
+.graduacoes-v2-alert-card {
+    border-color: rgba(180, 83, 9, .22);
+    background: #fffbeb;
+    color: #92400e;
+}
+
+@media (max-width: 1199.98px) {
+    .graduacoes-v2-hero,
+    .graduacoes-v2-form-hero,
+    .graduacoes-v2-profile-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .graduacoes-v2-hero-actions {
+        justify-content: flex-start;
+    }
+
+    .graduacoes-v2-kpi-grid,
+    .graduacoes-v2-check-grid,
+    .graduacoes-v2-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .graduacoes-v2-filter-grid,
+    .graduacoes-v2-main-grid,
+    .graduacoes-v2-details-grid,
+    .graduacoes-v2-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .graduacoes-v2-assist-card {
+        position: static;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .graduacoes-v2-hero,
+    .graduacoes-v2-form-hero,
+    .graduacoes-v2-profile-hero {
+        padding: 1rem;
+    }
+
+    .graduacoes-v2-kpi-grid,
+    .graduacoes-v2-form-grid,
+    .graduacoes-v2-check-grid,
+    .graduacoes-v2-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .graduacoes-v2-field-span-2,
+    .graduacoes-v2-field-span-3 {
+        grid-column: auto;
+    }
+
+    .graduacoes-v2-filter-actions,
+    .graduacoes-v2-form-actions,
+    .graduacoes-v2-profile-title {
+        flex-direction: column;
+    }
+
+    .graduacoes-v2-hero-actions .btn,
+    .graduacoes-v2-filter-actions .btn,
+    .graduacoes-v2-form-actions .btn {
+        width: 100%;
+    }
+
+    .graduacoes-v2-level-flow {
+        white-space: normal;
+    }
+}
