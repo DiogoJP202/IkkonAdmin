@@ -13,11 +13,12 @@
 
 <div class="institucional-page public-blog-page public-blog-detail-page">
     <partial name="_PublicHeader" />
+    <partial name="_PublicBreadcrumbs" />
 
     <article class="public-blog-detail">
         <header class="public-blog-detail-hero">
             <div class="container-xxl px-3 px-lg-4">
-                <a class="public-blog-back-link" href="/blog">Blog</a>
+                <a class="public-blog-back-link" href="@I18n.LocalizePath("/blog")">Blog</a>
 
                 <div class="public-blog-detail-heading">
                     <div class="public-blog-detail-meta">
@@ -31,7 +32,7 @@
 
                     @if (!string.IsNullOrWhiteSpace(Model.CategoryName))
                     {
-                        <a class="public-blog-detail-category" href="@Url.Action("Index", "Blog", new { categoria = Model.CategorySlug })">@Model.CategoryName</a>
+                        <a class="public-blog-detail-category" href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { categoria = Model.CategorySlug }) ?? "/blog")">@Model.CategoryName</a>
                     }
 
                     <h1>@Model.Title</h1>
@@ -46,7 +47,7 @@
                         <div class="public-blog-detail-tags">
                             @foreach (var tag in Model.Tags)
                             {
-                                <a href="@Url.Action("Index", "Blog", new { tag = tag.Slug })">#@tag.Name</a>
+                                <a href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { tag = tag.Slug }) ?? "/blog")">#@tag.Name</a>
                             }
                         </div>
                     }
@@ -75,7 +76,7 @@
                         {
                             <div>
                                 <span>@I18n["Categoria", "Category", "カテゴリ"]</span>
-                                <a href="@Url.Action("Index", "Blog", new { categoria = Model.CategorySlug })">@Model.CategoryName</a>
+                                <a href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { categoria = Model.CategorySlug }) ?? "/blog")">@Model.CategoryName</a>
                             </div>
                         }
                         @if (!string.IsNullOrWhiteSpace(Model.AuthorName))
@@ -111,7 +112,7 @@
                         <p class="institucional-kicker mb-2">@I18n["Continuar lendo", "Keep reading", "続きを読む"]</p>
                         <h2 class="institucional-section-title">@I18n["Posts relacionados", "Related posts", "関連記事"]</h2>
                     </div>
-                    <a class="public-blog-clear" href="/blog">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
+                    <a class="public-blog-clear" href="@I18n.LocalizePath("/blog")">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
                 </div>
 
                 <div class="public-blog-grid">

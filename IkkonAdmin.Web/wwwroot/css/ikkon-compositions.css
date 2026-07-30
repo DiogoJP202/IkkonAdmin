@@ -720,3 +720,43 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+
+.public-breadcrumbs {
+    background: var(--ikkon-cream);
+    border-bottom: 1px solid rgb(7 31 59 / 10%);
+}
+
+.public-blog-detail-page > .public-breadcrumbs {
+    padding-top: 0.25rem;
+}
+
+.public-breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0.75rem 0;
+    color: rgb(7 31 59 / 68%);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    list-style: none;
+}
+
+.public-breadcrumbs li:not(:last-child)::after {
+    margin-left: 0.45rem;
+    color: var(--ikkon-red);
+    content: "/";
+}
+
+.public-breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.public-breadcrumbs a:hover,
+.public-breadcrumbs a:focus-visible {
+    color: var(--ikkon-red);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}

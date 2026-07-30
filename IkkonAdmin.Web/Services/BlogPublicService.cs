@@ -121,6 +121,8 @@ public sealed class BlogPublicService(
                 ReadingTimeMinutes = x.ReadingTimeMinutes,
                 SeoTitle = x.SeoTitle,
                 SeoDescription = x.SeoDescription,
+                LanguageCode = x.LanguageCode,
+                UpdatedAtUtc = x.UpdatedAtUtc ?? x.PublishedAtUtc ?? x.CreatedAtUtc,
                 Tags = x.PostTags
                     .OrderBy(t => t.BlogTag.Name)
                     .Select(t => new BlogPublicTagViewModel
@@ -136,6 +138,16 @@ public sealed class BlogPublicService(
         {
             return null;
         }
+
+        post.AlternateVersions = await CreatePublicQuery(now)
+            .Where(x => x.Id == groupId || x.TranslationGroupId == groupId)
+            .OrderBy(x => x.Id)
+            .Select(x => new BlogPublicAlternateVersionViewModel
+            {
+                LanguageCode = x.LanguageCode,
+                Slug = x.Slug
+            })
+            .ToListAsync(cancellationToken);
 
         var relatedQuery = CreatePublicQuery(now)
             .Where(x => (x.TranslationGroupId ?? x.Id) != groupId);

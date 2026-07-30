@@ -19,3 +19,15 @@ public sealed record PublicBlogCardPartialViewModel(
     bool ShowBadges = false,
     bool ShowTags = false,
     bool UseCompactReadingLabel = false);
+
+public sealed record PublicAlternateLinkViewModel(
+    string Hreflang,
+    string Url);
+
+public sealed record PublicBreadcrumbItemViewModel(
+    string Label,
+    string? Url = null);
+
+public sealed record PublicFaqItemViewModel(
+    string Question,
+    string Answer);

@@ -1,32 +1,32 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net10.0": {
-      "AngleSharp/0.17.1": {
+      "AngleSharp/1.6.0": {
         "type": "package",
         "compile": {
-          "lib/netstandard2.0/AngleSharp.dll": {
+          "lib/net10.0/AngleSharp.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/netstandard2.0/AngleSharp.dll": {
+          "lib/net10.0/AngleSharp.dll": {
             "related": ".xml"
           }
         }
       },
-      "AngleSharp.Css/0.17.0": {
+      "AngleSharp.Css/1.0.0": {
         "type": "package",
         "dependencies": {
-          "AngleSharp": "[0.17.0, 0.18.0)"
+          "AngleSharp": "[1.5.0, 2.0.0)"
         },
         "compile": {
-          "lib/net7.0/AngleSharp.Css.dll": {
+          "lib/net10.0/AngleSharp.Css.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net7.0/AngleSharp.Css.dll": {
+          "lib/net10.0/AngleSharp.Css.dll": {
             "related": ".xml"
           }
         }
@@ -67,11 +67,11 @@
           }
         }
       },
-      "HtmlSanitizer/9.0.892": {
+      "HtmlSanitizer/9.1.973": {
         "type": "package",
         "dependencies": {
-          "AngleSharp": "[0.17.1]",
-          "AngleSharp.Css": "[0.17.0]"
+          "AngleSharp": "1.6.0",
+          "AngleSharp.Css": "1.0.0"
         },
         "compile": {
           "lib/net8.0/HtmlSanitizer.dll": {
@@ -1072,42 +1072,47 @@
     }
   },
   "libraries": {
-    "AngleSharp/0.17.1": {
-      "sha512": "5MPI4bbixlwxb0W/smOMeIR+QlxMy5/5jD+WnIAw4pBC+7AhLPe5bS3cLgQMJyvd6q0A48sG+uYOt/ep406GLA==",
+    "AngleSharp/1.6.0": {
+      "sha512": "kVnhnZlM4Yww2KWqW3uSL8isvhYsrTTBMSPAgoF8ZhMrLSoay6783AP6dQxAj1J9gvWKi3OIM4ZezdE2Y4ufCQ==",
       "type": "package",
-      "path": "anglesharp/0.17.1",
+      "path": "anglesharp/1.6.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "anglesharp.0.17.1.nupkg.sha512",
+        "README.md",
+        "anglesharp.1.6.0.nupkg.sha512",
         "anglesharp.nuspec",
-        "lib/net461/AngleSharp.dll",
-        "lib/net461/AngleSharp.xml",
+        "lib/net10.0/AngleSharp.dll",
+        "lib/net10.0/AngleSharp.xml",
+        "lib/net462/AngleSharp.dll",
+        "lib/net462/AngleSharp.xml",
         "lib/net472/AngleSharp.dll",
         "lib/net472/AngleSharp.xml",
+        "lib/net8.0/AngleSharp.dll",
+        "lib/net8.0/AngleSharp.xml",
         "lib/netstandard2.0/AngleSharp.dll",
         "lib/netstandard2.0/AngleSharp.xml",
         "logo.png"
       ]
     },
-    "AngleSharp.Css/0.17.0": {
-      "sha512": "bg0AcugmX6BFEi/DHG61QrwRU8iuiX4H8LZehdIzYdqOM/dgb3BsCTzNIcc1XADn4+xfQEdVwJYTSwUxroL4vg==",
+    "AngleSharp.Css/1.0.0": {
+      "sha512": "yMpYcNkI/ZHTt+qZMczhHEAHZV0AZf75nqJ5LqERFXvJGOFLJjwr0eqaYXqYlt9JPojOd+OkZLlGbnsmKjmh+g==",
       "type": "package",
-      "path": "anglesharp.css/0.17.0",
+      "path": "anglesharp.css/1.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "anglesharp.css.0.17.0.nupkg.sha512",
+        "anglesharp.css.1.0.0.nupkg.sha512",
         "anglesharp.css.nuspec",
-        "lib/net461/AngleSharp.Css.dll",
-        "lib/net461/AngleSharp.Css.xml",
+        "lib/net10.0/AngleSharp.Css.dll",
+        "lib/net10.0/AngleSharp.Css.xml",
+        "lib/net462/AngleSharp.Css.dll",
+        "lib/net462/AngleSharp.Css.xml",
         "lib/net472/AngleSharp.Css.dll",
         "lib/net472/AngleSharp.Css.xml",
-        "lib/net6.0/AngleSharp.Css.dll",
-        "lib/net6.0/AngleSharp.Css.xml",
-        "lib/net7.0/AngleSharp.Css.dll",
-        "lib/net7.0/AngleSharp.Css.xml",
+        "lib/net8.0/AngleSharp.Css.dll",
+        "lib/net8.0/AngleSharp.Css.xml",
         "lib/netstandard2.0/AngleSharp.Css.dll",
         "lib/netstandard2.0/AngleSharp.Css.xml",
         "logo.png"
@@ -1153,15 +1158,15 @@
         "lib/netstandard2.0/Azure.Identity.xml"
       ]
     },
-    "HtmlSanitizer/9.0.892": {
-      "sha512": "zdkMmpNCjTkxna8Y+jmPIFm2st+HjHrf32yNElFYwe7L4GmDm+mdKR6TzDyf6ewJ0RUUz84D4IkHNgrwGi4VbQ==",
+    "HtmlSanitizer/9.1.973": {
+      "sha512": "0gDDlj8SZiYFn9fxdWOrxp5mO9y+5jOE0dunOzJ6EELr/FBtlPasvdLR/K3YVgbo4FiPKT3YomlarsvhLm/H2A==",
       "type": "package",
-      "path": "htmlsanitizer/9.0.892",
+      "path": "htmlsanitizer/9.1.973",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "README.md",
-        "htmlsanitizer.9.0.892.nupkg.sha512",
+        "htmlsanitizer.9.1.973.nupkg.sha512",
         "htmlsanitizer.nuspec",
         "lib/net462/HtmlSanitizer.dll",
         "lib/net462/HtmlSanitizer.xml",
@@ -3151,42 +3156,35 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
-      "HtmlSanitizer >= 9.0.892",
+      "HtmlSanitizer >= 9.1.973",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.6",
       "Microsoft.EntityFrameworkCore.SqlServer >= 10.0.6"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dsoares\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\diogo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+      "projectUniqueName": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
       "projectName": "IkkonAdmin.Web",
-      "projectPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
-      "packagesPath": "C:\\Users\\dsoares\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
+      "projectPath": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+      "packagesPath": "C:\\Users\\diogo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\dsoares\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\diogo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -3201,15 +3199,16 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "HtmlSanitizer": {
             "target": "Package",
-            "version": "[9.0.892, )"
+            "version": "[9.1.973, )"
           },
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -3241,7 +3240,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

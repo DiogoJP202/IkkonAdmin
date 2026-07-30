@@ -2,7 +2,6 @@
 
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = I18n["Blog | IKKON SPTD", "Blog | IKKON SPTD", "ブログ | IKKON SPTD"];
     ViewData["PublicSection"] = "blog";
     ViewData["ContactMode"] = "geral";
     ViewData["JapanesePublicEnabled"] = true;
@@ -17,12 +16,13 @@
         I18n["Conteúdos, histórias e bastidores do taiko", "Taiko stories, insights, and behind the scenes", "太鼓の読みもの・物語・舞台裏"],
         I18n["Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.", "Follow school news, Japanese culture, events, studies, and records from the IKKON SPTD community.", "IKKON SPTDのニュース、日本文化、イベント、学び、コミュニティの記録をお届けします。"],
         new(I18n["Ver publicações", "See posts", "記事を見る"], "#posts", "btn btn-danger btn-lg"),
-        new(I18n["Conhecer a escola", "Discover the school", "教室を見る"], "/escola", "btn btn-outline-dark btn-lg"));
+        new(I18n["Conhecer a escola", "Discover the school", "教室を見る"], I18n.LocalizePath("/escola"), "btn btn-outline-dark btn-lg"));
 }
 
 <div class="institucional-page public-blog-page">
     <partial name="_PublicHeader" />
     <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
     <partial name="_PublicPageIntro" model="pageIntro" />
 
     @if (Model.FeaturedPosts.Any())
@@ -70,7 +70,7 @@
                             @foreach (var post in Model.WeeklyHighlights)
                             {
                                 <article class="public-blog-weekly-card">
-                                    <a href="@PublicViewFormatter.BuildBlogUrl(post.Slug)">
+                                    <a href="@I18n.LocalizePath(PublicViewFormatter.BuildBlogUrl(post.Slug))">
                                         <span>@I18n["Blog da semana", "Weekly blog", "今週のブログ"]</span>
                                         <strong>@post.Title</strong>
                                         @if (!string.IsNullOrWhiteSpace(post.Summary))
@@ -98,7 +98,7 @@
                     </p>
                 </div>
 
-                <form method="get" action="/blog" class="public-blog-filter-form">
+                <form method="get" action="@I18n.LocalizePath("/blog")" class="public-blog-filter-form">
                     <div class="public-blog-search">
                         <label for="blog-q" class="visually-hidden">@I18n["Pesquisar no blog", "Search the blog", "ブログ内を検索"]</label>
                         <input id="blog-q" type="search" name="q" value="@q" placeholder="@I18n["Buscar no blog", "Search the blog", "ブログを検索"]" />
@@ -127,7 +127,7 @@
 
                     @if (Model.HasActiveFilter)
                     {
-                        <a class="public-blog-clear" href="/blog">@I18n["Limpar filtros", "Clear filters", "フィルターをクリア"]</a>
+                        <a class="public-blog-clear" href="@I18n.LocalizePath("/blog")">@I18n["Limpar filtros", "Clear filters", "フィルターをクリア"]</a>
                     }
                 </form>
             </div>
@@ -137,11 +137,11 @@
                 <div class="public-blog-chips">
                     @foreach (var item in Model.Categories.Take(8))
                     {
-                        <a class="@(item.IsActive ? "is-active" : string.Empty)" href="@Url.Action("Index", "Blog", new { q, categoria = item.Slug, tag })">@item.Name</a>
+                        <a class="@(item.IsActive ? "is-active" : string.Empty)" href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { q, categoria = item.Slug, tag }) ?? "/blog")">@item.Name</a>
                     }
                     @foreach (var item in Model.Tags.Take(10))
                     {
-                        <a class="@(item.IsActive ? "is-active" : string.Empty)" href="@Url.Action("Index", "Blog", new { q, categoria, tag = item.Slug })">#@item.Name</a>
+                        <a class="@(item.IsActive ? "is-active" : string.Empty)" href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { q, categoria, tag = item.Slug }) ?? "/blog")">#@item.Name</a>
                     }
                 </div>
             }
@@ -169,7 +169,7 @@
                     <nav class="public-blog-pagination" aria-label="@I18n["Paginação do blog", "Blog pagination", "ブログのページ送り"]">
                         @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
                         {
-                            <a class="@(pageNumber == Model.CurrentPage ? "is-active" : string.Empty)" href="@Url.Action("Index", "Blog", new { q, categoria, tag, pagina = pageNumber })">@pageNumber</a>
+                            <a class="@(pageNumber == Model.CurrentPage ? "is-active" : string.Empty)" href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { q, categoria, tag, pagina = pageNumber }) ?? "/blog")">@pageNumber</a>
                         }
                     </nav>
                 }
@@ -182,7 +182,7 @@
                     <p>@I18n["Quando houver conteúdos publicados no painel, eles aparecerão aqui automaticamente.", "When content is published from the admin panel, it will appear here automatically.", "管理画面で公開された記事は、ここに自動的に表示されます。"]</p>
                     @if (Model.HasActiveFilter)
                     {
-                        <a class="btn btn-dark" href="/blog">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
+                        <a class="btn btn-dark" href="@I18n.LocalizePath("/blog")">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
                     }
                 </div>
             }

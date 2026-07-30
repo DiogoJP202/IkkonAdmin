@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "IkkonAdmin.Web/1.0.0": {
         "dependencies": {
-          "HtmlSanitizer": "9.0.892",
+          "HtmlSanitizer": "9.1.973",
           "Microsoft.EntityFrameworkCore.Design": "10.0.6",
           "Microsoft.EntityFrameworkCore.SqlServer": "10.0.6"
         },
@@ -16,22 +16,22 @@
           "IkkonAdmin.Web.dll": {}
         }
       },
-      "AngleSharp/0.17.1": {
+      "AngleSharp/1.6.0": {
         "runtime": {
-          "lib/netstandard2.0/AngleSharp.dll": {
-            "assemblyVersion": "0.17.1.0",
-            "fileVersion": "0.17.1.0"
+          "lib/net10.0/AngleSharp.dll": {
+            "assemblyVersion": "1.6.0.0",
+            "fileVersion": "1.6.0.0"
           }
         }
       },
-      "AngleSharp.Css/0.17.0": {
+      "AngleSharp.Css/1.0.0": {
         "dependencies": {
-          "AngleSharp": "0.17.1"
+          "AngleSharp": "1.6.0"
         },
         "runtime": {
-          "lib/net7.0/AngleSharp.Css.dll": {
-            "assemblyVersion": "0.17.0.0",
-            "fileVersion": "0.17.0.0"
+          "lib/net10.0/AngleSharp.Css.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       },
@@ -61,15 +61,15 @@
           }
         }
       },
-      "HtmlSanitizer/9.0.892": {
+      "HtmlSanitizer/9.1.973": {
         "dependencies": {
-          "AngleSharp": "0.17.1",
-          "AngleSharp.Css": "0.17.0"
+          "AngleSharp": "1.6.0",
+          "AngleSharp.Css": "1.0.0"
         },
         "runtime": {
           "lib/net8.0/HtmlSanitizer.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.892.0"
+            "fileVersion": "9.1.973.0"
           }
         }
       },
@@ -786,19 +786,19 @@
       "serviceable": false,
       "sha512": ""
     },
-    "AngleSharp/0.17.1": {
+    "AngleSharp/1.6.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-5MPI4bbixlwxb0W/smOMeIR+QlxMy5/5jD+WnIAw4pBC+7AhLPe5bS3cLgQMJyvd6q0A48sG+uYOt/ep406GLA==",
-      "path": "anglesharp/0.17.1",
-      "hashPath": "anglesharp.0.17.1.nupkg.sha512"
+      "sha512": "sha512-kVnhnZlM4Yww2KWqW3uSL8isvhYsrTTBMSPAgoF8ZhMrLSoay6783AP6dQxAj1J9gvWKi3OIM4ZezdE2Y4ufCQ==",
+      "path": "anglesharp/1.6.0",
+      "hashPath": "anglesharp.1.6.0.nupkg.sha512"
     },
-    "AngleSharp.Css/0.17.0": {
+    "AngleSharp.Css/1.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bg0AcugmX6BFEi/DHG61QrwRU8iuiX4H8LZehdIzYdqOM/dgb3BsCTzNIcc1XADn4+xfQEdVwJYTSwUxroL4vg==",
-      "path": "anglesharp.css/0.17.0",
-      "hashPath": "anglesharp.css.0.17.0.nupkg.sha512"
+      "sha512": "sha512-yMpYcNkI/ZHTt+qZMczhHEAHZV0AZf75nqJ5LqERFXvJGOFLJjwr0eqaYXqYlt9JPojOd+OkZLlGbnsmKjmh+g==",
+      "path": "anglesharp.css/1.0.0",
+      "hashPath": "anglesharp.css.1.0.0.nupkg.sha512"
     },
     "Azure.Core/1.47.1": {
       "type": "package",
@@ -814,12 +814,12 @@
       "path": "azure.identity/1.14.2",
       "hashPath": "azure.identity.1.14.2.nupkg.sha512"
     },
-    "HtmlSanitizer/9.0.892": {
+    "HtmlSanitizer/9.1.973": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-zdkMmpNCjTkxna8Y+jmPIFm2st+HjHrf32yNElFYwe7L4GmDm+mdKR6TzDyf6ewJ0RUUz84D4IkHNgrwGi4VbQ==",
-      "path": "htmlsanitizer/9.0.892",
-      "hashPath": "htmlsanitizer.9.0.892.nupkg.sha512"
+      "sha512": "sha512-0gDDlj8SZiYFn9fxdWOrxp5mO9y+5jOE0dunOzJ6EELr/FBtlPasvdLR/K3YVgbo4FiPKT3YomlarsvhLm/H2A==",
+      "path": "htmlsanitizer/9.1.973",
+      "hashPath": "htmlsanitizer.9.1.973.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",

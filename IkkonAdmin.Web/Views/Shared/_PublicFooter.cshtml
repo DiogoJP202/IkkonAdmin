@@ -4,11 +4,13 @@
             <img src="~/design-ikkon/assets/logo-horizontal-branco.png" asp-append-version="true" alt="IKKON SPTD | São Paulo Taiko Dojo" class="institucional-footer-logo" />
             <p>@I18n["Escola de taiko em São Paulo · desde 2015", "Taiko school in Sao Paulo · since 2015", "サンパウロの太鼓教室 · 2015年設立"]</p>
             <nav class="ikkon-footer-links" aria-label="@I18n["Navegação do rodapé", "Footer navigation", "フッターナビゲーション"]">
-                <a href="/">Home</a>
-                <a href="/escola">@I18n["Escola", "School", "教室"]</a>
-                <a href="/eventos">@I18n["Eventos", "Events", "イベント"]</a>
-                <a href="/blog">Blog</a>
-                <a href="/#contato">@I18n["Contato", "Contact", "お問い合わせ"]</a>
+                <a href="@I18n.LocalizePath("/")">Home</a>
+                <a href="@I18n.LocalizePath("/sobre")">@I18n["Sobre", "About", "IKKONについて"]</a>
+                <a href="@I18n.LocalizePath("/taiko")">@I18n["O que é taiko", "What is taiko", "和太鼓とは"]</a>
+                <a href="@I18n.LocalizePath("/escola")">@I18n["Escola", "School", "教室"]</a>
+                <a href="@I18n.LocalizePath("/eventos")">@I18n["Eventos", "Events", "イベント"]</a>
+                <a href="@I18n.LocalizePath("/blog")">Blog</a>
+                <a href="@I18n.LocalizePath("/contato")">@I18n["Contato", "Contact", "お問い合わせ"]</a>
             </nav>
             <div class="ikkon-footer-social">
                 <a href="https://wa.me/5511937799916" target="_blank" rel="noopener">WhatsApp</a>

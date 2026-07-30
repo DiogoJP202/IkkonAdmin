@@ -1,6 +1,5 @@
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = I18n["IKKON SPTD | Taiko em São Paulo", "IKKON SPTD | Taiko in Sao Paulo", "IKKON SPTD | サンパウロの和太鼓"];
     ViewData["PublicSection"] = "home";
     ViewData["ContactMode"] = "geral";
     ViewData["JapaneseLandingEnabled"] = true;
@@ -31,8 +30,8 @@
                         @I18n["Uma escola e grupo artístico dedicados ao taiko, unindo tradição japonesa, formação musical, disciplina e a energia de tocar em conjunto.", "A school and performance group dedicated to taiko, bringing together Japanese tradition, musical education, discipline, and the energy of playing together.", "日本の伝統、音楽教育、規律、そして仲間と演奏する力を結ぶ、和太鼓の教室・芸能グループです。"]
                     </p>
                     <div class="d-flex flex-wrap gap-2 mt-4">
-                        <a class="btn btn-danger btn-lg" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
-                        <a class="btn btn-outline-dark btn-lg" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
+                        <a class="btn btn-danger btn-lg" href="@I18n.LocalizePath("/escola")">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
+                        <a class="btn btn-outline-dark btn-lg" href="@I18n.LocalizePath("/eventos")">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
                     </div>
                 </div>
                 <div class="ikkon-home-photo-composition" aria-label="@I18n["Momentos de aulas e apresentações de taiko", "Moments from taiko classes and performances", "和太鼓のレッスンと公演の様子"]">
@@ -61,13 +60,13 @@
                     <span>@I18n["Escola de Taiko", "Taiko School", "和太鼓教室"]</span>
                     <h3>@I18n["Aprenda taiko em São Paulo", "Learn taiko in Sao Paulo", "サンパウロで和太鼓を学ぶ"]</h3>
                     <p>@I18n["Aulas, aprendizado musical, cultura japonesa e acolhimento para quem quer começar ou evoluir.", "Classes, musical learning, Japanese culture, and a welcoming path for beginners and growing students.", "初めての方も経験者も、音楽、日本文化、あたたかな仲間の中で学べます。"]</p>
-                    <a class="btn btn-dark" href="/escola">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
+                    <a class="btn btn-dark" href="@I18n.LocalizePath("/escola")">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
                 </article>
                 <article class="public-path-card public-path-card-eventos">
                     <span>@I18n["Grupo artístico e eventos", "Performance group and events", "芸能グループ・イベント出演"]</span>
                     <h3>@I18n["Apresentações com energia de palco", "Performances with stage energy", "舞台に響く力強い公演"]</h3>
                     <p>@I18n["Shows, festivais, eventos corporativos e apresentações especiais com tambores japoneses.", "Shows, festivals, corporate events, and special performances with Japanese drums.", "日本の太鼓によるショー、フェスティバル、企業イベント、特別公演。"]</p>
-                    <a class="btn btn-danger" href="/eventos">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
+                    <a class="btn btn-danger" href="@I18n.LocalizePath("/eventos")">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
                 </article>
             </div>
         </div>

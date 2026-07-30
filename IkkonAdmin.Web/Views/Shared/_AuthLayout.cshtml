@@ -1,17 +1,28 @@
 @{
-    var htmlLang = I18n.IsEnglish ? "en" : "pt-BR";
+    var htmlLang = PublicSiteLocales.ForCulture(I18n.CurrentCulture).Hreflang;
+    var authMode = ViewData["AuthMode"]?.ToString() == "student" ? "student" : "staff";
+    var authHeroImage = authMode == "student"
+        ? Url.Content("~/design-ikkon/photos/hero-aulas-6.webp")
+        : Url.Content("~/design-ikkon/photos/hero-ensemble-6.webp");
 }
 <!DOCTYPE html>
 <html lang="@htmlLang">
 <head>
     <meta charset="utf-8" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - IkkonAdmin</title>
+    <title>@ViewData["Title"] | IKKON</title>
+    <meta name="theme-color" content="#00203e" />
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="@authHeroImage" type="image/webp" />
+    @if (I18n.IsJapanese)
+    {
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/ikkon-tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-internal-foundation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-auth.css" asp-append-version="true" />
 </head>

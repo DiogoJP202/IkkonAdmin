@@ -39,8 +39,17 @@ public class BlogPublicDetailsViewModel
     public int ReadingTimeMinutes { get; set; }
     public string? SeoTitle { get; set; }
     public string? SeoDescription { get; set; }
+    public string LanguageCode { get; set; } = "pt-BR";
+    public DateTime UpdatedAtUtc { get; set; }
     public List<BlogPublicTagViewModel> Tags { get; set; } = new();
     public List<BlogPublicPostCardViewModel> RelatedPosts { get; set; } = new();
+    public List<BlogPublicAlternateVersionViewModel> AlternateVersions { get; set; } = new();
+}
+
+public class BlogPublicAlternateVersionViewModel
+{
+    public string LanguageCode { get; set; } = "pt-BR";
+    public string Slug { get; set; } = string.Empty;
 }
 
 public class BlogPublicPostCardViewModel

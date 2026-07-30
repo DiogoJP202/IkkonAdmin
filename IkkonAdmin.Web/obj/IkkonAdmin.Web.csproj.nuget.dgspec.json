@@ -1,36 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj": {}
+    "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj": {
+    "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+        "projectUniqueName": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
         "projectName": "IkkonAdmin.Web",
-        "projectPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
-        "packagesPath": "C:\\Users\\dsoares\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dsoares\\Documents\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
+        "projectPath": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\IkkonAdmin.Web.csproj",
+        "packagesPath": "C:\\Users\\diogo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\diogo\\OneDrive\\Documentos\\Meus-Arquivos\\Projetos\\IkkonAdmin\\IkkonAdmin.Web\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\dsoares\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\diogo\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -45,15 +39,16 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.200"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "HtmlSanitizer": {
               "target": "Package",
-              "version": "[9.0.892, )"
+              "version": "[9.1.973, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -85,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

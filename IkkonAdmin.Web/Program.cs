@@ -1,6 +1,7 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Localization;
 using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
@@ -9,6 +10,7 @@ using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Globalization;
@@ -22,6 +24,12 @@ CultureInfo.DefaultThreadCurrentCulture = culturaPadrao;
 CultureInfo.DefaultThreadCurrentUICulture = culturaPadrao;
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
 builder.Services.AddSingleton<IViewTextService, ViewTextService>();
 builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddHttpContextAccessor();
@@ -39,6 +47,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = culturasSuportadas;
     options.RequestCultureProviders =
     [
+        new PublicPathRequestCultureProvider(),
         new QueryStringRequestCultureProvider(),
         new CookieRequestCultureProvider(),
         new AcceptLanguageHeaderRequestCultureProvider()
@@ -131,6 +140,7 @@ builder.Services.AddScoped<IBlogVersionService, BlogVersionService>();
 builder.Services.AddScoped<IBlogCategoriaService, BlogCategoriaService>();
 builder.Services.AddScoped<IBlogMediaService, BlogMediaService>();
 builder.Services.AddScoped<IBlogContentSanitizer, BlogContentSanitizer>();
+builder.Services.AddScoped<IPublicSeoService, PublicSeoService>();
 builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection("GoogleAgenda"));
 builder.Services.AddScoped<IGoogleAgendaConnectionService, GoogleAgendaConnectionService>();
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
@@ -156,8 +166,19 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/erro/{0}");
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseResponseCompression();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        var hasVersion = context.Context.Request.Query.ContainsKey("v");
+        context.Context.Response.Headers.CacheControl = hasVersion
+            ? "public,max-age=31536000,immutable"
+            : "public,max-age=604800";
+    }
+});
 app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
@@ -172,6 +193,42 @@ app.MapMethods("/health", new[] { "GET", "HEAD" }, () => Results.Ok(new
     checkedAtUtc = DateTimeOffset.UtcNow
 }))
 .AllowAnonymous();
+
+app.MapControllerRoute(
+    name: "localized-home",
+    pattern: "{culture:regex(^(pt|en|ja)$)}",
+    defaults: new { controller = "Institucional", action = "Index" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-sobre",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/sobre",
+    defaults: new { controller = "Institucional", action = "Sobre" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-taiko",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/taiko",
+    defaults: new { controller = "Institucional", action = "Taiko" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-escola",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/escola",
+    defaults: new { controller = "Institucional", action = "Escola" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-eventos",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/eventos",
+    defaults: new { controller = "Institucional", action = "Eventos" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-contato",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/contato",
+    defaults: new { controller = "Institucional", action = "Contato" })
+    .WithStaticAssets();
 
 app.MapControllerRoute(
     name: "landing",
@@ -189,6 +246,24 @@ app.MapControllerRoute(
     name: "eventos",
     pattern: "eventos",
     defaults: new { controller = "Institucional", action = "Eventos" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "sobre",
+    pattern: "sobre",
+    defaults: new { controller = "Institucional", action = "Sobre" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "taiko",
+    pattern: "taiko",
+    defaults: new { controller = "Institucional", action = "Taiko" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "contato",
+    pattern: "contato",
+    defaults: new { controller = "Institucional", action = "Contato" })
     .WithStaticAssets();
 
 app.MapControllerRoute(

@@ -1,18 +1,38 @@
 @{
     var pageTitle = ViewData["Title"]?.ToString() ?? "Ikkon SPTD";
-    var japaneseLandingEnabled = ViewData["JapaneseLandingEnabled"] as bool? == true;
-    var japanesePublicEnabled = ViewData["JapanesePublicEnabled"] as bool? == true;
     var publicConstructionTagEnabled = ViewData["PublicConstructionTagEnabled"] as bool? == true;
-    var japaneseContentEnabled = japaneseLandingEnabled || japanesePublicEnabled;
-    var pageDescription = ViewData["Description"]?.ToString() ?? (japaneseContentEnabled
-        ? I18n["Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.", "Ikkon SPTD | Taiko school. Japanese percussion classes for everyone in Sao Paulo, with classes, events, and shows.", "IKKON SPTD | サンパウロの和太鼓教室。レッスン、イベント、公演を通じて日本の打楽器を学べる場所です。"]
-        : I18n["Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.", "Ikkon SPTD | Taiko school. Japanese percussion classes for everyone in Sao Paulo, with classes, events, and shows."]);
-    var canonicalUrl = ViewData["CanonicalUrl"]?.ToString();
+    var pageDescription = ViewData["Description"]?.ToString() ?? I18n[
+        "Ikkon SPTD | Escola de Taiko. Ensino de percussão japonesa para todos em São Paulo, com aulas, eventos e shows.",
+        "Ikkon SPTD | Taiko school. Japanese percussion classes for everyone in Sao Paulo, with classes, events, and shows.",
+        "IKKON SPTD | サンパウロの和太鼓教室。レッスン、イベント、公演を通じて日本の打楽器を学べる場所です。"];
+    var canonicalPath = ViewData["CanonicalPath"]?.ToString()
+        ?? PublicSiteLocales.LocalizePath(Context.Request.Path.Value, I18n.CurrentCulture);
+    var canonicalUrl = ViewData["CanonicalUrl"]?.ToString()
+        ?? PublicSiteLocales.AbsoluteUrl(Context.Request, canonicalPath);
     var ogTitle = ViewData["OgTitle"]?.ToString() ?? pageTitle;
     var ogDescription = ViewData["OgDescription"]?.ToString() ?? pageDescription;
     var ogType = ViewData["OgType"]?.ToString() ?? "website";
-    var ogImage = ViewData["OgImage"]?.ToString();
-    var htmlLang = I18n.IsJapanese && japaneseContentEnabled ? "ja" : I18n.IsEnglish ? "en" : "pt-BR";
+    var ogImage = ViewData["OgImage"]?.ToString()
+        ?? PublicSiteLocales.AbsoluteUrl(
+            Context.Request,
+            "/design-ikkon/social/ikkon-social-preview.jpg");
+    var currentLocale = PublicSiteLocales.ForCulture(I18n.CurrentCulture);
+    var htmlLang = currentLocale.Hreflang;
+    var robots = ViewData["Robots"]?.ToString() ?? "index,follow,max-image-preview:large";
+    var alternates = ViewData["AlternateLinks"] as IEnumerable<PublicAlternateLinkViewModel>
+        ?? PublicSiteLocales.All.Select(locale => new PublicAlternateLinkViewModel(
+            locale.Hreflang,
+            PublicSiteLocales.AbsoluteUrl(
+                Context.Request,
+                PublicSiteLocales.LocalizePath(Context.Request.Path.Value, locale.Culture))));
+    var alternateList = alternates.ToList();
+    var xDefaultUrl = ViewData["XDefaultUrl"]?.ToString()
+        ?? alternateList.FirstOrDefault(link => link.Hreflang == "pt-BR")?.Url
+        ?? PublicSiteLocales.AbsoluteUrl(Context.Request, "/pt");
+    var structuredData = ViewData["StructuredData"] as IEnumerable<string> ?? [];
+    var includeSiteIdentitySchema = ViewData["IncludeSiteIdentitySchema"] as bool? == true;
+    var suppressCanonicalAndAlternates =
+        ViewData["SuppressCanonicalAndAlternates"] as bool? == true;
 }
 <!DOCTYPE html>
 <html lang="@htmlLang">
@@ -21,24 +41,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@pageTitle</title>
     <meta name="description" content="@pageDescription" />
-    @if (!string.IsNullOrWhiteSpace(canonicalUrl))
+    <meta name="robots" content="@robots" />
+    @if (!suppressCanonicalAndAlternates)
     {
         <link rel="canonical" href="@canonicalUrl" />
+        @foreach (var alternate in alternateList)
+        {
+            <link rel="alternate" hreflang="@alternate.Hreflang" href="@alternate.Url" />
+        }
+        <link rel="alternate" hreflang="x-default" href="@xDefaultUrl" />
         <meta property="og:url" content="@canonicalUrl" />
     }
     <meta property="og:title" content="@ogTitle" />
     <meta property="og:description" content="@ogDescription" />
     <meta property="og:type" content="@ogType" />
     <meta property="og:site_name" content="IKKON SPTD" />
-    @if (!string.IsNullOrWhiteSpace(ogImage))
+    <meta property="og:locale" content="@currentLocale.OpenGraphLocale" />
+    @foreach (var alternateLocale in PublicSiteLocales.All.Where(locale => locale.Culture != currentLocale.Culture))
     {
-        <meta property="og:image" content="@ogImage" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:locale:alternate" content="@alternateLocale.OpenGraphLocale" />
     }
+    <meta property="og:image" content="@ogImage" />
+    <meta property="og:image:alt" content="@ogTitle" />
+    @if (ViewData["ArticlePublishedTime"] is string articlePublishedTime)
+    {
+        <meta property="article:published_time" content="@articlePublishedTime" />
+    }
+    @if (ViewData["ArticleModifiedTime"] is string articleModifiedTime)
+    {
+        <meta property="article:modified_time" content="@articleModifiedTime" />
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@ogTitle" />
+    <meta name="twitter:description" content="@ogDescription" />
+    <meta name="twitter:image" content="@ogImage" />
+    <meta name="theme-color" content="#071f3b" />
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    @if (I18n.IsJapanese)
+    {
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/ikkon-public-foundation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-tokens.css" asp-append-version="true" />
@@ -49,6 +93,15 @@
     @if (publicConstructionTagEnabled)
     {
         <link rel="stylesheet" href="~/css/public-construction-tag.css" asp-append-version="true" />
+    }
+    @if (includeSiteIdentitySchema)
+    {
+        <script type="application/ld+json">@Html.Raw(PublicSeoHelper.Organization(Context.Request))</script>
+        <script type="application/ld+json">@Html.Raw(PublicSeoHelper.WebSite(Context.Request))</script>
+    }
+    @foreach (var jsonLd in structuredData)
+    {
+        <script type="application/ld+json">@Html.Raw(jsonLd)</script>
     }
 </head>
 <body class="institucional-body">

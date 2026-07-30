@@ -54,6 +54,8 @@
                  src="@slides[index]"
                  alt="@I18n[$"Foto em destaque {index + 1}", $"Featured photo {index + 1}", $"注目写真 {index + 1}"]"
                  aria-hidden="@(index == 0 ? "false" : "true")"
+                 decoding="async"
+                 fetchpriority="@(index == 0 ? "high" : "auto")"
                  loading="@(index == 0 ? "eager" : "lazy")" />
         }
     </div>

@@ -1,0 +1,96 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["ContactMode"] = "geral";
+    ViewData["HeroCarouselMode"] = "home";
+
+    var pageIntro = new PublicPageIntroViewModel(
+        I18n["Sobre o IKKON", "About IKKON", "IKKONについて"],
+        I18n[
+            "Uma escola e grupo artístico dedicados ao taiko",
+            "A school and performance group dedicated to taiko",
+            "和太鼓を学び、演奏する教室・芸能グループ"],
+        I18n[
+            "Desde 2015, o IKKON São Paulo Taiko Dojo reúne ensino musical, prática coletiva e apresentações culturais em São Paulo.",
+            "Since 2015, IKKON Sao Paulo Taiko Dojo has brought together music education, ensemble practice, and cultural performances in Sao Paulo.",
+            "IKKONサンパウロ太鼓道場は2015年から、サンパウロで音楽教育、合奏、文化公演に取り組んでいます。"],
+        new(
+            I18n["Conhecer a escola", "Discover the school", "教室について"],
+            I18n.LocalizePath("/escola"),
+            "btn btn-danger btn-lg"),
+        new(
+            I18n["Ver apresentações", "See performances", "公演を見る"],
+            I18n.LocalizePath("/eventos"),
+            "btn btn-outline-dark btn-lg"));
+}
+
+<div class="institucional-page public-about-page">
+    <partial name="_PublicHeader" />
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
+    <partial name="_PublicPageIntro" model="pageIntro" />
+
+    <section class="institucional-section institucional-about reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-about-wrap">
+                <figure class="institucional-about-media mb-0">
+                    <img src="~/design-ikkon/photos/hero-sobre-6.webp"
+                         alt="@I18n["Integrantes do IKKON São Paulo Taiko Dojo", "Members of IKKON Sao Paulo Taiko Dojo", "IKKONサンパウロ太鼓道場のメンバー"]"
+                         class="institucional-about-image"
+                         loading="lazy" />
+                </figure>
+                <article class="institucional-about-content">
+                    <p class="institucional-kicker mb-2">@I18n["Quem somos", "Who we are", "私たちについて"]</p>
+                    <h2 class="institucional-about-title">
+                        @I18n[
+                            "Taiko como aprendizado, expressão e encontro",
+                            "Taiko as learning, expression, and connection",
+                            "学び、表現し、人とつながる和太鼓"]
+                    </h2>
+                    <p class="institucional-about-text">
+                        @I18n[
+                            "O IKKON SPTD é uma escola de taiko e um grupo artístico de São Paulo. Nosso trabalho conecta a formação de novos praticantes à experiência de tocar em conjunto e levar os tambores japoneses a diferentes públicos.",
+                            "IKKON SPTD is a taiko school and performance group in Sao Paulo. Our work connects the education of new players with ensemble practice and the experience of bringing Japanese drums to different audiences.",
+                            "IKKON SPTDは、サンパウロの和太鼓教室・芸能グループです。新しい奏者を育て、仲間と音を合わせ、日本の太鼓をさまざまな人々へ届けています。"]
+                    </p>
+                    <p class="institucional-about-text mb-0">
+                        @I18n[
+                            "A prática valoriza ritmo, técnica, postura, escuta coletiva, disciplina e respeito pela cultura japonesa. Iniciantes podem começar sem experiência musical prévia.",
+                            "The practice develops rhythm, technique, posture, ensemble listening, discipline, and respect for Japanese culture. Beginners can start without previous musical experience.",
+                            "リズム、技術、姿勢、仲間の音を聴く力、規律、日本文化への敬意を大切にしています。音楽経験のない初心者も始められます。"]
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">@I18n["Nossa atuação", "What we do", "活動内容"]</p>
+                <h2 class="institucional-section-title">
+                    @I18n[
+                        "Formação, comunidade e presença cultural",
+                        "Education, community, and cultural presence",
+                        "教育、コミュニティ、文化発信"]
+                </h2>
+            </div>
+            <div class="public-event-type-grid mt-4">
+                <article class="institucional-card">
+                    <h3>@I18n["Ensino de taiko", "Taiko education", "和太鼓の指導"]</h3>
+                    <p>@I18n["Aulas progressivas para desenvolver fundamentos musicais e corporais.", "Progressive classes that develop musical and physical foundations.", "音楽と身体の基礎を段階的に身につけるレッスン。"]</p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Prática coletiva", "Ensemble practice", "合奏"]</h3>
+                    <p>@I18n["Escuta, coordenação e cooperação para construir música em grupo.", "Listening, coordination, and cooperation to build music as a group.", "仲間の音を聴き、動きを合わせ、共に音楽をつくります。"]</p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Apresentações", "Performances", "公演"]</h3>
+                    <p>@I18n["Shows e participações em festivais, celebrações e projetos culturais.", "Shows and appearances at festivals, celebrations, and cultural projects.", "祭り、祝典、文化プロジェクトでの公演。"]</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <partial name="_PublicContactCta" />
+    <partial name="_PublicFooter" />
+</div>

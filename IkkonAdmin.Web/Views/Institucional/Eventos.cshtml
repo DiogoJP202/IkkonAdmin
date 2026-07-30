@@ -1,6 +1,5 @@
 @{
     Layout = "_PublicLayout";
-    ViewData["Title"] = I18n["Apresentações de Taiko para Eventos | IKKON SPTD", "Taiko Performances for Events | IKKON SPTD", "イベント向け和太鼓公演 | IKKON SPTD"];
     ViewData["PublicSection"] = "eventos";
     ViewData["ContactMode"] = "eventos";
     ViewData["JapaneseLandingEnabled"] = true;
@@ -28,6 +27,7 @@
 <div class="institucional-page public-eventos-page">
     <partial name="_PublicHeader" />
     <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
     <partial name="_PublicPageIntro" model="pageIntro" />
 
     <section class="institucional-section public-eventos-intro reveal">

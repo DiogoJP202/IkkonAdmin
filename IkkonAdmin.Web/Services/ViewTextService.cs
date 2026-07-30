@@ -1,4 +1,5 @@
 using System.Globalization;
+using IkkonAdmin.Web.Helpers;
 
 namespace IkkonAdmin.Web.Services;
 
@@ -8,8 +9,11 @@ public interface IViewTextService
     bool IsJapanese { get; }
     bool IsPortuguese { get; }
     string CurrentCulture { get; }
+    string CurrentLanguageSegment { get; }
     string ToggleCulture { get; }
     string ToggleLabel { get; }
+    string LocalizePath(string path);
+    string PathForCulture(string path, string culture);
     string Term(object? value);
     string this[string ptBr, string enUs] { get; }
     string this[string ptBr, string enUs, string jaJp] { get; }
@@ -76,9 +80,15 @@ public sealed class ViewTextService : IViewTextService
 
     public string CurrentCulture => IsJapanese ? "ja-JP" : IsEnglish ? "en-US" : "pt-BR";
 
+    public string CurrentLanguageSegment => PublicSiteLocales.ForCulture(CurrentCulture).Segment;
+
     public string ToggleCulture => IsEnglish ? "pt-BR" : "en-US";
 
     public string ToggleLabel => IsEnglish ? "PT" : "EN";
+
+    public string LocalizePath(string path) => PublicSiteLocales.LocalizePath(path, CurrentCulture);
+
+    public string PathForCulture(string path, string culture) => PublicSiteLocales.LocalizePath(path, culture);
 
     public string Term(object? value)
     {

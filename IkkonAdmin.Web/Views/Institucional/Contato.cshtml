@@ -1,0 +1,62 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["ContactMode"] = "geral";
+    ViewData["HeroCarouselMode"] = "home";
+
+    var pageIntro = new PublicPageIntroViewModel(
+        I18n["Contato", "Contact", "お問い合わせ"],
+        I18n[
+            "Fale com o IKKON",
+            "Talk to IKKON",
+            "IKKONへお問い合わせ"],
+        I18n[
+            "Entre em contato sobre aulas de taiko, apresentações, festivais, projetos culturais e parcerias.",
+            "Get in touch about taiko classes, performances, festivals, cultural projects, and partnerships.",
+            "和太鼓レッスン、公演、祭り、文化プロジェクト、協力企画についてお問い合わせください。"],
+        new(
+            I18n["Conversar no WhatsApp", "Chat on WhatsApp", "WhatsAppで相談"],
+            "https://wa.me/5511937799916?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Ikkon%20SPTD%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.",
+            "btn btn-danger btn-lg",
+            OpensInNewWindow: true),
+        new(
+            I18n["Enviar e-mail", "Send an email", "メールを送る"],
+            "mailto:contato@ikkontaiko.com",
+            "btn btn-outline-dark btn-lg"));
+}
+
+<div class="institucional-page public-contact-page">
+    <partial name="_PublicHeader" />
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
+    <partial name="_PublicPageIntro" model="pageIntro" />
+
+    <section class="institucional-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">@I18n["Canais oficiais", "Official channels", "公式連絡先"]</p>
+                <h2 class="institucional-section-title">@I18n["Escolha como prefere falar conosco", "Choose how to reach us", "ご都合のよい方法でご連絡ください"]</h2>
+            </div>
+            <div class="public-event-type-grid mt-4">
+                <article class="institucional-card">
+                    <h3>WhatsApp</h3>
+                    <p><a href="https://wa.me/5511937799916" target="_blank" rel="noopener">+55 11 93779-9916</a></p>
+                </article>
+                <article class="institucional-card">
+                    <h3>E-mail</h3>
+                    <p><a href="mailto:contato@ikkontaiko.com">contato@ikkontaiko.com</a></p>
+                </article>
+                <article class="institucional-card">
+                    <h3>Instagram</h3>
+                    <p><a href="https://www.instagram.com/ikkontaiko/" target="_blank" rel="noopener">@@ikkontaiko</a></p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Endereço", "Address", "所在地"]</h3>
+                    <p>Rua Domingos de Morais, 2975, São Paulo, SP, Brasil</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <partial name="_PublicContactCta" />
+    <partial name="_PublicFooter" />
+</div>

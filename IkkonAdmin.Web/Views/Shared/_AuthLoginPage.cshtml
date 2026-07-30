@@ -1,0 +1,216 @@
+@model LoginViewModel
+@{
+    var mode = ViewData["AuthMode"]?.ToString() == "student" ? "student" : "staff";
+    var isStudent = mode == "student";
+    var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+    var formAction = isStudent ? "/aluno/login" : "/auth/login";
+    var alternateLoginUrl = isStudent ? "/auth/login" : "/aluno/login";
+    var visualTitle = isStudent
+        ? I18n[
+            "Seu caminho continua aqui.",
+            "Your journey continues here.",
+            "ここから、また歩みが続きます。"]
+        : I18n[
+            "A escola em um só ritmo.",
+            "The school, working in one rhythm.",
+            "道場の歩みを、ひとつのリズムで。"];
+    var visualDescription = isStudent
+        ? I18n[
+            "Acompanhe sua vida na IKKON e mantenha-se conectado às aulas, à comunidade e à sua evolução.",
+            "Follow your life at IKKON and stay connected to classes, community, and your progress.",
+            "レッスン、仲間、そして自分の成長。IKKONでの歩みをここから確認できます。"]
+        : I18n[
+            "Um espaço seguro para organizar alunos, turmas, agenda, conteúdo e as operações da IKKON.",
+            "A secure space to organize students, classes, schedules, content, and IKKON operations.",
+            "生徒、クラス、予定、コンテンツ、IKKONの運営を安全に管理するための場所です。"];
+    var visualItems = isStudent
+        ? new[]
+        {
+            I18n["Turmas e próximas aulas", "Classes and upcoming sessions", "クラスと今後のレッスン"],
+            I18n["Frequência e documentos", "Attendance and documents", "出席状況と書類"],
+            I18n["Financeiro e comunicados", "Payments and announcements", "お支払いとお知らせ"]
+        }
+        : new[]
+        {
+            I18n["Alunos e turmas", "Students and classes", "生徒とクラス"],
+            I18n["Agenda e financeiro", "Schedule and finance", "予定と会計"],
+            I18n["Conteúdo e operações", "Content and operations", "コンテンツと運営"]
+        };
+    string LanguageClass(string culture) =>
+        string.Equals(I18n.CurrentCulture, culture, StringComparison.OrdinalIgnoreCase)
+            ? "is-active"
+            : string.Empty;
+}
+
+<main class="auth-page auth-page--@mode">
+    <section class="auth-visual" aria-label="@I18n["Apresentação da IKKON", "About IKKON", "IKKONについて"]">
+        <div class="auth-visual-overlay" aria-hidden="true"></div>
+
+        <a class="auth-brand" href="@I18n.LocalizePath("/")" aria-label="@I18n["Voltar ao site da IKKON", "Return to the IKKON website", "IKKONのサイトへ戻る"]">
+            <span class="auth-brand-mark" aria-hidden="true">
+                <img src="~/design-ikkon/assets/emblema-mitsudomoe.png" asp-append-version="true" alt="" />
+                <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" />
+            </span>
+            <span class="auth-brand-copy">
+                <strong>IKKON</strong>
+                <small>São Paulo Taiko Dojo</small>
+            </span>
+        </a>
+
+        <div class="auth-visual-content">
+            <p class="auth-visual-kicker">
+                @(isStudent
+                    ? I18n["Área do aluno", "Student area", "生徒エリア"]
+                    : I18n["Gestão IKKON", "IKKON management", "IKKON管理"])
+            </p>
+            <h2>@visualTitle</h2>
+            <p class="auth-visual-description">@visualDescription</p>
+            <ul class="auth-visual-list">
+                @foreach (var item in visualItems)
+                {
+                    <li>@item</li>
+                }
+            </ul>
+        </div>
+
+        <p class="auth-visual-signature">
+            @I18n["Tradição · Disciplina · Comunidade", "Tradition · Discipline · Community", "伝統・規律・コミュニティ"]
+        </p>
+    </section>
+
+    <section class="auth-panel">
+        <header class="auth-panel-header">
+            <a class="auth-back-link" href="@I18n.LocalizePath("/")">
+                <span aria-hidden="true">←</span>
+                @I18n["Voltar ao site", "Back to website", "サイトへ戻る"]
+            </a>
+
+            <nav class="auth-language-list" aria-label="@I18n["Selecionar idioma", "Select language", "言語を選択"]">
+                <a class="@LanguageClass("pt-BR")"
+                   asp-controller="Idioma"
+                   asp-action="Alterar"
+                   asp-route-culture="pt-BR"
+                   asp-route-returnUrl="@languageReturnUrl"
+                   aria-current="@(I18n.IsPortuguese ? "page" : null)">PT</a>
+                <a class="@LanguageClass("en-US")"
+                   asp-controller="Idioma"
+                   asp-action="Alterar"
+                   asp-route-culture="en-US"
+                   asp-route-returnUrl="@languageReturnUrl"
+                   aria-current="@(I18n.IsEnglish ? "page" : null)">EN</a>
+                <a class="@LanguageClass("ja-JP")"
+                   asp-controller="Idioma"
+                   asp-action="Alterar"
+                   asp-route-culture="ja-JP"
+                   asp-route-returnUrl="@languageReturnUrl"
+                   aria-current="@(I18n.IsJapanese ? "page" : null)">日本語</a>
+            </nav>
+        </header>
+
+        <div class="auth-panel-main">
+            <article class="auth-card">
+                <div class="auth-card-intro">
+                    <p class="auth-kicker">
+                        @(isStudent
+                            ? I18n["Portal do aluno", "Student portal", "生徒ポータル"]
+                            : I18n["Acesso restrito", "Restricted access", "関係者専用"])
+                    </p>
+                    <h1 class="auth-title">
+                        @(isStudent
+                            ? I18n["Bem-vindo de volta", "Welcome back", "おかえりなさい"]
+                            : I18n["Acesse a área interna", "Access the staff area", "スタッフエリアへ"])
+                    </h1>
+                    <p class="auth-subtitle">
+                        @(isStudent
+                            ? I18n[
+                                "Use sua conta de aluno para acessar suas informações.",
+                                "Use your student account to access your information.",
+                                "生徒アカウントでログインしてください。"]
+                            : I18n[
+                                "Entre com suas credenciais de funcionário ou administrador.",
+                                "Sign in with your staff or administrator credentials.",
+                                "スタッフまたは管理者の認証情報でログインしてください。"])
+                    </p>
+                </div>
+
+                <form action="@formAction" method="post" novalidate class="auth-form">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="ReturnUrl" type="hidden" />
+
+                    @if (isStudent)
+                    {
+                        <input asp-for="TipoAcesso" type="hidden" value="@TipoAcessoEnum.Aluno" />
+                    }
+                    else
+                    {
+                        <fieldset class="auth-role-fieldset">
+                            <legend>@I18n["Tipo de acesso", "Access type", "アクセス種別"]</legend>
+                            <div class="auth-role-tabs">
+                                <input asp-for="TipoAcesso" class="btn-check" type="radio" id="tipoFuncionario" value="@TipoAcessoEnum.Funcionario" />
+                                <label class="auth-role-tab" for="tipoFuncionario">
+                                    @I18n["Funcionário", "Staff", "スタッフ"]
+                                </label>
+
+                                <input asp-for="TipoAcesso" class="btn-check" type="radio" id="tipoAdmin" value="@TipoAcessoEnum.Admin" />
+                                <label class="auth-role-tab" for="tipoAdmin">
+                                    @I18n["Administrador", "Administrator", "管理者"]
+                                </label>
+                            </div>
+                            <span asp-validation-for="TipoAcesso" class="auth-validation"></span>
+                        </fieldset>
+                    }
+
+                    <div class="auth-field">
+                        <label asp-for="LoginOuEmail">
+                            @I18n["E-mail ou usuário", "Email or username", "メールアドレスまたはユーザー名"]
+                        </label>
+                        <input asp-for="LoginOuEmail"
+                               class="form-control auth-input"
+                               placeholder="@I18n["seu.email@dominio.com ou usuário", "your.email@domain.com or username", "メールアドレスまたはユーザー名"]"
+                               autocomplete="username"
+                               spellcheck="false" />
+                        <span asp-validation-for="LoginOuEmail" class="auth-validation"></span>
+                    </div>
+
+                    <div class="auth-field">
+                        <label asp-for="Senha">@I18n["Senha", "Password", "パスワード"]</label>
+                        <input asp-for="Senha"
+                               class="form-control auth-input"
+                               placeholder="@I18n["Informe sua senha", "Enter your password", "パスワードを入力"]"
+                               autocomplete="current-password" />
+                        <span asp-validation-for="Senha" class="auth-validation"></span>
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="auth-form-alert"></div>
+
+                    <button type="submit" class="btn auth-submit">
+                        <span>
+                            @(isStudent
+                                ? I18n["Entrar na Área do Aluno", "Sign in to Student Area", "生徒エリアにログイン"]
+                                : I18n["Entrar", "Sign in", "ログイン"])
+                        </span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+
+                <footer class="auth-card-footer">
+                    <span>
+                        @(isStudent
+                            ? I18n["Você faz parte da equipe?", "Are you part of the staff?", "スタッフの方ですか？"]
+                            : I18n["Você é aluno da IKKON?", "Are you an IKKON student?", "IKKONの生徒ですか？"])
+                    </span>
+                    <a href="@alternateLoginUrl">
+                        @(isStudent
+                            ? I18n["Acessar área interna", "Open staff area", "スタッフエリアへ"]
+                            : I18n["Acessar área do aluno", "Open student area", "生徒エリアへ"])
+                    </a>
+                </footer>
+            </article>
+        </div>
+
+        <footer class="auth-panel-footer">
+            <span>© @DateTime.UtcNow.Year IKKON São Paulo Taiko Dojo</span>
+            <span>@I18n["Acesso seguro", "Secure access", "安全なアクセス"]</span>
+        </footer>
+    </section>
+</main>

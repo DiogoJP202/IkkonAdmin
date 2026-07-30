@@ -1,0 +1,32 @@
+@{
+    Layout = "_PublicLayout";
+}
+
+<div class="institucional-page public-error-page">
+    <partial name="_PublicHeader" />
+
+    <main class="ikkon-page-intro">
+        <div class="container-xxl px-3 px-lg-4">
+            <p class="institucional-kicker mb-2">404</p>
+            <h1 class="institucional-hero-title">
+                @I18n["Página não encontrada", "Page not found", "ページが見つかりません"]
+            </h1>
+            <p class="institucional-hero-subtitle">
+                @I18n[
+                    "O endereço pode ter mudado ou não existir. Use os links abaixo para continuar.",
+                    "The address may have changed or may not exist. Use the links below to continue.",
+                    "アドレスが変更されたか、存在しない可能性があります。以下のリンクからお進みください。"]
+            </p>
+            <div class="d-flex flex-wrap gap-2 mt-4 justify-content-center">
+                <a class="btn btn-danger btn-lg" href="@I18n.LocalizePath("/")">
+                    @I18n["Ir para o início", "Go to home", "ホームへ"]
+                </a>
+                <a class="btn btn-outline-dark btn-lg" href="@I18n.LocalizePath("/contato")">
+                    @I18n["Falar conosco", "Contact us", "お問い合わせ"]
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <partial name="_PublicFooter" />
+</div>

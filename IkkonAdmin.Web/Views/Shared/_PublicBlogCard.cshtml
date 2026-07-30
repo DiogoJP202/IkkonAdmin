@@ -2,7 +2,7 @@
 
 @{
     var post = Model.Post;
-    var postUrl = PublicViewFormatter.BuildBlogUrl(post.Slug);
+    var postUrl = I18n.LocalizePath(PublicViewFormatter.BuildBlogUrl(post.Slug));
     var cardClass = Model.IsFeaturedLayout
         ? "public-blog-card public-blog-card-featured"
         : "public-blog-card";
@@ -59,7 +59,7 @@
             <div class="public-blog-tag-row">
                 @foreach (var postTag in post.Tags)
                 {
-                    <a href="@Url.Action("Index", "Blog", new { tag = postTag.Slug })">#@postTag.Name</a>
+                    <a href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { tag = postTag.Slug }) ?? "/blog")">#@postTag.Name</a>
                 }
             </div>
         }
@@ -68,7 +68,7 @@
             @if (!string.IsNullOrWhiteSpace(post.CategoryName))
             {
                 <a class="public-blog-taxonomy"
-                   href="@Url.Action("Index", "Blog", new { categoria = post.CategorySlug })">@post.CategoryName</a>
+                   href="@I18n.LocalizePath(Url.Action("Index", "Blog", new { categoria = post.CategorySlug }) ?? "/blog")">@post.CategoryName</a>
             }
             <span>
                 @Math.Max(1, post.ReadingTimeMinutes)

@@ -1,0 +1,120 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["ContactMode"] = "escola";
+    ViewData["HeroCarouselMode"] = "escola";
+
+    var pageIntro = new PublicPageIntroViewModel(
+        I18n["Conheça o taiko", "Discover taiko", "和太鼓を知る"],
+        I18n[
+            "O que é taiko?",
+            "What is taiko?",
+            "和太鼓とは？"],
+        I18n[
+            "Taiko reúne tambores japoneses, música, movimento e trabalho coletivo. Entenda os termos e descubra como essa prática ganha vida nas aulas e nos palcos.",
+            "Taiko brings together Japanese drums, music, movement, and teamwork. Learn the terms and discover how the practice comes alive in classes and on stage.",
+            "和太鼓は、日本の太鼓、音楽、身体表現、仲間との協力を結ぶ芸能です。言葉の意味と、教室や舞台での魅力をご紹介します。"],
+        new(
+            I18n["Experimentar uma aula", "Try a class", "体験レッスン"],
+            I18n.LocalizePath("/escola"),
+            "btn btn-danger btn-lg"),
+        new(
+            I18n["Ver apresentações", "See performances", "公演を見る"],
+            I18n.LocalizePath("/eventos"),
+            "btn btn-outline-dark btn-lg"));
+}
+
+<div class="institucional-page public-taiko-page">
+    <partial name="_PublicHeader" />
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
+    <partial name="_PublicPageIntro" model="pageIntro" />
+
+    <section class="institucional-section institucional-about reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-about-wrap">
+                <figure class="institucional-about-media mb-0">
+                    <img src="~/Images/AulaTaiko.png"
+                         asp-append-version="true"
+                         alt="@I18n["Prática de taiko com tambores japoneses", "Taiko practice with Japanese drums", "日本の太鼓を使った和太鼓の練習"]"
+                         class="institucional-about-image"
+                         loading="lazy" />
+                </figure>
+                <article class="institucional-about-content">
+                    <p class="institucional-kicker mb-2">@I18n["Significado", "Meaning", "言葉の意味"]</p>
+                    <h2 class="institucional-about-title">
+                        @I18n[
+                            "Taiko, wadaiko e a prática em conjunto",
+                            "Taiko, wadaiko, and ensemble practice",
+                            "太鼓・和太鼓・組太鼓"]
+                    </h2>
+                    <p class="institucional-about-text">
+                        @I18n[
+                            "Em japonês, taiko (太鼓) significa tambor. Fora do Japão, a palavra também é usada para falar dos tambores japoneses e de sua prática musical. Wadaiko (和太鼓) destaca especificamente os tambores tradicionais do Japão.",
+                            "In Japanese, taiko (太鼓) means drum. Outside Japan, the word is also used for Japanese drums and their musical practice. Wadaiko (和太鼓) refers specifically to traditional Japanese drums.",
+                            "日本語の「太鼓」は、打楽器としての太鼓を意味します。「和太鼓」は日本の伝統的な太鼓を表し、複数の太鼓を組み合わせた合奏は「組太鼓」と呼ばれます。"]
+                    </p>
+                    <p class="institucional-about-text mb-0">
+                        @I18n[
+                            "Na prática de conjunto, diferentes tambores e padrões rítmicos se combinam com postura, deslocamento e intenção musical. Cada pessoa precisa ouvir o grupo para construir uma única pulsação.",
+                            "In ensemble practice, different drums and rhythmic patterns combine with posture, movement, and musical intention. Each player listens to the group to build one shared pulse.",
+                            "合奏では、さまざまな太鼓とリズムに、姿勢、動き、音楽的な表現が加わります。一人ひとりが仲間の音を聴き、ひとつの鼓動をつくります。"]
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="institucional-section-head text-center mx-auto">
+                <p class="institucional-kicker mb-2">@I18n["Na prática", "In practice", "和太鼓の魅力"]</p>
+                <h2 class="institucional-section-title">
+                    @I18n[
+                        "Som, corpo, disciplina e comunidade",
+                        "Sound, movement, discipline, and community",
+                        "音、身体、規律、仲間"]
+                </h2>
+            </div>
+            <div class="public-event-type-grid mt-4">
+                <article class="institucional-card">
+                    <h3>@I18n["Ritmo e escuta", "Rhythm and listening", "リズムと聴く力"]</h3>
+                    <p>@I18n["A pulsação individual se integra ao tempo e à dinâmica do grupo.", "Each player's pulse joins the group's timing and dynamics.", "一人の拍を、仲間のテンポと強弱に合わせます。"]</p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Postura e movimento", "Posture and movement", "姿勢と動き"]</h3>
+                    <p>@I18n["O corpo participa da produção do som e da expressão visual.", "The body contributes to both sound production and visual expression.", "身体全体で音を生み、視覚的にも表現します。"]</p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Cultura viva", "Living culture", "生きた文化"]</h3>
+                    <p>@I18n["O respeito às referências japonesas convive com repertórios e experiências atuais.", "Respect for Japanese references coexists with contemporary repertoire and experiences.", "日本の文化的背景を大切にしながら、現代の演目や体験へつなげます。"]</p>
+                </article>
+                <article class="institucional-card">
+                    <h3>@I18n["Taiko no Brasil", "Taiko in Brazil", "ブラジルの和太鼓"]</h3>
+                    <p>@I18n["A prática integra atividades culturais e comunidades ligadas ao intercâmbio entre Brasil e Japão.", "The practice is part of cultural activities and communities connected to exchange between Brazil and Japan.", "和太鼓は、ブラジルと日本の交流に関わる文化活動や日系社会でも親しまれています。"]</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="institucional-section public-home-paths reveal">
+        <div class="container-xxl px-3 px-lg-4">
+            <div class="public-path-grid">
+                <article class="public-path-card public-path-card-escola">
+                    <span>@I18n["Aprender", "Learn", "学ぶ"]</span>
+                    <h2>@I18n["Comece a praticar taiko", "Start practicing taiko", "和太鼓を始める"]</h2>
+                    <p>@I18n["Conheça as aulas, o método e as respostas para quem está começando.", "Explore classes, the teaching approach, and answers for new students.", "レッスン、指導方法、初心者向けのよくある質問をご覧ください。"]</p>
+                    <a class="btn btn-dark" href="@I18n.LocalizePath("/escola")">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
+                </article>
+                <article class="public-path-card public-path-card-eventos">
+                    <span>@I18n["Assistir", "Experience", "観る"]</span>
+                    <h2>@I18n["Veja o taiko no palco", "See taiko on stage", "舞台の和太鼓を見る"]</h2>
+                    <p>@I18n["Descubra formatos de apresentações para festivais, empresas e projetos culturais.", "Discover performance formats for festivals, companies, and cultural projects.", "祭り、企業、文化プロジェクト向けの公演をご紹介します。"]</p>
+                    <a class="btn btn-danger" href="@I18n.LocalizePath("/eventos")">@I18n["Ver apresentações", "See performances", "公演を見る"]</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <partial name="_PublicContactCta" />
+    <partial name="_PublicFooter" />
+</div>

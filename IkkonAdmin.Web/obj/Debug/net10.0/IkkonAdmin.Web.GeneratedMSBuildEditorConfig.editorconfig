@@ -17,431 +17,472 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
 build_property.RootNamespace = IkkonAdmin.Web
 build_property.RootNamespace = IkkonAdmin.Web
-build_property.ProjectDir = C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web\
+build_property.ProjectDir = C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.RazorLangVersion = 9.0
+build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\dsoares\Documents\Projetos\IkkonAdmin\IkkonAdmin.Web
+build_property.MSBuildProjectDirectory = C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaXNzb2VzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaXNzb2VzXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Admissoes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaXNzb2VzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/AcessoIndisponivel.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/AcessoIndisponivel.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEFjZXNzb0luZGlzcG9uaXZlbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Aulas.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Aulas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEF1bGFzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Comunicados.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Comunicados.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXENvbXVuaWNhZG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Conquistas.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Conquistas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXENvbnF1aXN0YXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Documentos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Documentos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXERvY3VtZW50b3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Eventos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Eventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEV2ZW50b3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Financeiro.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Financeiro.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEZpbmFuY2Vpcm8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Frequencia.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Frequencia.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEZyZXF1ZW5jaWEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Perfil.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Perfil.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXFBlcmZpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Turmas.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoArea/Turmas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BcmVhXFR1cm1hcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoAuth/Login.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AlunoAuth/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9BdXRoXExvZ2luLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9zXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9zXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9zXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Alunos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWx1bm9zXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Aulas.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Aulas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQXVsYXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Comunicados.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Comunicados.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQ29tdW5pY2Fkb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Conquistas.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Conquistas.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cQ29ucXVpc3Rhcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Documentos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Documentos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRG9jdW1lbnRvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Eventos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Eventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRXZlbnRvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Frequencia.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Frequencia.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cRnJlcXVlbmNpYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/RegistroFrequencia.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/AreaAlunoAdmin/RegistroFrequencia.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXJlYUFsdW5vQWRtaW5cUmVnaXN0cm9GcmVxdWVuY2lhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Auth/AcessoNegado.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Auth/AcessoNegado.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxBY2Vzc29OZWdhZG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Auth/Login.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Auth/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Preview.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/Preview.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXFByZXZpZXcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostForm.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXF9CbG9nUG9zdEZvcm0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostVersionsModalBody.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogAdmin/_BlogPostVersionsModalBody.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0FkbWluXF9CbG9nUG9zdFZlcnNpb25zTW9kYWxCb2R5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/_BlogCategoryForm.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/BlogCategorias/_BlogCategoryForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ0NhdGVnb3JpYXNcX0Jsb2dDYXRlZ29yeUZvcm0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Blog/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Blog/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Blog/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Blog/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmxvZ1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_AccountInfo.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_AccountInfo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xQYXJ0aWFsc1xfQWNjb3VudEluZm8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_AccountType.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_AccountType.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xQYXJ0aWFsc1xfQWNjb3VudFR5cGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_Preferences.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_Preferences.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xQYXJ0aWFsc1xfUHJlZmVyZW5jZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_SecuritySettings.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Configuracoes/Partials/_SecuritySettings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29uZmlndXJhY29lc1xQYXJ0aWFsc1xfU2VjdXJpdHlTZXR0aW5ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVzbGlnYW1lbnRvc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVzbGlnYW1lbnRvc1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Desligamentos/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGVzbGlnYW1lbnRvc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/Atrasados.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/Atrasados.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluYW5jZWlyb1xBdHJhc2Fkb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/HistoricoAluno.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/HistoricoAluno.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluYW5jZWlyb1xIaXN0b3JpY29BbHVuby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluYW5jZWlyb1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/RegistrarPagamento.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Financeiro/RegistrarPagamento.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluYW5jZWlyb1xSZWdpc3RyYXJQYWdhbWVudG8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/_GoogleAgendaForm.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/GoogleAgenda/_GoogleAgendaForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR29vZ2xlQWdlbmRhXF9Hb29nbGVBZ2VuZGFGb3JtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZHVhY29lc1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZHVhY29lc1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Graduacoes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR3JhZHVhY29lc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Home/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Home/Privacy.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Escola.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Contato.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxDb250YXRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Escola.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxFc2NvbGEuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Eventos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Eventos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxFdmVudG9zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Sobre.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxTb2JyZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Institucional/Taiko.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5zdGl0dWNpb25hbFxUYWlrby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Details.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/_InventarioForm.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Inventario/_InventarioForm.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW52ZW50YXJpb1xfSW52ZW50YXJpb0Zvcm0uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Acessos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Acessos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cQWNlc3Nvcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Cargos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Cargos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cQ2FyZ29zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/EditarCargo.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/EditarCargo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cRWRpdGFyQ2FyZ28uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/EditarUsuario.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/EditarUsuario.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cRWRpdGFyVXN1YXJpby5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Logs.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Logs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cTG9ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/NovoCargo.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/NovoCargo.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cTm92b0NhcmdvLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/NovoUsuario.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/NovoUsuario.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cTm92b1VzdWFyaW8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Sistema.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Sistema.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cU2lzdGVtYS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Usuarios.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/Usuarios.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cVXN1YXJpb3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/_AdminNav.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PainelAdmin/_AdminNav.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFpbmVsQWRtaW5cX0FkbWluTmF2LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/Error.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/PublicError/NotFound.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHVibGljRXJyb3JcTm90Rm91bmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Alerts.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Alerts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbGVydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AlunoLayout.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AlunoLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BbHVub0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AuthLayout.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AuthLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BdXRoTGF5b3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Layout.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_AuthLoginPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BdXRoTG9naW5QYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicConstructionTag.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicBlogCard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNCbG9nQ2FyZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicBreadcrumbs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNCcmVhZGNydW1icy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicConstructionTag.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb25zdHJ1Y3Rpb25UYWcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicContactCta.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicContactCta.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb250YWN0Q3RhLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicCourseCards.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicCourseCards.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNDb3Vyc2VDYXJkcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicEventosGallery.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicEventosGallery.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNFdmVudG9zR2FsbGVyeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFaqAlunos.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFaqAlunos.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNGYXFBbHVub3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFooter.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicFooter.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNGb290ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicHeader.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicGateway.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNHYXRld2F5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicHeader.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNIZWFkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicLayout.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicHeroCarousel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNIZXJvQ2Fyb3VzZWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNMYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicVideoGrid.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicPageIntro.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNQYWdlSW50cm8uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_PublicVideoGrid.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9QdWJsaWNWaWRlb0dyaWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Sidebar.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Sidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Topbar.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_Topbar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Ub3BiYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Create.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHVybWFzXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Edit.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHVybWFzXEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Index.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/Turmas/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHVybWFzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/_ViewImports.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/dsoares/Documents/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/_ViewStart.cshtml]
+[C:/Users/diogo/OneDrive/Documentos/Meus-Arquivos/Projetos/IkkonAdmin/IkkonAdmin.Web/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

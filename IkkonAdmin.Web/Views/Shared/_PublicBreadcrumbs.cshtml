@@ -1,0 +1,28 @@
+@{
+    var breadcrumbItems = ViewData["Breadcrumbs"] as IReadOnlyList<PublicBreadcrumbItemViewModel>;
+}
+
+@if (breadcrumbItems?.Count > 0)
+{
+    <nav class="public-breadcrumbs" aria-label="@I18n["Navegação estrutural", "Breadcrumb", "パンくずリスト"]">
+        <div class="container-xxl px-3 px-lg-4">
+            <ol>
+                @for (var index = 0; index < breadcrumbItems.Count; index++)
+                {
+                    var item = breadcrumbItems[index];
+                    var isCurrent = index == breadcrumbItems.Count - 1;
+                    <li aria-current="@(isCurrent ? "page" : null)">
+                        @if (!isCurrent && !string.IsNullOrWhiteSpace(item.Url))
+                        {
+                            <a href="@item.Url">@item.Label</a>
+                        }
+                        else
+                        {
+                            <span>@item.Label</span>
+                        }
+                    </li>
+                }
+            </ol>
+        </div>
+    </nav>
+}
