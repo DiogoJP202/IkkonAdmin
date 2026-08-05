@@ -21,6 +21,8 @@ public sealed class HttpCurrentUserService(IHttpContextAccessor httpContextAcces
 
     public string? RemoteIpAddress => httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
 
+    public string? CorrelationId => httpContextAccessor.HttpContext?.TraceIdentifier;
+
     public bool IsInRole(string role)
     {
         return User?.IsInRole(role) == true;

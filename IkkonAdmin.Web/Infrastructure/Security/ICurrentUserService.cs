@@ -8,6 +8,7 @@ public interface ICurrentUserService
     int? UserId { get; }
     string? UserName { get; }
     string? RemoteIpAddress { get; }
+    string? CorrelationId { get; }
     bool IsInRole(string role);
     bool HasClaim(string type, string value);
     string? FindFirstValue(string claimType);

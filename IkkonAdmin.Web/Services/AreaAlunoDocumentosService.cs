@@ -1,7 +1,9 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -13,20 +15,12 @@ namespace IkkonAdmin.Web.Services;
 public sealed class AreaAlunoDocumentosService(
     ApplicationDbContext dbContext,
     IClock clock,
-    IFileStorageService fileStorageService,
-    IAreaAlunoContextService contextService) : IAreaAlunoDocumentosService
+    IPrivateFileStorageService privateFileStorageService,
+    IDocumentFileValidator documentFileValidator,
+    IAreaAlunoContextService contextService,
+    IAuditLogger auditLogger,
+    ICurrentUserService currentUserService) : IAreaAlunoDocumentosService
 {
-    private static readonly HashSet<string> DocumentExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".pdf",
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp"
-    };
-
-    private const long MaxDocumentSizeBytes = 10 * 1024 * 1024;
-
     public async Task<AreaAlunoDocumentosViewModel?> ObterDocumentosAsync(
         int usuarioId,
         CancellationToken cancellationToken = default)
@@ -55,28 +49,13 @@ public sealed class AreaAlunoDocumentosService(
             return OperationResult.Fail("Conta de aluno não encontrada.");
         }
 
-        if (arquivo.Length <= 0)
-        {
-            return OperationResult.Fail("Selecione um arquivo para envio.");
-        }
-
-        if (arquivo.Length > MaxDocumentSizeBytes)
-        {
-            return OperationResult.Fail("O arquivo deve ter no máximo 10 MB.");
-        }
-
-        var extension = Path.GetExtension(arquivo.FileName ?? string.Empty);
-        if (!DocumentExtensions.Contains(extension))
-        {
-            return OperationResult.Fail("Formato inválido. Use PDF, JPG, PNG ou WEBP.");
-        }
-
         var solicitacao = await dbContext.DocumentoSolicitacoes
             .FirstOrDefaultAsync(x => x.Id == solicitacaoId && x.AlunoId == alunoId.Value, cancellationToken);
 
         if (solicitacao is null)
         {
-            return OperationResult.Fail("Solicitação de documento não encontrada.");
+            await LogDeniedDocumentAccessAsync(usuarioId, solicitacaoId, nameof(DocumentoSolicitacao), cancellationToken);
+            return OperationResult.NotFound("Solicitação de documento não encontrada.");
         }
 
         if (solicitacao.Status == DocumentoStatusEnum.Aprovado)
@@ -84,28 +63,57 @@ public sealed class AreaAlunoDocumentosService(
             return OperationResult.Fail("Este documento já foi aprovado.");
         }
 
-        var fileName = $"{alunoId.Value}-{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
-        await fileStorageService.SaveToAppDataAsync(
-            arquivo,
-            ["uploads", "documentos"],
-            fileName,
-            cancellationToken);
-
-        dbContext.DocumentoEnvios.Add(new DocumentoEnvio
+        var validation = await documentFileValidator.ValidateAsync(arquivo, cancellationToken);
+        if (!validation.Success || validation.Value is null)
         {
-            DocumentoSolicitacaoId = solicitacao.Id,
-            ArquivoUrl = fileName,
-            NomeArquivoOriginal = string.IsNullOrWhiteSpace(arquivo.FileName)
-                ? fileName
-                : Path.GetFileName(arquivo.FileName),
-            ContentType = arquivo.ContentType,
-            TamanhoBytes = arquivo.Length,
-            EnviadoEmUtc = clock.UtcNow,
-            EnviadoPorUsuarioId = usuarioId
-        });
+            return OperationResult.Fail(validation.Message, validation.Errors);
+        }
 
-        solicitacao.Status = DocumentoStatusEnum.Enviado;
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var storageKey = $"{alunoId.Value}/{Guid.NewGuid():N}{validation.Value.Extension}";
+        await using (var stream = arquivo.OpenReadStream())
+        {
+            await privateFileStorageService.SaveAsync(storageKey, stream, cancellationToken);
+        }
+
+        try
+        {
+            dbContext.DocumentoEnvios.Add(new DocumentoEnvio
+            {
+                DocumentoSolicitacaoId = solicitacao.Id,
+                ArquivoUrl = storageKey,
+                NomeArquivoOriginal = validation.Value.SafeOriginalFileName,
+                ContentType = validation.Value.ContentType,
+                TamanhoBytes = arquivo.Length,
+                EnviadoEmUtc = clock.UtcNow,
+                EnviadoPorUsuarioId = usuarioId
+            });
+
+            solicitacao.Status = DocumentoStatusEnum.Enviado;
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            await privateFileStorageService.DeleteIfExistsAsync(storageKey, CancellationToken.None);
+            throw;
+        }
+
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = usuarioId,
+            UsuarioAfetadoId = usuarioId,
+            Acao = AuditEventCodes.DocumentUploaded,
+            Entidade = nameof(DocumentoEnvio),
+            EntidadeId = solicitacao.Id.ToString(),
+            Descricao = "Documento enviado pelo aluno para análise.",
+            DadosDepoisJson = AuditJson.Serialize(new
+            {
+                SolicitacaoId = solicitacao.Id,
+                validation.Value.ContentType,
+                TamanhoBytes = arquivo.Length
+            }),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
 
         return OperationResult.Ok("Documento enviado para análise.");
     }
@@ -132,13 +140,41 @@ public sealed class AreaAlunoDocumentosService(
 
         if (envio is null)
         {
+            await LogDeniedDocumentAccessAsync(usuarioId, envioId, nameof(DocumentoEnvio), cancellationToken);
             return null;
         }
 
-        var caminho = ObterDocumentoPath(envio.ArquivoUrl);
-        return fileStorageService.Exists(caminho)
-            ? new AreaAlunoDocumentoDownload(caminho, envio.NomeArquivoOriginal, envio.ContentType)
-            : null;
+        var storedFile = await privateFileStorageService.OpenReadAsync(envio.ArquivoUrl, cancellationToken);
+        if (storedFile is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            await auditLogger.LogAsync(new AuditLogEntry
+            {
+                UsuarioResponsavelId = usuarioId,
+                UsuarioAfetadoId = usuarioId,
+                Acao = AuditEventCodes.DocumentDownloaded,
+                Entidade = nameof(DocumentoEnvio),
+                EntidadeId = envio.Id.ToString(),
+                Descricao = "Documento privado baixado pelo aluno.",
+                EnderecoIp = currentUserService.RemoteIpAddress,
+                CorrelationId = currentUserService.CorrelationId
+            }, cancellationToken);
+
+            return new AreaAlunoDocumentoDownload(
+                storedFile.Content,
+                DocumentFileValidator.SanitizeDownloadFileName(envio.NomeArquivoOriginal),
+                string.IsNullOrWhiteSpace(envio.ContentType) ? "application/octet-stream" : envio.ContentType,
+                storedFile.Length);
+        }
+        catch
+        {
+            await storedFile.Content.DisposeAsync();
+            throw;
+        }
     }
 
     public async Task<List<AreaAlunoDocumentoItemViewModel>> ListarDocumentosAsync(
@@ -180,8 +216,23 @@ public sealed class AreaAlunoDocumentosService(
             .ToList();
     }
 
-    private string ObterDocumentoPath(string fileName)
+    private Task LogDeniedDocumentAccessAsync(
+        int usuarioId,
+        int resourceId,
+        string entity,
+        CancellationToken cancellationToken)
     {
-        return fileStorageService.GetAppDataPath("uploads", "documentos", fileName);
+        return auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = usuarioId,
+            UsuarioAfetadoId = usuarioId,
+            Acao = AuditEventCodes.SensitiveAccessDenied,
+            Entidade = entity,
+            EntidadeId = resourceId.ToString(),
+            Descricao = "Tentativa negada de acesso a documento privado.",
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
     }
+
 }

@@ -163,10 +163,8 @@ public class AlunoAreaController(
             return NotFound();
         }
 
-        return PhysicalFile(
-            arquivo.CaminhoArquivo,
-            string.IsNullOrWhiteSpace(arquivo.ContentType) ? "application/octet-stream" : arquivo.ContentType,
-            arquivo.NomeArquivoOriginal);
+        AplicarCabecalhosDownloadPrivado();
+        return File(arquivo.Content, arquivo.ContentType, arquivo.NomeArquivoOriginal);
     }
 
     [HttpGet]
@@ -223,5 +221,12 @@ public class AlunoAreaController(
     private int? ObterUsuarioId()
     {
         return currentUserService.UserId;
+    }
+
+    private void AplicarCabecalhosDownloadPrivado()
+    {
+        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.XContentTypeOptions = "nosniff";
     }
 }

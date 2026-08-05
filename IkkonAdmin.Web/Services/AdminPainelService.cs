@@ -4,6 +4,7 @@ using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -17,7 +18,8 @@ public class AdminPainelService(
     ApplicationDbContext dbContext,
     IPasswordHasher<UsuarioSistema> passwordHasher,
     IClock clock,
-    IAuditLogger auditLogger) : IAdminPainelService
+    IAuditLogger auditLogger,
+    ICurrentUserService currentUserService) : IAdminPainelService
 {
     public async Task<OperationResult> CriarUsuarioAsync(
         AdminUsuarioFormViewModel model,
@@ -87,7 +89,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             usuario.Id,
-            "CRIAR_USUARIO",
+            AuditEventCodes.UserCreated,
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
             $"Usuário {usuario.NomeExibicao} criado.",
@@ -159,7 +161,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             usuario.Id,
-            "EDITAR_USUARIO",
+            AuditEventCodes.UserEdited,
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
             $"Usuário {usuario.NomeExibicao} atualizado.",
@@ -204,7 +206,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             usuario.Id,
-            ativo ? "ATIVAR_USUARIO" : "DESATIVAR_USUARIO",
+            ativo ? AuditEventCodes.UserActivated : AuditEventCodes.UserDeactivated,
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
             $"Usuário {(ativo ? "ativado" : "desativado")}.",
@@ -253,7 +255,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             usuario.Id,
-            "EXCLUIR_USUARIO",
+            AuditEventCodes.UserDeleted,
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
             "Usuário removido (soft delete).",
@@ -317,7 +319,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             usuario.Id,
-            "EDITAR_ACESSOS",
+            AuditEventCodes.UserAccessChanged,
             nameof(UsuarioSistema),
             usuario.Id.ToString(),
             "Permissões e cargo do usuário atualizados.",
@@ -382,7 +384,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             null,
-            "CRIAR_ROLE",
+            AuditEventCodes.RoleCreated,
             nameof(RoleSistema),
             role.Id.ToString(),
             $"Cargo {role.Nome} criado.",
@@ -489,7 +491,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             null,
-            "EDITAR_ROLE",
+            AuditEventCodes.RoleEdited,
             nameof(RoleSistema),
             role.Id.ToString(),
             $"Cargo {role.Nome} atualizado.",
@@ -539,7 +541,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             null,
-            ativo ? "ATIVAR_ROLE" : "DESATIVAR_ROLE",
+            ativo ? AuditEventCodes.RoleActivated : AuditEventCodes.RoleDeactivated,
             nameof(RoleSistema),
             role.Id.ToString(),
             $"Cargo {(ativo ? "ativado" : "desativado")}: {role.Nome}.",
@@ -584,7 +586,7 @@ public class AdminPainelService(
         await RegistrarAuditoriaAsync(
             usuarioResponsavelId,
             null,
-            "EXCLUIR_ROLE",
+            AuditEventCodes.RoleDeleted,
             nameof(RoleSistema),
             role.Id.ToString(),
             "Cargo removido (inativado).",
@@ -783,7 +785,8 @@ public class AdminPainelService(
             Descricao = descricao,
             DadosAntesJson = dadosAntesJson,
             DadosDepoisJson = dadosDepoisJson,
-            EnderecoIp = enderecoIp
+            EnderecoIp = enderecoIp,
+            CorrelationId = currentUserService.CorrelationId
         }, cancellationToken);
     }
 

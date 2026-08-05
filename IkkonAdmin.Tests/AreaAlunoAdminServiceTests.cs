@@ -2,6 +2,7 @@ using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Files;
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -290,14 +291,20 @@ public class AreaAlunoAdminServiceTests
     {
         var environment = new TestWebHostEnvironment();
         var clock = new TestClock();
-        var fileStorageService = new LocalFileStorageService(environment);
+        var currentUserService = new TestCurrentUserService();
+        var auditLogger = new RecordingAuditLogger();
+        var privateFileStorageService = new LocalPrivateFileStorageService(environment);
         var aulasAdminService = new AreaAlunoAulasAdminService(
             dbContext,
-            clock);
+            clock,
+            auditLogger,
+            currentUserService);
         var documentoAdminService = new AreaAlunoDocumentoAdminService(
             dbContext,
             clock,
-            fileStorageService);
+            privateFileStorageService,
+            auditLogger,
+            currentUserService);
         var comunicadoAdminService = new AreaAlunoComunicadoAdminService(
             dbContext,
             clock);
@@ -310,6 +317,7 @@ public class AreaAlunoAdminServiceTests
 
         return new AreaAlunoAdminService(
             clock,
+            currentUserService,
             aulasAdminService,
             documentoAdminService,
             comunicadoAdminService,
@@ -354,5 +362,17 @@ public class AreaAlunoAdminServiceTests
         public DateTime Now { get; } = new(2026, 7, 13, 9, 0, 0, DateTimeKind.Local);
         public DateTime Today => Now.Date;
         public DateOnly TodayDate => DateOnly.FromDateTime(Today);
+    }
+
+    private sealed class TestCurrentUserService : ICurrentUserService
+    {
+        public bool IsAuthenticated => true;
+        public int? UserId => 1;
+        public string? UserName => "admin.teste";
+        public string? RemoteIpAddress => "127.0.0.1";
+        public string? CorrelationId => "test-correlation-id";
+        public bool IsInRole(string role) => role == IkkonAdmin.Web.Security.AppRoles.Admin;
+        public bool HasClaim(string type, string value) => false;
+        public string? FindFirstValue(string claimType) => null;
     }
 }

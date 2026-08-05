@@ -11,4 +11,5 @@ public sealed record AuditLogEntry
     public string? DadosAntesJson { get; init; }
     public string? DadosDepoisJson { get; init; }
     public string? EnderecoIp { get; init; }
+    public string? CorrelationId { get; init; }
 }

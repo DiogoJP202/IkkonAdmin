@@ -158,7 +158,13 @@ public class AreaAlunoAdminController(
     public async Task<IActionResult> SalvarFrequencia(int aulaId, FrequenciaRegistroPostViewModel model, CancellationToken cancellationToken)
     {
         model.AulaId = aulaId;
-        await ExecutarOperacaoAsync(areaAlunoAdminService.SalvarFrequenciaAsync(model, ObterUsuarioId(), cancellationToken));
+        var resultado = await areaAlunoAdminService.SalvarFrequenciaAsync(model, ObterUsuarioId(), cancellationToken);
+        if (resultado.Status == OperationResultStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        resultado.AddToTempData(TempData);
         return RedirectToAction(nameof(Frequencia));
     }
 
@@ -259,10 +265,8 @@ public class AreaAlunoAdminController(
             return NotFound();
         }
 
-        return PhysicalFile(
-            arquivo.CaminhoArquivo,
-            string.IsNullOrWhiteSpace(arquivo.ContentType) ? "application/octet-stream" : arquivo.ContentType,
-            arquivo.NomeArquivoOriginal);
+        AplicarCabecalhosDownloadPrivado();
+        return File(arquivo.Content, arquivo.ContentType, arquivo.NomeArquivoOriginal);
     }
 
     [HttpGet("comunicados")]
@@ -438,5 +442,12 @@ public class AreaAlunoAdminController(
     private int? ObterUsuarioId()
     {
         return currentUserService.UserId;
+    }
+
+    private void AplicarCabecalhosDownloadPrivado()
+    {
+        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.XContentTypeOptions = "nosniff";
     }
 }

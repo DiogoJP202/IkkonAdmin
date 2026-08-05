@@ -16,5 +16,6 @@ public class AuditoriaLog
     public string? DadosAntesJson { get; set; }
     public string? DadosDepoisJson { get; set; }
     public string? EnderecoIp { get; set; }
+    public string? CorrelationId { get; set; }
     public DateTime DataEventoUtc { get; set; } = DateTime.UtcNow;
 }

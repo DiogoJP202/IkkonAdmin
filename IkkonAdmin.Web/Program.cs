@@ -36,6 +36,8 @@ builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, HttpCurrentUserService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<IPrivateFileStorageService, LocalPrivateFileStorageService>();
+builder.Services.AddSingleton<IDocumentFileValidator, DocumentFileValidator>();
 builder.Services.AddScoped<IAuditLogger, EfAuditLogger>();
 builder.Services.AddSingleton<IBlogPostActionAuthorizer, BlogPostActionAuthorizer>();
 builder.Services.AddDataProtection();

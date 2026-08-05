@@ -15,12 +15,14 @@ public class AuditoriaLogConfiguration : IEntityTypeConfiguration<AuditoriaLog>
         builder.HasIndex(x => x.UsuarioResponsavelId);
         builder.HasIndex(x => x.UsuarioAfetadoId);
         builder.HasIndex(x => new { x.Entidade, x.Acao });
+        builder.HasIndex(x => x.CorrelationId);
 
         builder.Property(x => x.Acao).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Entidade).HasMaxLength(80).IsRequired();
         builder.Property(x => x.EntidadeId).HasMaxLength(80);
         builder.Property(x => x.Descricao).HasMaxLength(400);
         builder.Property(x => x.EnderecoIp).HasMaxLength(64);
+        builder.Property(x => x.CorrelationId).HasMaxLength(100);
         builder.Property(x => x.DataEventoUtc).HasColumnType("datetime2");
     }
 }

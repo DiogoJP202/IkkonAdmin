@@ -60,7 +60,7 @@ public class AuthService(
         {
             UsuarioResponsavelId = usuario.Id,
             UsuarioAfetadoId = usuario.Id,
-            Acao = "LOGIN_SUCESSO",
+            Acao = AuditEventCodes.LoginSuccess,
             Entidade = nameof(UsuarioSistema),
             EntidadeId = usuario.Id.ToString(),
             Descricao = "Login realizado com sucesso.",

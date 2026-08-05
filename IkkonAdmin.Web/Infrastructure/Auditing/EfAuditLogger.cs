@@ -21,6 +21,7 @@ public sealed class EfAuditLogger(
             DadosAntesJson = entry.DadosAntesJson,
             DadosDepoisJson = entry.DadosDepoisJson,
             EnderecoIp = LimparIp(entry.EnderecoIp),
+            CorrelationId = LimparCorrelationId(entry.CorrelationId),
             DataEventoUtc = clock.UtcNow
         }, cancellationToken);
 
@@ -31,5 +32,11 @@ public sealed class EfAuditLogger(
     {
         var valor = ip?.Trim();
         return string.IsNullOrWhiteSpace(valor) ? null : valor;
+    }
+
+    private static string? LimparCorrelationId(string? correlationId)
+    {
+        var valor = correlationId?.Trim();
+        return string.IsNullOrWhiteSpace(valor) ? null : valor[..Math.Min(valor.Length, 100)];
     }
 }

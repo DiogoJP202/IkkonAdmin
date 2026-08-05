@@ -1,6 +1,8 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -10,7 +12,9 @@ namespace IkkonAdmin.Web.Services;
 
 public sealed class AreaAlunoAulasAdminService(
     ApplicationDbContext dbContext,
-    IClock clock) : IAreaAlunoAulasAdminService
+    IClock clock,
+    IAuditLogger auditLogger,
+    ICurrentUserService currentUserService) : IAreaAlunoAulasAdminService
 {
     public async Task<AreaAlunoAulasAdminViewModel> ObterAulasAsync(CancellationToken cancellationToken = default)
     {
@@ -20,7 +24,7 @@ public sealed class AreaAlunoAulasAdminService(
             Instrutores = await ListarInstrutoresOpcoesAsync(cancellationToken),
             Horarios = await ListarHorariosAdminAsync(cancellationToken),
             TurmaInstrutores = await ListarInstrutoresTurmasAdminAsync(cancellationToken),
-            Aulas = await ListarAulasAdminAsync(50, clock.Today.AddDays(-14), cancellationToken)
+            Aulas = await ListarAulasSemEscopoAsync(50, clock.Today.AddDays(-14), cancellationToken)
         };
     }
 
@@ -367,19 +371,22 @@ public sealed class AreaAlunoAulasAdminService(
         return OperationResult.Ok("Aula excluída.");
     }
 
-    public async Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(
+        AulaAccessScope accessScope,
+        CancellationToken cancellationToken = default)
     {
         return new AreaAlunoFrequenciaAdminViewModel
         {
-            Aulas = await ListarAulasAdminAsync(80, clock.Today.AddMonths(-2), cancellationToken)
+            Aulas = await ListarAulasAdminAsync(80, clock.Today.AddMonths(-2), accessScope, cancellationToken)
         };
     }
 
     public async Task<AreaAlunoRegistroFrequenciaViewModel?> ObterRegistroFrequenciaAsync(
         int aulaId,
+        AulaAccessScope accessScope,
         CancellationToken cancellationToken = default)
     {
-        var aula = await dbContext.Aulas
+        var aula = await ApplyAccessScope(dbContext.Aulas.AsQueryable(), accessScope)
             .AsNoTracking()
             .Include(x => x.Turma)
             .ThenInclude(x => x!.AlunoTurmas)
@@ -390,6 +397,7 @@ public sealed class AreaAlunoAulasAdminService(
 
         if (aula is null || aula.Turma is null)
         {
+            await LogDeniedAttendanceAccessAsync(aulaId, accessScope.UserId, cancellationToken);
             return null;
         }
 
@@ -424,10 +432,10 @@ public sealed class AreaAlunoAulasAdminService(
 
     public async Task<OperationResult> SalvarFrequenciaAsync(
         FrequenciaRegistroPostViewModel model,
-        int? usuarioId,
+        AulaAccessScope accessScope,
         CancellationToken cancellationToken = default)
     {
-        var aula = await dbContext.Aulas
+        var aula = await ApplyAccessScope(dbContext.Aulas.AsQueryable(), accessScope)
             .Include(x => x.Turma)
             .ThenInclude(x => x!.AlunoTurmas)
             .Include(x => x.Frequencias)
@@ -435,9 +443,17 @@ public sealed class AreaAlunoAulasAdminService(
 
         if (aula is null || aula.Turma is null)
         {
-            return OperationResult.Fail("Aula não encontrada.");
+            await LogDeniedAttendanceAccessAsync(model.AulaId, accessScope.UserId, cancellationToken);
+            return OperationResult.NotFound("Aula não encontrada.");
         }
 
+        var hadExistingAttendance = aula.Frequencias.Count > 0;
+        var before = AuditJson.Serialize(aula.Frequencias.Select(x => new
+        {
+            x.AlunoId,
+            x.Status,
+            x.Justificada
+        }));
         var alunosDaTurma = aula.Turma.AlunoTurmas.Select(x => x.AlunoId).ToHashSet();
         foreach (var item in model.Alunos.Where(x => alunosDaTurma.Contains(x.AlunoId)))
         {
@@ -456,7 +472,7 @@ public sealed class AreaAlunoAulasAdminService(
             frequencia.Status = item.Status;
             frequencia.Justificada = item.Status == StatusFrequenciaEnum.FaltaJustificada || item.Justificada;
             frequencia.Justificativa = LimparOpcional(item.Justificativa);
-            frequencia.RegistradoPorUsuarioId = usuarioId;
+            frequencia.RegistradoPorUsuarioId = accessScope.UserId;
             frequencia.RegistradoEmUtc = clock.UtcNow;
         }
 
@@ -466,26 +482,80 @@ public sealed class AreaAlunoAulasAdminService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = accessScope.UserId,
+            Acao = hadExistingAttendance
+                ? AuditEventCodes.AttendanceCorrected
+                : AuditEventCodes.AttendanceRecorded,
+            Entidade = nameof(Aula),
+            EntidadeId = aula.Id.ToString(),
+            Descricao = hadExistingAttendance
+                ? "Frequência de aula corrigida."
+                : "Frequência de aula registrada.",
+            DadosAntesJson = before,
+            DadosDepoisJson = AuditJson.Serialize(aula.Frequencias.Select(x => new
+            {
+                x.AlunoId,
+                x.Status,
+                x.Justificada
+            })),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
+
         return OperationResult.Ok("Frequência salva.");
     }
 
-    public Task<int> ContarAulasProximasAsync(DateTime inicioMinimo, CancellationToken cancellationToken = default)
+    public Task<int> ContarAulasProximasAsync(
+        DateTime inicioMinimo,
+        AulaAccessScope accessScope,
+        CancellationToken cancellationToken = default)
     {
-        return dbContext.Aulas.CountAsync(x => x.Inicio >= inicioMinimo && x.Status == StatusAulaEnum.Agendada, cancellationToken);
+        return ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope)
+            .CountAsync(x => x.Inicio >= inicioMinimo && x.Status == StatusAulaEnum.Agendada, cancellationToken);
     }
 
-    public Task<int> ContarFrequenciasRegistradasAsync(DateTime inicio, DateTime fim, CancellationToken cancellationToken = default)
+    public Task<int> ContarFrequenciasRegistradasAsync(
+        DateTime inicio,
+        DateTime fim,
+        AulaAccessScope accessScope,
+        CancellationToken cancellationToken = default)
     {
-        return dbContext.FrequenciasAlunos.CountAsync(x => x.RegistradoEmUtc >= inicio && x.RegistradoEmUtc < fim, cancellationToken);
+        var aulasPermitidas = ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope).Select(x => x.Id);
+        return dbContext.FrequenciasAlunos.CountAsync(
+            x => aulasPermitidas.Contains(x.AulaId) && x.RegistradoEmUtc >= inicio && x.RegistradoEmUtc < fim,
+            cancellationToken);
     }
 
     public async Task<IReadOnlyCollection<AreaAlunoAulaAdminItemViewModel>> ListarAulasAdminAsync(
         int limite,
         DateTime inicioMinimo,
+        AulaAccessScope accessScope,
         CancellationToken cancellationToken = default)
     {
-        return await dbContext.Aulas
-            .AsNoTracking()
+        return await ProjetarAulasAdmin(
+                ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope),
+                limite,
+                inicioMinimo)
+            .ToListAsync(cancellationToken);
+    }
+
+    private async Task<IReadOnlyCollection<AreaAlunoAulaAdminItemViewModel>> ListarAulasSemEscopoAsync(
+        int limite,
+        DateTime inicioMinimo,
+        CancellationToken cancellationToken)
+    {
+        return await ProjetarAulasAdmin(dbContext.Aulas.AsNoTracking(), limite, inicioMinimo)
+            .ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<AreaAlunoAulaAdminItemViewModel> ProjetarAulasAdmin(
+        IQueryable<Aula> query,
+        int limite,
+        DateTime inicioMinimo)
+    {
+        return query
             .Include(x => x.Turma)
             .ThenInclude(x => x!.AlunoTurmas)
             .Include(x => x.InstrutorUsuario)
@@ -508,8 +578,49 @@ public sealed class AreaAlunoAulasAdminService(
                 Observacoes = x.Observacoes,
                 TotalAlunos = x.Turma != null ? x.Turma.AlunoTurmas.Count : 0,
                 FrequenciasRegistradas = x.Frequencias.Count
-            })
-            .ToListAsync(cancellationToken);
+            });
+    }
+
+    private IQueryable<Aula> ApplyAccessScope(IQueryable<Aula> query, AulaAccessScope accessScope)
+    {
+        if (accessScope.HasGlobalAccess)
+        {
+            return query;
+        }
+
+        if (!accessScope.UserId.HasValue)
+        {
+            return query.Where(_ => false);
+        }
+
+        var userId = accessScope.UserId.Value;
+        return query.Where(aula =>
+            aula.InstrutorUsuarioId == userId ||
+            (aula.InstrutorUsuarioId == null &&
+             dbContext.TurmaInstrutores.Any(vinculo =>
+                 vinculo.TurmaId == aula.TurmaId &&
+                 vinculo.UsuarioSistemaId == userId &&
+                 vinculo.UsuarioSistema != null &&
+                 vinculo.UsuarioSistema.Ativo &&
+                 vinculo.DataInicio <= DateOnly.FromDateTime(aula.Inicio) &&
+                 (!vinculo.DataFim.HasValue || vinculo.DataFim.Value >= DateOnly.FromDateTime(aula.Inicio)))));
+    }
+
+    private Task LogDeniedAttendanceAccessAsync(
+        int aulaId,
+        int? userId,
+        CancellationToken cancellationToken)
+    {
+        return auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = userId,
+            Acao = AuditEventCodes.SensitiveAccessDenied,
+            Entidade = nameof(Aula),
+            EntidadeId = aulaId.ToString(),
+            Descricao = "Tentativa negada de acesso ao registro de frequência.",
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
     }
 
     private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarTurmasOpcoesAsync(CancellationToken cancellationToken)

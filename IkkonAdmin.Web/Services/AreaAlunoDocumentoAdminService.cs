@@ -1,7 +1,9 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -12,7 +14,9 @@ namespace IkkonAdmin.Web.Services;
 public sealed class AreaAlunoDocumentoAdminService(
     ApplicationDbContext dbContext,
     IClock clock,
-    IFileStorageService fileStorageService) : IAreaAlunoDocumentoAdminService
+    IPrivateFileStorageService privateFileStorageService,
+    IAuditLogger auditLogger,
+    ICurrentUserService currentUserService) : IAreaAlunoDocumentoAdminService
 {
     public async Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default)
     {
@@ -235,12 +239,40 @@ public sealed class AreaAlunoDocumentoAdminService(
 
         if (solicitacao is null)
         {
-            return OperationResult.Fail("Solicitação não encontrada.");
+            return OperationResult.NotFound("Solicitação não encontrada.");
         }
 
+        var previousStatus = solicitacao.Status;
+        var previousObservation = solicitacao.ObservacaoAdministrativa;
         solicitacao.Status = model.Status;
         solicitacao.ObservacaoAdministrativa = LimparOpcional(model.ObservacaoAdministrativa);
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        var action = model.Status == DocumentoStatusEnum.Aprovado
+            ? AuditEventCodes.DocumentApproved
+            : model.Status == DocumentoStatusEnum.Recusado
+                ? AuditEventCodes.DocumentRejected
+                : "DOCUMENTO_STATUS_ALTERADO";
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = currentUserService.UserId,
+            Acao = action,
+            Entidade = nameof(DocumentoSolicitacao),
+            EntidadeId = solicitacao.Id.ToString(),
+            Descricao = "Avaliação administrativa de documento atualizada.",
+            DadosAntesJson = AuditJson.Serialize(new
+            {
+                Status = previousStatus,
+                Observacao = previousObservation
+            }),
+            DadosDepoisJson = AuditJson.Serialize(new
+            {
+                solicitacao.Status,
+                Observacao = solicitacao.ObservacaoAdministrativa
+            }),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
 
         return OperationResult.Ok("Documento atualizado.");
     }
@@ -255,13 +287,40 @@ public sealed class AreaAlunoDocumentoAdminService(
 
         if (envio is null)
         {
+            await LogDeniedDocumentAccessAsync(envioId, cancellationToken);
             return null;
         }
 
-        var caminho = ObterDocumentoPath(envio.ArquivoUrl);
-        return fileStorageService.Exists(caminho)
-            ? new AreaAlunoDocumentoDownload(caminho, envio.NomeArquivoOriginal, envio.ContentType)
-            : null;
+        var storedFile = await privateFileStorageService.OpenReadAsync(envio.ArquivoUrl, cancellationToken);
+        if (storedFile is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            await auditLogger.LogAsync(new AuditLogEntry
+            {
+                UsuarioResponsavelId = currentUserService.UserId,
+                Acao = AuditEventCodes.DocumentDownloaded,
+                Entidade = nameof(DocumentoEnvio),
+                EntidadeId = envio.Id.ToString(),
+                Descricao = "Documento privado baixado pela administração.",
+                EnderecoIp = currentUserService.RemoteIpAddress,
+                CorrelationId = currentUserService.CorrelationId
+            }, cancellationToken);
+
+            return new AreaAlunoDocumentoDownload(
+                storedFile.Content,
+                DocumentFileValidator.SanitizeDownloadFileName(envio.NomeArquivoOriginal),
+                string.IsNullOrWhiteSpace(envio.ContentType) ? "application/octet-stream" : envio.ContentType,
+                storedFile.Length);
+        }
+        catch
+        {
+            await storedFile.Content.DisposeAsync();
+            throw;
+        }
     }
 
     private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarAlunosOpcoesAsync(CancellationToken cancellationToken)
@@ -294,14 +353,23 @@ public sealed class AreaAlunoDocumentoAdminService(
             .ToListAsync(cancellationToken);
     }
 
-    private string ObterDocumentoPath(string fileName)
-    {
-        return fileStorageService.GetAppDataPath("uploads", "documentos", fileName);
-    }
-
     private static string? LimparOpcional(string? valor)
     {
         var texto = valor?.Trim();
         return string.IsNullOrWhiteSpace(texto) ? null : texto;
+    }
+
+    private Task LogDeniedDocumentAccessAsync(int envioId, CancellationToken cancellationToken)
+    {
+        return auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = currentUserService.UserId,
+            Acao = AuditEventCodes.SensitiveAccessDenied,
+            Entidade = nameof(DocumentoEnvio),
+            EntidadeId = envioId.ToString(),
+            Descricao = "Tentativa negada de acesso administrativo a documento privado.",
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
     }
 }

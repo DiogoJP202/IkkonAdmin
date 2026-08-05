@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.ViewModels;
 
@@ -6,6 +7,7 @@ namespace IkkonAdmin.Web.Services;
 
 public class AreaAlunoAdminService(
     IClock clock,
+    ICurrentUserService currentUserService,
     IAreaAlunoAulasAdminService aulasAdminService,
     IAreaAlunoDocumentoAdminService documentoAdminService,
     IAreaAlunoComunicadoAdminService comunicadoAdminService,
@@ -17,16 +19,17 @@ public class AreaAlunoAdminService(
         var hoje = clock.Today;
         var inicioMes = new DateTime(hoje.Year, hoje.Month, 1);
         var proximoMes = inicioMes.AddMonths(1);
+        var accessScope = ObterEscopoAulas();
 
         return new AreaAlunoAdminDashboardViewModel
         {
-            AulasProximas = await aulasAdminService.ContarAulasProximasAsync(hoje, cancellationToken),
-            FrequenciasRegistradasMes = await aulasAdminService.ContarFrequenciasRegistradasAsync(inicioMes, proximoMes, cancellationToken),
+            AulasProximas = await aulasAdminService.ContarAulasProximasAsync(hoje, accessScope, cancellationToken),
+            FrequenciasRegistradasMes = await aulasAdminService.ContarFrequenciasRegistradasAsync(inicioMes, proximoMes, accessScope, cancellationToken),
             DocumentosPendentes = await documentoAdminService.ContarDocumentosPendentesAsync(cancellationToken),
             ComunicadosAtivos = await comunicadoAdminService.ContarComunicadosAtivosAsync(cancellationToken),
             EventosProximos = await eventoAdminService.ContarEventosProximosAsync(cancellationToken),
             ConquistasConcedidasMes = await conquistaAdminService.ContarConquistasConcedidasAsync(inicioMes, proximoMes, cancellationToken),
-            ProximasAulas = await aulasAdminService.ListarAulasAdminAsync(8, hoje, cancellationToken),
+            ProximasAulas = await aulasAdminService.ListarAulasAdminAsync(8, hoje, accessScope, cancellationToken),
             DocumentosRecentes = await documentoAdminService.ListarDocumentosRecentesAsync(8, cancellationToken),
             ComunicadosRecentes = await comunicadoAdminService.ListarComunicadosRecentesAsync(6, cancellationToken)
         };
@@ -105,14 +108,14 @@ public class AreaAlunoAdminService(
 
     public Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(CancellationToken cancellationToken = default)
     {
-        return aulasAdminService.ObterFrequenciaAsync(cancellationToken);
+        return aulasAdminService.ObterFrequenciaAsync(ObterEscopoAulas(), cancellationToken);
     }
 
     public Task<AreaAlunoRegistroFrequenciaViewModel?> ObterRegistroFrequenciaAsync(
         int aulaId,
         CancellationToken cancellationToken = default)
     {
-        return aulasAdminService.ObterRegistroFrequenciaAsync(aulaId, cancellationToken);
+        return aulasAdminService.ObterRegistroFrequenciaAsync(aulaId, ObterEscopoAulas(), cancellationToken);
     }
 
     public Task<OperationResult> SalvarFrequenciaAsync(
@@ -120,7 +123,7 @@ public class AreaAlunoAdminService(
         int? usuarioId,
         CancellationToken cancellationToken = default)
     {
-        return aulasAdminService.SalvarFrequenciaAsync(model, usuarioId, cancellationToken);
+        return aulasAdminService.SalvarFrequenciaAsync(model, ObterEscopoAulas(usuarioId), cancellationToken);
     }
 
     public Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default)
@@ -290,5 +293,16 @@ public class AreaAlunoAdminService(
         CancellationToken cancellationToken = default)
     {
         return conquistaAdminService.ExcluirAlunoInsigniaAsync(id, cancellationToken);
+    }
+
+    private AulaAccessScope ObterEscopoAulas(int? usuarioId = null)
+    {
+        var userId = usuarioId ?? currentUserService.UserId;
+        var hasGlobalAccess = currentUserService.IsInRole(Security.AppRoles.Admin) ||
+                              currentUserService.HasClaim(
+                                  Security.AppClaimTypes.Permissao,
+                                  Security.AppPermissions.AreaAlunoManage);
+
+        return new AulaAccessScope(userId, hasGlobalAccess);
     }
 }

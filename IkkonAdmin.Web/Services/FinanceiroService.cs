@@ -1,6 +1,8 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -10,7 +12,9 @@ namespace IkkonAdmin.Web.Services;
 
 public class FinanceiroService(
     ApplicationDbContext dbContext,
-    IClock clock) : IFinanceiroService
+    IClock clock,
+    IAuditLogger auditLogger,
+    ICurrentUserService currentUserService) : IFinanceiroService
 {
     private const decimal ValorBasePadraoMensalidade = 260m;
     private const int DiaPadraoVencimento = 10;
@@ -48,6 +52,25 @@ public class FinanceiroService(
         mensalidade.DataPagamento = DateOnly.FromDateTime(model.DataPagamento.Date);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = currentUserService.UserId,
+            Acao = AuditEventCodes.PaymentRecorded,
+            Entidade = nameof(Pagamento),
+            EntidadeId = pagamento.Id.ToString(),
+            Descricao = "Pagamento de mensalidade registrado.",
+            DadosDepoisJson = AuditJson.Serialize(new
+            {
+                pagamento.MensalidadeId,
+                pagamento.AlunoId,
+                pagamento.DataPagamento,
+                pagamento.ValorPago,
+                pagamento.FormaPagamento
+            }),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
+
         return OperationResult.Ok("Pagamento registrado com sucesso.");
     }
 
@@ -180,8 +203,22 @@ public class FinanceiroService(
             return OperationResult.NotFound("Mensalidade não encontrada para atualizar valor.");
         }
 
+        var previousValue = mensalidade.ValorFinal;
         mensalidade.ValorFinal = decimal.Round(valorFinal, 2);
         await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = currentUserService.UserId,
+            Acao = AuditEventCodes.MonthlyFeeValueChanged,
+            Entidade = nameof(Mensalidade),
+            EntidadeId = mensalidade.Id.ToString(),
+            Descricao = "Valor final da mensalidade alterado.",
+            DadosAntesJson = AuditJson.Serialize(new { ValorFinal = previousValue }),
+            DadosDepoisJson = AuditJson.Serialize(new { mensalidade.ValorFinal }),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
+
         return OperationResult.Ok("Valor final atualizado.");
     }
 
@@ -198,6 +235,8 @@ public class FinanceiroService(
             return OperationResult.NotFound("Mensalidade não encontrada para alterar status.");
         }
 
+        var previousStatus = mensalidade.Status;
+        var previousPaymentDate = mensalidade.DataPagamento;
         mensalidade.Status = status;
 
         if (status == StatusMensalidadeEnum.Pago)
@@ -210,6 +249,27 @@ public class FinanceiroService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await auditLogger.LogAsync(new AuditLogEntry
+        {
+            UsuarioResponsavelId = currentUserService.UserId,
+            Acao = AuditEventCodes.MonthlyFeeStatusChanged,
+            Entidade = nameof(Mensalidade),
+            EntidadeId = mensalidade.Id.ToString(),
+            Descricao = "Status da mensalidade alterado.",
+            DadosAntesJson = AuditJson.Serialize(new
+            {
+                Status = previousStatus,
+                DataPagamento = previousPaymentDate
+            }),
+            DadosDepoisJson = AuditJson.Serialize(new
+            {
+                mensalidade.Status,
+                mensalidade.DataPagamento
+            }),
+            EnderecoIp = currentUserService.RemoteIpAddress,
+            CorrelationId = currentUserService.CorrelationId
+        }, cancellationToken);
+
         return OperationResult.Ok("Status da mensalidade atualizado.");
     }
 

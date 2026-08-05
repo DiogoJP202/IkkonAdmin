@@ -22,6 +22,7 @@ public interface IAreaAlunoService
 }
 
 public sealed record AreaAlunoDocumentoDownload(
-    string CaminhoArquivo,
+    Stream Content,
     string NomeArquivoOriginal,
-    string? ContentType);
+    string ContentType,
+    long Length);
