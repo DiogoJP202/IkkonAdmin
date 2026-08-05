@@ -1,77 +1,110 @@
 @model AreaAlunoAulasViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Aulas e Horários", "Classes and Schedule"];
+    ViewData["Title"] = I18n["Aulas e Horários", "Classes and Schedule", "レッスンと時間"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Agenda", "Schedule", "スケジュール"],
+        I18n["Aulas e horários", "Classes and schedule", "レッスンと時間"],
+        I18n[
+            "Consulte as próximas aulas e os horários recorrentes das turmas às quais você está vinculado.",
+            "Check upcoming classes and the recurring schedules of the groups you belong to.",
+            "今後のレッスンと所属クラスの定期練習時間を確認できます。"],
+        I18n["Turmas vinculadas", "Linked groups", "所属クラス"] + $": {Model.Turmas.Count}");
 }
 
-<section class="aluno-portal-panel mb-3">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Próximas aulas", "Upcoming classes"]</h3>
-            <p class="mb-0 text-muted">@I18n["Aulas cadastradas pela equipe para as suas turmas.", "Classes registered by the team for your groups."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="table-responsive">
-        <table class="table align-middle mb-0 aluno-portal-table">
-            <thead>
-                <tr>
-                    <th>@I18n["Data", "Date"]</th>
-                    <th>@I18n["Turma", "Group"]</th>
-                    <th>@I18n["Instrutor", "Instructor"]</th>
-                    <th>Local</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.ProximasAulas.Count == 0)
-                {
-                    <tr><td colspan="5" class="text-center text-muted py-4">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</td></tr>
-                }
-                else
-                {
-                    @foreach (var aula in Model.ProximasAulas)
+    <section class="aluno-portal-panel mb-4" aria-labelledby="classesScheduleTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="classesScheduleTitle">@I18n["Próximas aulas", "Upcoming classes", "今後のレッスン"]</h2>
+                <p>@I18n["Aulas cadastradas pela equipe para as suas turmas.", "Classes registered by the team for your groups.", "所属クラスに登録されているレッスンです。"]</p>
+            </div>
+        </div>
+
+        <div class="aluno-portal-responsive-table">
+            <table class="table aluno-portal-table">
+                <thead>
+                    <tr>
+                        <th>@I18n["Data", "Date", "日付"]</th>
+                        <th>@I18n["Turma", "Group", "クラス"]</th>
+                        <th>@I18n["Instrutor", "Instructor", "指導者"]</th>
+                        <th>@I18n["Local", "Location", "場所"]</th>
+                        <th>@I18n["Status", "Status", "ステータス"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ProximasAulas.Count == 0)
                     {
-                        <tr>
-                            <td>
-                                <strong>@aula.Inicio.ToString("dd/MM/yyyy")</strong>
-                                <span class="d-block text-muted">@aula.Inicio.ToString("HH:mm") - @aula.Fim.ToString("HH:mm")</span>
-                            </td>
-                            <td>@aula.Turma</td>
-                            <td>@(string.IsNullOrWhiteSpace(aula.Instrutor) ? "-" : aula.Instrutor)</td>
-                            <td>@(string.IsNullOrWhiteSpace(aula.Local) ? "-" : aula.Local)</td>
-                            <td><span class="aluno-portal-pill">@I18n.Term(aula.Status)</span></td>
+                        <tr class="aluno-portal-empty-row">
+                            <td colspan="5">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered.", "今後のレッスンは登録されていません。"]</td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
-    </div>
-</section>
-
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <h3>@I18n["Horários das turmas", "Group schedules"]</h3>
-    </div>
-    <div class="aluno-portal-turma-grid">
-        @foreach (var turma in Model.Turmas)
-        {
-            <article class="aluno-portal-turma-card">
-                <span>@turma.Modalidade</span>
-                <h3>@turma.Nome</h3>
-                <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided"] : turma.Instrutor)</p>
-                @if (turma.Horarios.Count == 0)
-                {
-                    <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided"] : turma.Horario)</small>
-                }
-                else
-                {
-                    @foreach (var horario in turma.Horarios)
+                    else
                     {
-                        <small>@I18n.Term(horario.DiaSemana) - @horario.HoraInicio.ToString("HH:mm") @I18n["às", "to"] @horario.HoraFim.ToString("HH:mm")</small>
+                        @foreach (var aula in Model.ProximasAulas)
+                        {
+                            <tr>
+                                <td data-label="@I18n["Data", "Date", "日付"]">
+                                    <strong>@aula.Inicio.ToString("dd/MM/yyyy")</strong>
+                                    <span class="d-block text-muted">@aula.Inicio.ToString("HH:mm")–@aula.Fim.ToString("HH:mm")</span>
+                                </td>
+                                <td data-label="@I18n["Turma", "Group", "クラス"]">@aula.Turma</td>
+                                <td data-label="@I18n["Instrutor", "Instructor", "指導者"]">@(string.IsNullOrWhiteSpace(aula.Instrutor) ? "—" : aula.Instrutor)</td>
+                                <td data-label="@I18n["Local", "Location", "場所"]">@(string.IsNullOrWhiteSpace(aula.Local) ? "—" : aula.Local)</td>
+                                <td data-label="@I18n["Status", "Status", "ステータス"]">
+                                    <partial name="_AlunoStatusBadge"
+                                             model="new AlunoStatusBadgeViewModel(I18n.Term(aula.Status), AlunoPortalPresentation.StatusTone(aula.Status))" />
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-            </article>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="aluno-portal-panel" aria-labelledby="recurringSchedulesTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="recurringSchedulesTitle">@I18n["Horários das turmas", "Group schedules", "クラスの練習時間"]</h2>
+                <p>@I18n["Programação recorrente para organizar sua rotina.", "Recurring schedule to organize your routine.", "日々の予定を立てるための定期スケジュールです。"]</p>
+            </div>
+        </div>
+
+        @if (Model.Turmas.Count == 0)
+        {
+            <p class="aluno-portal-empty-inline">@I18n["Nenhuma turma vinculada no momento.", "No linked groups at the moment.", "現在所属しているクラスはありません。"]</p>
         }
-    </div>
-</section>
+        else
+        {
+            <div class="aluno-portal-card-grid">
+                @foreach (var turma in Model.Turmas)
+                {
+                    <article class="aluno-portal-turma-card">
+                        <span>@turma.Modalidade</span>
+                        <h3>@turma.Nome</h3>
+                        <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided", "指導者未登録"] : turma.Instrutor)</p>
+                        <div class="aluno-portal-schedule-list">
+                            @if (turma.Horarios.Count == 0)
+                            {
+                                <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided", "時間未登録"] : turma.Horario)</small>
+                            }
+                            else
+                            {
+                                @foreach (var horario in turma.Horarios)
+                                {
+                                    <div class="aluno-portal-schedule-item">
+                                        <strong>@I18n.Term(horario.DiaSemana)</strong>
+                                        <span>@horario.HoraInicio.ToString("HH:mm")–@horario.HoraFim.ToString("HH:mm")</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</div>

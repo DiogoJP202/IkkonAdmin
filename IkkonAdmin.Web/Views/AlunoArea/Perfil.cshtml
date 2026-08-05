@@ -1,26 +1,67 @@
 @model AreaAlunoPerfilViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Meu Perfil", "My Profile"];
+    ViewData["Title"] = I18n["Meu Perfil", "My Profile", "プロフィール"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Dados pessoais", "Personal details", "個人情報"],
+        I18n["Meu perfil", "My profile", "プロフィール"],
+        I18n[
+            "Consulte as informações registradas pela equipe da escola. Para correções, entre em contato com a administração.",
+            "Review the information registered by the school team. Contact the administration if anything needs to be corrected.",
+            "学校が登録した情報を確認できます。修正が必要な場合は運営スタッフへご連絡ください。"],
+        I18n["Aluno desde", "Student since", "入門日"] + $" {Model.DataEntrada:dd/MM/yyyy}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Dados cadastrais", "Registration data"]</h3>
-            <p class="mb-0 text-muted">@I18n["Informações básicas registradas pela equipe administrativa.", "Basic information registered by the administrative team."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-data-grid">
-        <article><span>@I18n["Nome completo", "Full name"]</span><strong>@Model.NomeCompleto</strong></article>
-        <article><span>CPF</span><strong>@Model.CPF</strong></article>
-        <article><span>RG</span><strong>@(string.IsNullOrWhiteSpace(Model.RG) ? "-" : Model.RG)</strong></article>
-        <article><span>@I18n["Data de nascimento", "Birth date"]</span><strong>@(Model.DataNascimento.HasValue ? Model.DataNascimento.Value.ToString("dd/MM/yyyy") : "-")</strong></article>
-        <article><span>E-mail</span><strong>@(string.IsNullOrWhiteSpace(Model.Email) ? "-" : Model.Email)</strong></article>
-        <article><span>@I18n["Celular", "Mobile"]</span><strong>@(string.IsNullOrWhiteSpace(Model.Celular) ? "-" : Model.Celular)</strong></article>
-        <article><span>@I18n["Contato de emergência", "Emergency contact"]</span><strong>@(string.IsNullOrWhiteSpace(Model.ContatoEmergencia) ? "-" : Model.ContatoEmergencia)</strong></article>
-        <article><span>Status</span><strong>@I18n.Term(Model.Status)</strong></article>
-        <article class="aluno-portal-data-wide"><span>@I18n["Endereço", "Address"]</span><strong>@(string.IsNullOrWhiteSpace(Model.Endereco) ? "-" : Model.Endereco)</strong></article>
-    </div>
-</section>
+    <section class="aluno-portal-panel" aria-labelledby="registrationDataTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="registrationDataTitle">@I18n["Dados cadastrais", "Registration data", "登録情報"]</h2>
+                <p>@I18n["Informações básicas registradas pela equipe administrativa.", "Basic information registered by the administrative team.", "運営スタッフが登録した基本情報です。"]</p>
+            </div>
+            <partial name="_AlunoStatusBadge"
+                     model="new AlunoStatusBadgeViewModel(I18n.Term(Model.Status), AlunoPortalPresentation.StatusTone(Model.Status))" />
+        </div>
+
+        <div class="aluno-portal-data-grid">
+            <article class="aluno-portal-data-card">
+                <span>@I18n["Nome completo", "Full name", "氏名"]</span>
+                <strong>@Model.NomeCompleto</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>CPF</span>
+                <strong>@Model.CPF</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>RG</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.RG) ? "—" : Model.RG)</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>@I18n["Data de nascimento", "Birth date", "生年月日"]</span>
+                <strong>@(Model.DataNascimento.HasValue ? Model.DataNascimento.Value.ToString("dd/MM/yyyy") : "—")</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>@I18n["E-mail", "Email", "メールアドレス"]</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.Email) ? "—" : Model.Email)</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>@I18n["Celular", "Mobile", "携帯電話"]</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.Celular) ? "—" : Model.Celular)</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>@I18n["Contato de emergência", "Emergency contact", "緊急連絡先"]</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.ContatoEmergencia) ? "—" : Model.ContatoEmergencia)</strong>
+            </article>
+            <article class="aluno-portal-data-card">
+                <span>@I18n["Status", "Status", "ステータス"]</span>
+                <strong>@I18n.Term(Model.Status)</strong>
+            </article>
+            <article class="aluno-portal-data-card aluno-portal-data-wide">
+                <span>@I18n["Endereço", "Address", "住所"]</span>
+                <strong>@(string.IsNullOrWhiteSpace(Model.Endereco) ? "—" : Model.Endereco)</strong>
+            </article>
+        </div>
+    </section>
+</div>

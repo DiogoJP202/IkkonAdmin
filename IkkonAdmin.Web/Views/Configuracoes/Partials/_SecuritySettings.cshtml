@@ -3,12 +3,12 @@
 <article class="configuracoes-v2-card">
     <div class="configuracoes-v2-card-header">
         <div>
-            <span class="configuracoes-v2-eyebrow">@I18n["Segurança", "Security"]</span>
-            <h2>@I18n["Senha e histórico de acessos", "Password and access history"]</h2>
-            <p>@I18n["Altere sua senha e acompanhe eventos recentes de autenticação.", "Change your password and track recent authentication events."]</p>
+            <span class="configuracoes-v2-eyebrow">@I18n["Segurança", "Security", "セキュリティ"]</span>
+            <h2>@I18n["Senha e histórico de acessos", "Password and access history", "パスワードとアクセス履歴"]</h2>
+            <p>@I18n["Altere sua senha e acompanhe eventos recentes de autenticação.", "Change your password and track recent authentication events.", "パスワードの変更と最近の認証履歴を確認できます。"]</p>
         </div>
         <span class="configuracoes-v2-status-pill @(Model.SecurityStatus.ContaAtiva ? "is-success" : "is-muted")">
-            @(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])
+            @(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active", "有効"] : I18n["Inativa", "Inactive", "無効"])
         </span>
     </div>
 
@@ -19,69 +19,69 @@
 
                 <div class="configuracoes-v2-form-grid">
                     <div class="configuracoes-v2-field configuracoes-v2-field-span-2">
-                        <label for="SenhaAtual">@I18n["Senha atual", "Current password"]</label>
+                        <label for="SenhaAtual">@I18n["Senha atual", "Current password", "現在のパスワード"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="SenhaAtual"
                                name="SenhaAtual"
                                autocomplete="current-password"
-                               placeholder="@I18n["Informe sua senha atual", "Enter your current password"]" />
+                               placeholder="@I18n["Informe sua senha atual", "Enter your current password", "現在のパスワードを入力"]" />
                         <span class="text-danger small field-error" data-field-error="SenhaAtual"></span>
                     </div>
 
                     <div class="configuracoes-v2-field">
-                        <label for="NovaSenha">@I18n["Nova senha", "New password"]</label>
+                        <label for="NovaSenha">@I18n["Nova senha", "New password", "新しいパスワード"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="NovaSenha"
                                name="NovaSenha"
                                autocomplete="new-password"
-                               placeholder="@I18n["Mínimo de 8 caracteres", "At least 8 characters"]" />
+                               placeholder="@I18n["Mínimo de 8 caracteres", "At least 8 characters", "8文字以上"]" />
                         <span class="text-danger small field-error" data-field-error="NovaSenha"></span>
                     </div>
 
                     <div class="configuracoes-v2-field">
-                        <label for="ConfirmacaoNovaSenha">@I18n["Confirmar nova senha", "Confirm new password"]</label>
+                        <label for="ConfirmacaoNovaSenha">@I18n["Confirmar nova senha", "Confirm new password", "新しいパスワードを確認"]</label>
                         <input type="password"
                                class="form-control configuracoes-v2-control"
                                id="ConfirmacaoNovaSenha"
                                name="ConfirmacaoNovaSenha"
                                autocomplete="new-password"
-                               placeholder="@I18n["Repita a nova senha", "Repeat the new password"]" />
+                               placeholder="@I18n["Repita a nova senha", "Repeat the new password", "新しいパスワードを再入力"]" />
                         <span class="text-danger small field-error" data-field-error="ConfirmacaoNovaSenha"></span>
                     </div>
                 </div>
 
                 <div class="configuracoes-v2-form-actions">
-                    <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Atualizando...", "Updating..."]">@I18n["Alterar senha", "Change password"]</button>
+                    <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Atualizando...", "Updating...", "更新中..."]">@I18n["Alterar senha", "Change password", "パスワードを変更"]</button>
                 </div>
             </form>
 
             <aside class="configuracoes-v2-security-summary">
                 <article>
-                    <span>@I18n["Status da conta", "Account status"]</span>
-                    <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong>
+                    <span>@I18n["Status da conta", "Account status", "アカウント状態"]</span>
+                    <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active", "有効"] : I18n["Inativa", "Inactive", "無効"])</strong>
                 </article>
                 <article>
-                    <span>@I18n["Último login", "Last login"]</span>
-                    <strong>@(Model.SecurityStatus.UltimoLoginUtc.HasValue ? Model.SecurityStatus.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : I18n["Sem registro", "No record"])</strong>
+                    <span>@I18n["Último login", "Last login", "最終ログイン"]</span>
+                    <strong>@(Model.SecurityStatus.UltimoLoginUtc.HasValue ? Model.SecurityStatus.UltimoLoginUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : I18n["Sem registro", "No record", "記録なし"])</strong>
                 </article>
             </aside>
         </div>
 
         <div class="configuracoes-v2-history-block">
             <div class="configuracoes-v2-subheading">
-                <span>@I18n["Histórico", "History"]</span>
-                <h3>@I18n["Acessos recentes", "Recent access"]</h3>
+                <span>@I18n["Histórico", "History", "履歴"]</span>
+                <h3>@I18n["Acessos recentes", "Recent access", "最近のアクセス"]</h3>
             </div>
 
             <div class="table-responsive">
                 <table class="table configuracoes-v2-table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>@I18n["Data e hora", "Date and time"]</th>
+                            <th>@I18n["Data e hora", "Date and time", "日時"]</th>
                             <th>IP</th>
-                            <th>@I18n["Evento", "Event"]</th>
+                            <th>@I18n["Evento", "Event", "イベント"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,8 +90,8 @@
                             <tr>
                                 <td colspan="3">
                                     <div class="configuracoes-v2-empty-state">
-                                        <strong>@I18n["Nenhum acesso registrado", "No access registered"]</strong>
-                                        <span>@I18n["Quando houver autenticações registradas, elas aparecerão aqui.", "When authentications are registered, they will appear here."]</span>
+                                        <strong>@I18n["Nenhum acesso registrado", "No access registered", "アクセス履歴はありません"]</strong>
+                                        <span>@I18n["Quando houver autenticações registradas, elas aparecerão aqui.", "When authentications are registered, they will appear here.", "認証履歴が記録されると、ここに表示されます。"]</span>
                                     </div>
                                 </td>
                             </tr>
@@ -101,9 +101,9 @@
                             @foreach (var acesso in Model.SecurityStatus.HistoricoAcessos)
                             {
                                 <tr>
-                                    <td>@acesso.DataAcessoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                    <td>@(string.IsNullOrWhiteSpace(acesso.EnderecoIp) ? "-" : acesso.EnderecoIp)</td>
-                                    <td>@acesso.Descricao</td>
+                                    <td data-label="@I18n["Data e hora", "Date and time", "日時"]">@acesso.DataAcessoUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    <td data-label="IP">@(string.IsNullOrWhiteSpace(acesso.EnderecoIp) ? "-" : acesso.EnderecoIp)</td>
+                                    <td data-label="@I18n["Evento", "Event", "イベント"]">@acesso.Descricao</td>
                                 </tr>
                             }
                         }

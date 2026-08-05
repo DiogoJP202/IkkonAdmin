@@ -1,67 +1,101 @@
 @model AreaAlunoTurmasViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Minhas Turmas", "My Groups"];
+    ViewData["Title"] = I18n["Minhas Turmas", "My Groups", "所属クラス"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Vida no dojo", "Life at the dojo", "道場での活動"],
+        I18n["Minhas turmas", "My groups", "所属クラス"],
+        I18n[
+            "Veja suas turmas, instrutores e os horários recorrentes de treinamento.",
+            "See your groups, instructors, and recurring training schedules.",
+            "所属クラス、指導者、定期練習の時間を確認できます。"],
+        string.IsNullOrWhiteSpace(Model.TurmaPrincipal)
+            ? I18n["Turma principal não definida", "Main group not set", "メインクラス未設定"]
+            : I18n["Turma principal", "Main group", "メインクラス"] + $": {Model.TurmaPrincipal}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Turmas vinculadas", "Linked groups"]</h3>
-            <p class="mb-0 text-muted">@I18n["Turma principal", "Main group"]: @(string.IsNullOrWhiteSpace(Model.TurmaPrincipal) ? I18n["não definida", "not set"] : Model.TurmaPrincipal)</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-turma-grid">
+    <section class="aluno-portal-panel" aria-labelledby="linkedGroupsTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="linkedGroupsTitle">@I18n["Turmas vinculadas", "Linked groups", "所属クラス一覧"]</h2>
+                <p>@I18n["Seus vínculos ativos com as turmas da escola.", "Your active links to school groups.", "現在所属しているクラスです。"]</p>
+            </div>
+        </div>
+
         @if (Model.Turmas.Count == 0)
         {
-            <p class="text-muted mb-0">@I18n["Nenhuma turma vinculada no momento.", "No linked groups at the moment."]</p>
+            <p class="aluno-portal-empty-inline">@I18n["Nenhuma turma vinculada no momento.", "No linked groups at the moment.", "現在所属しているクラスはありません。"]</p>
         }
         else
         {
-            @foreach (var turma in Model.Turmas)
-            {
-                <article class="aluno-portal-turma-card">
-                    <span>@turma.Modalidade</span>
-                    <h3>@turma.Nome</h3>
-                    <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided"] : turma.Instrutor)</p>
-                    @if (turma.Horarios.Count > 0)
-                    {
-                        @foreach (var horario in turma.Horarios)
-                        {
-                            <small>@I18n.Term(horario.DiaSemana) - @horario.HoraInicio.ToString("HH:mm") @I18n["às", "to"] @horario.HoraFim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(horario.Local) ? string.Empty : $"| {horario.Local}")</small>
-                        }
-                    }
-                    else
-                    {
-                        <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided"] : turma.Horario)</small>
-                    }
-                    <small>@I18n["Vinculado em", "Linked on"] @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
-                </article>
-            }
-        }
-    </div>
-</section>
+            <div class="aluno-portal-card-grid">
+                @foreach (var turma in Model.Turmas)
+                {
+                    var isPrimary = string.Equals(Model.TurmaPrincipal, turma.Nome, StringComparison.OrdinalIgnoreCase);
+                    <article class="aluno-portal-turma-card @(isPrimary ? "is-primary" : string.Empty)">
+                        <div class="aluno-portal-card-topline">
+                            <div>
+                                <span>@turma.Modalidade</span>
+                                <h3>@turma.Nome</h3>
+                            </div>
+                            @if (isPrimary)
+                            {
+                                <span class="aluno-portal-badge aluno-portal-badge--info">
+                                    @I18n["Principal", "Main", "メイン"]
+                                </span>
+                            }
+                        </div>
+                        <p>@(string.IsNullOrWhiteSpace(turma.Instrutor) ? I18n["Instrutor não informado", "Instructor not provided", "指導者未登録"] : turma.Instrutor)</p>
 
-<section class="aluno-portal-panel mt-3">
-    <div class="aluno-portal-panel-head">
-        <h3>@I18n["Próximas aulas", "Upcoming classes"]</h3>
-        <a href="/area-do-aluno/aulas">@I18n["Ver agenda completa", "View full schedule"]</a>
-    </div>
-    <div class="aluno-portal-list">
-        @if (Model.ProximasAulas.Count == 0)
-        {
-            <p class="text-muted mb-0">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered."]</p>
+                        <div class="aluno-portal-schedule-list">
+                            @if (turma.Horarios.Count > 0)
+                            {
+                                @foreach (var horario in turma.Horarios)
+                                {
+                                    <div class="aluno-portal-schedule-item">
+                                        <strong>@I18n.Term(horario.DiaSemana)</strong>
+                                        <span>
+                                            @horario.HoraInicio.ToString("HH:mm")–@horario.HoraFim.ToString("HH:mm")
+                                            @(string.IsNullOrWhiteSpace(horario.Local) ? string.Empty : $"· {horario.Local}")
+                                        </span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <small>@(string.IsNullOrWhiteSpace(turma.Horario) ? I18n["Horário não informado", "Schedule not provided", "時間未登録"] : turma.Horario)</small>
+                            }
+                        </div>
+                        <small>@I18n["Vinculado em", "Linked on", "登録日"] @turma.DataVinculo.ToLocalTime().ToString("dd/MM/yyyy")</small>
+                    </article>
+                }
+            </div>
         }
-        else
-        {
-            @foreach (var aula in Model.ProximasAulas)
+    </section>
+
+    <section class="aluno-portal-panel mt-4" aria-labelledby="groupUpcomingClassesTitle">
+        <div class="aluno-portal-panel-head">
+            <h2 id="groupUpcomingClassesTitle">@I18n["Próximas aulas", "Upcoming classes", "今後のレッスン"]</h2>
+            <a href="/area-do-aluno/aulas">@I18n["Ver agenda completa", "View full schedule", "すべての予定を見る"]</a>
+        </div>
+        <div class="aluno-portal-list">
+            @if (Model.ProximasAulas.Count == 0)
             {
-                <div class="aluno-portal-list-item">
-                    <strong>@aula.Turma</strong>
-                    <span>@aula.Inicio.ToString("dd/MM/yyyy HH:mm") - @aula.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(aula.Local) ? string.Empty : $"| {aula.Local}")</span>
-                </div>
+                <p class="aluno-portal-empty-inline">@I18n["Nenhuma aula futura cadastrada.", "No upcoming classes registered.", "今後のレッスンは登録されていません。"]</p>
             }
-        }
-    </div>
-</section>
+            else
+            {
+                @foreach (var aula in Model.ProximasAulas)
+                {
+                    <article class="aluno-portal-list-item">
+                        <strong>@aula.Turma</strong>
+                        <span>@aula.Inicio.ToString("dd/MM/yyyy HH:mm")–@aula.Fim.ToString("HH:mm") @(string.IsNullOrWhiteSpace(aula.Local) ? string.Empty : $"· {aula.Local}")</span>
+                    </article>
+                }
+            }
+        </div>
+    </section>
+</div>

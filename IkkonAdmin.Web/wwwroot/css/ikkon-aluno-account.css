@@ -1,0 +1,229 @@
+/*
+ * Ajustes da tela compartilhada de Configurações quando renderizada no portal.
+ * O painel administrativo continua usando apenas ikkon-account.css.
+ */
+
+.aluno-portal-body .configuracoes-v2-page {
+  --configuracoes-ink: var(--aluno-heading);
+  --configuracoes-copy: var(--aluno-text);
+  --configuracoes-muted: var(--aluno-muted);
+  --configuracoes-surface: var(--aluno-surface);
+  --configuracoes-surface-soft: var(--aluno-surface-soft);
+  --configuracoes-border: var(--aluno-border);
+  --configuracoes-red: var(--aluno-accent);
+  --configuracoes-red-dark: var(--aluno-accent-dark);
+  padding: 0;
+  color: var(--aluno-text);
+  font-family: var(--ikkon-font-body);
+}
+
+.aluno-portal-body .configuracoes-v2-hero {
+  min-height: 11rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem !important;
+  padding: clamp(1.35rem, 3vw, 2.4rem);
+  border: 1px solid var(--aluno-border);
+  border-top: 4px solid var(--aluno-accent);
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, var(--aluno-surface) 55%, rgba(255, 255, 255, 0.82)),
+    url("/design-ikkon/assets/aro-enso-azul.png") right -4rem center / 22rem no-repeat;
+  box-shadow: none;
+}
+
+.aluno-portal-body .configuracoes-v2-hero h1,
+.aluno-portal-body .configuracoes-v2-card-header h2,
+.aluno-portal-body .configuracoes-v2-side-card h2,
+.aluno-portal-body .configuracoes-v2-assist-card h2,
+.aluno-portal-body .configuracoes-v2-subheading h3 {
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+}
+
+.aluno-portal-body .configuracoes-v2-hero h1 {
+  font-size: clamp(1.8rem, 3.2vw, 3.2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.aluno-portal-body .configuracoes-v2-eyebrow {
+  color: var(--aluno-accent);
+}
+
+.aluno-portal-body .configuracoes-v2-hero p,
+.aluno-portal-body .configuracoes-v2-card-header p,
+.aluno-portal-body .configuracoes-v2-side-card p {
+  color: var(--aluno-muted);
+}
+
+.aluno-portal-body .configuracoes-v2-meta span,
+.aluno-portal-body .configuracoes-v2-kpi-card,
+.aluno-portal-body .configuracoes-v2-card,
+.aluno-portal-body .configuracoes-v2-side-card,
+.aluno-portal-body .configuracoes-v2-assist-card,
+.aluno-portal-body .configuracoes-v2-control,
+.aluno-portal-body .configuracoes-v2-check-card,
+.aluno-portal-body .configuracoes-v2-security-summary article,
+.aluno-portal-body .configuracoes-v2-account-type-box,
+.aluno-portal-body .configuracoes-v2-permissions-box {
+  border-radius: 0;
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card,
+.aluno-portal-body .configuracoes-v2-card,
+.aluno-portal-body .configuracoes-v2-side-card {
+  border-color: var(--aluno-border);
+  background: var(--aluno-surface);
+  box-shadow: none;
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card {
+  border-top: 3px solid var(--aluno-heading);
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card.is-success {
+  border-top-color: var(--aluno-success);
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card.is-warning {
+  border-top-color: var(--aluno-warning);
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card.is-danger {
+  border-top-color: var(--aluno-danger);
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card.is-info {
+  border-top-color: var(--aluno-info);
+}
+
+.aluno-portal-body .configuracoes-v2-kpi-card::after {
+  display: none;
+}
+
+.aluno-portal-body .configuracoes-v2-card-header,
+.aluno-portal-body .configuracoes-v2-card-body,
+.aluno-portal-body .configuracoes-v2-side-card,
+.aluno-portal-body .configuracoes-v2-assist-card {
+  border-color: var(--aluno-border);
+}
+
+.aluno-portal-body .configuracoes-v2-control {
+  border-color: var(--aluno-border-strong);
+  background: var(--aluno-surface);
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-body .configuracoes-v2-control:focus {
+  border-color: var(--aluno-accent);
+  box-shadow: var(--ikkon-focus-ring);
+}
+
+.aluno-portal-body .configuracoes-v2-btn {
+  min-height: var(--ikkon-touch-target);
+  border-radius: var(--ikkon-radius-pill);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-body .configuracoes-v2-btn-primary {
+  border-color: var(--aluno-accent);
+  background: var(--aluno-accent);
+}
+
+.aluno-portal-body .configuracoes-v2-btn-primary:hover,
+.aluno-portal-body .configuracoes-v2-btn-primary:focus {
+  border-color: var(--aluno-accent-dark);
+  background: var(--aluno-accent-dark);
+}
+
+.aluno-portal-body .configuracoes-v2-assist-card {
+  background: var(--aluno-heading);
+  color: var(--ikkon-cream);
+}
+
+.aluno-portal-body .configuracoes-v2-assist-card h2 {
+  color: var(--ikkon-cream);
+}
+
+.aluno-portal-body .configuracoes-v2-assist-card li {
+  color: rgba(247, 244, 231, 0.76);
+}
+
+@media (max-width: 767.98px) {
+  .aluno-portal-body .configuracoes-v2-hero {
+    min-height: 10rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .aluno-portal-body .configuracoes-v2-history-block .table-responsive {
+    overflow: visible;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table,
+  .aluno-portal-body .configuracoes-v2-table tbody,
+  .aluno-portal-body .configuracoes-v2-table tr,
+  .aluno-portal-body .configuracoes-v2-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table tr {
+    margin-bottom: 0.75rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--aluno-border);
+    border-left: 3px solid var(--aluno-accent);
+    background: var(--aluno-surface-soft);
+  }
+
+  .aluno-portal-body .configuracoes-v2-table td {
+    min-height: 2.35rem;
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 42%) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--aluno-border);
+    overflow-wrap: anywhere;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table td::before {
+    color: var(--aluno-muted);
+    content: attr(data-label);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table td[colspan] {
+    display: block;
+    padding: 1rem;
+  }
+
+  .aluno-portal-body .configuracoes-v2-table td[colspan]::before {
+    content: none;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .aluno-portal-body .configuracoes-v2-table td {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+  }
+}

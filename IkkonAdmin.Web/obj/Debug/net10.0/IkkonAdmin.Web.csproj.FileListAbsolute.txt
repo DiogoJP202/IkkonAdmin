@@ -814,9 +814,7 @@ C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\scopedcss\bundle\IkkonAdmin.Web.styles.css
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\xtwf5esnun-{0}-tfwdiprujf-tfwdiprujf.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\9e8livlu26-{0}-61n19gt1b8-61n19gt1b8.gz
-C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\59128giy75-{0}-p78md52tn7-p78md52tn7.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\lommt1rhbg-{0}-0glcwf1ttl-0glcwf1ttl.gz
-C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-2b6q5bsvnq-2b6q5bsvnq.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\a66a96eg2e-{0}-mx7rov1dfu-mx7rov1dfu.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\6u1tk750my-{0}-cfs4bsmc8l-cfs4bsmc8l.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\ufao3wt7jt-{0}-qk252la6xd-qk252la6xd.gz
@@ -897,9 +895,7 @@ C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\eekg2hd0vo-{0}-t1g5ohahe2-t1g5ohahe2.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\vchbd36gi2-{0}-gdqa4u62iz-gdqa4u62iz.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\eg5yfph5u1-{0}-fiy1c3mbjx-fiy1c3mbjx.gz
-C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\60fwyzd21l-{0}-tpg2j72fnc-tpg2j72fnc.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\xqlbqadpfh-{0}-wbxtsi4hwi-wbxtsi4hwi.gz
-C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\gftyrenhmq-{0}-g2gneadma1-g2gneadma1.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\fw9is3bnb4-{0}-mxpef74xzj-mxpef74xzj.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\7lbsqc8376-{0}-yl6igavkt0-yl6igavkt0.gz
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\pge0sus27g-{0}-ghu0aku226-ghu0aku226.gz
@@ -945,3 +941,8 @@ C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Tests\bin\CodexLoginValidation\IkkonAdmin.Web.runtimeconfig.json
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Tests\bin\CodexLoginValidation\IkkonAdmin.Web.dll
 C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Tests\bin\CodexLoginValidation\IkkonAdmin.Web.pdb
+C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\yhdweswsjo-{0}-o76bkmtye8-o76bkmtye8.gz
+C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\60fwyzd21l-{0}-ulx4zoas0f-ulx4zoas0f.gz
+C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\gftyrenhmq-{0}-4u8oouk8e4-4u8oouk8e4.gz
+C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\59128giy75-{0}-gbt7t167ka-gbt7t167ka.gz
+C:\Users\diogo\OneDrive\Documentos\Meus-Arquivos\Projetos\IkkonAdmin\IkkonAdmin.Web\obj\Debug\net10.0\compressed\0g4wgxf5fq-{0}-c9uawhb7fl-c9uawhb7fl.gz

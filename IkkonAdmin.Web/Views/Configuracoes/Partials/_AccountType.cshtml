@@ -1,21 +1,21 @@
 ﻿@model UserSettingsPageViewModel
 
 <section class="configuracoes-v2-side-card">
-    <span class="configuracoes-v2-eyebrow">@I18n["Tipo de conta", "Account type"]</span>
-    <h2>@I18n["Perfil e permissões", "Profile and permissions"]</h2>
-    <p>@I18n["Informações de acesso definidas pelo administrador do sistema.", "Access information defined by the system administrator."]</p>
+    <span class="configuracoes-v2-eyebrow">@I18n["Tipo de conta", "Account type", "アカウント種類"]</span>
+    <h2>@I18n["Perfil e permissões", "Profile and permissions", "プロフィールと権限"]</h2>
+    <p>@I18n["Informações de acesso definidas pelo administrador do sistema.", "Access information defined by the system administrator.", "システム管理者が設定したアクセス情報です。"]</p>
 
     <div class="configuracoes-v2-account-type-box">
-        <span>@I18n["Perfil atual", "Current profile"]</span>
+        <span>@I18n["Perfil atual", "Current profile", "現在のプロフィール"]</span>
         <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong>
     </div>
 
     <div class="configuracoes-v2-permissions-box">
-        <span>@I18n["Permissões básicas", "Basic permissions"]</span>
+        <span>@I18n["Permissões básicas", "Basic permissions", "基本権限"]</span>
         <ul>
             @foreach (var permission in Model.AccountType.PermissoesBasicas)
             {
-                <li>@permission</li>
+                <li>@I18n.Term(permission)</li>
             }
         </ul>
     </div>

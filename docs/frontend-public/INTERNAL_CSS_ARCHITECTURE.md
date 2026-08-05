@@ -12,8 +12,10 @@ Esta documentação registra a divisão do antigo `site.css` por responsabilidad
 | `ikkon-admin-{dominio}.css` | Componentes e páginas de Dashboard, Alunos, Turmas, Financeiro, Admissões, Desligamentos, Graduações, Agenda, Inventário, Painel e Blog | `_Layout`, somente nas rotas resolvidas para o domínio | Regras de outro domínio ou do shell |
 | `ikkon-admin-resources.css` | Primitivos realmente compartilhados por Agenda e Inventário | Rotas de Agenda e Inventário | Componentes exclusivos de apenas uma dessas páginas |
 | `ikkon-admin-configuracoes.css` | Apresentação administrativa específica de Configurações | Rota de Configurações no painel | Shell, estilos de Alunos ou regras do portal |
+| `ikkon-tokens.css` | Identidade compartilhada: navy, creme, vermelho, tipografia e primitivas | Frontend público e `_AlunoLayout` | Componentes ou regras exclusivas de página |
 | `ikkon-aluno.css` | Shell, navegação e componentes do portal do aluno | `_AlunoLayout` | Regras administrativas ou de autenticação |
 | `ikkon-account.css` | Conta, senha e preferências usadas pelos dois perfis autenticados | Somente a rota de Configurações em `_Layout` e `_AlunoLayout` | Regras exclusivas de uma das áreas |
+| `ikkon-aluno-account.css` | Composição visual de Configurações dentro do portal | Somente `/configuracoes` em `_AlunoLayout` | Alterar a apresentação administrativa compartilhada |
 | `ikkon-internal-themes.css` | Tokens e correções dos temas escuros administrativo e aluno | `_Layout` e `_AlunoLayout` | Estilos-base de componentes; o arquivo deve conter apenas variações de tema |
 
 ## Ordem de carregamento
@@ -42,9 +44,12 @@ O `AdminCssModuleResolver` mantém a relação entre controller e arquivos. Conf
 ### Portal do aluno
 
 ```html
+<link rel="stylesheet" href="~/css/ikkon-tokens.css" />
 <link rel="stylesheet" href="~/css/ikkon-internal-foundation.css" />
 <link rel="stylesheet" href="~/css/ikkon-aluno.css" />
-<!-- ikkon-account.css é incluído somente em /configuracoes -->
+<!-- Em /configuracoes: -->
+<link rel="stylesheet" href="~/css/ikkon-account.css" />
+<link rel="stylesheet" href="~/css/ikkon-aluno-account.css" />
 <link rel="stylesheet" href="~/css/ikkon-internal-themes.css" />
 ```
 
@@ -61,6 +66,8 @@ Essa ordem faz parte da cascata e é protegida por testes automatizados.
 7. Ao criar uma nova área compartilhada, confirmar repetição real antes de criar outro arquivo transversal.
 8. Ao criar um controller administrativo, registrar seus módulos em `AdminCssModuleResolver` e atualizar o teste de mapeamento.
 9. Manter no `ikkon-admin-core.css` apenas contratos necessários em todas as rotas, incluindo shell, menu móvel, motion e compatibilidade responsiva compartilhada.
+10. Componentes novos do aluno usam o prefixo `aluno-portal-*`; estilos de Configurações exclusivos do aluno ficam escopados por `.aluno-portal-body`.
+11. O bloco canônico `body.aluno-theme-dark` fica ao final de `ikkon-internal-themes.css` para não contaminar nem ser sobrescrito pelo tema administrativo legado.
 
 ## Métricas sem compressão
 
@@ -106,4 +113,7 @@ Os testes de arquitetura verificam:
 - isolamento entre autenticação, administração, aluno e configurações;
 - mapeamento de cada controller para módulos existentes;
 - presença do contrato responsivo móvel no núcleo administrativo;
-- presença da camada transversal de temas.
+- presença da camada transversal de temas;
+- tokens institucionais antes dos módulos do aluno;
+- isolamento de `ikkon-aluno-account.css`;
+- introdução compartilhada, único `h1`, traduções PT/EN/JA e tabelas móveis do portal.

@@ -1,40 +1,85 @@
 @model AreaAlunoComunicadosViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Comunicados", "Announcements"];
+    ViewData["Title"] = I18n["Comunicados", "Announcements", "お知らせ"];
+    var unreadCount = Model.Comunicados.Count(x => !x.Lido);
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Mural da escola", "School board", "道場からのお知らせ"],
+        I18n["Comunicados", "Announcements", "お知らせ"],
+        I18n[
+            "Acompanhe avisos destinados a você, às suas turmas ou a toda a comunidade.",
+            "Follow notices addressed to you, your groups, or the entire community.",
+            "あなた、所属クラス、または道場全体へのお知らせを確認できます。"],
+        I18n["Não lidos", "Unread", "未読"] + $": {unreadCount}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Comunicados e avisos", "Announcements and notices"]</h3>
-            <p class="mb-0 text-muted">@I18n["Avisos direcionados a você, suas turmas ou todos os alunos.", "Notices directed to you, your groups, or all students."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-list">
+    <section class="aluno-portal-panel" aria-labelledby="announcementsTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="announcementsTitle">@I18n["Comunicados e avisos", "Announcements and notices", "お知らせ一覧"]</h2>
+                <p>@I18n["Os comunicados mais recentes aparecem primeiro.", "The latest announcements appear first.", "新しいお知らせから順に表示されます。"]</p>
+            </div>
+        </div>
+
         @if (Model.Comunicados.Count == 0)
         {
-            <p class="text-muted mb-0">@I18n["Nenhum comunicado ativo.", "No active announcements."]</p>
+            <p class="aluno-portal-empty-inline">@I18n["Nenhum comunicado ativo.", "No active announcements.", "現在のお知らせはありません。"]</p>
         }
         else
         {
-            @foreach (var comunicado in Model.Comunicados)
-            {
-                <article class="aluno-portal-list-item">
-                    <strong>@comunicado.Titulo @(comunicado.Importante ? I18n["| Importante", "| Important"] : string.Empty)</strong>
-                    <span>@comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm") @(comunicado.Lido ? I18n["| Lido", "| Read"] : I18n["| Novo", "| New"])</span>
-                    <span>@comunicado.Conteudo</span>
-                    @if (!comunicado.Lido)
+            <div class="aluno-portal-feed">
+                @foreach (var comunicado in Model.Comunicados)
+                {
+                    var stateClass = comunicado.Lido ? "is-read" : "is-new";
+                    if (comunicado.Importante)
                     {
-                        <form asp-action="MarcarComunicadoLido" method="post" class="mt-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="comunicadoId" value="@comunicado.Id" />
-                            <button class="btn btn-sm btn-outline-secondary" type="submit">@I18n["Marcar como lido", "Mark as read"]</button>
-                        </form>
+                        stateClass += " is-important";
                     }
-                </article>
-            }
+                    var statusBadge = new AlunoStatusBadgeViewModel(
+                        comunicado.Lido
+                            ? I18n["Lido", "Read", "既読"]
+                            : I18n["Novo", "New", "未読"],
+                        comunicado.Lido ? "success" : "info");
+
+                    <article class="aluno-portal-announcement-card @stateClass">
+                        <div class="aluno-portal-card-topline">
+                            <div>
+                                <h3>@comunicado.Titulo</h3>
+                                <p class="aluno-portal-card-meta">
+                                    <time datetime="@comunicado.PublicadoEmUtc.ToString("O")">
+                                        @comunicado.PublicadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                    </time>
+                                    @if (comunicado.Fixado)
+                                    {
+                                        <span>@I18n["Fixado", "Pinned", "固定"]</span>
+                                    }
+                                    @if (comunicado.Importante)
+                                    {
+                                        <span>@I18n["Importante", "Important", "重要"]</span>
+                                    }
+                                </p>
+                            </div>
+                            <partial name="_AlunoStatusBadge" model="statusBadge" />
+                        </div>
+
+                        <p class="aluno-portal-card-copy">@comunicado.Conteudo</p>
+
+                        @if (!comunicado.Lido)
+                        {
+                            <form asp-action="MarcarComunicadoLido" method="post" class="aluno-portal-card-actions">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="comunicadoId" value="@comunicado.Id" />
+                                <button class="aluno-portal-button aluno-portal-button--secondary" type="submit">
+                                    @I18n["Marcar como lido", "Mark as read", "既読にする"]
+                                </button>
+                            </form>
+                        }
+                    </article>
+                }
+            </div>
         }
-    </div>
-</section>
+    </section>
+</div>

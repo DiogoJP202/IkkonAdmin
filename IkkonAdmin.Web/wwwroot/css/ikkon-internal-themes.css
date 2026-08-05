@@ -3404,3 +3404,235 @@ body.admin-theme-dark .user-settings-permissions-box h3 {
   color: var(--theme-heading) !important;
 
 }
+
+
+
+/* Portal do aluno: bloco canônico do tema escuro.
+ * Mantido ao final para isolar a identidade navy, creme e vermelho das regras
+ * administrativas legadas que permanecem acima.
+ */
+
+body.aluno-theme-dark {
+  --aluno-bg: #07111f;
+  --aluno-bg-soft: #0a1725;
+  --aluno-surface: #0d1b2b;
+  --aluno-surface-soft: #112235;
+  --aluno-heading: #f7f4e7;
+  --aluno-text: #d8e1e9;
+  --aluno-muted: #aab9c7;
+  --aluno-border: rgba(247, 244, 231, 0.16);
+  --aluno-border-strong: rgba(247, 244, 231, 0.3);
+  --aluno-sidebar: #00162a;
+  --aluno-sidebar-deep: #000d19;
+  --aluno-success: #77d6a4;
+  --aluno-success-soft: #102c21;
+  --aluno-warning: #f4c66a;
+  --aluno-warning-soft: #30240f;
+  --aluno-danger: #ff8589;
+  --aluno-danger-soft: #35171c;
+  --aluno-info: #72c6ea;
+  --aluno-info-soft: #102a38;
+  --bs-body-color: var(--aluno-text);
+  --bs-body-bg: var(--aluno-bg);
+  --bs-border-color: var(--aluno-border);
+  background: var(--aluno-bg) !important;
+  color: var(--aluno-text) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-main,
+body.aluno-theme-dark .aluno-portal-content {
+  background: var(--aluno-bg) !important;
+  color: var(--aluno-text) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-sidebar {
+  background:
+    linear-gradient(180deg, rgba(0, 22, 42, 0.08), rgba(0, 13, 25, 0.92)),
+    var(--aluno-sidebar) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-nav a:hover,
+body.aluno-theme-dark .aluno-portal-nav a:focus-visible {
+  background: rgba(247, 244, 231, 0.1) !important;
+  border-color: rgba(247, 244, 231, 0.18) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-nav a.is-active {
+  background: var(--aluno-accent) !important;
+  border-color: var(--aluno-accent) !important;
+  color: var(--ikkon-white) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-topbar,
+body.aluno-theme-dark .aluno-portal-panel,
+body.aluno-theme-dark .aluno-portal-metric,
+body.aluno-theme-dark .aluno-portal-data-card,
+body.aluno-theme-dark .aluno-portal-group-card,
+body.aluno-theme-dark .aluno-portal-schedule-card,
+body.aluno-theme-dark .aluno-portal-list-card,
+body.aluno-theme-dark .aluno-portal-document-card,
+body.aluno-theme-dark .aluno-portal-announcement-card,
+body.aluno-theme-dark .aluno-portal-event-card,
+body.aluno-theme-dark .aluno-portal-achievement-card,
+body.aluno-theme-dark .configuracoes-v2-kpi-card,
+body.aluno-theme-dark .configuracoes-v2-card,
+body.aluno-theme-dark .configuracoes-v2-side-card {
+  background: var(--aluno-surface) !important;
+  border-color: var(--aluno-border) !important;
+  color: var(--aluno-text) !important;
+  box-shadow: none !important;
+}
+
+body.aluno-theme-dark .aluno-portal-hero {
+  background:
+    linear-gradient(90deg, rgba(0, 13, 25, 0.98) 0%, rgba(0, 22, 42, 0.9) 54%, rgba(0, 22, 42, 0.72) 100%),
+    url("/design-ikkon/assets/hero-aulas-6.jpg") center 42% / cover no-repeat !important;
+  border-color: var(--aluno-border) !important;
+  color: var(--ikkon-cream) !important;
+}
+
+body.aluno-theme-dark .configuracoes-v2-hero {
+  background:
+    linear-gradient(90deg, var(--aluno-surface) 55%, rgba(13, 27, 43, 0.8)),
+    url("/design-ikkon/assets/aro-enso-azul.png") right -4rem center / 22rem no-repeat !important;
+  border-color: var(--aluno-border) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-page-header,
+body.aluno-theme-dark .aluno-portal-empty {
+  background-color: var(--aluno-surface) !important;
+  border-color: var(--aluno-border) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-page-header {
+  border-top-color: var(--aluno-accent) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-menu-toggle span {
+  background: var(--ikkon-cream) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-language-list a:hover,
+body.aluno-theme-dark .aluno-portal-language-list a.is-active {
+  background: var(--ikkon-cream) !important;
+  color: var(--ikkon-navy-dark) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-avatar {
+  background: var(--ikkon-cream) !important;
+  border-color: var(--ikkon-cream) !important;
+  box-shadow: 0 0 0 1px rgba(247, 244, 231, 0.35) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-menu-toggle,
+body.aluno-theme-dark .form-control,
+body.aluno-theme-dark .form-select,
+body.aluno-theme-dark .input-group-text,
+body.aluno-theme-dark .modal-content,
+body.aluno-theme-dark .dropdown-menu,
+body.aluno-theme-dark .list-group-item,
+body.aluno-theme-dark .configuracoes-v2-control,
+body.aluno-theme-dark .configuracoes-v2-meta span,
+body.aluno-theme-dark .configuracoes-v2-kpi-top b,
+body.aluno-theme-dark .configuracoes-v2-check-card,
+body.aluno-theme-dark .configuracoes-v2-account-type-box,
+body.aluno-theme-dark .configuracoes-v2-permissions-box,
+body.aluno-theme-dark .configuracoes-v2-security-summary article,
+body.aluno-theme-dark .aluno-portal-achievement-symbol {
+  background-color: var(--aluno-surface-soft) !important;
+  border-color: var(--aluno-border) !important;
+  color: var(--aluno-heading) !important;
+}
+
+body.aluno-theme-dark .form-control:focus,
+body.aluno-theme-dark .form-select:focus,
+body.aluno-theme-dark .configuracoes-v2-control:focus {
+  background-color: var(--aluno-surface) !important;
+  border-color: var(--aluno-accent) !important;
+  color: var(--aluno-heading) !important;
+  box-shadow: var(--ikkon-focus-ring) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-page-header h1,
+body.aluno-theme-dark .aluno-portal-panel-head h2,
+body.aluno-theme-dark .aluno-portal-card-title,
+body.aluno-theme-dark .aluno-portal-data-card strong,
+body.aluno-theme-dark .aluno-portal-achievement-card h3,
+body.aluno-theme-dark .configuracoes-v2-hero h1,
+body.aluno-theme-dark .configuracoes-v2-card-header h2,
+body.aluno-theme-dark .configuracoes-v2-side-card h2,
+body.aluno-theme-dark .configuracoes-v2-meta strong {
+  color: var(--aluno-heading) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-page-header p,
+body.aluno-theme-dark .aluno-portal-panel-head p,
+body.aluno-theme-dark .aluno-portal-card-copy,
+body.aluno-theme-dark .aluno-portal-muted,
+body.aluno-theme-dark .configuracoes-v2-hero p,
+body.aluno-theme-dark .configuracoes-v2-card-header p,
+body.aluno-theme-dark .configuracoes-v2-side-card p,
+body.aluno-theme-dark .configuracoes-v2-kpi-top span,
+body.aluno-theme-dark .configuracoes-v2-kpi-card small,
+body.aluno-theme-dark .text-muted {
+  color: var(--aluno-muted) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-kicker,
+body.aluno-theme-dark .aluno-portal-eyebrow,
+body.aluno-theme-dark .aluno-portal-panel-head a,
+body.aluno-theme-dark .configuracoes-v2-eyebrow {
+  color: var(--aluno-accent) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-badge--success {
+  background: var(--aluno-success-soft) !important;
+  border-color: color-mix(in srgb, var(--aluno-success) 48%, transparent) !important;
+  color: var(--aluno-success) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-badge--warning {
+  background: var(--aluno-warning-soft) !important;
+  border-color: color-mix(in srgb, var(--aluno-warning) 48%, transparent) !important;
+  color: var(--aluno-warning) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-badge--danger {
+  background: var(--aluno-danger-soft) !important;
+  border-color: color-mix(in srgb, var(--aluno-danger) 48%, transparent) !important;
+  color: var(--aluno-danger) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-badge--info {
+  background: var(--aluno-info-soft) !important;
+  border-color: color-mix(in srgb, var(--aluno-info) 48%, transparent) !important;
+  color: var(--aluno-info) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-badge--neutral,
+body.aluno-theme-dark .configuracoes-v2-status-pill {
+  background: var(--aluno-surface-soft) !important;
+  border-color: var(--aluno-border-strong) !important;
+  color: var(--aluno-heading) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-table,
+body.aluno-theme-dark .aluno-portal-table > :not(caption) > * > *,
+body.aluno-theme-dark .configuracoes-v2-table,
+body.aluno-theme-dark .configuracoes-v2-table th,
+body.aluno-theme-dark .configuracoes-v2-table td {
+  border-color: var(--aluno-border) !important;
+  color: var(--aluno-text) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-table thead th,
+body.aluno-theme-dark .configuracoes-v2-table thead th {
+  background: var(--aluno-surface-soft) !important;
+  color: var(--aluno-muted) !important;
+}
+
+body.aluno-theme-dark .aluno-portal-responsive-table .aluno-portal-table tr,
+body.aluno-theme-dark .configuracoes-v2-table tr {
+  background: var(--aluno-surface-soft);
+  border-color: var(--aluno-border);
+}

@@ -126,11 +126,14 @@ public class CssArchitectureTests
 
         AssertCssLinks(
             alunoLayout,
+            "ikkon-tokens.css",
             "ikkon-internal-foundation.css",
             "ikkon-aluno.css",
             "ikkon-account.css",
+            "ikkon-aluno-account.css",
             "ikkon-internal-themes.css");
         Assert.Contains("isAccountPage", alunoLayout, StringComparison.Ordinal);
+        Assert.Contains("ja-JP", alunoLayout, StringComparison.Ordinal);
         Assert.DoesNotContain("ikkon-auth.css", alunoLayout, StringComparison.Ordinal);
         Assert.DoesNotContain("ikkon-admin-core.css", alunoLayout, StringComparison.Ordinal);
     }
@@ -153,6 +156,11 @@ public class CssArchitectureTests
             "wwwroot",
             "css",
             "ikkon-account.css");
+        var alunoAccountCss = ReadRepoFile(
+            "IkkonAdmin.Web",
+            "wwwroot",
+            "css",
+            "ikkon-aluno-account.css");
         var adminCoreCss = ReadRepoFile(
             "IkkonAdmin.Web",
             "wwwroot",
@@ -179,12 +187,25 @@ public class CssArchitectureTests
         Assert.DoesNotContain(".admin-shell", authCss, StringComparison.Ordinal);
 
         Assert.Contains(".aluno-portal-shell", alunoCss, StringComparison.Ordinal);
+        Assert.Contains(".aluno-portal-page-header", alunoCss, StringComparison.Ordinal);
+        Assert.Contains(".aluno-portal-responsive-table", alunoCss, StringComparison.Ordinal);
+        Assert.Contains("@media (max-width: 767.98px)", alunoCss, StringComparison.Ordinal);
         Assert.DoesNotContain(".auth-page", alunoCss, StringComparison.Ordinal);
         Assert.DoesNotContain(".admin-shell", alunoCss, StringComparison.Ordinal);
 
         Assert.Contains(".configuracoes-v2-page", accountCss, StringComparison.Ordinal);
         Assert.DoesNotContain(".auth-page", accountCss, StringComparison.Ordinal);
         Assert.DoesNotContain(".aluno-portal-", accountCss, StringComparison.Ordinal);
+
+        Assert.Contains(
+            ".aluno-portal-body .configuracoes-v2-page",
+            alunoAccountCss,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            ".aluno-portal-body .configuracoes-v2-table",
+            alunoAccountCss,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(".admin-shell", alunoAccountCss, StringComparison.Ordinal);
 
         Assert.Contains(".admin-shell", adminCoreCss, StringComparison.Ordinal);
         Assert.Contains("@media (max-width: 768px)", adminCoreCss, StringComparison.Ordinal);

@@ -214,6 +214,120 @@ Origem:
 
 Regras automáticas devem evitar duplicidade.
 
+## Padrão visual e de implementação
+
+O portal autenticado compartilha a identidade navy, creme e vermelho do frontend
+público, mas mantém uma densidade adequada para consulta frequente. Dados, rotas,
+permissões e formulários continuam independentes da camada de apresentação.
+
+### Shell e navegação
+
+- `_AlunoLayout` é o único shell do portal e não renderiza `h1`.
+- A sidebar permanece fixa a partir de 992 px.
+- Abaixo de 992 px ela vira uma gaveta com backdrop, Escape, armadilha de foco,
+  retorno de foco e bloqueio de rolagem.
+- O seletor de idioma oferece PT, EN e JA preservando a rota de retorno.
+- A topbar mostra somente contexto compacto; o título principal pertence à página.
+- Alvos de toque possuem no mínimo 44 px e o foco visível usa vermelho institucional.
+
+Exemplo:
+
+```cshtml
+@{
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Contexto", "Context", "コンテキスト"],
+        I18n["Título", "Title", "タイトル"],
+        I18n["Descrição.", "Description.", "説明。"]);
+}
+
+<partial name="_AlunoPageHeader" model="pageHeader" />
+```
+
+Evitar criar cabeçalho, seletor de idioma ou menu próprios dentro de uma view.
+
+### Componentes compartilhados
+
+| Componente | Finalidade | Variações | Regra de uso | Evitar |
+| --- | --- | --- | --- | --- |
+| `_AlunoPageHeader` | Introdução semântica e único `h1` | Metadado opcional | Usar no início de toda página de conteúdo | Repetir a marcação ou adicionar outro `h1` |
+| `_AlunoMetricCard` | Indicador numérico ou textual | `success`, `warning`, `danger`, `info`, `neutral` | Sempre fornecer rótulo; dica é opcional | Comunicar estado somente pela cor |
+| `_AlunoStatusBadge` | Status compacto | Mesmos cinco tons semânticos | Texto vem de `I18n.Term`; tom vem do helper | Classes montadas a partir de texto traduzido |
+| `.aluno-portal-panel` | Agrupar uma responsabilidade | Cabeçalho, corpo, vazio | Um painel por assunto | Card aninhado sem necessidade |
+| `.aluno-portal-responsive-table` | Dados tabulares densos | Tabela desktop, cartões no mobile | Cada `td` deve ter `data-label` | Ocultar coluna ou depender de scroll horizontal |
+| `.aluno-portal-button` | Ações do portal | Primário, secundário e link | Preservar elemento nativo e estado disabled/loading | Novo botão com medidas próprias |
+
+`AlunoPortalPresentation.StatusTone` converte enums e status conhecidos para tons
+semânticos. Valores desconhecidos usam `neutral`, preservando texto e legibilidade.
+
+### Tipografia, cores e forma
+
+| Padrão | Uso | Regra |
+| --- | --- | --- |
+| Lato | Corpo, formulários, navegação e metadados | `var(--ikkon-font-body)` |
+| Cinzel | Títulos, marca e números editoriais | `var(--ikkon-font-brand)` |
+| Noto Serif JP / Zen Kaku Gothic New | Título/corpo em japonês | Carregadas somente quando `lang="ja"` |
+| Navy `#00203e` | Títulos, sidebar e ações fortes | Token `--ikkon-navy` |
+| Creme `#f7f4e7` | Fundo claro editorial | Token `--ikkon-cream` |
+| Vermelho `#e73439` | Ação, foco e estado ativo | Token `--ikkon-red`; não usar como texto longo |
+| Bordas | Separação entre superfícies | 1 px; cards internos não recebem raios decorativos |
+| Espaçamento | Ritmo entre blocos | Preferir `--ikkon-space-*` e gaps fluidos existentes |
+| Elevação | Separação excepcional | Sem sombra por padrão; não criar níveis arbitrários |
+
+O tema escuro substitui superfícies por navy profundo, mantém texto creme e conserva
+vermelho como ação. As regras são escopadas por `body.aluno-theme-dark`, sem modificar
+`body.admin-theme-dark`.
+
+### Formulários, feedback e estados
+
+- Todo campo possui `label` associado e conserva nome, método e antiforgery token.
+- `focus`, `hover`, `active`, `disabled` e `loading` devem permanecer textuais e
+  navegáveis por teclado.
+- Configurações recebe mensagens de loading, sucesso, erro e rede por atributos
+  `data-*` traduzidos; JavaScript não contém mensagem fixa em português.
+- Estados vazio, erro, bloqueado e sucesso usam título e explicação, nunca só ícone
+  ou cor.
+- Uploads ocupam a largura disponível no celular e mantêm extensão/limite visíveis.
+- Textos externos e dados longos usam quebra segura em vez de corte.
+
+### Imagens e ícones
+
+- Marca, selo, enso, textura e fotos existentes ficam em `wwwroot/design-ikkon`.
+- Imagens de conteúdo exigem `alt`; elementos decorativos usam `alt=""` ou CSS.
+- Conquistas sem ícone usam o fallback textual `魂`.
+- O portal não adiciona biblioteca de ícones: controles usam símbolos existentes e
+  texto acessível.
+
+### Responsividade
+
+| Faixa | Comportamento |
+| --- | --- |
+| ≥1200 px | Sidebar fixa, grids completos e conteúdo com largura confortável |
+| 992–1199.98 px | Grids intermediários e redução controlada de densidade |
+| 768–991.98 px | Gaveta móvel e componentes em até duas colunas |
+| 480–767.98 px | Uma coluna; tabelas viram cartões; ações e filtros empilham |
+| 320–479.98 px | Labels tabulares acima do valor e ações em largura total |
+
+Nenhuma faixa pode esconder informação ou ação. `prefers-reduced-motion: reduce`
+elimina transições perceptíveis, e a página não deve apresentar overflow horizontal.
+
+### Estrutura recomendada para nova página
+
+1. Criar ViewModel de negócio no módulo responsável.
+2. Configurar `Layout = "_AlunoLayout"` e `ViewData["Title"]` com três idiomas.
+3. Compor `AlunoPageHeaderViewModel` e renderizar `_AlunoPageHeader`.
+4. Reutilizar painel, métrica e badge antes de criar nova marcação.
+5. Em tabelas, adicionar `aluno-portal-responsive-table` e `data-label` em cada célula.
+6. Preservar ações, antiforgery e autorização existentes.
+7. Validar claro/escuro, PT/EN/JA, teclado e larguras de 320 a 1440 px.
+
+Convenções:
+
+- CSS e hooks visuais: `aluno-portal-*`;
+- comportamento JavaScript: atributos `data-aluno-*`;
+- variação de estado: `is-*`;
+- propriedades visuais compartilhadas: records `Aluno*ViewModel`;
+- regras de negócio não devem ser movidas para partials de apresentação.
+
 ## Manutenção administrativa
 
 ### Aulas e horários

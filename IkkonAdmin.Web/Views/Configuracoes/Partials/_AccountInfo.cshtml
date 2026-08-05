@@ -3,12 +3,12 @@
 <article class="configuracoes-v2-card">
     <div class="configuracoes-v2-card-header">
         <div>
-            <span class="configuracoes-v2-eyebrow">@I18n["Dados da conta", "Account data"]</span>
-            <h2>@I18n["Informações pessoais", "Personal information"]</h2>
-            <p>@I18n["Atualize nome, e-mail, telefone e foto de perfil usados no sistema.", "Update name, email, phone, and profile photo used in the system."]</p>
+            <span class="configuracoes-v2-eyebrow">@I18n["Dados da conta", "Account data", "アカウント情報"]</span>
+            <h2>@I18n["Informações pessoais", "Personal information", "個人情報"]</h2>
+            <p>@I18n["Atualize nome, e-mail, telefone e foto de perfil usados no sistema.", "Update name, email, phone, and profile photo used in the system.", "システムで使用する氏名、メール、電話番号、プロフィール写真を更新できます。"]</p>
         </div>
         <span class="configuracoes-v2-status-pill @(Model.AccountInfo.ContaAtiva ? "is-success" : "is-muted")">
-            @I18n["Conta", "Account"] @(Model.AccountInfo.ContaAtiva ? I18n["ativa", "active"] : I18n["inativa", "inactive"])
+            @I18n["Conta", "Account", "アカウント"] @(Model.AccountInfo.ContaAtiva ? I18n["ativa", "active", "有効"] : I18n["inativa", "inactive", "無効"])
         </span>
     </div>
 
@@ -19,28 +19,28 @@
             <div class="configuracoes-v2-photo-panel">
                 <img id="userPhotoPreview"
                      src="@(string.IsNullOrWhiteSpace(Model.AccountInfo.FotoPerfilUrl) ? "/Images/Ikkon_Icon.png" : Model.AccountInfo.FotoPerfilUrl)"
-                     alt="@I18n["Foto de perfil", "Profile photo"]"
+                     alt="@I18n["Foto de perfil", "Profile photo", "プロフィール写真"]"
                      class="configuracoes-v2-photo" />
-                <label for="FotoPerfil" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Alterar foto", "Change photo"]</label>
+                <label for="FotoPerfil" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Alterar foto", "Change photo", "写真を変更"]</label>
                 <input id="FotoPerfil" name="FotoPerfil" type="file" accept="image/png,image/jpeg,image/webp" class="d-none" data-photo-input data-photo-preview="#userPhotoPreview" />
-                <small>@I18n["JPG, PNG ou WEBP até 2 MB.", "JPG, PNG, or WEBP up to 2 MB."]</small>
+                <small>@I18n["JPG, PNG ou WEBP até 2 MB.", "JPG, PNG, or WEBP up to 2 MB.", "JPG、PNG、WEBP（2MBまで）。"]</small>
             </div>
 
             <div class="configuracoes-v2-form-grid">
                 <div class="configuracoes-v2-field configuracoes-v2-field-span-2">
-                    <label for="NomeCompleto">@I18n["Nome completo", "Full name"]</label>
+                    <label for="NomeCompleto">@I18n["Nome completo", "Full name", "氏名"]</label>
                     <input class="form-control configuracoes-v2-control"
                            id="NomeCompleto"
                            name="NomeCompleto"
                            value="@Model.AccountInfo.NomeCompleto"
                            maxlength="200"
                            autocomplete="name"
-                           placeholder="@I18n["Ex.: Maria Fernanda Sato", "Ex.: Maria Fernanda Sato"]" />
+                           placeholder="@I18n["Ex.: Maria Fernanda Sato", "Ex.: Maria Fernanda Sato", "例：佐藤マリア"]" />
                     <span class="text-danger small field-error" data-field-error="NomeCompleto"></span>
                 </div>
 
                 <div class="configuracoes-v2-field">
-                    <label for="Email">E-mail</label>
+                    <label for="Email">@I18n["E-mail", "Email", "メールアドレス"]</label>
                     <input type="email"
                            class="form-control configuracoes-v2-control"
                            id="Email"
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="configuracoes-v2-field">
-                    <label for="Telefone">@I18n["Telefone", "Phone"]</label>
+                    <label for="Telefone">@I18n["Telefone", "Phone", "電話番号"]</label>
                     <input type="tel"
                            class="form-control configuracoes-v2-control"
                            id="Telefone"
@@ -69,7 +69,7 @@
         </div>
 
         <div class="configuracoes-v2-form-actions">
-            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Salvando...", "Saving..."]">@I18n["Salvar alterações", "Save changes"]</button>
+            <button type="submit" class="btn configuracoes-v2-btn configuracoes-v2-btn-primary" data-loading-text="@I18n["Salvando...", "Saving...", "保存中..."]">@I18n["Salvar alterações", "Save changes", "変更を保存"]</button>
         </div>
     </form>
 </article>

@@ -86,6 +86,111 @@ foreach (var viewport in viewports)
         await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, route.Path));
         await CaptureAndCompareAsync(route.Name, viewport, page);
     }
+
+    await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, "/aluno/login"));
+    await page.Locator("#LoginOuEmail").FillAsync("aluno.demo");
+    await page.Locator("#Senha").FillAsync("Aluno@123");
+    await page.Locator(".auth-submit").ClickAsync();
+    await page.WaitForURLAsync(
+        "**/area-do-aluno**",
+        new PageWaitForURLOptions
+        {
+            WaitUntil = WaitUntilState.Load,
+            Timeout = 30_000
+        });
+    await SettleAsync(page);
+
+    var studentRoutes = new[]
+    {
+        new VisualRoute("aluno-dashboard", "/area-do-aluno"),
+        new VisualRoute("aluno-perfil", "/area-do-aluno/perfil"),
+        new VisualRoute("aluno-turmas", "/area-do-aluno/turmas"),
+        new VisualRoute("aluno-aulas", "/area-do-aluno/aulas"),
+        new VisualRoute("aluno-frequencia", "/area-do-aluno/frequencia"),
+        new VisualRoute("aluno-financeiro", "/area-do-aluno/financeiro"),
+        new VisualRoute("aluno-documentos", "/area-do-aluno/documentos"),
+        new VisualRoute("aluno-comunicados", "/area-do-aluno/comunicados"),
+        new VisualRoute("aluno-eventos", "/area-do-aluno/eventos"),
+        new VisualRoute("aluno-conquistas", "/area-do-aluno/conquistas"),
+        new VisualRoute(
+            "aluno-acesso-indisponivel",
+            "/area-do-aluno/acessoindisponivel"),
+        new VisualRoute("aluno-configuracoes", "/configuracoes")
+    };
+
+    foreach (var route in studentRoutes)
+    {
+        await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, route.Path));
+        await ValidateStudentPageAsync(route.Name, viewport, page);
+        await CaptureAndCompareAsync(route.Name, viewport, page);
+
+        if (route.Name == "aluno-frequencia")
+        {
+            await page.Locator("#frequenciaInicio").FillAsync("2026-01-01");
+            await page.Locator("#frequenciaFim").FillAsync("2026-12-31");
+            await page.Locator(".aluno-portal-filter button[type='submit']").ClickAsync();
+            await page.WaitForURLAsync(
+                "**/area-do-aluno/frequencia?inicio=2026-01-01&fim=2026-12-31",
+                new PageWaitForURLOptions
+                {
+                    WaitUntil = WaitUntilState.Load,
+                    Timeout = 30_000
+                });
+            await SettleAsync(page);
+            await ValidateStudentPageAsync("aluno-frequencia-filtrada", viewport, page);
+        }
+
+        if (route.Name == "aluno-dashboard" && viewport.Name == "mobile")
+        {
+            await ValidateMobileDrawerAsync(viewport, page);
+        }
+    }
+
+    await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, "/area-do-aluno"));
+    await page.EvaluateAsync(
+        """
+        () => {
+          document.body.classList.remove("aluno-theme-light");
+          document.body.classList.add("aluno-theme-dark");
+          document.body.dataset.theme = "dark";
+        }
+        """);
+    await SettleAsync(page);
+    await ValidateStudentPageAsync("aluno-dashboard-dark", viewport, page);
+    await CaptureAndCompareAsync("aluno-dashboard-dark", viewport, page);
+
+    await NavigateAndSettleAsync(
+        page,
+        BuildUrl(
+            options.BaseUrl,
+            "/idioma/alterar?culture=ja-JP&returnUrl=%2Farea-do-aluno"));
+    await ValidateStudentPageAsync("aluno-dashboard-ja", viewport, page);
+    var documentLanguage = await page.Locator("html").GetAttributeAsync("lang");
+    if (!string.Equals(documentLanguage, "ja", StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add(
+            $"aluno-dashboard-ja-{viewport.Name}: idioma HTML esperado 'ja', " +
+            $"encontrado '{documentLanguage ?? "ausente"}'");
+    }
+
+    await CaptureAndCompareAsync("aluno-dashboard-ja", viewport, page);
+
+    if (viewport.Name == "mobile")
+    {
+        await page.Locator("[data-aluno-menu-toggle]").ClickAsync();
+    }
+
+    var logoutButton = page.Locator(
+        "form[action='/aluno/sair'] button[type='submit']");
+    await logoutButton.ScrollIntoViewIfNeededAsync();
+    await logoutButton.ClickAsync();
+    await page.WaitForURLAsync(
+        "**/aluno/login**",
+        new PageWaitForURLOptions
+        {
+            WaitUntil = WaitUntilState.Load,
+            Timeout = 30_000
+        });
 }
 
 failures.AddRange(pageErrors.Select(error => $"JavaScript: {error}"));
@@ -134,7 +239,7 @@ async Task CaptureAndCompareAsync(
 
     if (options.UpdateBaseline)
     {
-        File.Copy(actualPath, baselinePath, overwrite: true);
+        await CopyFileWithRetryAsync(actualPath, baselinePath);
         Console.WriteLine($"[baseline] {fileName}");
         return;
     }
@@ -207,6 +312,66 @@ async Task SettleAsync(IPage page)
         }
         """);
     await page.WaitForTimeoutAsync(50);
+}
+
+async Task ValidateStudentPageAsync(
+    string pageName,
+    VisualViewport viewport,
+    IPage page)
+{
+    var measurements = await page.EvaluateAsync<StudentPageMeasurements>(
+        """
+        () => ({
+          headingCount: document.querySelectorAll("h1").length,
+          horizontalOverflow: Math.max(
+            document.documentElement.scrollWidth,
+            document.body.scrollWidth
+          ) - window.innerWidth
+        })
+        """);
+
+    if (measurements.HeadingCount != 1)
+    {
+        failures.Add(
+            $"{pageName}-{viewport.Name}: esperado um h1, " +
+            $"encontrados {measurements.HeadingCount}");
+    }
+
+    if (measurements.HorizontalOverflow > 1)
+    {
+        failures.Add(
+            $"{pageName}-{viewport.Name}: overflow horizontal de " +
+            $"{measurements.HorizontalOverflow}px");
+    }
+}
+
+async Task ValidateMobileDrawerAsync(VisualViewport viewport, IPage page)
+{
+    var toggle = page.Locator("[data-aluno-menu-toggle]");
+    await toggle.ClickAsync();
+
+    if (!string.Equals(
+            await toggle.GetAttributeAsync("aria-expanded"),
+            "true",
+            StringComparison.Ordinal))
+    {
+        failures.Add($"aluno-dashboard-{viewport.Name}: gaveta não abriu");
+    }
+
+    await page.Keyboard.PressAsync("Escape");
+    var drawerClosed = string.Equals(
+        await toggle.GetAttributeAsync("aria-expanded"),
+        "false",
+        StringComparison.Ordinal);
+    var focusReturned = await toggle.EvaluateAsync<bool>(
+        "element => document.activeElement === element");
+
+    if (!drawerClosed || !focusReturned)
+    {
+        failures.Add(
+            $"aluno-dashboard-{viewport.Name}: Escape não fechou a gaveta " +
+            "com retorno de foco");
+    }
 }
 
 static async Task<VisualComparison> CompareImagesAsync(
@@ -342,6 +507,32 @@ static string BuildUrl(string baseUrl, string route)
     return $"{baseUrl.TrimEnd('/')}/{route.TrimStart('/')}";
 }
 
+static async Task CopyFileWithRetryAsync(string sourcePath, string destinationPath)
+{
+    IOException? lastException = null;
+
+    for (var attempt = 1; attempt <= 6; attempt++)
+    {
+        try
+        {
+            File.Copy(sourcePath, destinationPath, overwrite: true);
+            return;
+        }
+        catch (IOException exception)
+        {
+            lastException = exception;
+            if (attempt < 6)
+            {
+                await Task.Delay(attempt * 250);
+            }
+        }
+    }
+
+    throw new IOException(
+        $"Não foi possível atualizar o baseline visual '{destinationPath}'.",
+        lastException);
+}
+
 static string FindRepoRoot()
 {
     foreach (var startDirectory in new[]
@@ -396,6 +587,15 @@ internal sealed record VisualComparison
 
     [JsonPropertyName("diffDataUrl")]
     public string? DiffDataUrl { get; init; }
+}
+
+internal sealed record StudentPageMeasurements
+{
+    [JsonPropertyName("headingCount")]
+    public int HeadingCount { get; init; }
+
+    [JsonPropertyName("horizontalOverflow")]
+    public int HorizontalOverflow { get; init; }
 }
 
 internal sealed record RunnerOptions(

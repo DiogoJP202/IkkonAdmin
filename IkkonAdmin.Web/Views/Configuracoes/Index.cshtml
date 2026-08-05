@@ -2,70 +2,77 @@
 @using IkkonAdmin.Web.Security
 @{
     Layout = User.IsInRole(AppRoles.Aluno) ? "_AlunoLayout" : "_Layout";
-    ViewData["Title"] = I18n["Configurações", "Settings"];
+    ViewData["Title"] = I18n["Configurações", "Settings", "設定"];
 
     var isAluno = User.IsInRole(AppRoles.Aluno);
     var retornoUrl = isAluno ? "/area-do-aluno" : "/admin";
-    var ultimoLogin = Model.SecurityStatus.UltimoLoginUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? I18n["Sem registro", "No record"];
+    var ultimoLogin = Model.SecurityStatus.UltimoLoginUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? I18n["Sem registro", "No record", "記録なし"];
 }
 
 <div class="configuracoes-v2-page">
     <section class="configuracoes-v2-hero mb-4">
         <div class="configuracoes-v2-hero-copy">
-            <span class="configuracoes-v2-eyebrow">@I18n["Gerenciamento de conta", "Account management"]</span>
-            <h1>@I18n["Conta e preferências", "Account and preferences"]</h1>
+            <span class="configuracoes-v2-eyebrow">@I18n["Gerenciamento de conta", "Account management", "アカウント管理"]</span>
+            <h1>@I18n["Conta e preferências", "Account and preferences", "アカウントと設定"]</h1>
             <p>
-                @I18n["Atualize dados pessoais, senha, preferências e acompanhe os acessos recentes da sua conta.", "Update personal data, password, preferences, and track recent account access."]
+                @I18n["Atualize dados pessoais, senha, preferências e acompanhe os acessos recentes da sua conta.", "Update personal data, password, preferences, and track recent account access.", "個人情報、パスワード、設定を更新し、最近のアクセス履歴を確認できます。"]
             </p>
             <div class="configuracoes-v2-meta">
-                <span>@I18n["Perfil", "Profile"] <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong></span>
-                <span>Status <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong></span>
-                <span>@I18n["Último login", "Last login"] <strong>@ultimoLogin</strong></span>
+                <span>@I18n["Perfil", "Profile", "プロフィール"] <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong></span>
+                <span>@I18n["Status", "Status", "ステータス"] <strong>@(Model.SecurityStatus.ContaAtiva ? I18n["Ativa", "Active", "有効"] : I18n["Inativa", "Inactive", "無効"])</strong></span>
+                <span>@I18n["Último login", "Last login", "最終ログイン"] <strong>@ultimoLogin</strong></span>
             </div>
         </div>
 
         <div class="configuracoes-v2-hero-actions">
-            <a href="@retornoUrl" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Voltar", "Back"]</a>
+            <a href="@retornoUrl" class="btn configuracoes-v2-btn configuracoes-v2-btn-ghost">@I18n["Voltar", "Back", "戻る"]</a>
         </div>
     </section>
 
-    <div id="userSettingsFeedback" class="configuracoes-v2-feedback alert d-none" role="alert" aria-live="polite"></div>
+    <div id="userSettingsFeedback"
+         class="configuracoes-v2-feedback alert d-none"
+         role="alert"
+         aria-live="polite"
+         data-loading-default="@I18n["Salvando...", "Saving...", "保存中..."]"
+         data-save-error="@I18n["Não foi possível salvar as alterações.", "Could not save the changes.", "変更を保存できませんでした。"]"
+         data-save-success="@I18n["Alterações salvas com sucesso.", "Changes saved successfully.", "変更を保存しました。"]"
+         data-network-error="@I18n["Falha de comunicação. Tente novamente em instantes.", "Communication failed. Try again shortly.", "通信に失敗しました。しばらくしてからもう一度お試しください。"]"></div>
 
-    <section class="configuracoes-v2-kpi-grid mb-4" aria-label="@I18n["Resumo da conta", "Account summary"]">
+    <section class="configuracoes-v2-kpi-grid mb-4" aria-label="@I18n["Resumo da conta", "Account summary", "アカウントの概要"]">
         <article class="configuracoes-v2-kpi-card @(Model.AccountInfo.ContaAtiva ? "is-success" : "is-danger")">
             <div class="configuracoes-v2-kpi-top">
-                <span>@I18n["Conta", "Account"]</span>
-                <b>Status</b>
+                <span>@I18n["Conta", "Account", "アカウント"]</span>
+                <b>@I18n["Status", "Status", "ステータス"]</b>
             </div>
-            <strong>@(Model.AccountInfo.ContaAtiva ? I18n["Ativa", "Active"] : I18n["Inativa", "Inactive"])</strong>
-            <small>@I18n["Estado atual da sua conta no sistema.", "Current status of your system account."]</small>
+            <strong>@(Model.AccountInfo.ContaAtiva ? I18n["Ativa", "Active", "有効"] : I18n["Inativa", "Inactive", "無効"])</strong>
+            <small>@I18n["Estado atual da sua conta no sistema.", "Current status of your system account.", "システム上の現在のアカウント状態です。"]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card">
             <div class="configuracoes-v2-kpi-top">
-                <span>@I18n["Tipo", "Type"]</span>
-                <b>@I18n["Acesso", "Access"]</b>
+                <span>@I18n["Tipo", "Type", "種類"]</span>
+                <b>@I18n["Acesso", "Access", "アクセス"]</b>
             </div>
             <strong>@I18n.Term(Model.AccountType.NomeTipoConta)</strong>
-            <small>@I18n["Perfil de acesso definido pelo administrador.", "Access profile defined by the administrator."]</small>
+            <small>@I18n["Perfil de acesso definido pelo administrador.", "Access profile defined by the administrator.", "管理者が設定したアクセス権限です。"]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card is-info">
             <div class="configuracoes-v2-kpi-top">
-                <span>@I18n["Histórico", "History"]</span>
-                <b>@I18n["Acessos", "Access"]</b>
+                <span>@I18n["Histórico", "History", "履歴"]</span>
+                <b>@I18n["Acessos", "Access", "アクセス"]</b>
             </div>
             <strong>@Model.SecurityStatus.HistoricoAcessos.Count</strong>
-            <small>@I18n["Eventos recentes registrados para sua conta.", "Recent events registered for your account."]</small>
+            <small>@I18n["Eventos recentes registrados para sua conta.", "Recent events registered for your account.", "アカウントに記録された最近のアクセスです。"]</small>
         </article>
 
         <article class="configuracoes-v2-kpi-card is-warning">
             <div class="configuracoes-v2-kpi-top">
-                <span>@I18n["Preferências", "Preferences"]</span>
-                <b>@I18n["Uso diário", "Daily use"]</b>
+                <span>@I18n["Preferências", "Preferences", "設定"]</span>
+                <b>@I18n["Uso diário", "Daily use", "日常利用"]</b>
             </div>
-            <strong>@(Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro ? I18n["Claro", "Light"] : I18n["Escuro", "Dark"])</strong>
-            <small>@I18n["Tema da interface e alertas do painel.", "Interface theme and panel alerts."]</small>
+            <strong>@(Model.Preferences.TemaPreferencia == TemaPreferenciaEnum.Claro ? I18n["Claro", "Light", "ライト"] : I18n["Escuro", "Dark", "ダーク"])</strong>
+            <small>@I18n["Tema da interface e alertas do painel.", "Interface theme and panel alerts.", "画面テーマと通知の設定です。"]</small>
         </article>
     </section>
 
@@ -80,13 +87,13 @@
             <partial name="Partials/_AccountType" model="Model" />
 
             <section class="configuracoes-v2-assist-card">
-                <span class="configuracoes-v2-eyebrow">@I18n["Boas práticas", "Best practices"]</span>
-                <h2>@I18n["Segurança diária", "Daily security"]</h2>
+                <span class="configuracoes-v2-eyebrow">@I18n["Boas práticas", "Best practices", "安全のために"]</span>
+                <h2>@I18n["Segurança diária", "Daily security", "日々のセキュリティ"]</h2>
                 <ul>
-                    <li>@I18n["Use uma senha forte e diferente de outros serviços.", "Use a strong password that is different from other services."]</li>
-                    <li>@I18n["Revise o histórico de acessos quando notar comportamento estranho.", "Review access history when you notice unusual behavior."]</li>
-                    <li>@I18n["Mantenha e-mail e telefone atualizados para suporte interno.", "Keep email and phone updated for internal support."]</li>
-                    <li>@I18n["Permissões e tipo de conta só podem ser alterados por administradores.", "Permissions and account type can only be changed by administrators."]</li>
+                    <li>@I18n["Use uma senha forte e diferente de outros serviços.", "Use a strong password that is different from other services.", "他のサービスとは異なる強力なパスワードを使用してください。"]</li>
+                    <li>@I18n["Revise o histórico de acessos quando notar comportamento estranho.", "Review access history when you notice unusual behavior.", "不審な動作に気づいた場合はアクセス履歴を確認してください。"]</li>
+                    <li>@I18n["Mantenha e-mail e telefone atualizados para suporte interno.", "Keep email and phone updated for internal support.", "メールアドレスと電話番号を最新の状態に保ってください。"]</li>
+                    <li>@I18n["Permissões e tipo de conta só podem ser alterados por administradores.", "Permissions and account type can only be changed by administrators.", "権限とアカウント種類は管理者のみ変更できます。"]</li>
                 </ul>
             </section>
         </aside>

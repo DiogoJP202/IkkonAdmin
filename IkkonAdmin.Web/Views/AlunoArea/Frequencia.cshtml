@@ -1,69 +1,110 @@
 @model AreaAlunoFrequenciaViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Frequência", "Attendance"];
+    ViewData["Title"] = I18n["Frequência", "Attendance", "出席状況"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Acompanhamento", "Tracking", "記録"],
+        I18n["Minha frequência", "My attendance", "出席状況"],
+        I18n[
+            "Acompanhe sua constância nos treinos e consulte presenças e faltas por período.",
+            "Track your consistency in training and review attendance and absences by period.",
+            "練習への参加状況を確認し、期間ごとの出席・欠席記録を見ることができます。"],
+        I18n["Período atual", "Current period", "表示期間"] + $": {Model.Inicio:dd/MM/yyyy}–{Model.Fim:dd/MM/yyyy}");
+    var metrics = new[]
+    {
+        new AlunoMetricCardViewModel(
+            I18n["Presença", "Attendance", "出席率"],
+            $"{Model.PercentualPresenca:0.#}%",
+            Model.PercentualPresenca >= 75 ? "success" : "warning",
+            I18n["No período selecionado", "In the selected period", "選択期間内"]),
+        new AlunoMetricCardViewModel(
+            I18n["Presenças", "Presences", "出席"],
+            Model.Presencas.ToString(),
+            "success"),
+        new AlunoMetricCardViewModel(
+            I18n["Faltas justificadas", "Excused absences", "届出済み欠席"],
+            Model.FaltasJustificadas.ToString(),
+            "warning"),
+        new AlunoMetricCardViewModel(
+            I18n["Faltas não justificadas", "Unexcused absences", "無断欠席"],
+            Model.FaltasNaoJustificadas.ToString(),
+            Model.FaltasNaoJustificadas > 0 ? "danger" : "neutral")
+    };
 }
 
-<section class="aluno-portal-kpis mb-3">
-    <article>
-        <span>@I18n["Presença", "Attendance"]</span>
-        <strong>@Model.PercentualPresenca.ToString("0.#")%</strong>
-    </article>
-    <article>
-        <span>@I18n["Presenças", "Presences"]</span>
-        <strong>@Model.Presencas</strong>
-    </article>
-    <article>
-        <span>@I18n["Faltas justificadas", "Excused absences"]</span>
-        <strong>@Model.FaltasJustificadas</strong>
-    </article>
-    <article>
-        <span>@I18n["Faltas não justificadas", "Unexcused absences"]</span>
-        <strong>@Model.FaltasNaoJustificadas</strong>
-    </article>
-</section>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Histórico de frequência", "Attendance history"]</h3>
-            <p class="mb-0 text-muted">@I18n["Período", "Period"]: @Model.Inicio.ToString("dd/MM/yyyy") @I18n["a", "to"] @Model.Fim.ToString("dd/MM/yyyy")</p>
+    <section class="aluno-portal-kpis" aria-label="@I18n["Resumo da frequência", "Attendance summary", "出席状況の概要"]">
+        @foreach (var metric in metrics)
+        {
+            <partial name="_AlunoMetricCard" model="metric" />
+        }
+    </section>
+
+    <section class="aluno-portal-panel" aria-labelledby="attendanceHistoryTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="attendanceHistoryTitle">@I18n["Histórico de frequência", "Attendance history", "出席履歴"]</h2>
+                <p>@I18n["Escolha um período para consultar os registros.", "Choose a period to review records.", "期間を選択して記録を確認できます。"]</p>
+            </div>
+            <form method="get" class="aluno-portal-filter">
+                <div class="aluno-portal-filter-field">
+                    <label for="frequenciaInicio">@I18n["Data inicial", "Start date", "開始日"]</label>
+                    <input id="frequenciaInicio"
+                           type="date"
+                           name="inicio"
+                           value="@Model.Inicio.ToString("yyyy-MM-dd")"
+                           class="form-control aluno-portal-form-control" />
+                </div>
+                <div class="aluno-portal-filter-field">
+                    <label for="frequenciaFim">@I18n["Data final", "End date", "終了日"]</label>
+                    <input id="frequenciaFim"
+                           type="date"
+                           name="fim"
+                           value="@Model.Fim.ToString("yyyy-MM-dd")"
+                           class="form-control aluno-portal-form-control" />
+                </div>
+                <button class="aluno-portal-button aluno-portal-button--secondary" type="submit">
+                    @I18n["Filtrar", "Filter", "絞り込む"]
+                </button>
+            </form>
         </div>
-        <form method="get" class="d-flex gap-2 flex-wrap">
-            <input type="date" name="inicio" value="@Model.Inicio.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
-            <input type="date" name="fim" value="@Model.Fim.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
-            <button class="btn btn-sm btn-outline-secondary" type="submit">@I18n["Filtrar", "Filter"]</button>
-        </form>
-    </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle mb-0 aluno-portal-table">
-            <thead>
-                <tr>
-                    <th>@I18n["Data", "Date"]</th>
-                    <th>@I18n["Turma", "Group"]</th>
-                    <th>Status</th>
-                    <th>@I18n["Justificativa", "Justification"]</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Registros.Count == 0)
-                {
-                    <tr><td colspan="4" class="text-center text-muted py-4">@I18n["Nenhum registro de frequência no período.", "No attendance records in this period."]</td></tr>
-                }
-                else
-                {
-                    @foreach (var registro in Model.Registros)
+        <div class="aluno-portal-responsive-table">
+            <table class="table aluno-portal-table">
+                <thead>
+                    <tr>
+                        <th>@I18n["Data", "Date", "日付"]</th>
+                        <th>@I18n["Turma", "Group", "クラス"]</th>
+                        <th>@I18n["Status", "Status", "ステータス"]</th>
+                        <th>@I18n["Justificativa", "Justification", "理由"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Registros.Count == 0)
                     {
-                        <tr>
-                            <td>@registro.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@registro.Turma</td>
-                            <td><span class="aluno-portal-pill">@I18n.Term(registro.Status)</span></td>
-                            <td>@(string.IsNullOrWhiteSpace(registro.Justificativa) ? "-" : registro.Justificativa)</td>
+                        <tr class="aluno-portal-empty-row">
+                            <td colspan="4">@I18n["Nenhum registro de frequência no período.", "No attendance records in this period.", "この期間の出席記録はありません。"]</td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
-    </div>
-</section>
+                    else
+                    {
+                        @foreach (var registro in Model.Registros)
+                        {
+                            <tr>
+                                <td data-label="@I18n["Data", "Date", "日付"]">@registro.Inicio.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td data-label="@I18n["Turma", "Group", "クラス"]">@registro.Turma</td>
+                                <td data-label="@I18n["Status", "Status", "ステータス"]">
+                                    <partial name="_AlunoStatusBadge"
+                                             model="new AlunoStatusBadgeViewModel(I18n.Term(registro.Status), AlunoPortalPresentation.StatusTone(registro.Status))" />
+                                </td>
+                                <td data-label="@I18n["Justificativa", "Justification", "理由"]">@(string.IsNullOrWhiteSpace(registro.Justificativa) ? "—" : registro.Justificativa)</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

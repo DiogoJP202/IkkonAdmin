@@ -1,351 +1,1036 @@
 /*
- * Estrutura e componentes exclusivos do portal do aluno.
- * Mantém a ordem relativa das regras extraídas do antigo site.css.
+ * Portal do aluno — shell, componentes e páginas.
+ * A identidade pública é aplicada com densidade e hierarquia próprias de produto.
  */
 
 .aluno-portal-body {
+  --aluno-bg: var(--ikkon-cream);
+  --aluno-bg-soft: #eeeadc;
+  --aluno-surface: var(--ikkon-white);
+  --aluno-surface-soft: #fbfaf4;
+  --aluno-heading: var(--ikkon-navy);
+  --aluno-text: #183b59;
+  --aluno-muted: #5d7183;
+  --aluno-border: rgba(0, 32, 62, 0.17);
+  --aluno-border-strong: rgba(0, 32, 62, 0.3);
+  --aluno-accent: var(--ikkon-red);
+  --aluno-accent-dark: var(--ikkon-red-dark);
+  --aluno-sidebar: var(--ikkon-navy);
+  --aluno-sidebar-deep: var(--ikkon-navy-dark);
+  --aluno-success: #23734b;
+  --aluno-success-soft: #e8f4ed;
+  --aluno-warning: #9a5b0b;
+  --aluno-warning-soft: #fff2d9;
+  --aluno-danger: #b72d33;
+  --aluno-danger-soft: #fae8e8;
+  --aluno-info: #176b91;
+  --aluno-info-soft: #e6f2f7;
   margin: 0;
   min-height: 100vh;
-  background: #f4f1ec;
-  color: #25211c;
-  font-family: "Zen Kaku Gothic New", "Segoe UI", sans-serif;
+  overflow-x: clip;
+  background: var(--aluno-bg);
+  color: var(--aluno-text);
+  font-family: var(--ikkon-font-body);
+  line-height: 1.55;
 }
+
+.aluno-portal-body,
+.aluno-portal-body *,
+.aluno-portal-body *::before,
+.aluno-portal-body *::after {
+  box-sizing: border-box;
+}
+
+.aluno-portal-body a,
+.aluno-portal-body button,
+.aluno-portal-body input,
+.aluno-portal-body select,
+.aluno-portal-body textarea {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.aluno-portal-body :focus-visible {
+  outline: 2px solid var(--aluno-accent);
+  outline-offset: 3px;
+}
+
+html[lang="ja"] .aluno-portal-body {
+  font-family: "Zen Kaku Gothic New", var(--ikkon-font-body);
+}
+
+html[lang="ja"] .aluno-portal-body h1,
+html[lang="ja"] .aluno-portal-body h2,
+html[lang="ja"] .aluno-portal-body h3,
+html[lang="ja"] .aluno-portal-body h4,
+html[lang="ja"] .aluno-portal-brand-copy strong {
+  font-family: "Noto Serif JP", var(--ikkon-font-brand);
+  letter-spacing: 0;
+}
+
+.aluno-portal-skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1100;
+  padding: 0.7rem 1rem;
+  background: var(--aluno-accent);
+  color: var(--ikkon-white);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.aluno-portal-skip-link:focus {
+  color: var(--ikkon-white);
+  transform: translateY(0);
+}
+
+/* Shell */
 
 .aluno-portal-shell {
   min-height: 100vh;
-  display: flex;
+  display: grid;
+  grid-template-columns: 18.5rem minmax(0, 1fr);
 }
 
 .aluno-portal-sidebar {
-  width: 260px;
-  min-height: 100vh;
-  max-height: 100vh;
   position: sticky;
   top: 0;
-  align-self: flex-start;
+  z-index: 1040;
+  isolation: isolate;
+  width: 18.5rem;
+  min-height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: #151515;
-  color: #fff;
-  z-index: 1040;
+  background:
+    linear-gradient(180deg, rgba(0, 22, 42, 0.08), rgba(0, 22, 42, 0.88)),
+    var(--aluno-sidebar);
+  color: var(--ikkon-cream);
+  scrollbar-color: rgba(247, 244, 231, 0.28) transparent;
+}
+
+.aluno-portal-sidebar::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url("/design-ikkon/assets/textura-pontos.png");
+  background-position: top right;
+  background-size: 28rem auto;
+  content: "";
+  opacity: 0.075;
+  pointer-events: none;
 }
 
 .aluno-portal-sidebar-backdrop {
   display: none;
 }
 
-.aluno-portal-brand {
+.aluno-portal-brand-row {
+  min-height: 7.5rem;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  color: #fff;
+  justify-content: space-between;
+  padding: 1.15rem 1.35rem;
+  border-bottom: 1px solid var(--ikkon-line-dark);
+}
+
+.aluno-portal-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--ikkon-cream);
   text-decoration: none;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.aluno-portal-brand img {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.5rem;
-  object-fit: cover;
+.aluno-portal-brand:hover {
+  color: var(--ikkon-white);
 }
 
-.aluno-portal-brand span {
+.aluno-portal-brand-mark {
+  position: relative;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 3.25rem;
   display: grid;
-  line-height: 1.15;
+  place-items: center;
 }
 
-.aluno-portal-brand small {
-  color: rgba(255, 255, 255, 0.68);
+.aluno-portal-brand-mark img:first-child {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.aluno-portal-brand-mark img:last-child {
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.2rem;
+  width: 1.05rem;
+  height: 1.25rem;
+  object-fit: contain;
+}
+
+.aluno-portal-brand-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.08rem;
+}
+
+.aluno-portal-brand-copy strong {
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.35rem;
+  letter-spacing: 0.17em;
+  line-height: 1;
+}
+
+.aluno-portal-brand-copy small {
+  color: rgba(247, 244, 231, 0.68);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-sidebar-close {
+  display: none;
+  width: var(--ikkon-touch-target);
+  height: var(--ikkon-touch-target);
+  border: 1px solid var(--ikkon-line-dark);
+  background: transparent;
+  color: var(--ikkon-cream);
+  font-size: 1.65rem;
+  line-height: 1;
 }
 
 .aluno-portal-nav {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.12rem;
+  padding: 1rem 0.85rem 1.5rem;
+}
+
+.aluno-portal-nav-label {
+  margin: 1rem 0.7rem 0.38rem;
+  color: rgba(247, 244, 231, 0.5);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-nav-label:first-child {
+  margin-top: 0;
 }
 
 .aluno-portal-nav a {
-  border-radius: 0.5rem;
-  color: rgba(255, 255, 255, 0.82);
+  min-height: var(--ikkon-touch-target);
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.62rem 0.7rem;
+  border-left: 3px solid transparent;
+  color: rgba(247, 244, 231, 0.78);
+  font-size: 0.88rem;
+  font-weight: 700;
   text-decoration: none;
-  padding: 0.68rem 0.78rem;
-  font-weight: 600;
 }
 
-.aluno-portal-nav a:hover,
-.aluno-portal-nav a.active {
-  background: #8b1e21;
-  color: #fff;
+.aluno-portal-nav a > span {
+  color: rgba(247, 244, 231, 0.42);
+  font-family: var(--ikkon-font-brand);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+}
+
+.aluno-portal-nav a:hover {
+  background: rgba(247, 244, 231, 0.08);
+  color: var(--ikkon-white);
+}
+
+.aluno-portal-nav a.is-active {
+  border-left-color: var(--aluno-accent);
+  background: rgba(247, 244, 231, 0.11);
+  color: var(--ikkon-white);
+}
+
+.aluno-portal-nav a.is-active > span {
+  color: #ff8589;
+}
+
+.aluno-portal-sidebar-footer {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: auto;
+  padding: 1.1rem 1.35rem 1.35rem;
+  border-top: 1px solid var(--ikkon-line-dark);
+}
+
+.aluno-portal-sidebar-footer > a,
+.aluno-portal-sidebar-footer button {
+  width: 100%;
+  min-height: var(--ikkon-touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 0;
+  background: transparent;
+  color: rgba(247, 244, 231, 0.76);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.aluno-portal-sidebar-footer > a:hover,
+.aluno-portal-sidebar-footer button:hover {
+  color: var(--ikkon-white);
 }
 
 .aluno-portal-main {
-  flex: 1;
   min-width: 0;
+  background:
+    radial-gradient(circle at 100% 0, rgba(231, 52, 57, 0.045), transparent 28rem),
+    var(--aluno-bg);
 }
 
 .aluno-portal-topbar {
   position: sticky;
   top: 0;
   z-index: 1020;
-  min-height: 5.2rem;
-  background: #fffdf9;
-  border-bottom: 1px solid #e2ddd5;
-  padding: 1rem 1.35rem;
+  min-height: 5.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 0.8rem clamp(1rem, 2.5vw, 2rem);
+  border-bottom: 1px solid var(--aluno-border);
+  background: color-mix(in srgb, var(--aluno-bg) 92%, transparent);
+  backdrop-filter: blur(16px);
 }
 
 .aluno-portal-topbar-title {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  min-width: 0;
+  gap: 0.85rem;
 }
 
 .aluno-portal-topbar-title > div {
   min-width: 0;
+  display: grid;
+  gap: 0.04rem;
 }
 
-.aluno-portal-topbar h1 {
-  margin: 0;
-  color: #171717;
-  font-size: 1.35rem;
-  font-weight: 700;
-  overflow-wrap: anywhere;
+.aluno-portal-topbar-title span {
+  color: var(--aluno-accent);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-topbar-title strong {
+  overflow: hidden;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .aluno-portal-menu-toggle {
+  width: var(--ikkon-touch-target);
+  height: var(--ikkon-touch-target);
+  flex: 0 0 var(--ikkon-touch-target);
   display: none;
-  width: 2.65rem;
-  height: 2.65rem;
-  flex: 0 0 2.65rem;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.22rem;
-  border: 1px solid #d8d1c7;
-  border-radius: 0.65rem;
-  background: #fffdf9;
-  color: #171717;
-  box-shadow: 0 4px 12px rgba(37, 34, 30, 0.08);
+  gap: 0.25rem;
+  border: 1px solid var(--aluno-border-strong);
+  background: var(--aluno-surface);
+  color: var(--aluno-heading);
 }
 
 .aluno-portal-menu-toggle span {
   display: block;
   width: 1.15rem;
   height: 2px;
-  border-radius: 999px;
-  background: currentColor;
-  transition: transform 160ms ease, opacity 160ms ease;
+  background: var(--aluno-heading) !important;
 }
 
-.aluno-portal-menu-toggle[aria-expanded="true"] span:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
+.aluno-portal-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
 
-.aluno-portal-menu-toggle[aria-expanded="true"] span:nth-child(2) {
-  opacity: 0;
-}
-
-.aluno-portal-menu-toggle[aria-expanded="true"] span:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-.aluno-portal-eyebrow {
+.aluno-portal-language-list {
   display: inline-flex;
-  color: #8b1e21;
-  font-size: 0.74rem;
-  font-weight: 700;
+  align-items: center;
+  gap: 0.16rem;
+  padding: 0.2rem;
+  border: 1px solid var(--aluno-border);
+  background: var(--aluno-surface);
+}
+
+.aluno-portal-language-list a {
+  min-width: 2.15rem;
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.28rem 0.45rem;
+  color: var(--aluno-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.aluno-portal-language-list a:hover,
+.aluno-portal-language-list a.is-active {
+  background: var(--aluno-heading);
+  color: var(--ikkon-cream);
+}
+
+.aluno-portal-site-link {
+  min-height: var(--ikkon-touch-target);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--aluno-border-strong);
+  color: var(--aluno-heading);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+}
+
+.aluno-portal-site-link:hover {
+  border-color: var(--aluno-heading);
+  background: var(--aluno-heading);
+  color: var(--ikkon-cream);
 }
 
 .aluno-portal-content {
-  padding: 1.35rem;
+  width: min(100%, 92rem);
+  margin-inline: auto;
+  padding: clamp(1.2rem, 3vw, 2.5rem);
 }
 
-.aluno-portal-hero,
-.aluno-portal-panel,
-.aluno-portal-kpis article {
-  border: 1px solid #e0d8cd;
-  background: #fffdf9;
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 18px rgba(37, 34, 30, 0.05);
-}
+/* Page hierarchy */
 
-.aluno-portal-hero {
-  padding: 1.25rem;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.aluno-portal-hero h2 {
-  color: #151515;
-  margin: 0.35rem 0 0.4rem;
-  font-size: 1.45rem;
-}
-
-.aluno-portal-hero p {
-  color: #6a645d;
-  margin: 0;
-}
-
-.aluno-portal-hero-profile {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.aluno-portal-page {
   min-width: 0;
 }
 
-.aluno-portal-avatar {
-  width: 4.5rem;
-  height: 4.5rem;
-  flex: 0 0 4.5rem;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #f4efe8;
-  border: 2px solid #fffdf9;
-  box-shadow: 0 0 0 1px #e0d8cd, 0 8px 18px rgba(37, 34, 30, 0.12);
+.aluno-portal-page-header {
+  position: relative;
+  isolation: isolate;
+  min-height: 11rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.35rem, 3vw, 2.4rem);
+  border: 1px solid var(--aluno-border);
+  border-top: 4px solid var(--aluno-accent);
+  background: var(--aluno-surface);
 }
 
-.aluno-portal-status,
-.aluno-portal-pill {
+.aluno-portal-page-header::after {
+  position: absolute;
+  z-index: -1;
+  top: -7rem;
+  right: -4.5rem;
+  width: 22rem;
+  height: 22rem;
+  background: url("/design-ikkon/assets/aro-enso-azul.png") center / contain no-repeat;
+  content: "";
+  opacity: 0.075;
+  pointer-events: none;
+}
+
+.aluno-portal-page-header-copy {
+  max-width: 52rem;
+}
+
+.aluno-portal-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 0.55rem;
+  color: var(--aluno-accent);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-kicker::before {
+  width: 1.5rem;
+  height: 2px;
+  background: currentColor;
+  content: "";
+}
+
+.aluno-portal-page-header h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.8rem, 3.2vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+}
+
+.aluno-portal-page-description {
+  max-width: 66ch;
+  margin: 0.75rem 0 0;
+  color: var(--aluno-muted);
+  font-size: clamp(0.94rem, 1.2vw, 1.05rem);
+}
+
+.aluno-portal-page-meta {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 2px solid var(--aluno-accent);
+  color: var(--aluno-heading);
+  font-size: 0.73rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Buttons, forms, badges and feedback */
+
+.aluno-portal-button {
+  min-height: var(--ikkon-touch-target);
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
-  background: #f2e4e3;
-  color: #8b1e21;
-  border: 1px solid #e2c7c5;
-  padding: 0.28rem 0.72rem;
-  font-size: 0.78rem;
-  font-weight: 700;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.62rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--ikkon-radius-pill);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.aluno-portal-button--primary {
+  border-color: var(--aluno-accent);
+  background: var(--aluno-accent);
+  color: var(--ikkon-white);
+}
+
+.aluno-portal-button--primary:hover {
+  border-color: var(--aluno-accent-dark);
+  background: var(--aluno-accent-dark);
+  color: var(--ikkon-white);
+}
+
+.aluno-portal-button--secondary {
+  border-color: var(--aluno-heading);
+  background: transparent;
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-button--secondary:hover {
+  background: var(--aluno-heading);
+  color: var(--ikkon-cream);
+}
+
+.aluno-portal-button--quiet {
+  border-color: var(--aluno-border-strong);
+  background: var(--aluno-surface);
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-button--quiet:hover {
+  border-color: var(--aluno-accent);
+  color: var(--aluno-accent);
+}
+
+.aluno-portal-form-control {
+  min-height: 3rem;
+  border: 1px solid var(--aluno-border-strong);
+  border-radius: 0;
+  background: var(--aluno-surface);
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-form-control:focus {
+  border-color: var(--aluno-accent);
+  background: var(--aluno-surface);
+  color: var(--aluno-heading);
+  box-shadow: var(--ikkon-focus-ring);
+}
+
+.aluno-portal-badge {
+  min-height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--aluno-border);
+  border-radius: var(--ikkon-radius-pill);
+  background: var(--aluno-bg-soft);
+  color: var(--aluno-heading);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.aluno-portal-badge--success {
+  border-color: color-mix(in srgb, var(--aluno-success) 32%, transparent);
+  background: var(--aluno-success-soft);
+  color: var(--aluno-success);
+}
+
+.aluno-portal-badge--warning {
+  border-color: color-mix(in srgb, var(--aluno-warning) 35%, transparent);
+  background: var(--aluno-warning-soft);
+  color: var(--aluno-warning);
+}
+
+.aluno-portal-badge--danger {
+  border-color: color-mix(in srgb, var(--aluno-danger) 32%, transparent);
+  background: var(--aluno-danger-soft);
+  color: var(--aluno-danger);
+}
+
+.aluno-portal-badge--info {
+  border-color: color-mix(in srgb, var(--aluno-info) 32%, transparent);
+  background: var(--aluno-info-soft);
+  color: var(--aluno-info);
+}
+
+.aluno-portal-alerts {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.aluno-portal-alert {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--aluno-border);
+  border-left: 4px solid var(--aluno-info);
+  background: var(--aluno-surface);
+  color: var(--aluno-text);
+  text-decoration: none;
+}
+
+.aluno-portal-alert:hover {
+  border-color: var(--aluno-info);
+  color: var(--aluno-text);
+}
+
+.aluno-portal-alert--warning {
+  border-left-color: var(--aluno-warning);
+}
+
+.aluno-portal-alert--danger {
+  border-left-color: var(--aluno-danger);
+}
+
+.aluno-portal-alert-mark {
+  color: var(--aluno-accent);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.aluno-portal-alert-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.aluno-portal-alert-copy strong {
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-alert-copy span {
+  color: var(--aluno-muted);
+  font-size: 0.88rem;
+}
+
+/* Dashboard and shared content */
+
+.aluno-portal-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(247, 244, 231, 0.18);
+  background:
+    linear-gradient(115deg, rgba(0, 22, 42, 0.97), rgba(0, 32, 62, 0.88)),
+    url("/design-ikkon/photos/hero-aulas-6.webp") center 45% / cover;
+  color: var(--ikkon-cream);
+}
+
+.aluno-portal-hero::after {
+  position: absolute;
+  right: -6rem;
+  bottom: -8rem;
+  width: 22rem;
+  height: 22rem;
+  border: 1px solid rgba(247, 244, 231, 0.18);
+  border-radius: 50%;
+  content: "";
+}
+
+.aluno-portal-hero-profile {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.aluno-portal-avatar {
+  width: 5.2rem;
+  height: 5.2rem;
+  flex: 0 0 5.2rem;
+  border: 3px solid var(--ikkon-cream);
+  border-radius: 50%;
+  background: var(--aluno-surface);
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(247, 244, 231, 0.35);
+}
+
+.aluno-portal-hero .aluno-portal-kicker {
+  color: #ff7a7f;
+}
+
+.aluno-portal-hero h2 {
+  margin: 0.35rem 0 0.45rem;
+  color: var(--ikkon-cream);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.45rem, 2.5vw, 2.25rem);
+  line-height: 1.08;
+}
+
+.aluno-portal-hero p {
+  max-width: 62ch;
+  margin: 0;
+  color: rgba(247, 244, 231, 0.75);
+}
+
+.aluno-portal-hero > .aluno-portal-badge {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  border-color: rgba(247, 244, 231, 0.32);
 }
 
 .aluno-portal-kpis {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.aluno-portal-kpis article {
-  padding: 1rem;
+.aluno-portal-metric {
+  position: relative;
+  min-width: 0;
+  min-height: 8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--aluno-border);
+  border-top: 3px solid var(--aluno-heading);
+  background: var(--aluno-surface);
 }
 
-.aluno-portal-kpis span,
-.aluno-portal-data-grid span,
-.aluno-portal-turma-card span {
-  display: block;
-  color: #6f6860;
-  font-size: 0.78rem;
-  font-weight: 700;
+.aluno-portal-metric::after {
+  position: absolute;
+  right: -2rem;
+  bottom: -2.4rem;
+  width: 6rem;
+  height: 6rem;
+  border: 1px solid var(--aluno-border);
+  border-radius: 50%;
+  content: "";
+}
+
+.aluno-portal-metric--success {
+  border-top-color: var(--aluno-success);
+}
+
+.aluno-portal-metric--warning {
+  border-top-color: var(--aluno-warning);
+}
+
+.aluno-portal-metric--danger {
+  border-top-color: var(--aluno-danger);
+}
+
+.aluno-portal-metric--info {
+  border-top-color: var(--aluno-info);
+}
+
+.aluno-portal-metric > span {
+  color: var(--aluno-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.aluno-portal-kpis strong {
-  display: block;
-  color: #181818;
-  margin-top: 0.35rem;
-  font-size: 1.25rem;
+.aluno-portal-metric > strong {
+  position: relative;
+  z-index: 1;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.aluno-portal-metric > small {
+  position: relative;
+  z-index: 1;
+  color: var(--aluno-muted);
+}
+
+.aluno-portal-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.85fr);
+  gap: 1.25rem;
+}
+
+.aluno-portal-stack {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
 }
 
 .aluno-portal-panel {
+  min-width: 0;
   overflow: hidden;
+  border: 1px solid var(--aluno-border);
+  background: var(--aluno-surface);
 }
 
 .aluno-portal-panel-head {
-  padding: 1rem;
-  border-bottom: 1px solid #e6ded3;
+  min-height: 5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--aluno-border);
 }
 
+.aluno-portal-panel-head > div {
+  min-width: 0;
+}
+
+.aluno-portal-panel-head h2,
 .aluno-portal-panel-head h3 {
-  color: #181818;
-  font-size: 1rem;
   margin: 0;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.05rem;
   font-weight: 700;
 }
 
-.aluno-portal-panel-head a {
-  color: #8b1e21;
-  font-weight: 700;
+.aluno-portal-panel-head p {
+  margin: 0.25rem 0 0;
+  color: var(--aluno-muted) !important;
+  font-size: 0.87rem;
+}
+
+.aluno-portal-panel-head > a {
+  flex: 0 0 auto;
+  color: var(--aluno-accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
   text-decoration: none;
-}
-
-.aluno-portal-table th {
-  color: #736c63;
-  font-size: 0.76rem;
   text-transform: uppercase;
 }
 
-.aluno-portal-actions,
-.aluno-portal-list {
+.aluno-portal-panel-head > a:hover {
+  color: var(--aluno-accent-dark);
+}
+
+.aluno-portal-list,
+.aluno-portal-actions {
   display: grid;
+  gap: 0;
+  padding: 0;
+}
+
+.aluno-portal-list-item {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+  padding: 1rem 1.15rem;
+  border-bottom: 1px solid var(--aluno-border);
+  background: var(--aluno-surface);
+}
+
+.aluno-portal-list-item:last-child {
+  border-bottom: 0;
+}
+
+.aluno-portal-list-item:hover {
+  background: var(--aluno-surface-soft);
+}
+
+.aluno-portal-list-item strong {
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-list-item span,
+.aluno-portal-list-item small {
+  color: var(--aluno-muted);
+  font-size: 0.87rem;
+  overflow-wrap: anywhere;
+}
+
+.aluno-portal-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   padding: 1rem;
 }
 
 .aluno-portal-actions a {
-  border: 1px solid #e1d8cb;
-  border-radius: 0.55rem;
-  color: #29231e;
-  background: #f9f6f0;
-  padding: 0.72rem 0.82rem;
-  text-decoration: none;
+  min-height: var(--ikkon-touch-target);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--aluno-border);
+  color: var(--aluno-heading);
+  font-size: 0.82rem;
   font-weight: 700;
+  text-decoration: none;
+}
+
+.aluno-portal-actions a::after {
+  color: var(--aluno-accent);
+  content: "→";
 }
 
 .aluno-portal-actions a:hover {
-  border-color: #8b1e21;
-  color: #8b1e21;
+  border-color: var(--aluno-accent);
+  color: var(--aluno-accent);
 }
 
-.aluno-portal-list-item {
-  border: 1px solid #e3dbcf;
-  border-radius: 0.55rem;
-  padding: 0.75rem;
-  background: #f9f6f0;
-  display: grid;
+.aluno-portal-empty-inline {
+  margin: 0;
+  padding: 1.5rem 1.15rem;
+  color: var(--aluno-muted);
 }
 
-.aluno-portal-list-item span {
-  color: #6a645d;
-  font-size: 0.9rem;
+/* Tables and data */
+
+.aluno-portal-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--aluno-text);
+  margin: 0;
+}
+
+.aluno-portal-table > :not(caption) > * > * {
+  padding: 0.9rem 1rem;
+  border-bottom-color: var(--aluno-border);
+  color: var(--aluno-text);
+  vertical-align: middle;
+}
+
+.aluno-portal-table thead th {
+  border-bottom-width: 1px;
+  background: var(--aluno-surface-soft);
+  color: var(--aluno-muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.aluno-portal-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.aluno-portal-table td > strong {
+  color: var(--aluno-heading);
 }
 
 .aluno-portal-data-grid,
-.aluno-portal-turma-grid {
+.aluno-portal-card-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  padding: 1.15rem;
+}
+
+.aluno-portal-data-card,
+.aluno-portal-turma-card,
+.aluno-portal-content-card {
+  min-width: 0;
   padding: 1rem;
+  border: 1px solid var(--aluno-border);
+  border-top: 3px solid var(--aluno-heading);
+  background: var(--aluno-surface-soft);
 }
 
-.aluno-portal-data-grid article,
-.aluno-portal-turma-card {
-  border: 1px solid #e4dcd1;
-  border-radius: 0.6rem;
-  background: #f9f6f0;
-  padding: 0.85rem;
-}
-
-.aluno-portal-data-grid strong {
+.aluno-portal-data-card > span,
+.aluno-portal-turma-card > span,
+.aluno-portal-content-card > span {
   display: block;
-  color: #221f1b;
-  margin-top: 0.32rem;
+  margin-bottom: 0.35rem;
+  color: var(--aluno-accent);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-data-card > strong {
+  display: block;
+  color: var(--aluno-heading);
   overflow-wrap: anywhere;
 }
 
@@ -353,38 +1038,370 @@
   grid-column: 1 / -1;
 }
 
+.aluno-portal-card-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.aluno-portal-turma-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+
+.aluno-portal-turma-card.is-primary {
+  border-top-color: var(--aluno-accent);
+}
+
+.aluno-portal-turma-card h2,
 .aluno-portal-turma-card h3 {
-  color: #181818;
-  font-size: 1.05rem;
-  margin: 0.45rem 0 0.35rem;
+  margin: 0;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.18rem;
 }
 
-.aluno-portal-turma-card p {
-  color: #625b53;
-  margin-bottom: 0.55rem;
-}
-
+.aluno-portal-turma-card p,
 .aluno-portal-turma-card small {
-  color: #82796f;
+  margin: 0;
+  color: var(--aluno-muted);
+}
+
+.aluno-portal-schedule-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--aluno-border);
+}
+
+.aluno-portal-schedule-item {
+  display: grid;
+  grid-template-columns: minmax(5rem, auto) 1fr;
+  gap: 0.6rem;
+  color: var(--aluno-muted);
+  font-size: 0.82rem;
+}
+
+.aluno-portal-schedule-item strong {
+  color: var(--aluno-heading);
+}
+
+.aluno-portal-filter {
+  display: flex;
+  align-items: end;
+  gap: 0.6rem;
+}
+
+.aluno-portal-filter-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.aluno-portal-filter-field label {
+  color: var(--aluno-muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Documents, announcements, events and achievements */
+
+.aluno-portal-feed {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.aluno-portal-document-card,
+.aluno-portal-announcement-card,
+.aluno-portal-event-card,
+.aluno-portal-achievement-card {
+  min-width: 0;
+  padding: 1.05rem;
+  border: 1px solid var(--aluno-border);
+  border-left: 4px solid var(--aluno-heading);
+  background: var(--aluno-surface-soft);
+}
+
+.aluno-portal-document-card--success,
+.aluno-portal-announcement-card.is-read {
+  border-left-color: var(--aluno-success);
+}
+
+.aluno-portal-document-card--warning {
+  border-left-color: var(--aluno-warning);
+}
+
+.aluno-portal-document-card--danger,
+.aluno-portal-announcement-card.is-important,
+.aluno-portal-event-card.is-important {
+  border-left-color: var(--aluno-danger);
+}
+
+.aluno-portal-document-card--info,
+.aluno-portal-announcement-card.is-new {
+  border-left-color: var(--aluno-info);
+}
+
+.aluno-portal-card-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.aluno-portal-card-topline > div {
+  min-width: 0;
+}
+
+.aluno-portal-card-topline h2,
+.aluno-portal-card-topline h3 {
+  margin: 0;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.12rem;
+}
+
+.aluno-portal-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  margin: 0.4rem 0 0;
+  color: var(--aluno-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.aluno-portal-card-copy {
+  margin: 0.8rem 0 0;
+  color: var(--aluno-text);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.aluno-portal-card-note {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.8rem;
+  border-left: 2px solid var(--aluno-warning);
+  background: var(--aluno-warning-soft);
+  color: var(--aluno-text);
+  font-size: 0.84rem;
+}
+
+.aluno-portal-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+}
+
+.aluno-portal-upload {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.aluno-portal-upload-field {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.aluno-portal-upload-field label {
+  color: var(--aluno-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-event-card {
+  display: grid;
+  grid-template-columns: 5.2rem minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.aluno-portal-event-date {
+  min-height: 5.2rem;
+  display: grid;
+  place-content: center;
+  align-self: start;
+  border: 1px solid var(--aluno-border);
+  background: var(--aluno-heading);
+  color: var(--ikkon-cream);
+  text-align: center;
+}
+
+.aluno-portal-event-date strong {
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.aluno-portal-event-date span {
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.aluno-portal-achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.aluno-portal-achievement-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 13rem;
+  display: flex;
+  flex-direction: column;
+  border-left-width: 1px;
+  border-top: 4px solid var(--aluno-accent);
+}
+
+.aluno-portal-achievement-card::after {
+  position: absolute;
+  right: -2.5rem;
+  bottom: -2.5rem;
+  width: 8rem;
+  height: 8rem;
+  background: url("/design-ikkon/assets/emblema-mitsudomoe.png") center / contain no-repeat;
+  content: "";
+  opacity: 0.055;
+}
+
+.aluno-portal-achievement-symbol {
+  position: relative;
+  z-index: 1;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1rem;
+  border: 1px solid var(--aluno-border-strong);
+  border-radius: 50%;
+  background: var(--aluno-surface-soft);
+  color: var(--aluno-accent);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.aluno-portal-achievement-card h3 {
+  position: relative;
+  z-index: 1;
+  margin: 0.3rem 0 0.55rem;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.aluno-portal-achievement-card .aluno-portal-card-meta {
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .aluno-portal-empty {
-  padding: 1.5rem;
+  min-height: min(32rem, calc(100vh - 12rem));
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  border: 1px solid var(--aluno-border);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+    url("/design-ikkon/assets/aro-enso-azul.png") center / 24rem no-repeat;
+  text-align: center;
 }
 
-.aluno-portal-empty h2 {
-  color: #181818;
-  font-size: 1.35rem;
+.aluno-portal-empty-inner {
+  max-width: 38rem;
+}
+
+.aluno-portal-empty-mark {
+  width: 4.5rem;
+  height: 4.5rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1rem;
+  border: 1px solid var(--aluno-border-strong);
+  border-radius: 50%;
+  color: var(--aluno-accent);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.6rem;
+}
+
+.aluno-portal-empty h1 {
+  margin: 0;
+  color: var(--aluno-heading);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
 }
 
 .aluno-portal-empty p {
-  color: #625b53;
-  max-width: 62ch;
+  margin: 0.8rem auto 1.2rem;
+  color: var(--aluno-muted);
 }
 
+/* Responsive */
 
-@media (max-width: 768px) {
+@media (max-width: 1199.98px) {
+  .aluno-portal-shell {
+    grid-template-columns: 16.5rem minmax(0, 1fr);
+  }
 
+  .aluno-portal-sidebar {
+    width: 16.5rem;
+  }
+
+  .aluno-portal-dashboard-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(17rem, 0.85fr);
+  }
+
+  .aluno-portal-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .aluno-portal-card-grid--three,
+  .aluno-portal-achievement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991.98px) {
+  .aluno-portal-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .aluno-portal-page-meta {
+    align-self: flex-start;
+  }
+
+  .aluno-portal-data-grid,
+  .aluno-portal-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-data-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 767.98px) {
   body.aluno-menu-open {
     overflow: hidden;
   }
@@ -396,11 +1413,11 @@
   .aluno-portal-sidebar {
     position: fixed;
     inset: 0 auto 0 0;
-    width: min(82vw, 20rem);
+    width: min(88vw, 20rem);
     min-height: 100dvh;
     max-height: 100dvh;
     transform: translateX(-105%);
-    box-shadow: 18px 0 40px rgba(10, 10, 10, 0.28);
+    box-shadow: 20px 0 55px rgba(0, 22, 42, 0.36);
     transition: transform 180ms ease;
     will-change: transform;
   }
@@ -410,11 +1427,11 @@
   }
 
   .aluno-portal-sidebar-backdrop {
-    display: block;
     position: fixed;
     inset: 0;
     z-index: 1030;
-    background: rgba(0, 0, 0, 0.42);
+    display: block;
+    background: rgba(0, 22, 42, 0.62);
     opacity: 0;
     pointer-events: none;
     transition: opacity 180ms ease;
@@ -425,46 +1442,243 @@
     pointer-events: auto;
   }
 
-  .aluno-portal-nav {
-    grid-template-columns: minmax(0, 1fr);
+  .aluno-portal-sidebar-close,
+  .aluno-portal-menu-toggle {
+    display: flex;
   }
 
   .aluno-portal-topbar {
-    min-height: 4.35rem;
-    align-items: center;
-    flex-direction: row;
-    padding: 0.75rem 1rem;
+    min-height: 4.6rem;
+    gap: 0.7rem;
+    padding: 0.6rem 0.8rem;
   }
 
-  .aluno-portal-menu-toggle {
-    display: inline-flex;
-    flex-direction: column;
+  .aluno-portal-topbar-title strong {
+    max-width: 34vw;
+    font-size: 0.85rem;
   }
 
-  .aluno-portal-topbar h1 {
-    font-size: 1.08rem;
+  .aluno-portal-topbar-title > div > span,
+  .aluno-portal-site-link {
+    display: none;
   }
 
-  .aluno-portal-topbar > a {
-    white-space: nowrap;
+  .aluno-portal-language-list a {
+    min-width: 1.9rem;
+    padding-inline: 0.35rem;
   }
 
   .aluno-portal-content {
     padding: 1rem;
   }
 
+  .aluno-portal-page-header {
+    min-height: 10rem;
+    margin-bottom: 1rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .aluno-portal-page-header::after {
+    right: -7rem;
+  }
+
   .aluno-portal-hero {
+    align-items: flex-start;
     flex-direction: column;
+    gap: 1rem;
+  }
+
+  .aluno-portal-hero-profile {
+    align-items: flex-start;
+  }
+
+  .aluno-portal-avatar {
+    width: 4.2rem;
+    height: 4.2rem;
+    flex-basis: 4.2rem;
   }
 
   .aluno-portal-kpis,
-  .aluno-portal-data-grid,
-  .aluno-portal-turma-grid {
+  .aluno-portal-achievement-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-metric {
+    min-height: 7rem;
   }
 
   .aluno-portal-panel-head {
     align-items: flex-start;
     flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .aluno-portal-panel-head > a {
+    min-height: var(--ikkon-touch-target);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .aluno-portal-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-filter {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .aluno-portal-filter .aluno-portal-button {
+    width: 100%;
+  }
+
+  .aluno-portal-responsive-table {
+    overflow: visible;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table,
+  .aluno-portal-responsive-table .aluno-portal-table tbody,
+  .aluno-portal-responsive-table .aluno-portal-table tr,
+  .aluno-portal-responsive-table .aluno-portal-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table tbody {
+    display: grid;
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table tr {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--aluno-border);
+    border-left: 3px solid var(--aluno-accent);
+    background: var(--aluno-surface-soft);
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table tr.aluno-portal-empty-row {
+    padding: 0;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td {
+    min-height: 2.35rem;
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 42%) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--aluno-border);
+    text-align: left !important;
+    overflow-wrap: anywhere;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td::before {
+    color: var(--aluno-muted);
+    content: attr(data-label);
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td[colspan] {
+    display: block;
+    padding: 1rem;
+    text-align: center !important;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td[colspan]::before {
+    content: none;
+  }
+
+  .aluno-portal-upload {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-upload .aluno-portal-button {
+    width: 100%;
+  }
+
+  .aluno-portal-card-topline {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aluno-portal-event-card {
+    grid-template-columns: 4.4rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 479.98px) {
+  .aluno-portal-topbar-title strong {
+    max-width: 27vw;
+  }
+
+  .aluno-portal-language-list a {
+    min-width: 1.72rem;
+    font-size: 0.62rem;
+  }
+
+  .aluno-portal-page-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .aluno-portal-hero-profile {
+    flex-direction: column;
+  }
+
+  .aluno-portal-data-grid,
+  .aluno-portal-card-grid,
+  .aluno-portal-feed,
+  .aluno-portal-achievement-grid {
+    gap: 0.75rem;
+    padding: 0.8rem;
+  }
+
+  .aluno-portal-event-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aluno-portal-event-date {
+    width: 4.6rem;
+  }
+
+  .aluno-portal-card-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .aluno-portal-card-actions .aluno-portal-button {
+    width: 100%;
+  }
+
+  .aluno-portal-responsive-table .aluno-portal-table td {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aluno-portal-body *,
+  .aluno-portal-body *::before,
+  .aluno-portal-body *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

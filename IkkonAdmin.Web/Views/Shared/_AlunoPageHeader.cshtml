@@ -1,0 +1,13 @@
+@model AlunoPageHeaderViewModel
+
+<header class="aluno-portal-page-header">
+    <div class="aluno-portal-page-header-copy">
+        <p class="aluno-portal-kicker">@Model.Eyebrow</p>
+        <h1>@Model.Title</h1>
+        <p class="aluno-portal-page-description">@Model.Description</p>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Meta))
+    {
+        <p class="aluno-portal-page-meta">@Model.Meta</p>
+    }
+</header>

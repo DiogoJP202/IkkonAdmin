@@ -183,6 +183,27 @@ Regras:
 - Movimento automático respeita redução de movimento e visibilidade da aba.
 - Cor não deve ser a única forma de comunicar erro, sucesso, seleção ou bloqueio.
 
+## Portal autenticado do aluno
+
+O portal usa os mesmos tokens, fontes e recursos da identidade pública em um shell
+de aplicação. Seus padrões completos, componentes, estados, breakpoints e estrutura
+de novas páginas estão documentados em
+[`docs/AREA_DO_ALUNO.md`](../AREA_DO_ALUNO.md#padrão-visual-e-de-implementação).
+
+Regras de integração:
+
+- carregar `ikkon-tokens.css` antes de `ikkon-aluno.css`;
+- usar apenas um `h1`, fornecido por `_AlunoPageHeader`;
+- usar `_AlunoMetricCard` e `_AlunoStatusBadge` para indicadores e estados;
+- tabelas usam `data-label` e se tornam cartões abaixo de 768 px;
+- `/configuracoes` mantém `ikkon-account.css` compartilhado e recebe apenas a
+  composição escopada de `ikkon-aluno-account.css`;
+- temas escuros do aluno e do administrativo permanecem isolados;
+- toda cópia nova deve existir em PT, EN e JA.
+
+Evitar copiar o layout dividido do login, adicionar dependência visual, esconder
+colunas no celular ou mover regra de negócio para partial de apresentação.
+
 ## Exemplo completo de composição
 
 ```cshtml

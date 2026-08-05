@@ -2,15 +2,38 @@
 @using IkkonAdmin.Web.Security
 @{
     var temaPreferencia = User.FindFirst(AppClaimTypes.TemaPreferencia)?.Value;
-    var isDarkTheme = string.Equals(temaPreferencia, TemaPreferenciaEnum.Escuro.ToString(), StringComparison.OrdinalIgnoreCase);
+    var isDarkTheme = string.Equals(
+        temaPreferencia,
+        TemaPreferenciaEnum.Escuro.ToString(),
+        StringComparison.OrdinalIgnoreCase);
     var themeClass = isDarkTheme ? "aluno-theme-dark" : "aluno-theme-light";
     var themeName = isDarkTheme ? "dark" : "light";
-    var htmlLang = I18n.IsEnglish ? "en" : "pt-BR";
+    var htmlLang = PublicSiteLocales.ForCulture(I18n.CurrentCulture).Hreflang;
     var languageReturnUrl = $"{Context.Request.PathBase}{Context.Request.Path}{Context.Request.QueryString}";
+    var requestPath = Context.Request.Path.Value ?? string.Empty;
     var isAccountPage = string.Equals(
         ViewContext.RouteData.Values["controller"]?.ToString(),
         "Configuracoes",
         StringComparison.OrdinalIgnoreCase);
+
+    string NavClass(string segment, bool exact = false)
+    {
+        var isActive = exact
+            ? requestPath.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) ||
+              requestPath.Equals("/area-do-aluno/", StringComparison.OrdinalIgnoreCase) ||
+              requestPath.Equals("/aluno", StringComparison.OrdinalIgnoreCase) ||
+              requestPath.Equals("/aluno/", StringComparison.OrdinalIgnoreCase)
+            : requestPath.Contains(segment, StringComparison.OrdinalIgnoreCase);
+        return isActive ? "is-active" : string.Empty;
+    }
+
+    string? NavCurrent(string segment, bool exact = false) =>
+        NavClass(segment, exact) == "is-active" ? "page" : null;
+
+    string LanguageClass(string culture) =>
+        string.Equals(I18n.CurrentCulture, culture, StringComparison.OrdinalIgnoreCase)
+            ? "is-active"
+            : string.Empty;
 }
 <!DOCTYPE html>
 <html lang="@htmlLang">
@@ -18,78 +41,161 @@
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow,noarchive" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - @I18n["Área do Aluno IKKON", "IKKON Student Area"]</title>
+    <meta name="theme-color" content="@(isDarkTheme ? "#00162a" : "#f7f4e7")" />
+    <title>@ViewData["Title"] | @I18n["Área do Aluno IKKON", "IKKON Student Area", "IKKON生徒エリア"]</title>
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
+    @if (I18n.IsJapanese)
+    {
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/ikkon-tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-internal-foundation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-aluno.css" asp-append-version="true" />
     @if (isAccountPage)
     {
         <link rel="stylesheet" href="~/css/ikkon-account.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/ikkon-aluno-account.css" asp-append-version="true" />
     }
     <link rel="stylesheet" href="~/css/ikkon-internal-themes.css" asp-append-version="true" />
 </head>
 <body class="aluno-portal-body @themeClass" data-theme="@themeName">
-    <div class="aluno-portal-shell">
-        <aside id="alunoPortalSidebar" class="aluno-portal-sidebar">
-            <a class="aluno-portal-brand" href="/area-do-aluno">
-                <img src="~/Images/Ikkon_Icon.png" asp-append-version="true" alt="Logo IKKON" />
-                <span>
-                    <strong>IKKON SPTD</strong>
-                    <small>@I18n["Área do Aluno", "Student Area"]</small>
-                </span>
-            </a>
+    <a class="aluno-portal-skip-link" href="#alunoPortalContent">
+        @I18n["Ir para o conteúdo", "Skip to content", "コンテンツへ移動"]
+    </a>
 
-            <nav class="aluno-portal-nav" aria-label="@I18n["Navegação da Área do Aluno", "Student Area navigation"]">
-                <a class="@(Context.Request.Path.Value?.Equals("/area-do-aluno", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno">@I18n["Início", "Home"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/aulas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/aulas">@I18n["Aulas", "Classes"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/frequencia", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/frequencia">@I18n["Frequência", "Attendance"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/perfil", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/perfil">@I18n["Meu perfil", "My profile"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/financeiro", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/financeiro">@I18n["Financeiro", "Finance"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/documentos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/documentos">@I18n["Documentos", "Documents"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/comunicados", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/comunicados">@I18n["Comunicados", "Announcements"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/eventos", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/eventos">@I18n["Eventos", "Events"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/conquistas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/conquistas">@I18n["Conquistas", "Achievements"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/turmas", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/area-do-aluno/turmas">@I18n["Turmas", "Groups"]</a>
-                <a class="@(Context.Request.Path.Value?.Contains("/configuracoes", StringComparison.OrdinalIgnoreCase) == true ? "active" : string.Empty)" href="/configuracoes">@I18n["Conta e senha", "Account and password"]</a>
+    <div class="aluno-portal-shell">
+        <aside id="alunoPortalSidebar"
+               class="aluno-portal-sidebar"
+               aria-label="@I18n["Menu principal", "Main menu", "メインメニュー"]">
+            <div class="aluno-portal-brand-row">
+                <a class="aluno-portal-brand" href="/area-do-aluno">
+                    <span class="aluno-portal-brand-mark" aria-hidden="true">
+                        <img src="~/design-ikkon/assets/emblema-mitsudomoe.png" asp-append-version="true" alt="" />
+                        <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" />
+                    </span>
+                    <span class="aluno-portal-brand-copy">
+                        <strong>IKKON</strong>
+                        <small>@I18n["Área do Aluno", "Student Area", "生徒エリア"]</small>
+                    </span>
+                </a>
+                <button class="aluno-portal-sidebar-close"
+                        type="button"
+                        data-aluno-menu-close
+                        aria-label="@I18n["Fechar menu", "Close menu", "メニューを閉じる"]">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <nav class="aluno-portal-nav" aria-label="@I18n["Navegação da Área do Aluno", "Student Area navigation", "生徒エリアのナビゲーション"]">
+                <p class="aluno-portal-nav-label">@I18n["Acompanhar", "Track", "確認"]</p>
+                <a class="@NavClass(string.Empty, true)" aria-current="@NavCurrent(string.Empty, true)" href="/area-do-aluno">
+                    <span aria-hidden="true">01</span>@I18n["Início", "Home", "ホーム"]
+                </a>
+                <a class="@NavClass("/aulas")" aria-current="@NavCurrent("/aulas")" href="/area-do-aluno/aulas">
+                    <span aria-hidden="true">02</span>@I18n["Aulas", "Classes", "レッスン"]
+                </a>
+                <a class="@NavClass("/frequencia")" aria-current="@NavCurrent("/frequencia")" href="/area-do-aluno/frequencia">
+                    <span aria-hidden="true">03</span>@I18n["Frequência", "Attendance", "出席状況"]
+                </a>
+
+                <p class="aluno-portal-nav-label">@I18n["Minha conta", "My account", "マイアカウント"]</p>
+                <a class="@NavClass("/perfil")" aria-current="@NavCurrent("/perfil")" href="/area-do-aluno/perfil">
+                    <span aria-hidden="true">04</span>@I18n["Meu perfil", "My profile", "プロフィール"]
+                </a>
+                <a class="@NavClass("/financeiro")" aria-current="@NavCurrent("/financeiro")" href="/area-do-aluno/financeiro">
+                    <span aria-hidden="true">05</span>@I18n["Financeiro", "Finance", "お支払い"]
+                </a>
+                <a class="@NavClass("/documentos")" aria-current="@NavCurrent("/documentos")" href="/area-do-aluno/documentos">
+                    <span aria-hidden="true">06</span>@I18n["Documentos", "Documents", "書類"]
+                </a>
+                <a class="@NavClass("/configuracoes")" aria-current="@NavCurrent("/configuracoes")" href="/configuracoes">
+                    <span aria-hidden="true">07</span>@I18n["Conta e senha", "Account and password", "アカウントとパスワード"]
+                </a>
+
+                <p class="aluno-portal-nav-label">@I18n["Comunidade", "Community", "コミュニティ"]</p>
+                <a class="@NavClass("/turmas")" aria-current="@NavCurrent("/turmas")" href="/area-do-aluno/turmas">
+                    <span aria-hidden="true">08</span>@I18n["Turmas", "Groups", "クラス"]
+                </a>
+                <a class="@NavClass("/comunicados")" aria-current="@NavCurrent("/comunicados")" href="/area-do-aluno/comunicados">
+                    <span aria-hidden="true">09</span>@I18n["Comunicados", "Announcements", "お知らせ"]
+                </a>
+                <a class="@NavClass("/eventos")" aria-current="@NavCurrent("/eventos")" href="/area-do-aluno/eventos">
+                    <span aria-hidden="true">10</span>@I18n["Eventos", "Events", "イベント"]
+                </a>
+                <a class="@NavClass("/conquistas")" aria-current="@NavCurrent("/conquistas")" href="/area-do-aluno/conquistas">
+                    <span aria-hidden="true">11</span>@I18n["Conquistas", "Achievements", "実績"]
+                </a>
             </nav>
 
-            <form action="/aluno/sair" method="post" class="mt-auto">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-light w-100">@I18n["Sair", "Sign out"]</button>
-            </form>
+            <div class="aluno-portal-sidebar-footer">
+                <a href="@I18n.LocalizePath("/")">
+                    @I18n["Site institucional", "Institutional site", "公式サイト"]
+                    <span aria-hidden="true">↗</span>
+                </a>
+                <form action="/aluno/sair" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit">
+                        @I18n["Sair com segurança", "Sign out securely", "安全にログアウト"]
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+            </div>
         </aside>
+
         <div class="aluno-portal-sidebar-backdrop" data-aluno-menu-close aria-hidden="true"></div>
 
         <main class="aluno-portal-main">
-            <div class="aluno-portal-topbar">
+            <header class="aluno-portal-topbar">
                 <div class="aluno-portal-topbar-title">
                     <button class="aluno-portal-menu-toggle"
                             type="button"
                             data-aluno-menu-toggle
+                            data-open-label="@I18n["Abrir menu da Área do Aluno", "Open Student Area menu", "生徒エリアのメニューを開く"]"
+                            data-close-label="@I18n["Fechar menu da Área do Aluno", "Close Student Area menu", "生徒エリアのメニューを閉じる"]"
                             aria-controls="alunoPortalSidebar"
                             aria-expanded="false"
-                            aria-label="@I18n["Abrir menu da Área do Aluno", "Open Student Area menu"]">
+                            aria-label="@I18n["Abrir menu da Área do Aluno", "Open Student Area menu", "生徒エリアのメニューを開く"]">
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                         <span aria-hidden="true"></span>
                     </button>
                     <div>
-                        <span class="aluno-portal-eyebrow">@I18n["Portal", "Portal"]</span>
-                        <h1>@ViewData["Title"]</h1>
+                        <span>@I18n["Portal do aluno", "Student portal", "生徒ポータル"]</span>
+                        <strong>@ViewData["Title"]</strong>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <a class="btn btn-outline-secondary btn-sm"
-                       asp-controller="Idioma"
-                       asp-action="Alterar"
-                       asp-route-culture="@I18n.ToggleCulture"
-                       asp-route-returnUrl="@languageReturnUrl">@I18n.ToggleLabel</a>
-                    <a href="/" class="btn btn-outline-secondary btn-sm">@I18n["Site institucional", "Institutional site"]</a>
-                </div>
-            </div>
 
-            <div class="aluno-portal-content">
+                <div class="aluno-portal-topbar-actions">
+                    <nav class="aluno-portal-language-list" aria-label="@I18n["Selecionar idioma", "Select language", "言語を選択"]">
+                        <a class="@LanguageClass("pt-BR")"
+                           asp-controller="Idioma"
+                           asp-action="Alterar"
+                           asp-route-culture="pt-BR"
+                           asp-route-returnUrl="@languageReturnUrl"
+                           aria-current="@(I18n.IsPortuguese ? "page" : null)">PT</a>
+                        <a class="@LanguageClass("en-US")"
+                           asp-controller="Idioma"
+                           asp-action="Alterar"
+                           asp-route-culture="en-US"
+                           asp-route-returnUrl="@languageReturnUrl"
+                           aria-current="@(I18n.IsEnglish ? "page" : null)">EN</a>
+                        <a class="@LanguageClass("ja-JP")"
+                           asp-controller="Idioma"
+                           asp-action="Alterar"
+                           asp-route-culture="ja-JP"
+                           asp-route-returnUrl="@languageReturnUrl"
+                           aria-current="@(I18n.IsJapanese ? "page" : null)">日本語</a>
+                    </nav>
+                    <a class="aluno-portal-site-link" href="@I18n.LocalizePath("/")">
+                        @I18n["Ver site", "View website", "サイトを見る"]
+                    </a>
+                </div>
+            </header>
+
+            <div id="alunoPortalContent" class="aluno-portal-content" tabindex="-1">
                 <partial name="_Alerts" />
                 @RenderBody()
             </div>

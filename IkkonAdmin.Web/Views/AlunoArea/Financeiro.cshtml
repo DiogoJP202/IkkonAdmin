@@ -1,75 +1,104 @@
 @model AreaAlunoFinanceiroViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Minhas Mensalidades", "My Monthly Fees"];
+    ViewData["Title"] = I18n["Minhas Mensalidades", "My Monthly Fees", "月謝"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Financeiro", "Finance", "お支払い"],
+        I18n["Minhas mensalidades", "My monthly fees", "月謝"],
+        I18n[
+            "Consulte valores, vencimentos, pagamentos e comprovantes registrados em sua conta.",
+            "Review amounts, due dates, payments, and receipts registered in your account.",
+            "登録されている金額、支払期限、支払い、領収書を確認できます。"],
+        I18n["Lançamentos", "Entries", "明細"] + $": {Model.Mensalidades.Count}");
+    var metrics = new[]
+    {
+        new AlunoMetricCardViewModel(
+            I18n["Total pago", "Total paid", "支払済み合計"],
+            Model.TotalPago.ToString("C"),
+            "success"),
+        new AlunoMetricCardViewModel(
+            I18n["Total em aberto", "Open balance", "未払い合計"],
+            Model.TotalEmAberto.ToString("C"),
+            Model.TotalEmAberto > 0 ? "warning" : "success"),
+        new AlunoMetricCardViewModel(
+            I18n["Mensalidades atrasadas", "Overdue monthly fees", "期限超過"],
+            Model.MensalidadesAtrasadas.ToString(),
+            Model.MensalidadesAtrasadas > 0 ? "danger" : "neutral")
+    };
 }
 
-<section class="aluno-portal-kpis mb-3">
-    <article>
-        <span>@I18n["Total pago", "Total paid"]</span>
-        <strong>@Model.TotalPago.ToString("C")</strong>
-    </article>
-    <article>
-        <span>@I18n["Total em aberto", "Open balance"]</span>
-        <strong>@Model.TotalEmAberto.ToString("C")</strong>
-    </article>
-    <article>
-        <span>@I18n["Mensalidades atrasadas", "Overdue monthly fees"]</span>
-        <strong>@Model.MensalidadesAtrasadas</strong>
-    </article>
-</section>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Histórico financeiro", "Financial history"]</h3>
-            <p class="mb-0 text-muted">@I18n["Consulta das mensalidades registradas no sistema.", "View monthly fees registered in the system."]</p>
+    <section class="aluno-portal-kpis" aria-label="@I18n["Resumo financeiro", "Financial summary", "お支払いの概要"]">
+        @foreach (var metric in metrics)
+        {
+            <partial name="_AlunoMetricCard" model="metric" />
+        }
+    </section>
+
+    <section class="aluno-portal-panel" aria-labelledby="financialHistoryTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="financialHistoryTitle">@I18n["Histórico financeiro", "Financial history", "お支払い履歴"]</h2>
+                <p>@I18n["Mensalidades registradas no sistema.", "Monthly fees registered in the system.", "システムに登録された月謝です。"]</p>
+            </div>
         </div>
-    </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle mb-0 aluno-portal-table">
-            <thead>
-                <tr>
-                    <th>@I18n["Competência", "Period"]</th>
-                    <th>@I18n["Vencimento", "Due date"]</th>
-                    <th>Status</th>
-                    <th>@I18n["Pagamento", "Payment"]</th>
-                    <th>@I18n["Forma", "Method"]</th>
-                    <th class="text-end">@I18n["Valor", "Amount"]</th>
-                    <th class="text-end">@I18n["Comprovante", "Receipt"]</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Mensalidades.Count == 0)
-                {
-                    <tr><td colspan="7" class="text-center text-muted py-4">@I18n["Nenhuma mensalidade encontrada.", "No monthly fees found."]</td></tr>
-                }
-                else
-                {
-                    @foreach (var mensalidade in Model.Mensalidades)
+        <div class="aluno-portal-responsive-table">
+            <table class="table aluno-portal-table">
+                <thead>
+                    <tr>
+                        <th>@I18n["Competência", "Period", "対象月"]</th>
+                        <th>@I18n["Vencimento", "Due date", "支払期限"]</th>
+                        <th>@I18n["Status", "Status", "ステータス"]</th>
+                        <th>@I18n["Pagamento", "Payment", "支払日"]</th>
+                        <th>@I18n["Forma", "Method", "支払方法"]</th>
+                        <th class="text-end">@I18n["Valor", "Amount", "金額"]</th>
+                        <th class="text-end">@I18n["Comprovante", "Receipt", "領収書"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Mensalidades.Count == 0)
                     {
-                        <tr>
-                            <td>@mensalidade.Competencia.ToString("MM/yyyy")</td>
-                            <td>@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
-                            <td><span class="aluno-portal-pill">@I18n.Term(mensalidade.Status)</span></td>
-                            <td>@(mensalidade.DataPagamento.HasValue ? mensalidade.DataPagamento.Value.ToString("dd/MM/yyyy") : "-")</td>
-                            <td>@(mensalidade.FormaPagamento.HasValue ? I18n.Term(mensalidade.FormaPagamento.Value) : "-")</td>
-                            <td class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
-                            <td class="text-end">
-                                @if (!string.IsNullOrWhiteSpace(mensalidade.Comprovante))
-                                {
-                                    <a href="@mensalidade.Comprovante" target="_blank" rel="noopener">@I18n["Abrir", "Open"]</a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
+                        <tr class="aluno-portal-empty-row">
+                            <td colspan="7">@I18n["Nenhuma mensalidade encontrada.", "No monthly fees found.", "月謝の記録はありません。"]</td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
-    </div>
-</section>
+                    else
+                    {
+                        @foreach (var mensalidade in Model.Mensalidades)
+                        {
+                            <tr>
+                                <td data-label="@I18n["Competência", "Period", "対象月"]">@mensalidade.Competencia.ToString("MM/yyyy")</td>
+                                <td data-label="@I18n["Vencimento", "Due date", "支払期限"]">@mensalidade.DataVencimento.ToString("dd/MM/yyyy")</td>
+                                <td data-label="@I18n["Status", "Status", "ステータス"]">
+                                    <partial name="_AlunoStatusBadge"
+                                             model="new AlunoStatusBadgeViewModel(I18n.Term(mensalidade.Status), AlunoPortalPresentation.StatusTone(mensalidade.Status))" />
+                                </td>
+                                <td data-label="@I18n["Pagamento", "Payment", "支払日"]">@(mensalidade.DataPagamento.HasValue ? mensalidade.DataPagamento.Value.ToString("dd/MM/yyyy") : "—")</td>
+                                <td data-label="@I18n["Forma", "Method", "支払方法"]">@(mensalidade.FormaPagamento.HasValue ? I18n.Term(mensalidade.FormaPagamento.Value) : "—")</td>
+                                <td data-label="@I18n["Valor", "Amount", "金額"]" class="text-end">@mensalidade.ValorFinal.ToString("C")</td>
+                                <td data-label="@I18n["Comprovante", "Receipt", "領収書"]" class="text-end">
+                                    @if (!string.IsNullOrWhiteSpace(mensalidade.Comprovante))
+                                    {
+                                        <a class="aluno-portal-button aluno-portal-button--quiet"
+                                           href="@mensalidade.Comprovante"
+                                           target="_blank"
+                                           rel="noopener">
+                                            @I18n["Abrir", "Open", "開く"]
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

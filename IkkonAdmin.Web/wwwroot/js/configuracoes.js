@@ -1,6 +1,12 @@
 ﻿(() => {
   const feedback = document.getElementById("userSettingsFeedback");
   const forms = document.querySelectorAll("form[data-config-form]");
+  const messages = {
+    loading: feedback?.dataset.loadingDefault || "Saving...",
+    error: feedback?.dataset.saveError || "Could not save the changes.",
+    success: feedback?.dataset.saveSuccess || "Changes saved successfully.",
+    network: feedback?.dataset.networkError || "Communication failed. Try again shortly."
+  };
 
   const clearFieldErrors = form => {
     form.querySelectorAll("[data-field-error]").forEach(el => {
@@ -35,7 +41,7 @@
 
     if (loading) {
       button.dataset.originalText = button.innerHTML;
-      const loadingText = button.dataset.loadingText || "Salvando...";
+      const loadingText = button.dataset.loadingText || messages.loading;
       button.disabled = true;
       button.innerHTML = `<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>${loadingText}`;
       return;
@@ -72,11 +78,11 @@
 
         if (!response.ok || !payload?.success) {
           showFieldErrors(form, payload?.errors);
-          showFeedback("danger", payload?.message || "Não foi possível salvar as alterações.");
+          showFeedback("danger", payload?.message || messages.error);
           return;
         }
 
-        showFeedback("success", payload.message || "Alterações salvas com sucesso.");
+        showFeedback("success", payload.message || messages.success);
 
         if (form.dataset.resetOnSuccess === "true") {
           form.reset();
@@ -86,7 +92,7 @@
           window.setTimeout(() => window.location.reload(), 650);
         }
       } catch {
-        showFeedback("danger", "Falha de comunicação. Tente novamente em instantes.");
+        showFeedback("danger", messages.network);
       } finally {
         applyLoadingState(submitButton, false);
       }

@@ -1,55 +1,109 @@
 @model AreaAlunoDocumentosViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Documentos", "Documents"];
+    ViewData["Title"] = I18n["Documentos", "Documents", "書類"];
+    var pendingCount = Model.Documentos.Count(x => x.Status != DocumentoStatusEnum.Aprovado);
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Documentação", "Documentation", "書類管理"],
+        I18n["Meus documentos", "My documents", "書類"],
+        I18n[
+            "Envie os arquivos solicitados pela escola e acompanhe o andamento de cada análise.",
+            "Upload files requested by the school and track the progress of each review.",
+            "学校から依頼された書類を提出し、確認状況を追跡できます。"],
+        I18n["Pendentes", "Pending", "未完了"] + $": {pendingCount}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Documentos solicitados", "Requested documents"]</h3>
-            <p class="mb-0 text-muted">@I18n["Envie arquivos solicitados e acompanhe a aprovação.", "Upload requested files and track approval."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-list">
+    <section class="aluno-portal-panel" aria-labelledby="requestedDocumentsTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="requestedDocumentsTitle">@I18n["Documentos solicitados", "Requested documents", "提出依頼書類"]</h2>
+                <p>@I18n["Formatos aceitos: PDF, JPG, PNG e WebP.", "Accepted formats: PDF, JPG, PNG, and WebP.", "対応形式：PDF、JPG、PNG、WebP。"]</p>
+            </div>
+        </div>
+
         @if (Model.Documentos.Count == 0)
         {
-            <p class="text-muted mb-0">@I18n["Nenhum documento solicitado.", "No requested documents."]</p>
+            <p class="aluno-portal-empty-inline">@I18n["Nenhum documento solicitado.", "No requested documents.", "提出を求められている書類はありません。"]</p>
         }
         else
         {
-            @foreach (var documento in Model.Documentos)
-            {
-                <article class="aluno-portal-list-item">
-                    <strong>@documento.Tipo</strong>
-                    <span>Status: @I18n.Term(documento.Status) @(documento.DataLimite.HasValue ? I18n["| Limite: ", "| Deadline: "] + documento.DataLimite.Value.ToString("dd/MM/yyyy") : string.Empty)</span>
-                    @if (!string.IsNullOrWhiteSpace(documento.Descricao))
-                    {
-                        <span>@documento.Descricao</span>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(documento.ObservacaoAdministrativa))
-                    {
-                        <span>@I18n["Observação", "Note"]: @documento.ObservacaoAdministrativa</span>
-                    }
-                    @if (documento.UltimoEnvioId.HasValue)
-                    {
-                        <span>
-                            @I18n["Enviado", "Sent"]: @documento.NomeArquivoOriginal
-                            <a asp-action="BaixarDocumento" asp-route-envioId="@documento.UltimoEnvioId.Value">@I18n["baixar", "download"]</a>
-                        </span>
-                    }
-                    @if (documento.Status != DocumentoStatusEnum.Aprovado)
-                    {
-                        <form asp-action="EnviarDocumento" method="post" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap mt-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="solicitacaoId" value="@documento.SolicitacaoId" />
-                            <input type="file" name="arquivo" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png,.webp" required />
-                            <button type="submit" class="btn btn-sm btn-outline-secondary">@I18n["Enviar", "Send"]</button>
-                        </form>
-                    }
-                </article>
-            }
+            <div class="aluno-portal-feed">
+                @foreach (var documento in Model.Documentos)
+                {
+                    var tone = AlunoPortalPresentation.StatusTone(documento.Status);
+                    var inputId = $"arquivo-{documento.SolicitacaoId}";
+                    <article class="aluno-portal-document-card aluno-portal-document-card--@tone">
+                        <div class="aluno-portal-card-topline">
+                            <div>
+                                <h3>@documento.Tipo</h3>
+                                <p class="aluno-portal-card-meta">
+                                    <span>@I18n["Solicitado em", "Requested on", "依頼日"] @documento.DataSolicitacaoUtc.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                                    @if (documento.DataLimite.HasValue)
+                                    {
+                                        <span>@I18n["Prazo", "Deadline", "期限"] @documento.DataLimite.Value.ToString("dd/MM/yyyy")</span>
+                                    }
+                                </p>
+                            </div>
+                            <partial name="_AlunoStatusBadge"
+                                     model="new AlunoStatusBadgeViewModel(I18n.Term(documento.Status), tone)" />
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(documento.Descricao))
+                        {
+                            <p class="aluno-portal-card-copy">@documento.Descricao</p>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(documento.ObservacaoAdministrativa))
+                        {
+                            <p class="aluno-portal-card-note">
+                                <strong>@I18n["Observação da equipe", "Staff note", "スタッフからの連絡"]:</strong>
+                                @documento.ObservacaoAdministrativa
+                            </p>
+                        }
+
+                        @if (documento.UltimoEnvioId.HasValue)
+                        {
+                            <div class="aluno-portal-card-actions">
+                                <span class="aluno-portal-card-meta">
+                                    @I18n["Último envio", "Latest upload", "最新の提出"]:
+                                    @(string.IsNullOrWhiteSpace(documento.NomeArquivoOriginal) ? I18n["Arquivo enviado", "Uploaded file", "提出済みファイル"] : documento.NomeArquivoOriginal)
+                                </span>
+                                <a class="aluno-portal-button aluno-portal-button--quiet"
+                                   asp-action="BaixarDocumento"
+                                   asp-route-envioId="@documento.UltimoEnvioId.Value">
+                                    @I18n["Baixar arquivo", "Download file", "ダウンロード"]
+                                </a>
+                            </div>
+                        }
+
+                        @if (documento.Status != DocumentoStatusEnum.Aprovado)
+                        {
+                            <form asp-action="EnviarDocumento"
+                                  method="post"
+                                  enctype="multipart/form-data"
+                                  class="aluno-portal-upload mt-3">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="solicitacaoId" value="@documento.SolicitacaoId" />
+                                <div class="aluno-portal-upload-field">
+                                    <label for="@inputId">@I18n["Selecionar arquivo", "Select file", "ファイルを選択"]</label>
+                                    <input id="@inputId"
+                                           type="file"
+                                           name="arquivo"
+                                           class="form-control aluno-portal-form-control"
+                                           accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                           required />
+                                </div>
+                                <button type="submit" class="aluno-portal-button aluno-portal-button--primary">
+                                    @I18n["Enviar documento", "Upload document", "書類を提出"]
+                                </button>
+                            </form>
+                        }
+                    </article>
+                }
+            </div>
         }
-    </div>
-</section>
+    </section>
+</div>

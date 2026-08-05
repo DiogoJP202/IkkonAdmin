@@ -1,14 +1,23 @@
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Acesso indisponível", "Access unavailable"];
+    ViewData["Title"] = I18n["Acesso indisponível", "Access unavailable", "アクセスできません"];
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-empty">
-        <h2>@I18n["Conta sem vínculo de aluno", "Account without student link"]</h2>
-        <p>
-            @I18n["Sua conta está autenticada como aluno, mas ainda não possui um cadastro de aluno vinculado. Entre em contato com a equipe da escola para ajustar o acesso.", "Your account is authenticated as a student, but it does not have a linked student record yet. Contact the school team to adjust your access."]
+<section class="aluno-portal-empty">
+    <div class="aluno-portal-empty-inner">
+        <div class="aluno-portal-empty-mark" aria-hidden="true">!</div>
+        <p class="aluno-portal-kicker justify-content-center">
+            @I18n["Vínculo necessário", "Link required", "登録情報が必要です"]
         </p>
-        <a href="/" class="btn btn-outline-secondary">@I18n["Voltar ao site institucional", "Back to institutional site"]</a>
+        <h1>@I18n["Conta sem vínculo de aluno", "Account without student link", "生徒情報が連携されていません"]</h1>
+        <p>
+            @I18n[
+                "Sua conta está autenticada como aluno, mas ainda não possui um cadastro vinculado. Entre em contato com a equipe da escola para ajustar o acesso.",
+                "Your account is authenticated as a student, but it does not yet have a linked student record. Contact the school team to adjust access.",
+                "生徒としてログインしていますが、生徒情報がまだ連携されていません。アクセスの調整について学校スタッフへご連絡ください。"]
+        </p>
+        <a href="@I18n.LocalizePath("/")" class="aluno-portal-button aluno-portal-button--secondary">
+            @I18n["Voltar ao site institucional", "Back to institutional site", "公式サイトへ戻る"]
+        </a>
     </div>
 </section>

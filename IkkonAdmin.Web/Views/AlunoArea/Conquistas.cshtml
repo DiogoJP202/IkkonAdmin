@@ -1,37 +1,63 @@
 @model AreaAlunoConquistasViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Conquistas", "Achievements"];
+    ViewData["Title"] = I18n["Conquistas", "Achievements", "実績"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Evolução", "Progress", "成長"],
+        I18n["Conquistas e marcos", "Achievements and milestones", "実績と節目"],
+        I18n[
+            "Celebre os registros que marcam sua dedicação, constância e evolução no taiko.",
+            "Celebrate the records that mark your dedication, consistency, and progress in taiko.",
+            "太鼓への努力、継続、成長を示す記録を振り返りましょう。"],
+        I18n["Conquistas registradas", "Recorded achievements", "登録された実績"] + $": {Model.Conquistas.Count}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Insígnias e marcos", "Badges and milestones"]</h3>
-            <p class="mb-0 text-muted">@I18n["Conquistas adicionadas pela equipe ou geradas automaticamente.", "Achievements added by the team or generated automatically."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-turma-grid">
+    <section class="aluno-portal-panel" aria-labelledby="achievementsTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="achievementsTitle">@I18n["Insígnias e marcos", "Badges and milestones", "バッジと節目"]</h2>
+                <p>@I18n["Conquistas adicionadas pela equipe ou geradas automaticamente.", "Achievements added by the team or generated automatically.", "スタッフが登録した実績、または自動的に付与された実績です。"]</p>
+            </div>
+        </div>
+
         @if (Model.Conquistas.Count == 0)
         {
-            <p class="text-muted mb-0">@I18n["Nenhuma conquista registrada ainda.", "No achievements registered yet."]</p>
+            <p class="aluno-portal-empty-inline">@I18n["Nenhuma conquista registrada ainda.", "No achievements registered yet.", "まだ実績は登録されていません。"]</p>
         }
         else
         {
-            @foreach (var conquista in Model.Conquistas)
-            {
-                <article class="aluno-portal-turma-card">
-                    <span>@(string.IsNullOrWhiteSpace(conquista.Categoria) ? I18n["Conquista", "Achievement"] : conquista.Categoria)</span>
-                    <h3>@conquista.Nome</h3>
-                    <p>@(string.IsNullOrWhiteSpace(conquista.Descricao) ? I18n["Marco registrado na sua jornada.", "Milestone registered in your journey."] : conquista.Descricao)</p>
-                    <small>@I18n.Term(conquista.Origem) | @conquista.ConcedidaEmUtc.ToLocalTime().ToString("dd/MM/yyyy")</small>
-                    @if (!string.IsNullOrWhiteSpace(conquista.Observacao))
-                    {
-                        <small>@conquista.Observacao</small>
-                    }
-                </article>
-            }
+            <div class="aluno-portal-achievement-grid">
+                @foreach (var conquista in Model.Conquistas)
+                {
+                    <article class="aluno-portal-achievement-card">
+                        <div class="aluno-portal-achievement-symbol" aria-hidden="true">
+                            @(string.IsNullOrWhiteSpace(conquista.Icone) ? "魂" : conquista.Icone)
+                        </div>
+                        <span class="aluno-portal-kicker">
+                            @(string.IsNullOrWhiteSpace(conquista.Categoria) ? I18n["Conquista", "Achievement", "実績"] : conquista.Categoria)
+                        </span>
+                        <h3>@conquista.Nome</h3>
+                        <p class="aluno-portal-card-copy">
+                            @(string.IsNullOrWhiteSpace(conquista.Descricao)
+                                ? I18n["Marco registrado na sua jornada.", "Milestone registered in your journey.", "あなたの歩みに刻まれた節目です。"]
+                                : conquista.Descricao)
+                        </p>
+                        @if (!string.IsNullOrWhiteSpace(conquista.Observacao))
+                        {
+                            <p class="aluno-portal-card-note">@conquista.Observacao</p>
+                        }
+                        <p class="aluno-portal-card-meta">
+                            <span>@I18n.Term(conquista.Origem)</span>
+                            <time datetime="@conquista.ConcedidaEmUtc.ToString("O")">
+                                @conquista.ConcedidaEmUtc.ToLocalTime().ToString("dd/MM/yyyy")
+                            </time>
+                        </p>
+                    </article>
+                }
+            </div>
         }
-    </div>
-</section>
+    </section>
+</div>

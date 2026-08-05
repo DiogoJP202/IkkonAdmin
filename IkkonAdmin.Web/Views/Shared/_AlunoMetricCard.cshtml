@@ -1,0 +1,10 @@
+@model AlunoMetricCardViewModel
+
+<article class="aluno-portal-metric aluno-portal-metric--@Model.Tone">
+    <span>@Model.Label</span>
+    <strong>@Model.Value</strong>
+    @if (!string.IsNullOrWhiteSpace(Model.Hint))
+    {
+        <small>@Model.Hint</small>
+    }
+</article>

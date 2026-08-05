@@ -1,39 +1,76 @@
 @model AreaAlunoEventosViewModel
 @{
     Layout = "_AlunoLayout";
-    ViewData["Title"] = I18n["Eventos", "Events"];
+    ViewData["Title"] = I18n["Eventos", "Events", "イベント"];
+    var pageHeader = new AlunoPageHeaderViewModel(
+        I18n["Agenda da comunidade", "Community calendar", "コミュニティの予定"],
+        I18n["Eventos e datas importantes", "Events and important dates", "イベントと大切な日程"],
+        I18n[
+            "Consulte apresentações, encontros, exames e atividades ligados à sua jornada na IKKON.",
+            "Review performances, gatherings, exams, and activities connected to your journey at IKKON.",
+            "IKKONでの活動に関わる公演、交流会、審査、行事を確認できます。"],
+        I18n["Próximos eventos", "Upcoming events", "今後のイベント"] + $": {Model.Eventos.Count}");
 }
 
-<section class="aluno-portal-panel">
-    <div class="aluno-portal-panel-head">
-        <div>
-            <h3>@I18n["Eventos e datas importantes", "Events and important dates"]</h3>
-            <p class="mb-0 text-muted">@I18n["Eventos vinculados a você, suas turmas ou todos os alunos.", "Events linked to you, your groups, or all students."]</p>
-        </div>
-    </div>
+<div class="aluno-portal-page">
+    <partial name="_AlunoPageHeader" model="pageHeader" />
 
-    <div class="aluno-portal-list">
+    <section class="aluno-portal-panel" aria-labelledby="eventsListTitle">
+        <div class="aluno-portal-panel-head">
+            <div>
+                <h2 id="eventsListTitle">@I18n["Agenda de eventos", "Events calendar", "イベント一覧"]</h2>
+                <p>@I18n["Eventos vinculados a você, suas turmas ou todos os alunos.", "Events linked to you, your groups, or all students.", "あなた、所属クラス、または生徒全体に関連するイベントです。"]</p>
+            </div>
+        </div>
+
         @if (Model.Eventos.Count == 0)
         {
-            <p class="text-muted mb-0">@I18n["Nenhum evento futuro cadastrado.", "No upcoming events registered."]</p>
+            <p class="aluno-portal-empty-inline">@I18n["Nenhum evento futuro cadastrado.", "No upcoming events registered.", "今後のイベントは登録されていません。"]</p>
         }
         else
         {
-            @foreach (var evento in Model.Eventos)
-            {
-                <article class="aluno-portal-list-item">
-                    <strong>@evento.Titulo</strong>
-                    <span>@I18n.Term(evento.Tipo) | @evento.Inicio.ToString("dd/MM/yyyy HH:mm") - @evento.Fim.ToString("HH:mm") @(evento.Importante ? I18n["| Importante", "| Important"] : string.Empty)</span>
-                    @if (!string.IsNullOrWhiteSpace(evento.Local))
-                    {
-                        <span>@evento.Local</span>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(evento.Descricao))
-                    {
-                        <span>@evento.Descricao</span>
-                    }
-                </article>
-            }
+            <div class="aluno-portal-feed">
+                @foreach (var evento in Model.Eventos)
+                {
+                    <article class="aluno-portal-event-card @(evento.Importante ? "is-important" : string.Empty)">
+                        <time class="aluno-portal-event-date" datetime="@evento.Inicio.ToString("O")">
+                            <strong>@evento.Inicio.ToString("dd")</strong>
+                            <span>@evento.Inicio.ToString("MMM", System.Globalization.CultureInfo.CurrentCulture)</span>
+                        </time>
+                        <div>
+                            <div class="aluno-portal-card-topline">
+                                <div>
+                                    <h3>@evento.Titulo</h3>
+                                    <p class="aluno-portal-card-meta">
+                                        <span>@I18n.Term(evento.Tipo)</span>
+                                        <span>@evento.Inicio.ToString("HH:mm")–@evento.Fim.ToString("HH:mm")</span>
+                                        @if (evento.Importante)
+                                        {
+                                            <span>@I18n["Importante", "Important", "重要"]</span>
+                                        }
+                                    </p>
+                                </div>
+                                @if (evento.Importante)
+                                {
+                                    <span class="aluno-portal-badge aluno-portal-badge--danger">
+                                        @I18n["Atenção", "Attention", "注目"]
+                                    </span>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(evento.Local))
+                            {
+                                <p class="aluno-portal-card-meta">
+                                    <strong>@I18n["Local", "Location", "場所"]:</strong> @evento.Local
+                                </p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(evento.Descricao))
+                            {
+                                <p class="aluno-portal-card-copy">@evento.Descricao</p>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
         }
-    </div>
-</section>
+    </section>
+</div>
