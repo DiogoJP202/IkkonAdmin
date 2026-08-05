@@ -142,8 +142,7 @@ public class UserSettingsServiceTests
         return new UserSettingsService(
             dbContext,
             passwordHasher ?? new PasswordHasher<UsuarioSistema>(),
-            new FakeFileStorageService(),
-            new UserSettingsQueryService(dbContext));
+            new FakeFileStorageService());
     }
 
     private static UsuarioSistema CriarUsuario(string login, string email)

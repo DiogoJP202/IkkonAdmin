@@ -12,38 +12,6 @@ public class AlunoService(
     IClock clock,
     IAlunoQueryService queryService) : IAlunoService
 {
-    public Task<(IReadOnlyList<Aluno> Itens, int TotalRegistros)> ListarAsync(
-        string? busca = null,
-        StatusAlunoEnum? status = null,
-        int? turmaId = null,
-        int pagina = 1,
-        int tamanhoPagina = 20,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(busca, status, turmaId, pagina, tamanhoPagina, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarTurmasAsync(cancellationToken);
-    }
-
-    public Task<Aluno?> ObterParaEdicaoAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return dbContext.Alunos
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public Task<Aluno?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterDetalhesAsync(id, cancellationToken);
-    }
-
-    public Task<bool> ExisteCpfAsync(string cpf, int? ignorarAlunoId = null, CancellationToken cancellationToken = default)
-    {
-        return queryService.ExisteCpfAsync(cpf, ignorarAlunoId, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(Aluno aluno, CancellationToken cancellationToken = default)
     {
         NormalizarAluno(aluno);

@@ -234,7 +234,7 @@ public class FinanceiroServiceTests
 
     private static FinanceiroService CriarService(ApplicationDbContext dbContext)
     {
-        return new FinanceiroService(dbContext, new TestClock(), new FinanceiroQueryService(dbContext, new TestClock()));
+        return new FinanceiroService(dbContext, new TestClock());
     }
 
     private static Aluno CriarAluno()

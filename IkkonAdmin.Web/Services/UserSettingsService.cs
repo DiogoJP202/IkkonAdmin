@@ -11,8 +11,7 @@ namespace IkkonAdmin.Web.Services;
 public class UserSettingsService(
     ApplicationDbContext dbContext,
     IPasswordHasher<UsuarioSistema> passwordHasher,
-    IFileStorageService fileStorageService,
-    IUserSettingsQueryService queryService) : IUserSettingsService
+    IFileStorageService fileStorageService) : IUserSettingsService
 {
     private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -23,11 +22,6 @@ public class UserSettingsService(
     };
 
     private const long MaxImageSizeBytes = 2 * 1024 * 1024;
-
-    public Task<UserSettingsPageViewModel?> GetPageAsync(int userId, CancellationToken cancellationToken = default)
-    {
-        return queryService.GetPageAsync(userId, cancellationToken);
-    }
 
     public async Task<OperationResult> UpdateAccountInfoAsync(
         int userId,

@@ -13,6 +13,7 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize]
 [Authorize(Policy = AuthorizationPolicies.ConfiguracoesView)]
 public class ConfiguracoesController(
+    IUserSettingsQueryService userSettingsQueryService,
     IUserSettingsService userSettingsService,
     IAuthService authService,
     ICurrentUserService currentUserService) : Controller
@@ -27,7 +28,7 @@ public class ConfiguracoesController(
             return Challenge();
         }
 
-        var vm = await userSettingsService.GetPageAsync(userId, cancellationToken);
+        var vm = await userSettingsQueryService.GetPageAsync(userId, cancellationToken);
         if (vm is null)
         {
             return Forbid();

@@ -9,7 +9,7 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.DashboardView)]
-public class HomeController(IDashboardService dashboardService) : Controller
+public class HomeController(IDashboardQueryService dashboardQueryService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(
@@ -18,7 +18,7 @@ public class HomeController(IDashboardService dashboardService) : Controller
         int? turmaId,
         CancellationToken cancellationToken)
     {
-        var dashboard = await dashboardService.ObterDashboardAsync(
+        var dashboard = await dashboardQueryService.ObterDashboardAsync(
             anoReferencia,
             mesReferencia,
             turmaId,

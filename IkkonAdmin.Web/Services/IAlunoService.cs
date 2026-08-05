@@ -6,18 +6,6 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IAlunoService
 {
-    Task<(IReadOnlyList<Aluno> Itens, int TotalRegistros)> ListarAsync(
-        string? busca = null,
-        StatusAlunoEnum? status = null,
-        int? turmaId = null,
-        int pagina = 1,
-        int tamanhoPagina = 20,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default);
-    Task<Aluno?> ObterParaEdicaoAsync(int id, CancellationToken cancellationToken = default);
-    Task<Aluno?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default);
-    Task<bool> ExisteCpfAsync(string cpf, int? ignorarAlunoId = null, CancellationToken cancellationToken = default);
     Task<OperationResult<int>> CriarAsync(Aluno aluno, CancellationToken cancellationToken = default);
     Task<OperationResult> AtualizarAsync(int id, Aluno alunoAtualizado, CancellationToken cancellationToken = default);
     Task<OperationResult> AlterarStatusAsync(int id, StatusAlunoEnum status, CancellationToken cancellationToken = default);

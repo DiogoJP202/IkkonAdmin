@@ -11,31 +11,6 @@ public class TurmaService(
     IClock clock,
     ITurmaQueryService queryService) : ITurmaService
 {
-    public Task<IReadOnlyList<Turma>> ListarAsync(
-        string? busca = null,
-        bool? ativa = null,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(busca, ativa, cancellationToken);
-    }
-
-    public Task<Turma?> ObterComAlunosAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterComAlunosAsync(id, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Aluno>> ListarAlunosVinculaveisAsync(
-        int? turmaIdAtual = null,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAlunosVinculaveisAsync(turmaIdAtual, cancellationToken);
-    }
-
-    public Task<bool> ExisteNomeAsync(string nome, int? ignorarTurmaId = null, CancellationToken cancellationToken = default)
-    {
-        return queryService.ExisteNomeAsync(nome, ignorarTurmaId, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(
         Turma turma,
         IReadOnlyCollection<int> alunosIds,

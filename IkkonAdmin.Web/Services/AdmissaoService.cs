@@ -10,27 +10,8 @@ namespace IkkonAdmin.Web.Services;
 public class AdmissaoService(
     ApplicationDbContext dbContext,
     IClock clock,
-    IAdmissaoQueryService queryService,
     IAlunoQueryService alunoQueryService) : IAdmissaoService
 {
-    public Task<IReadOnlyList<Admissao>> ListarAsync(
-        string? busca = null,
-        StatusAdmissaoEnum? status = null,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(busca, status, cancellationToken);
-    }
-
-    public Task<Admissao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterDetalhesAsync(id, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Turma>> ListarTurmasAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarTurmasAsync(cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(Admissao admissao, CancellationToken cancellationToken = default)
     {
         admissao.NomeInteressado = admissao.NomeInteressado.Trim();

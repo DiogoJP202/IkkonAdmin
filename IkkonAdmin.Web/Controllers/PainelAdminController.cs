@@ -10,6 +10,7 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Admin)]
 public class PainelAdminController(
+    IAdminPainelQueryService adminPainelQueryService,
     IAdminPainelService adminPainelService,
     IConfiguracaoService configuracaoService,
     ICurrentUserService currentUserService) : Controller
@@ -19,7 +20,7 @@ public class PainelAdminController(
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Administração";
-        var vm = await adminPainelService.ObterPainelAsync(cancellationToken);
+        var vm = await adminPainelQueryService.ObterPainelAsync(cancellationToken);
         return View(vm);
     }
 
@@ -35,7 +36,7 @@ public class PainelAdminController(
         CancellationToken cancellationToken = default)
     {
         ViewData["Title"] = "Gestao de Usuarios";
-        var vm = await adminPainelService.ListarUsuariosAsync(
+        var vm = await adminPainelQueryService.ListarUsuariosAsync(
             busca,
             tipo,
             ativo,
@@ -102,7 +103,7 @@ public class PainelAdminController(
     public async Task<IActionResult> EditarUsuario(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Editar Usuário";
-        var model = await adminPainelService.ObterUsuarioParaEdicaoAsync(id, cancellationToken);
+        var model = await adminPainelQueryService.ObterUsuarioParaEdicaoAsync(id, cancellationToken);
         if (model is null)
         {
             return NotFound();
@@ -201,7 +202,7 @@ public class PainelAdminController(
     public async Task<IActionResult> Acessos(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Permissões e Acessos";
-        var vm = await adminPainelService.ObterAcessosAsync(id, cancellationToken);
+        var vm = await adminPainelQueryService.ObterAcessosAsync(id, cancellationToken);
         if (vm is null)
         {
             return NotFound();
@@ -249,7 +250,7 @@ public class PainelAdminController(
         CancellationToken cancellationToken = default)
     {
         ViewData["Title"] = "Cargos";
-        var vm = await adminPainelService.ListarRolesAsync(
+        var vm = await adminPainelQueryService.ListarRolesAsync(
             busca,
             tipo,
             ativo,
@@ -265,7 +266,7 @@ public class PainelAdminController(
     public async Task<IActionResult> NovoCargo(CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Novo Cargo";
-        var model = await adminPainelService.ObterRoleParaCriacaoAsync(cancellationToken);
+        var model = await adminPainelQueryService.ObterRoleParaCriacaoAsync(cancellationToken);
         return View(model);
     }
 
@@ -311,7 +312,7 @@ public class PainelAdminController(
     public async Task<IActionResult> EditarCargo(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Editar Cargo";
-        var model = await adminPainelService.ObterRoleParaEdicaoAsync(id, cancellationToken);
+        var model = await adminPainelQueryService.ObterRoleParaEdicaoAsync(id, cancellationToken);
         if (model is null)
         {
             return NotFound();
@@ -413,7 +414,7 @@ public class PainelAdminController(
         CancellationToken cancellationToken = default)
     {
         ViewData["Title"] = "Logs e Auditoria";
-        var vm = await adminPainelService.ListarLogsAsync(
+        var vm = await adminPainelQueryService.ListarLogsAsync(
             busca,
             usuarioResponsavelId,
             pagina,
@@ -462,7 +463,7 @@ public class PainelAdminController(
 
     private async Task PopularRolesNoFormularioUsuarioAsync(AdminUsuarioFormViewModel model, CancellationToken cancellationToken)
     {
-        model.RolesDisponiveis = await adminPainelService.ListarRolesAtivasAsync(null, cancellationToken);
+        model.RolesDisponiveis = await adminPainelQueryService.ListarRolesAtivasAsync(null, cancellationToken);
 
         if (model.RoleId <= 0 && model.RolesDisponiveis.Count > 0)
         {
@@ -481,7 +482,7 @@ public class PainelAdminController(
     {
         if (model.Id.HasValue)
         {
-            var existente = await adminPainelService.ObterRoleParaEdicaoAsync(model.Id.Value, cancellationToken);
+            var existente = await adminPainelQueryService.ObterRoleParaEdicaoAsync(model.Id.Value, cancellationToken);
             if (existente is not null)
             {
                 model.PermissoesDisponiveis = existente.PermissoesDisponiveis;
@@ -489,7 +490,7 @@ public class PainelAdminController(
         }
         else
         {
-            var novo = await adminPainelService.ObterRoleParaCriacaoAsync(cancellationToken);
+            var novo = await adminPainelQueryService.ObterRoleParaCriacaoAsync(cancellationToken);
             model.PermissoesDisponiveis = novo.PermissoesDisponiveis;
         }
 

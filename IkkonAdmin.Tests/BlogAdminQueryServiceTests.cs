@@ -93,18 +93,9 @@ public class BlogAdminQueryServiceTests
         var lookupService = new BlogLookupService(dbContext);
         var languageService = new BlogLanguageService();
         var dateTimeService = new BlogDateTimeService();
-        var textService = new BlogTextService(new BlogContentSanitizer());
-        var slugService = new BlogSlugService(dbContext);
-        var workflowService = new BlogWorkflowService(
-            dbContext,
-            lookupService,
-            slugService,
-            textService,
-            dateTimeService);
 
         return new BlogAdminQueryService(
             dbContext,
-            workflowService,
             lookupService,
             languageService,
             dateTimeService);

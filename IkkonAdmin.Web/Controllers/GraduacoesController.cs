@@ -11,16 +11,18 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.GraduacoesView)]
-public class GraduacoesController(IGraduacaoService graduacaoService) : Controller
+public class GraduacoesController(
+    IGraduacaoQueryService graduacaoQueryService,
+    IGraduacaoService graduacaoService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string? busca, bool? somenteAprovados, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Graduações";
 
-        var graduacoes = await graduacaoService.ListarAsync(busca, somenteAprovados, cancellationToken);
-        var exames = await graduacaoService.ListarExamesAsync(cancellationToken);
-        var alunosAptos = await graduacaoService.ListarAlunosAptosAsync(cancellationToken);
+        var graduacoes = await graduacaoQueryService.ListarAsync(busca, somenteAprovados, cancellationToken);
+        var exames = await graduacaoQueryService.ListarExamesAsync(cancellationToken);
+        var alunosAptos = await graduacaoQueryService.ListarAlunosAptosAsync(cancellationToken);
         var resumoNivelAtual = await ObterResumoNivelAtualAsync(cancellationToken);
 
         var vm = new GraduacaoIndexViewModel
@@ -158,13 +160,13 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
     {
         ViewData["Title"] = "Detalhes da Graduação";
 
-        var graduacao = await graduacaoService.ObterDetalhesAsync(id, cancellationToken);
+        var graduacao = await graduacaoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (graduacao is null)
         {
             return NotFound();
         }
 
-        var historicoAluno = await graduacaoService.ListarHistoricoAlunoAsync(graduacao.AlunoId, cancellationToken);
+        var historicoAluno = await graduacaoQueryService.ListarHistoricoAlunoAsync(graduacao.AlunoId, cancellationToken);
 
         var vm = new GraduacaoDetalhesViewModel
         {
@@ -200,8 +202,8 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
 
     private async Task PopularDadosFormularioAsync(GraduacaoViewModel model, CancellationToken cancellationToken)
     {
-        var alunos = await graduacaoService.ListarAlunosAptosAsync(cancellationToken);
-        var exames = await graduacaoService.ListarExamesAsync(cancellationToken);
+        var alunos = await graduacaoQueryService.ListarAlunosAptosAsync(cancellationToken);
+        var exames = await graduacaoQueryService.ListarExamesAsync(cancellationToken);
         var resumoNivelAtual = await ObterResumoNivelAtualAsync(cancellationToken);
 
         model.AlunosDisponiveis = alunos
@@ -234,7 +236,7 @@ public class GraduacoesController(IGraduacaoService graduacaoService) : Controll
 
     private async Task<Dictionary<int, ResumoNivelAtual>> ObterResumoNivelAtualAsync(CancellationToken cancellationToken)
     {
-        var graduacoesAprovadas = await graduacaoService.ListarAsync(
+        var graduacoesAprovadas = await graduacaoQueryService.ListarAsync(
             somenteAprovados: true,
             cancellationToken: cancellationToken);
 

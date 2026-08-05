@@ -12,36 +12,6 @@ public class GraduacaoService(
     IClock clock,
     IGraduacaoQueryService queryService) : IGraduacaoService
 {
-    public Task<IReadOnlyList<Graduacao>> ListarAsync(
-        string? busca = null,
-        bool? somenteAprovados = null,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(busca, somenteAprovados, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Graduacao>> ListarHistoricoAlunoAsync(
-        int alunoId,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarHistoricoAlunoAsync(alunoId, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Aluno>> ListarAlunosAptosAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAlunosAptosAsync(cancellationToken);
-    }
-
-    public Task<IReadOnlyList<ExameGraduacao>> ListarExamesAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarExamesAsync(cancellationToken);
-    }
-
-    public Task<Graduacao?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterDetalhesAsync(id, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarExameAsync(
         ExameGraduacao exame,
         CancellationToken cancellationToken = default)

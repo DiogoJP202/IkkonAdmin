@@ -10,7 +10,9 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.FinanceiroView)]
-public class FinanceiroController(IFinanceiroService financeiroService) : Controller
+public class FinanceiroController(
+    IFinanceiroQueryService financeiroQueryService,
+    IFinanceiroService financeiroService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(
@@ -23,7 +25,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
         ViewData["Title"] = "Financeiro";
         tamanhoPagina = NormalizarTamanhoPagina(tamanhoPagina);
 
-        var vm = await financeiroService.ObterResumoAsync(buscaAluno, statusFiltro, pagina, tamanhoPagina, cancellationToken);
+        var vm = await financeiroQueryService.ObterResumoAsync(buscaAluno, statusFiltro, pagina, tamanhoPagina, cancellationToken);
         return View(vm);
     }
 
@@ -54,7 +56,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     public async Task<IActionResult> Atrasados(CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Mensalidades Atrasadas";
-        var vm = await financeiroService.ObterAtrasadosAsync(cancellationToken);
+        var vm = await financeiroQueryService.ObterAtrasadosAsync(cancellationToken);
         return View(vm);
     }
 
@@ -69,7 +71,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
             return View(new RegistrarPagamentoViewModel { ReturnUrl = returnUrl });
         }
 
-        var vm = await financeiroService.ObterFormularioPagamentoAsync(mensalidadeId.Value, cancellationToken);
+        var vm = await financeiroQueryService.ObterFormularioPagamentoAsync(mensalidadeId.Value, cancellationToken);
         if (vm is null)
         {
             return NotFound();
@@ -134,7 +136,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
     public async Task<IActionResult> HistoricoAluno(int alunoId, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Histórico Financeiro";
-        var vm = await financeiroService.ObterHistoricoAlunoAsync(alunoId, cancellationToken);
+        var vm = await financeiroQueryService.ObterHistoricoAlunoAsync(alunoId, cancellationToken);
 
         if (vm is null)
         {
@@ -146,7 +148,7 @@ public class FinanceiroController(IFinanceiroService financeiroService) : Contro
 
     private async Task RecarregarContextoPagamentoAsync(RegistrarPagamentoViewModel model, CancellationToken cancellationToken)
     {
-        var contexto = await financeiroService.ObterFormularioPagamentoAsync(model.MensalidadeId, cancellationToken);
+        var contexto = await financeiroQueryService.ObterFormularioPagamentoAsync(model.MensalidadeId, cancellationToken);
         if (contexto is null)
         {
             return;

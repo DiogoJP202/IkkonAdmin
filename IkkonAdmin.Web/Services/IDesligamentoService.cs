@@ -5,14 +5,6 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IDesligamentoService
 {
-    Task<IReadOnlyList<Desligamento>> ListarAsync(
-        string? busca = null,
-        bool? confirmado = null,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<Aluno>> ListarAlunosElegiveisAsync(CancellationToken cancellationToken = default);
-    Task<Desligamento?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default);
-    Task<decimal> CalcularPendenciasAsync(int alunoId, CancellationToken cancellationToken = default);
     Task<OperationResult<int>> CriarAsync(Desligamento desligamento, CancellationToken cancellationToken = default);
     Task<OperationResult> AtualizarAsync(
         int id,

@@ -9,14 +9,14 @@ namespace IkkonAdmin.Web.Controllers;
 [AllowAnonymous]
 [Route("blog")]
 [Route("{culture:regex(^(pt|en|ja)$)}/blog")]
-public class BlogController(IBlogService blogService, IViewTextService i18n) : Controller
+public class BlogController(IBlogPublicService blogPublicService, IViewTextService i18n) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index(
         [FromQuery] BlogPublicFilterViewModel filtro,
         CancellationToken cancellationToken)
     {
-        var viewModel = await blogService.ListarPublicoAsync(filtro, cancellationToken);
+        var viewModel = await blogPublicService.ListarPublicoAsync(filtro, cancellationToken);
         var hasTaxonomyOrSearchFilter =
             !string.IsNullOrWhiteSpace(viewModel.Filtro.Q) ||
             !string.IsNullOrWhiteSpace(viewModel.Filtro.Categoria) ||
@@ -84,7 +84,7 @@ public class BlogController(IBlogService blogService, IViewTextService i18n) : C
     [HttpGet("{slug}")]
     public async Task<IActionResult> Details(string slug, CancellationToken cancellationToken)
     {
-        var viewModel = await blogService.ObterPublicoPorSlugAsync(slug, cancellationToken);
+        var viewModel = await blogPublicService.ObterPublicoPorSlugAsync(slug, cancellationToken);
         if (viewModel is null)
         {
             return NotFound();

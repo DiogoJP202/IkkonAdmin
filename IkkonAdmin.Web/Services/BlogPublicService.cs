@@ -8,15 +8,12 @@ namespace IkkonAdmin.Web.Services;
 
 public sealed class BlogPublicService(
     ApplicationDbContext dbContext,
-    IBlogWorkflowService blogWorkflowService,
     IBlogLanguageService blogLanguageService) : IBlogPublicService
 {
     public async Task<BlogPublicIndexViewModel> ListarPublicoAsync(
         BlogPublicFilterViewModel filtro,
         CancellationToken cancellationToken = default)
     {
-        await blogWorkflowService.PromoteScheduledPostsAsync(cancellationToken);
-
         var now = DateTime.UtcNow;
         var pageSize = 9;
         var currentPage = Math.Max(1, filtro.Pagina);
@@ -76,8 +73,6 @@ public sealed class BlogPublicService(
         {
             return null;
         }
-
-        await blogWorkflowService.PromoteScheduledPostsAsync(cancellationToken);
 
         var now = DateTime.UtcNow;
         var normalizedSlug = slug.Trim();

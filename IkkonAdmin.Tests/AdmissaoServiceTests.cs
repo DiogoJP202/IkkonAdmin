@@ -330,7 +330,6 @@ public class AdmissaoServiceTests
         return new AdmissaoService(
             dbContext,
             new TestClock(),
-            new AdmissaoQueryService(dbContext),
             new AlunoQueryService(dbContext));
     }
 

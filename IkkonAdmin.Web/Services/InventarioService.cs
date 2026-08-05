@@ -10,31 +10,8 @@ namespace IkkonAdmin.Web.Services;
 
 public class InventarioService(
     ApplicationDbContext dbContext,
-    IClock clock,
-    IInventarioQueryService queryService) : IInventarioService
+    IClock clock) : IInventarioService
 {
-    public Task<InventarioIndexViewModel> ListarAsync(
-        InventarioFiltroViewModel filtro,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(filtro, cancellationToken);
-    }
-
-    public Task<InventarioDetalhesViewModel?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterDetalhesAsync(id, cancellationToken);
-    }
-
-    public Task<InventarioFormViewModel> ObterFormCriacaoAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterFormCriacaoAsync(cancellationToken);
-    }
-
-    public Task<InventarioFormViewModel?> ObterFormEdicaoAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterFormEdicaoAsync(id, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(
         InventarioFormViewModel model,
         int? usuarioId,

@@ -215,8 +215,7 @@ public class DesligamentoServiceTests
     {
         return new DesligamentoService(
             dbContext,
-            new TestClock(),
-            new DesligamentoQueryService(dbContext, new TestClock()));
+            new TestClock());
     }
 
     private static Aluno CriarAluno(string nome)

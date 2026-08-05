@@ -13,6 +13,7 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.InventarioView)]
 public class InventarioController(
+    IInventarioQueryService inventarioQueryService,
     IInventarioService inventarioService,
     ICurrentUserService currentUserService) : Controller
 {
@@ -20,7 +21,7 @@ public class InventarioController(
     public async Task<IActionResult> Index([FromQuery] InventarioFiltroViewModel filtro, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Inventário";
-        var vm = await inventarioService.ListarAsync(filtro, cancellationToken);
+        var vm = await inventarioQueryService.ListarAsync(filtro, cancellationToken);
         return View(vm);
     }
 
@@ -28,7 +29,7 @@ public class InventarioController(
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Detalhes do item";
-        var vm = await inventarioService.ObterDetalhesAsync(id, cancellationToken);
+        var vm = await inventarioQueryService.ObterDetalhesAsync(id, cancellationToken);
         return vm is null ? NotFound() : View(vm);
     }
 
@@ -37,7 +38,7 @@ public class InventarioController(
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Novo item";
-        var vm = await inventarioService.ObterFormCriacaoAsync(cancellationToken);
+        var vm = await inventarioQueryService.ObterFormCriacaoAsync(cancellationToken);
         return View(vm);
     }
 
@@ -50,7 +51,7 @@ public class InventarioController(
 
         if (!ModelState.IsValid)
         {
-            var form = await inventarioService.ObterFormCriacaoAsync(cancellationToken);
+            var form = await inventarioQueryService.ObterFormCriacaoAsync(cancellationToken);
             model.TiposSugeridos = form.TiposSugeridos;
             return View(model);
         }
@@ -59,7 +60,7 @@ public class InventarioController(
         if (!result.Success)
         {
             result.AddToModelState(ModelState);
-            var form = await inventarioService.ObterFormCriacaoAsync(cancellationToken);
+            var form = await inventarioQueryService.ObterFormCriacaoAsync(cancellationToken);
             model.TiposSugeridos = form.TiposSugeridos;
             return View(model);
         }
@@ -73,7 +74,7 @@ public class InventarioController(
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Editar item";
-        var vm = await inventarioService.ObterFormEdicaoAsync(id, cancellationToken);
+        var vm = await inventarioQueryService.ObterFormEdicaoAsync(id, cancellationToken);
         return vm is null ? NotFound() : View(vm);
     }
 
@@ -91,7 +92,7 @@ public class InventarioController(
 
         if (!ModelState.IsValid)
         {
-            var form = await inventarioService.ObterFormEdicaoAsync(id, cancellationToken);
+            var form = await inventarioQueryService.ObterFormEdicaoAsync(id, cancellationToken);
             model.TiposSugeridos = form?.TiposSugeridos ?? [];
             return View(model);
         }
@@ -105,7 +106,7 @@ public class InventarioController(
         if (!result.Success)
         {
             result.AddToModelState(ModelState);
-            var form = await inventarioService.ObterFormEdicaoAsync(id, cancellationToken);
+            var form = await inventarioQueryService.ObterFormEdicaoAsync(id, cancellationToken);
             model.TiposSugeridos = form?.TiposSugeridos ?? [];
             return View(model);
         }

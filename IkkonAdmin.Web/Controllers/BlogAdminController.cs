@@ -12,6 +12,7 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.BlogView)]
 public class BlogAdminController(
+    IBlogAdminQueryService blogAdminQueryService,
     IBlogService blogService,
     IBlogMediaService blogMediaService,
     ICurrentUserService currentUserService,
@@ -21,7 +22,7 @@ public class BlogAdminController(
     public async Task<IActionResult> Index([FromQuery] BlogAdminFilterViewModel filtro, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Blog";
-        var vm = await blogService.ListarAsync(filtro, cancellationToken);
+        var vm = await blogAdminQueryService.ListarAsync(filtro, cancellationToken);
         return View(vm);
     }
 
@@ -30,7 +31,7 @@ public class BlogAdminController(
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Novo post";
-        var vm = await blogService.ObterFormCriacaoAsync(ObterUsuarioId(), cancellationToken);
+        var vm = await blogAdminQueryService.ObterFormCriacaoAsync(ObterUsuarioId(), cancellationToken);
         return View(vm);
     }
 
@@ -69,7 +70,7 @@ public class BlogAdminController(
     public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Editar post";
-        var vm = await blogService.ObterFormEdicaoAsync(id, cancellationToken);
+        var vm = await blogAdminQueryService.ObterFormEdicaoAsync(id, cancellationToken);
         return vm is null ? NotFound() : View(vm);
     }
 
@@ -112,7 +113,7 @@ public class BlogAdminController(
     public async Task<IActionResult> Preview(int id, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Preview do post";
-        var vm = await blogService.ObterPreviewAsync(id, cancellationToken);
+        var vm = await blogAdminQueryService.ObterPreviewAsync(id, cancellationToken);
         return vm is null ? NotFound() : View(vm);
     }
 
@@ -120,7 +121,7 @@ public class BlogAdminController(
     [Authorize(Policy = AuthorizationPolicies.BlogEdit)]
     public async Task<IActionResult> Versions(int id, CancellationToken cancellationToken)
     {
-        var vm = await blogService.ObterVersoesAsync(id, cancellationToken);
+        var vm = await blogAdminQueryService.ObterVersoesAsync(id, cancellationToken);
         return vm is null ? NotFound() : PartialView("_BlogPostVersionsModalBody", vm);
     }
 
@@ -191,8 +192,8 @@ public class BlogAdminController(
     private async Task RecarregarOpcoesAsync(BlogPostFormViewModel model, CancellationToken cancellationToken)
     {
         var source = model.Id.HasValue
-            ? await blogService.ObterFormEdicaoAsync(model.Id.Value, cancellationToken)
-            : await blogService.ObterFormCriacaoAsync(ObterUsuarioId(), cancellationToken);
+            ? await blogAdminQueryService.ObterFormEdicaoAsync(model.Id.Value, cancellationToken)
+            : await blogAdminQueryService.ObterFormCriacaoAsync(ObterUsuarioId(), cancellationToken);
 
         model.CategoryOptions = source?.CategoryOptions ?? [];
         model.AuthorOptions = source?.AuthorOptions ?? [];

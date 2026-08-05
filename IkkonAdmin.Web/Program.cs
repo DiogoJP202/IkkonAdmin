@@ -2,6 +2,7 @@ using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
 using IkkonAdmin.Web.Infrastructure.Localization;
+using IkkonAdmin.Web.Infrastructure.Maintenance;
 using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
@@ -99,7 +100,6 @@ builder.Services.AddScoped<IDesligamentoService, DesligamentoService>();
 builder.Services.AddScoped<IGraduacaoQueryService, GraduacaoQueryService>();
 builder.Services.AddScoped<IGraduacaoService, GraduacaoService>();
 builder.Services.AddScoped<IDashboardQueryService, DashboardQueryService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IConfiguracaoSistemaProvider, ConfiguracaoSistemaProvider>();
 builder.Services.AddScoped<IConfiguracaoQueryService, ConfiguracaoQueryService>();
 builder.Services.AddScoped<IConfiguracaoService, ConfiguracaoService>();
@@ -145,6 +145,9 @@ builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection
 builder.Services.AddScoped<IGoogleAgendaConnectionService, GoogleAgendaConnectionService>();
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
+builder.Services.Configure<OperationalMaintenanceOptions>(
+    builder.Configuration.GetSection(OperationalMaintenanceOptions.SectionName));
+builder.Services.AddHostedService<OperationalMaintenanceHostedService>();
 
 var app = builder.Build();
 

@@ -17,38 +17,8 @@ public class AdminPainelService(
     ApplicationDbContext dbContext,
     IPasswordHasher<UsuarioSistema> passwordHasher,
     IClock clock,
-    IAuditLogger auditLogger,
-    IAdminPainelQueryService queryService) : IAdminPainelService
+    IAuditLogger auditLogger) : IAdminPainelService
 {
-    public Task<AdminPainelViewModel> ObterPainelAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterPainelAsync(cancellationToken);
-    }
-
-    public Task<AdminUsuariosIndexViewModel> ListarUsuariosAsync(
-        string? busca,
-        TipoAcessoEnum? tipo,
-        bool? ativo,
-        bool incluirExcluidos,
-        int pagina,
-        int tamanhoPagina,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarUsuariosAsync(busca, tipo, ativo, incluirExcluidos, pagina, tamanhoPagina, cancellationToken);
-    }
-
-    public Task<List<AdminRoleSelectItemViewModel>> ListarRolesAtivasAsync(
-        TipoAcessoEnum? tipoAcesso,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarRolesAtivasAsync(tipoAcesso, cancellationToken);
-    }
-
-    public Task<AdminUsuarioFormViewModel?> ObterUsuarioParaEdicaoAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterUsuarioParaEdicaoAsync(id, cancellationToken);
-    }
-
     public async Task<OperationResult> CriarUsuarioAsync(
         AdminUsuarioFormViewModel model,
         int usuarioResponsavelId,
@@ -295,11 +265,6 @@ public class AdminPainelService(
         return OperationResult.Ok("Usuário excluído com sucesso.");
     }
 
-    public Task<AdminAcessosViewModel?> ObterAcessosAsync(int usuarioId, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterAcessosAsync(usuarioId, cancellationToken);
-    }
-
     public async Task<OperationResult> AtualizarAcessosAsync(
         AdminAcessosUpdateRequest request,
         int usuarioResponsavelId,
@@ -362,27 +327,6 @@ public class AdminPainelService(
             cancellationToken);
 
         return OperationResult.Ok("Acessos atualizados com sucesso.");
-    }
-
-    public Task<AdminRolesIndexViewModel> ListarRolesAsync(
-        string? busca,
-        TipoAcessoEnum? tipo,
-        bool? ativo,
-        int pagina,
-        int tamanhoPagina,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarRolesAsync(busca, tipo, ativo, pagina, tamanhoPagina, cancellationToken);
-    }
-
-    public Task<AdminRoleFormViewModel> ObterRoleParaCriacaoAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterRoleParaCriacaoAsync(cancellationToken);
-    }
-
-    public Task<AdminRoleFormViewModel?> ObterRoleParaEdicaoAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterRoleParaEdicaoAsync(id, cancellationToken);
     }
 
     public async Task<OperationResult> CriarRoleAsync(
@@ -650,16 +594,6 @@ public class AdminPainelService(
             cancellationToken);
 
         return OperationResult.Ok("Cargo removido com sucesso.");
-    }
-
-    public Task<AdminLogsIndexViewModel> ListarLogsAsync(
-        string? busca,
-        int? usuarioResponsavelId,
-        int pagina,
-        int tamanhoPagina,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarLogsAsync(busca, usuarioResponsavelId, pagina, tamanhoPagina, cancellationToken);
     }
 
     private async Task<List<int>> ValidarPermissoesSelecionadasAsync(

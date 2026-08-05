@@ -10,33 +10,10 @@ namespace IkkonAdmin.Web.Services;
 
 public class FinanceiroService(
     ApplicationDbContext dbContext,
-    IClock clock,
-    IFinanceiroQueryService queryService) : IFinanceiroService
+    IClock clock) : IFinanceiroService
 {
     private const decimal ValorBasePadraoMensalidade = 260m;
     private const int DiaPadraoVencimento = 10;
-
-    public async Task<FinanceiroIndexViewModel> ObterResumoAsync(
-        string? buscaAluno = null,
-        StatusMensalidadeEnum? statusFiltro = null,
-        int pagina = 1,
-        int tamanhoPagina = 20,
-        CancellationToken cancellationToken = default)
-    {
-        await AtualizarAtrasosAsync(cancellationToken);
-        return await queryService.ObterResumoAsync(buscaAluno, statusFiltro, pagina, tamanhoPagina, cancellationToken);
-    }
-
-    public async Task<FinanceiroAtrasadosViewModel> ObterAtrasadosAsync(CancellationToken cancellationToken = default)
-    {
-        await AtualizarAtrasosAsync(cancellationToken);
-        return await queryService.ObterAtrasadosAsync(cancellationToken);
-    }
-
-    public Task<RegistrarPagamentoViewModel?> ObterFormularioPagamentoAsync(int mensalidadeId, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterFormularioPagamentoAsync(mensalidadeId, cancellationToken);
-    }
 
     public async Task<OperationResult> RegistrarPagamentoAsync(
         RegistrarPagamentoViewModel model,
@@ -236,13 +213,7 @@ public class FinanceiroService(
         return OperationResult.Ok("Status da mensalidade atualizado.");
     }
 
-    public async Task<FinanceiroHistoricoAlunoViewModel?> ObterHistoricoAlunoAsync(int alunoId, CancellationToken cancellationToken = default)
-    {
-        await AtualizarAtrasosAsync(cancellationToken);
-        return await queryService.ObterHistoricoAlunoAsync(alunoId, cancellationToken);
-    }
-
-    private async Task AtualizarAtrasosAsync(CancellationToken cancellationToken)
+    public async Task<int> AtualizarAtrasosAsync(CancellationToken cancellationToken = default)
     {
         var config = await ObterConfiguracaoFinanceiraAsync(cancellationToken);
         var hoje = DateOnly.FromDateTime(clock.Today);
@@ -255,7 +226,7 @@ public class FinanceiroService(
 
         if (pendentesVencidas.Count == 0)
         {
-            return;
+            return 0;
         }
 
         foreach (var mensalidade in pendentesVencidas)
@@ -276,6 +247,7 @@ public class FinanceiroService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        return pendentesVencidas.Count;
     }
 
     private async Task<ConfiguracaoSistema?> ObterConfiguracaoFinanceiraAsync(CancellationToken cancellationToken)

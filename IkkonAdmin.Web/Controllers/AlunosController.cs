@@ -12,7 +12,9 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.AlunosView)]
-public class AlunosController(IAlunoService alunoService) : Controller
+public class AlunosController(
+    IAlunoQueryService alunoQueryService,
+    IAlunoService alunoService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(
@@ -26,8 +28,8 @@ public class AlunosController(IAlunoService alunoService) : Controller
         ViewData["Title"] = "Alunos";
         tamanhoPagina = NormalizarTamanhoPagina(tamanhoPagina);
 
-        var resultado = await alunoService.ListarAsync(busca, status, turmaId, pagina, tamanhoPagina, cancellationToken);
-        var turmas = await alunoService.ListarTurmasAsync(cancellationToken);
+        var resultado = await alunoQueryService.ListarAsync(busca, status, turmaId, pagina, tamanhoPagina, cancellationToken);
+        var turmas = await alunoQueryService.ListarTurmasAsync(cancellationToken);
 
         var vm = new AlunoIndexViewModel
         {
@@ -123,7 +125,7 @@ public class AlunosController(IAlunoService alunoService) : Controller
     {
         ViewData["Title"] = "Editar Aluno";
 
-        var aluno = await alunoService.ObterParaEdicaoAsync(id, cancellationToken);
+        var aluno = await alunoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (aluno is null)
         {
             return NotFound();
@@ -206,7 +208,7 @@ public class AlunosController(IAlunoService alunoService) : Controller
     {
         ViewData["Title"] = "Detalhes do Aluno";
 
-        var aluno = await alunoService.ObterDetalhesAsync(id, cancellationToken);
+        var aluno = await alunoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (aluno is null)
         {
             return NotFound();
@@ -287,7 +289,7 @@ public class AlunosController(IAlunoService alunoService) : Controller
 
     private async Task PopularTurmasAsync(int? turmaSelecionada, CancellationToken cancellationToken)
     {
-        var turmas = await alunoService.ListarTurmasAsync(cancellationToken);
+        var turmas = await alunoQueryService.ListarTurmasAsync(cancellationToken);
         ViewBag.Turmas = new SelectList(turmas, nameof(Turma.Id), nameof(Turma.Nome), turmaSelecionada);
     }
 

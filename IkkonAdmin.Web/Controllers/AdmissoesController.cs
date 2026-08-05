@@ -11,14 +11,16 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.AdmissoesView)]
-public class AdmissoesController(IAdmissaoService admissaoService) : Controller
+public class AdmissoesController(
+    IAdmissaoQueryService admissaoQueryService,
+    IAdmissaoService admissaoService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string? busca, StatusAdmissaoEnum? status, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Admissões";
 
-        var admissoes = await admissaoService.ListarAsync(busca, status, cancellationToken);
+        var admissoes = await admissaoQueryService.ListarAsync(busca, status, cancellationToken);
 
         var vm = new AdmissaoIndexViewModel
         {
@@ -193,13 +195,13 @@ public class AdmissoesController(IAdmissaoService admissaoService) : Controller
         AdmissaoMatriculaViewModel matriculaModel,
         CancellationToken cancellationToken)
     {
-        var admissao = await admissaoService.ObterDetalhesAsync(id, cancellationToken);
+        var admissao = await admissaoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (admissao is null)
         {
             return null;
         }
 
-        var turmas = await admissaoService.ListarTurmasAsync(cancellationToken);
+        var turmas = await admissaoQueryService.ListarTurmasAsync(cancellationToken);
 
         return new AdmissaoDetalhesViewModel
         {

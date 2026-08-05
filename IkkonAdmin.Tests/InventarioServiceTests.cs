@@ -96,8 +96,7 @@ public class InventarioServiceTests
     {
         return new InventarioService(
             dbContext,
-            new TestClock(),
-            new InventarioQueryService(dbContext));
+            new TestClock());
     }
 
     private static InventarioFormViewModel CriarForm(string nome, string codigo)

@@ -9,32 +9,8 @@ namespace IkkonAdmin.Web.Services;
 
 public class DesligamentoService(
     ApplicationDbContext dbContext,
-    IClock clock,
-    IDesligamentoQueryService queryService) : IDesligamentoService
+    IClock clock) : IDesligamentoService
 {
-    public Task<IReadOnlyList<Desligamento>> ListarAsync(
-        string? busca = null,
-        bool? confirmado = null,
-        CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAsync(busca, confirmado, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<Aluno>> ListarAlunosElegiveisAsync(CancellationToken cancellationToken = default)
-    {
-        return queryService.ListarAlunosElegiveisAsync(cancellationToken);
-    }
-
-    public Task<Desligamento?> ObterDetalhesAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return queryService.ObterDetalhesAsync(id, cancellationToken);
-    }
-
-    public Task<decimal> CalcularPendenciasAsync(int alunoId, CancellationToken cancellationToken = default)
-    {
-        return queryService.CalcularPendenciasAsync(alunoId, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(
         Desligamento desligamento,
         CancellationToken cancellationToken = default)

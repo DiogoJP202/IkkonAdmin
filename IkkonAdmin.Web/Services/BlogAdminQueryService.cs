@@ -7,7 +7,6 @@ namespace IkkonAdmin.Web.Services;
 
 public sealed class BlogAdminQueryService(
     ApplicationDbContext dbContext,
-    IBlogWorkflowService blogWorkflowService,
     IBlogLookupService blogLookupService,
     IBlogLanguageService blogLanguageService,
     IBlogDateTimeService blogDateTimeService) : IBlogAdminQueryService
@@ -16,8 +15,6 @@ public sealed class BlogAdminQueryService(
         BlogAdminFilterViewModel filtro,
         CancellationToken cancellationToken = default)
     {
-        await blogWorkflowService.PromoteScheduledPostsAsync(cancellationToken);
-
         var baseQuery = dbContext.BlogPosts
             .AsNoTracking()
             .Where(x => x.DeletedAtUtc == null);
@@ -138,8 +135,6 @@ public sealed class BlogAdminQueryService(
         int id,
         CancellationToken cancellationToken = default)
     {
-        await blogWorkflowService.PromoteScheduledPostsAsync(cancellationToken);
-
         var post = await dbContext.BlogPosts
             .AsNoTracking()
             .Include(x => x.PostTags)
@@ -188,8 +183,6 @@ public sealed class BlogAdminQueryService(
         int id,
         CancellationToken cancellationToken = default)
     {
-        await blogWorkflowService.PromoteScheduledPostsAsync(cancellationToken);
-
         return await dbContext.BlogPosts
             .AsNoTracking()
             .Where(x => x.Id == id && x.DeletedAtUtc == null)
@@ -214,5 +207,79 @@ public sealed class BlogAdminQueryService(
                     .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<BlogVersionOverviewViewModel?> ObterVersoesAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var source = await dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.Id == id && x.DeletedAtUtc == null)
+            .Select(x => new
+            {
+                x.Id,
+                x.Title,
+                x.LanguageCode,
+                x.TranslationGroupId
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (source is null)
+        {
+            return null;
+        }
+
+        var groupId = source.TranslationGroupId ?? source.Id;
+        var versions = await dbContext.BlogPosts
+            .AsNoTracking()
+            .Where(x => x.DeletedAtUtc == null &&
+                        (x.Id == groupId || x.TranslationGroupId == groupId))
+            .Select(x => new
+            {
+                x.Id,
+                x.Title,
+                x.Slug,
+                x.LanguageCode,
+                x.Status,
+                x.UpdatedAtUtc,
+                x.PublishedAtUtc,
+                x.CreatedAtUtc
+            })
+            .ToListAsync(cancellationToken);
+
+        return new BlogVersionOverviewViewModel
+        {
+            SourcePostId = source.Id,
+            TranslationGroupId = groupId,
+            SourceTitle = source.Title,
+            SourceLanguageCode = blogLanguageService.Normalize(source.LanguageCode),
+            Versions = blogLanguageService.SupportedLanguages
+                .Select(language =>
+                {
+                    var version = versions
+                        .Where(x => string.Equals(blogLanguageService.Normalize(x.LanguageCode), language.Code, StringComparison.OrdinalIgnoreCase))
+                        .OrderByDescending(x => x.Id == source.Id)
+                        .ThenBy(x => x.Id)
+                        .FirstOrDefault();
+
+                    return new BlogVersionItemViewModel
+                    {
+                        LanguageCode = language.Code,
+                        LanguageLabel = language.Label,
+                        NativeLabel = language.NativeLabel,
+                        SlugSuffix = language.SlugSuffix,
+                        IsDefault = language.IsDefault,
+                        IsCurrent = version?.Id == source.Id,
+                        PostId = version?.Id,
+                        Title = version?.Title,
+                        Slug = version?.Slug,
+                        Status = version?.Status,
+                        UpdatedAtUtc = version?.UpdatedAtUtc ?? version?.CreatedAtUtc,
+                        PublishedAtUtc = version?.PublishedAtUtc
+                    };
+                })
+                .ToList()
+        };
     }
 }

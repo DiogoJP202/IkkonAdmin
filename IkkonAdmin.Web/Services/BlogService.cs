@@ -10,63 +10,14 @@ namespace IkkonAdmin.Web.Services;
 public class BlogService(
     ApplicationDbContext dbContext,
     IBlogMediaService blogMediaService,
-    IBlogAdminQueryService blogAdminQueryService,
     IBlogWorkflowService blogWorkflowService,
     IBlogLookupService blogLookupService,
     IBlogLanguageService blogLanguageService,
     IBlogTextService blogTextService,
     IBlogSlugService blogSlugService,
     IBlogTagService blogTagService,
-    IBlogPublicService blogPublicService,
     IBlogVersionService blogVersionService) : IBlogService
 {
-    public async Task<BlogAdminIndexViewModel> ListarAsync(
-        BlogAdminFilterViewModel filtro,
-        CancellationToken cancellationToken = default)
-    {
-        return await blogAdminQueryService.ListarAsync(filtro, cancellationToken);
-    }
-
-    public async Task<BlogPostFormViewModel> ObterFormCriacaoAsync(
-        int? usuarioAtualId,
-        CancellationToken cancellationToken = default)
-    {
-        return await blogAdminQueryService.ObterFormCriacaoAsync(usuarioAtualId, cancellationToken);
-    }
-
-    public async Task<BlogPostFormViewModel?> ObterFormEdicaoAsync(
-        int id,
-        CancellationToken cancellationToken = default)
-    {
-        return await blogAdminQueryService.ObterFormEdicaoAsync(id, cancellationToken);
-    }
-
-    public Task<BlogPublicIndexViewModel> ListarPublicoAsync(
-        BlogPublicFilterViewModel filtro,
-        CancellationToken cancellationToken = default)
-    {
-        return blogPublicService.ListarPublicoAsync(filtro, cancellationToken);
-    }
-
-    public Task<BlogPublicDetailsViewModel?> ObterPublicoPorSlugAsync(
-        string slug,
-        CancellationToken cancellationToken = default)
-    {
-        return blogPublicService.ObterPublicoPorSlugAsync(slug, cancellationToken);
-    }
-
-    public async Task<BlogPreviewViewModel?> ObterPreviewAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return await blogAdminQueryService.ObterPreviewAsync(id, cancellationToken);
-    }
-
-    public Task<BlogVersionOverviewViewModel?> ObterVersoesAsync(
-        int id,
-        CancellationToken cancellationToken = default)
-    {
-        return blogVersionService.ObterVersoesAsync(id, cancellationToken);
-    }
-
     public async Task<OperationResult<int>> CriarAsync(
         BlogPostFormViewModel model,
         int? usuarioAtualId,

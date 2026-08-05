@@ -10,14 +10,16 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.TurmasView)]
-public class TurmasController(ITurmaService turmaService) : Controller
+public class TurmasController(
+    ITurmaQueryService turmaQueryService,
+    ITurmaService turmaService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string? busca, bool? ativa, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Turmas";
 
-        var turmas = await turmaService.ListarAsync(busca, ativa, cancellationToken);
+        var turmas = await turmaQueryService.ListarAsync(busca, ativa, cancellationToken);
 
         var vm = new TurmaIndexViewModel
         {
@@ -96,7 +98,7 @@ public class TurmasController(ITurmaService turmaService) : Controller
     {
         ViewData["Title"] = "Editar Turma";
 
-        var turma = await turmaService.ObterComAlunosAsync(id, cancellationToken);
+        var turma = await turmaQueryService.ObterComAlunosAsync(id, cancellationToken);
         if (turma is null)
         {
             return NotFound();
@@ -168,7 +170,7 @@ public class TurmasController(ITurmaService turmaService) : Controller
 
     private async Task PopularAlunosAsync(TurmaFormViewModel model, int? turmaIdAtual, CancellationToken cancellationToken)
     {
-        var alunos = await turmaService.ListarAlunosVinculaveisAsync(turmaIdAtual, cancellationToken);
+        var alunos = await turmaQueryService.ListarAlunosVinculaveisAsync(turmaIdAtual, cancellationToken);
         model.AlunosDisponiveis = alunos
             .Select(x => new TurmaAlunoOpcaoViewModel
             {

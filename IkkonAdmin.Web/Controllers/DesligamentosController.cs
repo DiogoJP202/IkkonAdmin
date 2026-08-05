@@ -10,14 +10,16 @@ namespace IkkonAdmin.Web.Controllers;
 
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 [Authorize(Policy = AuthorizationPolicies.DesligamentosView)]
-public class DesligamentosController(IDesligamentoService desligamentoService) : Controller
+public class DesligamentosController(
+    IDesligamentoQueryService desligamentoQueryService,
+    IDesligamentoService desligamentoService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string? busca, bool? confirmado, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Desligamentos";
 
-        var desligamentos = await desligamentoService.ListarAsync(busca, confirmado, cancellationToken);
+        var desligamentos = await desligamentoQueryService.ListarAsync(busca, confirmado, cancellationToken);
 
         var vm = new DesligamentoIndexViewModel
         {
@@ -68,7 +70,7 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
 
         if (model.CalcularPendenciasAutomaticamente)
         {
-            model.PendenciaFinanceira = await desligamentoService.CalcularPendenciasAsync(model.AlunoId, cancellationToken);
+            model.PendenciaFinanceira = await desligamentoQueryService.CalcularPendenciasAsync(model.AlunoId, cancellationToken);
         }
 
         var desligamento = new Desligamento
@@ -115,13 +117,13 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
     [Authorize(Policy = AuthorizationPolicies.DesligamentosEdit)]
     public async Task<IActionResult> RecalcularPendencias(int id, string? returnUrl, CancellationToken cancellationToken)
     {
-        var detalhes = await desligamentoService.ObterDetalhesAsync(id, cancellationToken);
+        var detalhes = await desligamentoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (detalhes is null)
         {
             return NotFound();
         }
 
-        var novoTotal = await desligamentoService.CalcularPendenciasAsync(detalhes.AlunoId, cancellationToken);
+        var novoTotal = await desligamentoQueryService.CalcularPendenciasAsync(detalhes.AlunoId, cancellationToken);
 
         var result = await desligamentoService.AtualizarAsync(
             id,
@@ -205,7 +207,7 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
 
     private async Task PopularAlunosDisponiveisAsync(DesligamentoCreateViewModel model, CancellationToken cancellationToken)
     {
-        var alunos = await desligamentoService.ListarAlunosElegiveisAsync(cancellationToken);
+        var alunos = await desligamentoQueryService.ListarAlunosElegiveisAsync(cancellationToken);
         model.AlunosDisponiveis = alunos
             .Select(x => new DesligamentoAlunoOpcaoViewModel
             {
@@ -219,7 +221,7 @@ public class DesligamentosController(IDesligamentoService desligamentoService) :
 
     private async Task<DesligamentoDetalhesViewModel?> ConstruirDetalhesAsync(int id, CancellationToken cancellationToken)
     {
-        var desligamento = await desligamentoService.ObterDetalhesAsync(id, cancellationToken);
+        var desligamento = await desligamentoQueryService.ObterDetalhesAsync(id, cancellationToken);
         if (desligamento is null)
         {
             return null;
