@@ -25,6 +25,16 @@ public sealed record OperationResult(
     {
         return new OperationResult(false, message, Array.Empty<OperationError>(), OperationResultStatus.NotFound);
     }
+
+    public static OperationResult Forbidden(string message)
+    {
+        return new OperationResult(false, message, Array.Empty<OperationError>(), OperationResultStatus.Forbidden);
+    }
+
+    public static OperationResult Conflict(string message, string? field = null)
+    {
+        return new OperationResult(false, message, [new OperationError(field, message)], OperationResultStatus.Conflict);
+    }
 }
 
 public sealed record OperationResult<T>(
@@ -52,5 +62,15 @@ public sealed record OperationResult<T>(
     public static OperationResult<T> NotFound(string message)
     {
         return new OperationResult<T>(false, message, default, Array.Empty<OperationError>(), OperationResultStatus.NotFound);
+    }
+
+    public static OperationResult<T> Forbidden(string message)
+    {
+        return new OperationResult<T>(false, message, default, Array.Empty<OperationError>(), OperationResultStatus.Forbidden);
+    }
+
+    public static OperationResult<T> Conflict(string message, string? field = null)
+    {
+        return new OperationResult<T>(false, message, default, [new OperationError(field, message)], OperationResultStatus.Conflict);
     }
 }

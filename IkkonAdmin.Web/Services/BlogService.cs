@@ -1,5 +1,6 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +67,7 @@ public class BlogService(
         return blogVersionService.ObterVersoesAsync(id, cancellationToken);
     }
 
-    public async Task<BlogOperationResult> CriarAsync(
+    public async Task<OperationResult<int>> CriarAsync(
         BlogPostFormViewModel model,
         int? usuarioAtualId,
         CancellationToken cancellationToken = default)
@@ -82,7 +83,7 @@ public class BlogService(
 
         if (!validacao.Success)
         {
-            return BlogOperationResult.Fail(validacao.Message);
+            return OperationResult<int>.Fail(validacao.Message);
         }
 
         string? coverImageUrl = null;
@@ -91,7 +92,7 @@ public class BlogService(
             var saveResult = await blogMediaService.SaveCoverImageAsync(model.CoverImage, null, cancellationToken);
             if (!saveResult.Success)
             {
-                return BlogOperationResult.Fail(saveResult.Message);
+                return OperationResult<int>.Fail(saveResult.Message);
             }
 
             coverImageUrl = saveResult.PublicUrl;
@@ -135,15 +136,15 @@ public class BlogService(
         await blogTagService.SyncTagsAsync(post, model.TagsInput, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok(
+        return OperationResult<int>.Ok(
+            post.Id,
             validacao.Status == BlogPostStatusEnum.Scheduled ? "Post criado e agendado com sucesso." :
             validacao.Status == BlogPostStatusEnum.Published ? "Post criado e publicado com sucesso." :
             validacao.Status == BlogPostStatusEnum.Archived ? "Post criado e arquivado com sucesso." :
-            "Rascunho criado com sucesso.",
-            post.Id);
+            "Rascunho criado com sucesso.");
     }
 
-    public Task<BlogOperationResult> CriarVersaoAsync(
+    public Task<OperationResult<int>> CriarVersaoAsync(
         int id,
         string languageCode,
         int? usuarioAtualId,
@@ -152,7 +153,7 @@ public class BlogService(
         return blogVersionService.CriarVersaoAsync(id, languageCode, usuarioAtualId, cancellationToken);
     }
 
-    public async Task<BlogOperationResult> AtualizarAsync(
+    public async Task<OperationResult<int>> AtualizarAsync(
         int id,
         BlogPostFormViewModel model,
         int? usuarioAtualId,
@@ -167,7 +168,7 @@ public class BlogService(
 
         if (post is null)
         {
-            return BlogOperationResult.Fail("Post não encontrado.");
+            return OperationResult<int>.NotFound("Post não encontrado.");
         }
 
         var author = await blogLookupService.GetValidAuthorAsync(model.AuthorUserId, cancellationToken);
@@ -181,7 +182,7 @@ public class BlogService(
 
         if (!validacao.Success)
         {
-            return BlogOperationResult.Fail(validacao.Message);
+            return OperationResult<int>.Fail(validacao.Message);
         }
 
         var coverImageUrl = post.CoverImageUrl;
@@ -197,7 +198,7 @@ public class BlogService(
             var saveResult = await blogMediaService.SaveCoverImageAsync(model.CoverImage, post.CoverImageUrl, cancellationToken);
             if (!saveResult.Success)
             {
-                return BlogOperationResult.Fail(saveResult.Message);
+                return OperationResult<int>.Fail(saveResult.Message);
             }
 
             coverImageUrl = saveResult.PublicUrl;
@@ -234,15 +235,15 @@ public class BlogService(
         await blogTagService.SyncTagsAsync(post, model.TagsInput, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok(
+        return OperationResult<int>.Ok(
+            post.Id,
             validacao.Status == BlogPostStatusEnum.Scheduled ? "Post atualizado e agendado com sucesso." :
             validacao.Status == BlogPostStatusEnum.Published ? "Post atualizado e publicado com sucesso." :
             validacao.Status == BlogPostStatusEnum.Archived ? "Post arquivado com sucesso." :
-            "Rascunho atualizado com sucesso.",
-            post.Id);
+            "Rascunho atualizado com sucesso.");
     }
 
-    public async Task<BlogOperationResult> ExcluirAsync(
+    public async Task<OperationResult<int>> ExcluirAsync(
         int id,
         int? usuarioAtualId,
         CancellationToken cancellationToken = default)
@@ -250,17 +251,17 @@ public class BlogService(
         var post = await dbContext.BlogPosts.FirstOrDefaultAsync(x => x.Id == id && x.DeletedAtUtc == null, cancellationToken);
         if (post is null)
         {
-            return BlogOperationResult.Fail("Post não encontrado.");
+            return OperationResult<int>.NotFound("Post não encontrado.");
         }
 
         post.DeletedAtUtc = DateTime.UtcNow;
         post.UpdatedAtUtc = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Post excluído com sucesso.", post.Id);
+        return OperationResult<int>.Ok(post.Id, "Post excluído com sucesso.");
     }
 
-    public Task<BlogOperationResult> ExcluirVersaoAsync(
+    public Task<OperationResult<int>> ExcluirVersaoAsync(
         int id,
         int versionId,
         int? usuarioAtualId,

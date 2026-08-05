@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.ViewModels;
 
 namespace IkkonAdmin.Web.Services;
@@ -21,13 +22,13 @@ public interface IAdminPainelService
         CancellationToken cancellationToken = default);
 
     Task<AdminUsuarioFormViewModel?> ObterUsuarioParaEdicaoAsync(int id, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> CriarUsuarioAsync(AdminUsuarioFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> AtualizarUsuarioAsync(int id, AdminUsuarioFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> AlterarStatusUsuarioAsync(int id, bool ativo, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> ExcluirUsuarioAsync(int id, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> CriarUsuarioAsync(AdminUsuarioFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> AtualizarUsuarioAsync(int id, AdminUsuarioFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> AlterarStatusUsuarioAsync(int id, bool ativo, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> ExcluirUsuarioAsync(int id, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
 
     Task<AdminAcessosViewModel?> ObterAcessosAsync(int usuarioId, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> AtualizarAcessosAsync(AdminAcessosUpdateRequest request, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> AtualizarAcessosAsync(AdminAcessosUpdateRequest request, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
 
     Task<AdminRolesIndexViewModel> ListarRolesAsync(
         string? busca,
@@ -39,10 +40,10 @@ public interface IAdminPainelService
 
     Task<AdminRoleFormViewModel> ObterRoleParaCriacaoAsync(CancellationToken cancellationToken = default);
     Task<AdminRoleFormViewModel?> ObterRoleParaEdicaoAsync(int id, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> CriarRoleAsync(AdminRoleFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> AtualizarRoleAsync(int id, AdminRoleFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> AlterarStatusRoleAsync(int id, bool ativo, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
-    Task<AdminOperationResult> ExcluirRoleAsync(int id, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> CriarRoleAsync(AdminRoleFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> AtualizarRoleAsync(int id, AdminRoleFormViewModel model, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> AlterarStatusRoleAsync(int id, bool ativo, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
+    Task<OperationResult> ExcluirRoleAsync(int id, int usuarioResponsavelId, string? enderecoIp, CancellationToken cancellationToken = default);
 
     Task<AdminLogsIndexViewModel> ListarLogsAsync(
         string? busca,

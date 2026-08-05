@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Auditing;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -48,7 +49,7 @@ public class AdminPainelService(
         return queryService.ObterUsuarioParaEdicaoAsync(id, cancellationToken);
     }
 
-    public async Task<AdminOperationResult> CriarUsuarioAsync(
+    public async Task<OperationResult> CriarUsuarioAsync(
         AdminUsuarioFormViewModel model,
         int usuarioResponsavelId,
         string? enderecoIp,
@@ -56,12 +57,12 @@ public class AdminPainelService(
     {
         if (string.IsNullOrWhiteSpace(model.SenhaInicial))
         {
-            return AdminOperationResult.Fail("Informe uma senha inicial para o usuário.");
+            return OperationResult.Fail("Informe uma senha inicial para o usuário.");
         }
 
         if (!IsStrongPassword(model.SenhaInicial))
         {
-            return AdminOperationResult.Fail("A senha inicial deve ter 8+ caracteres, com letra maiuscula, minuscula, numero e simbolo.");
+            return OperationResult.Fail("A senha inicial deve ter 8+ caracteres, com letra maiuscula, minuscula, numero e simbolo.");
         }
 
         var role = await dbContext.RolesSistema
@@ -69,7 +70,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo inválido para o novo usuário.");
+            return OperationResult.Fail("Cargo inválido para o novo usuário.");
         }
 
         var loginNormalizado = Normalize(model.Login);
@@ -80,7 +81,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.LoginNormalizado == loginNormalizado, cancellationToken);
         if (loginEmUso)
         {
-            return AdminOperationResult.Fail("Este login já está em uso.");
+            return OperationResult.Conflict("Este login já está em uso.", nameof(model.Login));
         }
 
         var emailEmUso = await dbContext.UsuariosSistema
@@ -88,7 +89,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.EmailNormalizado == emailNormalizado, cancellationToken);
         if (emailEmUso)
         {
-            return AdminOperationResult.Fail("Este e-mail já está em uso.");
+            return OperationResult.Conflict("Este e-mail já está em uso.", nameof(model.Email));
         }
 
         var usuario = new UsuarioSistema
@@ -125,10 +126,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuário criado com sucesso.");
+        return OperationResult.Ok("Usuário criado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> AtualizarUsuarioAsync(
+    public async Task<OperationResult> AtualizarUsuarioAsync(
         int id,
         AdminUsuarioFormViewModel model,
         int usuarioResponsavelId,
@@ -141,7 +142,7 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuário não encontrado.");
+            return OperationResult.NotFound("Usuário não encontrado.");
         }
 
         var role = await dbContext.RolesSistema
@@ -149,7 +150,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo inválido para o usuário.");
+            return OperationResult.Fail("Cargo inválido para o usuário.");
         }
 
         var loginNormalizado = Normalize(model.Login);
@@ -160,7 +161,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.Id != id && x.LoginNormalizado == loginNormalizado, cancellationToken);
         if (loginEmUso)
         {
-            return AdminOperationResult.Fail("Este login já está em uso.");
+            return OperationResult.Conflict("Este login já está em uso.", nameof(model.Login));
         }
 
         var emailEmUso = await dbContext.UsuariosSistema
@@ -168,7 +169,7 @@ public class AdminPainelService(
             .AnyAsync(x => x.Id != id && x.EmailNormalizado == emailNormalizado, cancellationToken);
         if (emailEmUso)
         {
-            return AdminOperationResult.Fail("Este e-mail já está em uso.");
+            return OperationResult.Conflict("Este e-mail já está em uso.", nameof(model.Email));
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -197,10 +198,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuário atualizado com sucesso.");
+        return OperationResult.Ok("Usuário atualizado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> AlterarStatusUsuarioAsync(
+    public async Task<OperationResult> AlterarStatusUsuarioAsync(
         int id,
         bool ativo,
         int usuarioResponsavelId,
@@ -213,17 +214,17 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuário não encontrado.");
+            return OperationResult.NotFound("Usuário não encontrado.");
         }
 
         if (usuario.Id == usuarioResponsavelId && !ativo)
         {
-            return AdminOperationResult.Fail("Não é permitido desativar o próprio usuário.");
+            return OperationResult.Forbidden("Não é permitido desativar o próprio usuário.");
         }
 
         if (usuario.Ativo == ativo)
         {
-            return AdminOperationResult.Ok("Status já estava atualizado.");
+            return OperationResult.Ok("Status já estava atualizado.");
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -242,10 +243,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Status atualizado com sucesso.");
+        return OperationResult.Ok("Status atualizado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> ExcluirUsuarioAsync(
+    public async Task<OperationResult> ExcluirUsuarioAsync(
         int id,
         int usuarioResponsavelId,
         string? enderecoIp,
@@ -257,17 +258,17 @@ public class AdminPainelService(
 
         if (usuario is null)
         {
-            return AdminOperationResult.Fail("Usuário não encontrado.");
+            return OperationResult.NotFound("Usuário não encontrado.");
         }
 
         if (usuario.Excluido)
         {
-            return AdminOperationResult.Ok("Usuário já estava excluído.");
+            return OperationResult.Ok("Usuário já estava excluído.");
         }
 
         if (usuario.Id == usuarioResponsavelId)
         {
-            return AdminOperationResult.Fail("Não é permitido excluir o próprio usuário.");
+            return OperationResult.Forbidden("Não é permitido excluir o próprio usuário.");
         }
 
         var antes = SnapshotUsuario(usuario);
@@ -291,7 +292,7 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Usuário excluído com sucesso.");
+        return OperationResult.Ok("Usuário excluído com sucesso.");
     }
 
     public Task<AdminAcessosViewModel?> ObterAcessosAsync(int usuarioId, CancellationToken cancellationToken = default)
@@ -299,7 +300,7 @@ public class AdminPainelService(
         return queryService.ObterAcessosAsync(usuarioId, cancellationToken);
     }
 
-    public async Task<AdminOperationResult> AtualizarAcessosAsync(
+    public async Task<OperationResult> AtualizarAcessosAsync(
         AdminAcessosUpdateRequest request,
         int usuarioResponsavelId,
         string? enderecoIp,
@@ -311,7 +312,7 @@ public class AdminPainelService(
 
         if (usuario is null || usuario.Excluido)
         {
-            return AdminOperationResult.Fail("Usuário não encontrado.");
+            return OperationResult.NotFound("Usuário não encontrado.");
         }
 
         var role = await dbContext.RolesSistema
@@ -319,7 +320,7 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo inválido.");
+            return OperationResult.Fail("Cargo inválido.");
         }
 
         var permissoesValidas = await dbContext.PermissoesSistema
@@ -360,7 +361,7 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Acessos atualizados com sucesso.");
+        return OperationResult.Ok("Acessos atualizados com sucesso.");
     }
 
     public Task<AdminRolesIndexViewModel> ListarRolesAsync(
@@ -384,7 +385,7 @@ public class AdminPainelService(
         return queryService.ObterRoleParaEdicaoAsync(id, cancellationToken);
     }
 
-    public async Task<AdminOperationResult> CriarRoleAsync(
+    public async Task<OperationResult> CriarRoleAsync(
         AdminRoleFormViewModel model,
         int usuarioResponsavelId,
         string? enderecoIp,
@@ -393,18 +394,18 @@ public class AdminPainelService(
         var nome = model.Nome.Trim();
         if (string.IsNullOrWhiteSpace(nome))
         {
-            return AdminOperationResult.Fail("Informe um nome valido para o cargo.");
+            return OperationResult.Fail("Informe um nome valido para o cargo.");
         }
 
         var codigo = NormalizarCodigoRole(model.Codigo, nome);
         if (string.IsNullOrWhiteSpace(codigo))
         {
-            return AdminOperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
+            return OperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
         }
 
         if (codigo.Length > 60)
         {
-            return AdminOperationResult.Fail("Codigo do cargo muito longo. Use um nome/codigo menor.");
+            return OperationResult.Fail("Codigo do cargo muito longo. Use um nome/codigo menor.");
         }
 
         var codigoEmUso = await dbContext.RolesSistema
@@ -412,7 +413,7 @@ public class AdminPainelService(
 
         if (codigoEmUso)
         {
-            return AdminOperationResult.Fail("Já existe um cargo com este código.");
+            return OperationResult.Conflict("Já existe um cargo com este código.", nameof(model.Codigo));
         }
 
         var permissoesIds = await ValidarPermissoesSelecionadasAsync(model.PermissoesSelecionadas, cancellationToken);
@@ -446,10 +447,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Cargo criado com sucesso.");
+        return OperationResult.Ok("Cargo criado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> AtualizarRoleAsync(
+    public async Task<OperationResult> AtualizarRoleAsync(
         int id,
         AdminRoleFormViewModel model,
         int usuarioResponsavelId,
@@ -461,13 +462,13 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo não encontrado.");
+            return OperationResult.NotFound("Cargo não encontrado.");
         }
 
         var nome = model.Nome.Trim();
         if (string.IsNullOrWhiteSpace(nome))
         {
-            return AdminOperationResult.Fail("Informe um nome valido para o cargo.");
+            return OperationResult.Fail("Informe um nome valido para o cargo.");
         }
 
         var codigo = role.IsSistema
@@ -478,12 +479,12 @@ public class AdminPainelService(
         {
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                return AdminOperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
+                return OperationResult.Fail("Não foi possível gerar um código válido para o cargo.");
             }
 
             if (codigo.Length > 60)
             {
-                return AdminOperationResult.Fail("Codigo do cargo muito longo. Use um nome/codigo menor.");
+                return OperationResult.Fail("Codigo do cargo muito longo. Use um nome/codigo menor.");
             }
 
             var codigoEmUso = await dbContext.RolesSistema
@@ -491,7 +492,7 @@ public class AdminPainelService(
 
             if (codigoEmUso)
             {
-                return AdminOperationResult.Fail("Já existe um cargo com este código.");
+                return OperationResult.Conflict("Já existe um cargo com este código.", nameof(model.Codigo));
             }
         }
 
@@ -553,10 +554,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Cargo atualizado com sucesso.");
+        return OperationResult.Ok("Cargo atualizado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> AlterarStatusRoleAsync(
+    public async Task<OperationResult> AlterarStatusRoleAsync(
         int id,
         bool ativo,
         int usuarioResponsavelId,
@@ -568,17 +569,17 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo não encontrado.");
+            return OperationResult.NotFound("Cargo não encontrado.");
         }
 
         if (role.IsSistema)
         {
-            return AdminOperationResult.Fail("Não é permitido alterar status de cargos do sistema.");
+            return OperationResult.Forbidden("Não é permitido alterar status de cargos do sistema.");
         }
 
         if (role.Ativo == ativo)
         {
-            return AdminOperationResult.Ok("Status do cargo já estava atualizado.");
+            return OperationResult.Ok("Status do cargo já estava atualizado.");
         }
 
         var antes = SnapshotRole(role);
@@ -603,10 +604,10 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Status do cargo atualizado com sucesso.");
+        return OperationResult.Ok("Status do cargo atualizado com sucesso.");
     }
 
-    public async Task<AdminOperationResult> ExcluirRoleAsync(
+    public async Task<OperationResult> ExcluirRoleAsync(
         int id,
         int usuarioResponsavelId,
         string? enderecoIp,
@@ -617,12 +618,12 @@ public class AdminPainelService(
 
         if (role is null)
         {
-            return AdminOperationResult.Fail("Cargo não encontrado.");
+            return OperationResult.NotFound("Cargo não encontrado.");
         }
 
         if (role.IsSistema)
         {
-            return AdminOperationResult.Fail("Não é permitido remover cargos do sistema.");
+            return OperationResult.Forbidden("Não é permitido remover cargos do sistema.");
         }
 
         var antes = SnapshotRole(role);
@@ -648,7 +649,7 @@ public class AdminPainelService(
             enderecoIp,
             cancellationToken);
 
-        return AdminOperationResult.Ok("Cargo removido com sucesso.");
+        return OperationResult.Ok("Cargo removido com sucesso.");
     }
 
     public Task<AdminLogsIndexViewModel> ListarLogsAsync(

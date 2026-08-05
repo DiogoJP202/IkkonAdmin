@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using IkkonAdmin.Web.Data;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -77,14 +78,14 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<BlogOperationResult> CriarAsync(BlogCategoryFormViewModel model, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> CriarAsync(BlogCategoryFormViewModel model, CancellationToken cancellationToken = default)
     {
         var normalizedName = NormalizarTexto(model.Name);
         var slug = await GarantirSlugUnicoAsync(GerarSlug(model.Slug, model.Name), null, cancellationToken);
 
         if (await dbContext.BlogCategories.AnyAsync(x => x.Name == normalizedName, cancellationToken))
         {
-            return BlogOperationResult.Fail("Já existe uma categoria com esse nome.");
+            return OperationResult<int>.Conflict("Já existe uma categoria com esse nome.", nameof(model.Name));
         }
 
         var categoria = new BlogCategory
@@ -98,15 +99,15 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         await dbContext.BlogCategories.AddAsync(categoria, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return BlogOperationResult.Ok("Categoria criada com sucesso.", categoria.Id);
+        return OperationResult<int>.Ok(categoria.Id, "Categoria criada com sucesso.");
     }
 
-    public async Task<BlogOperationResult> AtualizarAsync(int id, BlogCategoryFormViewModel model, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> AtualizarAsync(int id, BlogCategoryFormViewModel model, CancellationToken cancellationToken = default)
     {
         var categoria = await dbContext.BlogCategories.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria não encontrada.");
+            return OperationResult<int>.NotFound("Categoria não encontrada.");
         }
 
         var normalizedName = NormalizarTexto(model.Name);
@@ -114,7 +115,7 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         if (await dbContext.BlogCategories.AnyAsync(x => x.Id != id && x.Name == normalizedName, cancellationToken))
         {
-            return BlogOperationResult.Fail("Já existe uma categoria com esse nome.");
+            return OperationResult<int>.Conflict("Já existe uma categoria com esse nome.", nameof(model.Name));
         }
 
         categoria.Name = normalizedName;
@@ -124,25 +125,25 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
         categoria.UpdatedAtUtc = DateTime.UtcNow;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return BlogOperationResult.Ok("Categoria atualizada com sucesso.", categoria.Id);
+        return OperationResult<int>.Ok(categoria.Id, "Categoria atualizada com sucesso.");
     }
 
-    public async Task<BlogOperationResult> AlterarStatusAsync(int id, bool ativo, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> AlterarStatusAsync(int id, bool ativo, CancellationToken cancellationToken = default)
     {
         var categoria = await dbContext.BlogCategories.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria não encontrada.");
+            return OperationResult<int>.NotFound("Categoria não encontrada.");
         }
 
         categoria.IsActive = ativo;
         categoria.UpdatedAtUtc = DateTime.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok(ativo ? "Categoria ativada com sucesso." : "Categoria desativada com sucesso.", categoria.Id);
+        return OperationResult<int>.Ok(categoria.Id, ativo ? "Categoria ativada com sucesso." : "Categoria desativada com sucesso.");
     }
 
-    public async Task<BlogOperationResult> ExcluirAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<OperationResult<int>> ExcluirAsync(int id, CancellationToken cancellationToken = default)
     {
         var categoria = await dbContext.BlogCategories
             .Include(x => x.Posts)
@@ -150,18 +151,18 @@ public class BlogCategoriaService(ApplicationDbContext dbContext) : IBlogCategor
 
         if (categoria is null)
         {
-            return BlogOperationResult.Fail("Categoria não encontrada.");
+            return OperationResult<int>.NotFound("Categoria não encontrada.");
         }
 
         if (categoria.Posts.Any(x => x.DeletedAtUtc == null))
         {
-            return BlogOperationResult.Fail("Esta categoria possui posts vinculados. Desative a categoria para manter o histórico dos posts.");
+            return OperationResult<int>.Conflict("Esta categoria possui posts vinculados. Desative a categoria para manter o histórico dos posts.");
         }
 
         dbContext.BlogCategories.Remove(categoria);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Categoria excluída com sucesso.", categoria.Id);
+        return OperationResult<int>.Ok(categoria.Id, "Categoria excluída com sucesso.");
     }
 
     private async Task<string> GarantirSlugUnicoAsync(string baseSlug, int? ignorarId, CancellationToken cancellationToken)

@@ -214,8 +214,3 @@ public class AdminLogListItemViewModel
     public string? AfetadoNome { get; set; }
 }
 
-public sealed record AdminOperationResult(bool Success, string Message)
-{
-    public static AdminOperationResult Ok(string message) => new(true, message);
-    public static AdminOperationResult Fail(string message) => new(false, message);
-}

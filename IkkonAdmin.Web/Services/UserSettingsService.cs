@@ -1,5 +1,6 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ public class UserSettingsService(
         return queryService.GetPageAsync(userId, cancellationToken);
     }
 
-    public async Task<UserSettingsOperationResult> UpdateAccountInfoAsync(
+    public async Task<OperationResult> UpdateAccountInfoAsync(
         int userId,
         UpdateAccountInfoRequest request,
         CancellationToken cancellationToken = default)
@@ -38,7 +39,7 @@ public class UserSettingsService(
 
         if (user is null)
         {
-            return UserSettingsOperationResult.Fail("Conta não encontrada.");
+            return OperationResult.NotFound("Conta não encontrada.");
         }
 
         var normalizedEmail = Normalize(request.Email);
@@ -49,7 +50,7 @@ public class UserSettingsService(
 
         if (emailAlreadyUsed)
         {
-            return UserSettingsOperationResult.Fail("Este e-mail já está em uso por outra conta.");
+            return OperationResult.Conflict("Este e-mail já está em uso por outra conta.", nameof(request.Email));
         }
 
         user.NomeExibicao = request.NomeCompleto.Trim();
@@ -67,10 +68,10 @@ public class UserSettingsService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return UserSettingsOperationResult.Ok("Dados da conta atualizados com sucesso.");
+        return OperationResult.Ok("Dados da conta atualizados com sucesso.");
     }
 
-    public async Task<UserSettingsOperationResult> ChangePasswordAsync(
+    public async Task<OperationResult> ChangePasswordAsync(
         int userId,
         ChangePasswordRequest request,
         CancellationToken cancellationToken = default)
@@ -80,32 +81,32 @@ public class UserSettingsService(
 
         if (user is null)
         {
-            return UserSettingsOperationResult.Fail("Conta não encontrada.");
+            return OperationResult.NotFound("Conta não encontrada.");
         }
 
         var verifyResult = passwordHasher.VerifyHashedPassword(user, user.SenhaHash, request.SenhaAtual);
         if (verifyResult == PasswordVerificationResult.Failed)
         {
-            return UserSettingsOperationResult.Fail("Não foi possível alterar a senha. Verifique os dados informados.");
+            return OperationResult.Fail("Não foi possível alterar a senha. Verifique os dados informados.");
         }
 
         if (!IsStrongPassword(request.NovaSenha))
         {
-            return UserSettingsOperationResult.Fail("A nova senha deve ter 8+ caracteres, com letra maiúscula, minúscula, número e símbolo.");
+            return OperationResult.Fail("A nova senha deve ter 8+ caracteres, com letra maiúscula, minúscula, número e símbolo.");
         }
 
         if (request.SenhaAtual == request.NovaSenha)
         {
-            return UserSettingsOperationResult.Fail("A nova senha deve ser diferente da senha atual.");
+            return OperationResult.Fail("A nova senha deve ser diferente da senha atual.");
         }
 
         user.SenhaHash = passwordHasher.HashPassword(user, request.NovaSenha);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return UserSettingsOperationResult.Ok("Senha alterada com sucesso.");
+        return OperationResult.Ok("Senha alterada com sucesso.");
     }
 
-    public async Task<UserSettingsOperationResult> UpdatePreferencesAsync(
+    public async Task<OperationResult> UpdatePreferencesAsync(
         int userId,
         UpdatePreferencesRequest request,
         CancellationToken cancellationToken = default)
@@ -115,7 +116,7 @@ public class UserSettingsService(
 
         if (user is null)
         {
-            return UserSettingsOperationResult.Fail("Conta não encontrada.");
+            return OperationResult.NotFound("Conta não encontrada.");
         }
 
         user.TemaPreferencia = request.TemaPreferencia;
@@ -124,23 +125,23 @@ public class UserSettingsService(
         user.NotificarSistema = request.NotificarSistema;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return UserSettingsOperationResult.Ok("Preferências atualizadas com sucesso.");
+        return OperationResult.Ok("Preferências atualizadas com sucesso.");
     }
 
-    private async Task<UserSettingsOperationResult> SaveProfilePhotoAsync(
+    private async Task<OperationResult> SaveProfilePhotoAsync(
         UsuarioSistema user,
         IFormFile photo,
         CancellationToken cancellationToken)
     {
         if (photo.Length > MaxImageSizeBytes)
         {
-            return UserSettingsOperationResult.Fail("A foto de perfil deve ter no máximo 2 MB.");
+            return OperationResult.Fail("A foto de perfil deve ter no máximo 2 MB.");
         }
 
         var extension = Path.GetExtension(photo.FileName ?? string.Empty);
         if (!AllowedImageExtensions.Contains(extension))
         {
-            return UserSettingsOperationResult.Fail("Formato de imagem inválido. Use JPG, PNG ou WEBP.");
+            return OperationResult.Fail("Formato de imagem inválido. Use JPG, PNG ou WEBP.");
         }
 
         if (!string.IsNullOrWhiteSpace(user.FotoPerfilUrl) &&
@@ -167,7 +168,7 @@ public class UserSettingsService(
             cancellationToken);
 
         user.FotoPerfilUrl = result.PublicUrl ?? $"/uploads/perfis/{fileName}";
-        return UserSettingsOperationResult.Ok("Foto atualizada.");
+        return OperationResult.Ok("Foto atualizada.");
     }
 
     private static bool IsStrongPassword(string password)

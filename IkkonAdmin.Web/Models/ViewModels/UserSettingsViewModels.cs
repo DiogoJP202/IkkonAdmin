@@ -112,9 +112,3 @@ public class AccountTypeInfoViewModel
     public string NomeTipoConta { get; set; } = string.Empty;
     public IReadOnlyCollection<string> PermissoesBasicas { get; set; } = Array.Empty<string>();
 }
-
-public sealed record UserSettingsOperationResult(bool Success, string Message)
-{
-    public static UserSettingsOperationResult Ok(string message) => new(true, message);
-    public static UserSettingsOperationResult Fail(string message) => new(false, message);
-}

@@ -61,7 +61,7 @@ public class BlogAdminController(
         }
 
         TempData["Success"] = result.Message;
-        return RedirectToAction(nameof(Edit), new { id = result.EntityId });
+        return RedirectToAction(nameof(Edit), new { id = result.Value });
     }
 
     [HttpGet("editar/{id:int}")]
@@ -134,9 +134,9 @@ public class BlogAdminController(
         {
             success = result.Success,
             message = result.Message,
-            entityId = result.EntityId,
-            redirectUrl = result.Success && result.EntityId.HasValue
-                ? Url.Action(nameof(Edit), new { id = result.EntityId.Value })
+            entityId = result.Value,
+            redirectUrl = result.Success
+                ? Url.Action(nameof(Edit), new { id = result.Value })
                 : null
         });
     }
@@ -151,7 +151,7 @@ public class BlogAdminController(
         {
             success = result.Success,
             message = result.Message,
-            entityId = result.EntityId
+            entityId = result.Value
         });
     }
 

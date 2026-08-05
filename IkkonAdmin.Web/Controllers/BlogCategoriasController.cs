@@ -127,8 +127,8 @@ public class BlogCategoriasController(IBlogCategoriaService blogCategoriaService
         {
             success = true,
             message = result.Message,
-            entityId = result.EntityId,
-            data = await CriarPayloadModalAsync(result.EntityId, cancellationToken)
+            entityId = result.Value,
+            data = await CriarPayloadModalAsync(result.Value, cancellationToken)
         });
     }
 
@@ -153,8 +153,8 @@ public class BlogCategoriasController(IBlogCategoriaService blogCategoriaService
         {
             success = true,
             message = result.Message,
-            entityId = result.EntityId,
-            data = await CriarPayloadModalAsync(result.EntityId, cancellationToken)
+            entityId = result.Value,
+            data = await CriarPayloadModalAsync(result.Value, cancellationToken)
         });
     }
 
@@ -172,7 +172,7 @@ public class BlogCategoriasController(IBlogCategoriaService blogCategoriaService
         {
             success = true,
             message = result.Message,
-            entityId = result.EntityId,
+            entityId = result.Value,
             data = await CriarPayloadModalAsync(selectedCategoryId, cancellationToken)
         });
     }
@@ -193,7 +193,7 @@ public class BlogCategoriasController(IBlogCategoriaService blogCategoriaService
         {
             success = true,
             message = result.Message,
-            entityId = result.EntityId,
+            entityId = result.Value,
             data = await CriarPayloadModalAsync(nextSelectedCategoryId, cancellationToken)
         });
     }

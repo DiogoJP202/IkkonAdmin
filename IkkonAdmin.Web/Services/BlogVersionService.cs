@@ -1,5 +1,6 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Operations;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -87,7 +88,7 @@ public sealed class BlogVersionService(
         };
     }
 
-    public async Task<BlogOperationResult> CriarVersaoAsync(
+    public async Task<OperationResult<int>> CriarVersaoAsync(
         int id,
         string languageCode,
         int? usuarioAtualId,
@@ -96,7 +97,7 @@ public sealed class BlogVersionService(
         var language = blogLanguageService.GetDefinition(languageCode);
         if (language is null)
         {
-            return BlogOperationResult.Fail("Idioma não suportado para versões do blog.");
+            return OperationResult<int>.Fail("Idioma não suportado para versões do blog.");
         }
 
         var source = await dbContext.BlogPosts
@@ -106,7 +107,7 @@ public sealed class BlogVersionService(
 
         if (source is null)
         {
-            return BlogOperationResult.Fail("Post não encontrado.");
+            return OperationResult<int>.NotFound("Post não encontrado.");
         }
 
         var groupId = source.TranslationGroupId ?? source.Id;
@@ -118,7 +119,7 @@ public sealed class BlogVersionService(
 
         if (versionExists)
         {
-            return BlogOperationResult.Fail("Já existe uma versão neste idioma.");
+            return OperationResult<int>.Conflict("Já existe uma versão neste idioma.", nameof(languageCode));
         }
 
         var now = DateTime.UtcNow;
@@ -161,10 +162,10 @@ public sealed class BlogVersionService(
         await blogTagService.SyncTagsAsync(version, tagsInput, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Versão criada como rascunho. Revise a tradução antes de publicar.", version.Id);
+        return OperationResult<int>.Ok(version.Id, "Versão criada como rascunho. Revise a tradução antes de publicar.");
     }
 
-    public async Task<BlogOperationResult> ExcluirVersaoAsync(
+    public async Task<OperationResult<int>> ExcluirVersaoAsync(
         int id,
         int versionId,
         int? usuarioAtualId,
@@ -172,7 +173,7 @@ public sealed class BlogVersionService(
     {
         if (id == versionId)
         {
-            return BlogOperationResult.Fail("Use a ação principal do post para excluir a versão aberta.");
+            return OperationResult<int>.Fail("Use a ação principal do post para excluir a versão aberta.");
         }
 
         var source = await dbContext.BlogPosts
@@ -186,14 +187,14 @@ public sealed class BlogVersionService(
 
         if (source is null || version is null)
         {
-            return BlogOperationResult.Fail("Versão não encontrada.");
+            return OperationResult<int>.NotFound("Versão não encontrada.");
         }
 
         var sourceGroupId = source.TranslationGroupId ?? source.Id;
         var versionGroupId = version.TranslationGroupId ?? version.Id;
         if (sourceGroupId != versionGroupId)
         {
-            return BlogOperationResult.Fail("Esta versão não pertence ao post atual.");
+            return OperationResult<int>.Fail("Esta versão não pertence ao post atual.");
         }
 
         var now = DateTime.UtcNow;
@@ -201,6 +202,6 @@ public sealed class BlogVersionService(
         version.UpdatedAtUtc = now;
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return BlogOperationResult.Ok("Versão excluída com sucesso.", version.Id);
+        return OperationResult<int>.Ok(version.Id, "Versão excluída com sucesso.");
     }
 }

@@ -216,12 +216,6 @@ public class BlogCategoryFormViewModel
     public bool IsActive { get; set; } = true;
 }
 
-public sealed record BlogOperationResult(bool Success, string Message, int? EntityId = null)
-{
-    public static BlogOperationResult Ok(string message, int? entityId = null) => new(true, message, entityId);
-    public static BlogOperationResult Fail(string message) => new(false, message);
-}
-
 public sealed record BlogMediaSaveResult(bool Success, string Message, string? PublicUrl = null)
 {
     public static BlogMediaSaveResult Ok(string publicUrl) => new(true, "Imagem salva com sucesso.", publicUrl);
