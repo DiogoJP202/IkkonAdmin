@@ -156,16 +156,19 @@ builder.Services.AddHostedService<StudentAutomationHostedService>();
 
 var app = builder.Build();
 
-try
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    DatabaseBootstrap.EnsureDatabaseReady(dbContext);
-}
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Erro ao executar DatabaseBootstrap.EnsureDatabaseReady no startup.");
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        DatabaseBootstrap.EnsureDatabaseReady(dbContext);
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro ao executar DatabaseBootstrap.EnsureDatabaseReady no startup.");
+    }
 }
 
 if (!app.Environment.IsDevelopment())
@@ -174,7 +177,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/erro/{0}");
+app.UseWhen(
+    context => HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method),
+    branch => branch.UseStatusCodePagesWithReExecute("/erro/{0}"));
 app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseStaticFiles(new StaticFileOptions
@@ -321,3 +326,5 @@ app.MapControllerRoute(
     .RequireAuthorization(AuthorizationPolicies.Funcionario);
 
 app.Run();
+
+public partial class Program;

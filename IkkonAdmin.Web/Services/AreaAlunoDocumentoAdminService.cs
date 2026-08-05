@@ -309,6 +309,11 @@ public sealed class AreaAlunoDocumentoAdminService(
         DocumentoAvaliacaoFormViewModel model,
         CancellationToken cancellationToken = default)
     {
+        if (model.Status is not (DocumentoStatusEnum.Aprovado or DocumentoStatusEnum.Recusado))
+        {
+            return OperationResult.Fail("A avaliação deve aprovar ou recusar o documento.", nameof(model.Status));
+        }
+
         var solicitacao = await dbContext.DocumentoSolicitacoes
             .FirstOrDefaultAsync(x => x.Id == model.SolicitacaoId, cancellationToken);
 

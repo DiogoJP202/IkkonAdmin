@@ -397,8 +397,8 @@ public sealed class AreaAlunoAulasAdminService(
         return new AreaAlunoFrequenciaAdminViewModel
         {
             Filtro = filter,
-            Turmas = await ListarTurmasOpcoesAsync(cancellationToken),
-            Instrutores = await ListarInstrutoresOpcoesAsync(cancellationToken),
+            Turmas = await ListarTurmasOpcoesAsync(accessScope, cancellationToken),
+            Instrutores = await ListarInstrutoresOpcoesAsync(accessScope, cancellationToken),
             Aulas = await ProjetarAulasAdmin(aulasQuery).ToPagedResultAsync(filter, cancellationToken)
         };
     }
@@ -739,12 +739,54 @@ public sealed class AreaAlunoAulasAdminService(
             .ToListAsync(cancellationToken);
     }
 
+    private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarTurmasOpcoesAsync(
+        AulaAccessScope accessScope,
+        CancellationToken cancellationToken)
+    {
+        if (accessScope.HasGlobalAccess)
+        {
+            return await ListarTurmasOpcoesAsync(cancellationToken);
+        }
+
+        var accessibleLessons = ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope);
+        return await dbContext.Turmas
+            .AsNoTracking()
+            .Where(x => x.Ativa && accessibleLessons.Any(aula => aula.TurmaId == x.Id))
+            .OrderBy(x => x.Nome)
+            .Select(x => new AreaAlunoOpcaoViewModel
+            {
+                Id = x.Id,
+                Nome = x.Nome
+            })
+            .ToListAsync(cancellationToken);
+    }
+
     private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarInstrutoresOpcoesAsync(CancellationToken cancellationToken)
     {
         return await dbContext.UsuariosSistema
             .AsNoTracking()
             .Where(x => x.Ativo && x.TipoAcesso != TipoAcessoEnum.Aluno)
             .OrderBy(x => x.NomeExibicao)
+            .Select(x => new AreaAlunoOpcaoViewModel
+            {
+                Id = x.Id,
+                Nome = x.NomeExibicao
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    private async Task<IReadOnlyCollection<AreaAlunoOpcaoViewModel>> ListarInstrutoresOpcoesAsync(
+        AulaAccessScope accessScope,
+        CancellationToken cancellationToken)
+    {
+        if (accessScope.HasGlobalAccess)
+        {
+            return await ListarInstrutoresOpcoesAsync(cancellationToken);
+        }
+
+        return await dbContext.UsuariosSistema
+            .AsNoTracking()
+            .Where(x => x.Id == accessScope.UserId && x.Ativo)
             .Select(x => new AreaAlunoOpcaoViewModel
             {
                 Id = x.Id,
