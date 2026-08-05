@@ -117,15 +117,29 @@
         </div>
     </section>
 
+    <section class="admin-panel-card-v2 admin-panel-filter-card mb-4">
+        <div class="admin-panel-card-header"><div><span class="admin-panel-eyebrow">Filtros</span><h2>Consultar solicitações</h2><p>Refine por aluno, tipo, status, prazo ou existência de envio.</p></div></div>
+        <form method="get" asp-action="Documentos" class="admin-panel-filter-grid">
+            <div class="admin-panel-field"><label for="doc-aluno">Aluno</label><select id="doc-aluno" name="AlunoId" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var aluno in Model.Alunos) { <option value="@aluno.Id" selected="@(Model.Filtro.AlunoId == aluno.Id)">@aluno.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="doc-tipo">Tipo</label><select id="doc-tipo" name="TipoId" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var tipo in Model.Tipos) { <option value="@tipo.Id" selected="@(Model.Filtro.TipoId == tipo.Id)">@tipo.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="doc-status">Status</label><select id="doc-status" name="Status" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var status in Enum.GetValues<DocumentoStatusEnum>()) { <option value="@status" selected="@(Model.Filtro.Status == status)">@status</option> }</select></div>
+            <div class="admin-panel-field"><label for="doc-prazo">Prazo até</label><input id="doc-prazo" name="PrazoAte" type="date" value="@Model.Filtro.PrazoAte?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="doc-envio">Envio</label><select id="doc-envio" name="PossuiEnvio" class="form-select admin-panel-control"><option value="">Todos</option><option value="true" selected="@(Model.Filtro.PossuiEnvio == true)">Com envio</option><option value="false" selected="@(Model.Filtro.PossuiEnvio == false)">Sem envio</option></select></div>
+            <div class="admin-panel-field"><label for="doc-sort">Ordenação</label><select id="doc-sort" name="Sort" class="form-select admin-panel-control"><option value="">Mais recentes</option><option value="prazo" selected="@(Model.Filtro.Sort == "prazo")">Prazo</option><option value="aluno" selected="@(Model.Filtro.Sort == "aluno")">Aluno</option><option value="status" selected="@(Model.Filtro.Sort == "status")">Status</option></select></div>
+            <div class="admin-panel-field"><label for="doc-page-size">Registros</label><select id="doc-page-size" name="PageSize" class="form-select admin-panel-control">@foreach (var size in new[] { 20, 50, 100 }) { <option value="@size" selected="@(Model.Filtro.PageSize == size)">@size</option> }</select></div>
+            <div class="admin-panel-filter-actions"><button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button><a asp-action="Documentos" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a></div>
+        </form>
+    </section>
+
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Solicitações</h2></div>
+        <div class="admin-panel-card-header"><div><h2>Solicitações (@Model.Solicitacoes.TotalCount)</h2><p>Página @Model.Solicitacoes.Page de @Model.Solicitacoes.TotalPages</p></div></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead><tr><th>Aluno</th><th>Documento</th><th>Status</th><th>Limite</th><th>Envio</th><th>Observação</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Solicitacoes.Count == 0)
                     {
-                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma solicitação encontrada.</td></tr>
+                        <tr><td colspan="7"><div class="admin-panel-empty">@(Model.Filtro.HasActiveFilters ? "Nenhuma solicitação corresponde aos filtros." : "Nenhuma solicitação cadastrada.")</div></td></tr>
                     }
                     else
                     {
@@ -184,5 +198,6 @@
                 </tbody>
             </table>
         </div>
+        <partial name="_AdminPagination" model="Model.Solicitacoes" />
     </section>
 </div>

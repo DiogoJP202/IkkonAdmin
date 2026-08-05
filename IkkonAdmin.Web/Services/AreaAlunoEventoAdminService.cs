@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Time;
@@ -12,13 +13,16 @@ public sealed class AreaAlunoEventoAdminService(
     ApplicationDbContext dbContext,
     IClock clock) : IAreaAlunoEventoAdminService
 {
-    public async Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(
+        EventoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
         return new AreaAlunoEventosAdminViewModel
         {
+            Filtro = filter,
             Alunos = await ListarAlunosOpcoesAsync(cancellationToken),
             Turmas = await ListarTurmasOpcoesAsync(cancellationToken),
-            Eventos = await ListarEventosAdminAsync(100, cancellationToken)
+            Eventos = await ListarEventosPaginadosAsync(filter, cancellationToken)
         };
     }
 
@@ -150,19 +154,75 @@ public sealed class AreaAlunoEventoAdminService(
             .ToListAsync(cancellationToken);
     }
 
-    private async Task<IReadOnlyCollection<AreaAlunoEventoAdminItemViewModel>> ListarEventosAdminAsync(
-        int limite,
+    private async Task<PagedResult<AreaAlunoEventoAdminItemViewModel>> ListarEventosPaginadosAsync(
+        EventoAdminFilter filter,
         CancellationToken cancellationToken)
     {
-        var eventos = await dbContext.EventosAlunoPortal
+        filter.Normalize();
+        var query = dbContext.EventosAlunoPortal
             .AsNoTracking()
             .Include(x => x.Alvos)
-            .OrderBy(x => x.Inicio)
-            .Take(limite)
-            .ToListAsync(cancellationToken);
+            .AsQueryable();
 
-        return eventos
-            .Select(x =>
+        if (!string.IsNullOrWhiteSpace(filter.Busca))
+        {
+            var search = filter.Busca.Trim();
+            query = query.Where(x => x.Titulo.Contains(search) ||
+                                     (x.Descricao != null && x.Descricao.Contains(search)) ||
+                                     (x.Local != null && x.Local.Contains(search)));
+        }
+
+        if (filter.Tipo.HasValue)
+        {
+            query = query.Where(x => x.Tipo == filter.Tipo.Value);
+        }
+
+        if (filter.Publico.HasValue)
+        {
+            query = filter.Publico.Value switch
+            {
+                ComunicadoAlvoTipoEnum.Aluno => query.Where(x => x.Alvos.Any(a => a.AlunoId.HasValue)),
+                ComunicadoAlvoTipoEnum.Turma => query.Where(x => x.Alvos.Any(a => a.TurmaId.HasValue)),
+                _ => query.Where(x => x.Alvos.Any(a => a.Todos))
+            };
+        }
+
+        if (filter.Inicio.HasValue)
+        {
+            var start = filter.Inicio.Value.ToDateTime(TimeOnly.MinValue);
+            query = query.Where(x => x.Inicio >= start);
+        }
+
+        if (filter.Fim.HasValue)
+        {
+            var endExclusive = filter.Fim.Value.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            query = query.Where(x => x.Inicio < endExclusive);
+        }
+
+        if (filter.Importante.HasValue)
+        {
+            query = query.Where(x => x.Importante == filter.Importante.Value);
+        }
+
+        if (filter.Proximo.HasValue)
+        {
+            var now = clock.Now;
+            query = filter.Proximo.Value
+                ? query.Where(x => x.Fim >= now)
+                : query.Where(x => x.Fim < now);
+        }
+
+        query = filter.Sort switch
+        {
+            "data-desc" => query.OrderByDescending(x => x.Inicio).ThenByDescending(x => x.Id),
+            "titulo" => query.OrderBy(x => x.Titulo).ThenBy(x => x.Inicio),
+            "tipo" => query.OrderBy(x => x.Tipo).ThenBy(x => x.Inicio),
+            _ => query.OrderBy(x => x.Inicio).ThenBy(x => x.Id)
+        };
+
+        var eventos = await query.ToPagedResultAsync(filter, cancellationToken);
+
+        return eventos.Map(x =>
             {
                 var alvo = x.Alvos.FirstOrDefault();
                 return new AreaAlunoEventoAdminItemViewModel
@@ -181,8 +241,7 @@ public sealed class AreaAlunoEventoAdminService(
                     AlunoId = alvo?.AlunoId,
                     TurmaId = alvo?.TurmaId
                 };
-            })
-            .ToList();
+            });
     }
 
     private async Task<OperationResult> ValidarAlvoAsync(

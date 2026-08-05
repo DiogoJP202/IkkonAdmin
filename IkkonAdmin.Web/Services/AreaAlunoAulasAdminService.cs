@@ -3,6 +3,7 @@ using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Auditing;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
 using IkkonAdmin.Web.Models.ViewModels;
@@ -14,17 +15,24 @@ public sealed class AreaAlunoAulasAdminService(
     ApplicationDbContext dbContext,
     IClock clock,
     IAuditLogger auditLogger,
-    ICurrentUserService currentUserService) : IAreaAlunoAulasAdminService
+    ICurrentUserService currentUserService,
+    IInsigniaRuleEvaluator insigniaRuleEvaluator) : IAreaAlunoAulasAdminService
 {
-    public async Task<AreaAlunoAulasAdminViewModel> ObterAulasAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoAulasAdminViewModel> ObterAulasAsync(
+        AulaAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
+        var aulasQuery = ApplyLessonFilters(dbContext.Aulas.AsNoTracking(), filter);
+        aulasQuery = ApplyLessonSort(aulasQuery, filter.Sort);
+
         return new AreaAlunoAulasAdminViewModel
         {
+            Filtro = filter,
             Turmas = await ListarTurmasOpcoesAsync(cancellationToken),
             Instrutores = await ListarInstrutoresOpcoesAsync(cancellationToken),
             Horarios = await ListarHorariosAdminAsync(cancellationToken),
             TurmaInstrutores = await ListarInstrutoresTurmasAdminAsync(cancellationToken),
-            Aulas = await ListarAulasSemEscopoAsync(50, clock.Today.AddDays(-14), cancellationToken)
+            Aulas = await ProjetarAulasAdmin(aulasQuery).ToPagedResultAsync(filter, cancellationToken)
         };
     }
 
@@ -273,6 +281,9 @@ public sealed class AreaAlunoAulasAdminService(
         {
             TurmaId = model.TurmaId,
             TurmaHorarioId = model.TurmaHorarioId,
+            DataOcorrenciaRecorrencia = model.TurmaHorarioId.HasValue
+                ? DateOnly.FromDateTime(model.Inicio)
+                : null,
             InstrutorUsuarioId = model.InstrutorUsuarioId,
             Inicio = model.Inicio,
             Fim = model.Fim,
@@ -335,6 +346,9 @@ public sealed class AreaAlunoAulasAdminService(
 
         aula.TurmaId = model.TurmaId;
         aula.TurmaHorarioId = model.TurmaHorarioId;
+        aula.DataOcorrenciaRecorrencia ??= model.TurmaHorarioId.HasValue
+            ? DateOnly.FromDateTime(model.Inicio)
+            : null;
         aula.InstrutorUsuarioId = model.InstrutorUsuarioId;
         aula.Inicio = model.Inicio;
         aula.Fim = model.Fim;
@@ -372,12 +386,20 @@ public sealed class AreaAlunoAulasAdminService(
     }
 
     public async Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(
+        FrequenciaAdminFilter filter,
         AulaAccessScope accessScope,
         CancellationToken cancellationToken = default)
     {
+        var aulasQuery = ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope);
+        aulasQuery = ApplyAttendanceFilters(aulasQuery, filter);
+        aulasQuery = ApplyLessonSort(aulasQuery, filter.Sort);
+
         return new AreaAlunoFrequenciaAdminViewModel
         {
-            Aulas = await ListarAulasAdminAsync(80, clock.Today.AddMonths(-2), accessScope, cancellationToken)
+            Filtro = filter,
+            Turmas = await ListarTurmasOpcoesAsync(cancellationToken),
+            Instrutores = await ListarInstrutoresOpcoesAsync(cancellationToken),
+            Aulas = await ProjetarAulasAdmin(aulasQuery).ToPagedResultAsync(filter, cancellationToken)
         };
     }
 
@@ -504,6 +526,16 @@ public sealed class AreaAlunoAulasAdminService(
             CorrelationId = currentUserService.CorrelationId
         }, cancellationToken);
 
+        var affectedStudentIds = model.Alunos
+            .Where(x => alunosDaTurma.Contains(x.AlunoId))
+            .Select(x => x.AlunoId)
+            .Distinct()
+            .ToArray();
+        if (affectedStudentIds.Length > 0)
+        {
+            await insigniaRuleEvaluator.EvaluateAsync(affectedStudentIds, cancellationToken);
+        }
+
         return OperationResult.Ok("Frequência salva.");
     }
 
@@ -535,34 +567,21 @@ public sealed class AreaAlunoAulasAdminService(
         CancellationToken cancellationToken = default)
     {
         return await ProjetarAulasAdmin(
-                ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope),
-                limite,
-                inicioMinimo)
-            .ToListAsync(cancellationToken);
-    }
-
-    private async Task<IReadOnlyCollection<AreaAlunoAulaAdminItemViewModel>> ListarAulasSemEscopoAsync(
-        int limite,
-        DateTime inicioMinimo,
-        CancellationToken cancellationToken)
-    {
-        return await ProjetarAulasAdmin(dbContext.Aulas.AsNoTracking(), limite, inicioMinimo)
+                ApplyAccessScope(dbContext.Aulas.AsNoTracking(), accessScope)
+                    .Where(x => x.Inicio >= inicioMinimo)
+                    .OrderBy(x => x.Inicio)
+                    .Take(limite))
             .ToListAsync(cancellationToken);
     }
 
     private static IQueryable<AreaAlunoAulaAdminItemViewModel> ProjetarAulasAdmin(
-        IQueryable<Aula> query,
-        int limite,
-        DateTime inicioMinimo)
+        IQueryable<Aula> query)
     {
         return query
             .Include(x => x.Turma)
             .ThenInclude(x => x!.AlunoTurmas)
             .Include(x => x.InstrutorUsuario)
             .Include(x => x.Frequencias)
-            .Where(x => x.Inicio >= inicioMinimo)
-            .OrderBy(x => x.Inicio)
-            .Take(limite)
             .Select(x => new AreaAlunoAulaAdminItemViewModel
             {
                 Id = x.Id,
@@ -579,6 +598,89 @@ public sealed class AreaAlunoAulasAdminService(
                 TotalAlunos = x.Turma != null ? x.Turma.AlunoTurmas.Count : 0,
                 FrequenciasRegistradas = x.Frequencias.Count
             });
+    }
+
+    private static IQueryable<Aula> ApplyLessonFilters(IQueryable<Aula> query, AulaAdminFilter filter)
+    {
+        filter.Normalize();
+        query = ApplyDateAndRelationshipFilters(
+            query,
+            filter.Inicio,
+            filter.Fim,
+            filter.TurmaId,
+            filter.InstrutorId);
+
+        if (filter.Status.HasValue)
+        {
+            query = query.Where(x => x.Status == filter.Status.Value);
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Aula> ApplyAttendanceFilters(
+        IQueryable<Aula> query,
+        FrequenciaAdminFilter filter)
+    {
+        filter.Normalize();
+        query = ApplyDateAndRelationshipFilters(
+            query,
+            filter.Inicio,
+            filter.Fim,
+            filter.TurmaId,
+            filter.InstrutorId);
+
+        if (filter.Preenchida.HasValue)
+        {
+            query = filter.Preenchida.Value
+                ? query.Where(x => x.Frequencias.Any())
+                : query.Where(x => !x.Frequencias.Any());
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Aula> ApplyDateAndRelationshipFilters(
+        IQueryable<Aula> query,
+        DateOnly? start,
+        DateOnly? end,
+        int? classroomId,
+        int? instructorId)
+    {
+        if (start.HasValue)
+        {
+            var startDate = start.Value.ToDateTime(TimeOnly.MinValue);
+            query = query.Where(x => x.Inicio >= startDate);
+        }
+
+        if (end.HasValue)
+        {
+            var endExclusive = end.Value.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            query = query.Where(x => x.Inicio < endExclusive);
+        }
+
+        if (classroomId.HasValue)
+        {
+            query = query.Where(x => x.TurmaId == classroomId.Value);
+        }
+
+        if (instructorId.HasValue)
+        {
+            query = query.Where(x => x.InstrutorUsuarioId == instructorId.Value);
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Aula> ApplyLessonSort(IQueryable<Aula> query, string? sort)
+    {
+        return sort switch
+        {
+            "data-desc" => query.OrderByDescending(x => x.Inicio).ThenByDescending(x => x.Id),
+            "turma" => query.OrderBy(x => x.Turma!.Nome).ThenBy(x => x.Inicio),
+            "status" => query.OrderBy(x => x.Status).ThenBy(x => x.Inicio),
+            _ => query.OrderBy(x => x.Inicio).ThenBy(x => x.Id)
+        };
     }
 
     private IQueryable<Aula> ApplyAccessScope(IQueryable<Aula> query, AulaAccessScope accessScope)

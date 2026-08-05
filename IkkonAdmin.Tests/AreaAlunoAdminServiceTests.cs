@@ -278,6 +278,206 @@ public class AreaAlunoAdminServiceTests
         Assert.Equal(segunda.Id, (await dbContext.AlunoInsignias.FindAsync(alvo.Id))!.InsigniaId);
     }
 
+    [Fact]
+    public async Task ObterAulasAsync_AplicaFiltrosEPaginacaoPadrao()
+    {
+        await using var dbContext = CriarDbContext();
+        var turmaAlvo = CriarTurma();
+        var outraTurma = CriarTurma();
+        dbContext.Turmas.AddRange(turmaAlvo, outraTurma);
+        await dbContext.SaveChangesAsync();
+
+        dbContext.Aulas.AddRange(Enumerable.Range(0, 21).Select(index => new Aula
+        {
+            TurmaId = turmaAlvo.Id,
+            Inicio = DateTime.Today.AddDays(index).AddHours(19),
+            Fim = DateTime.Today.AddDays(index).AddHours(20),
+            Status = StatusAulaEnum.Agendada
+        }));
+        dbContext.Aulas.Add(new Aula
+        {
+            TurmaId = outraTurma.Id,
+            Inicio = DateTime.Today.AddHours(18),
+            Fim = DateTime.Today.AddHours(19),
+            Status = StatusAulaEnum.Cancelada
+        });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterAulasAsync(new AulaAdminFilter
+        {
+            TurmaId = turmaAlvo.Id,
+            Status = StatusAulaEnum.Agendada,
+            Page = 2,
+            PageSize = 20
+        });
+
+        Assert.Equal(21, resultado.Aulas.TotalCount);
+        Assert.Equal(2, resultado.Aulas.Page);
+        Assert.Single(resultado.Aulas);
+        Assert.All(resultado.Aulas, x => Assert.Equal(turmaAlvo.Id, x.TurmaId));
+    }
+
+    [Fact]
+    public async Task ObterFrequenciaAsync_DistingueAulasPreenchidas()
+    {
+        await using var dbContext = CriarDbContext();
+        var turma = CriarTurma();
+        var aluno = CriarAluno();
+        var preenchida = new Aula
+        {
+            Turma = turma,
+            Inicio = DateTime.Today.AddHours(18),
+            Fim = DateTime.Today.AddHours(19)
+        };
+        var pendente = new Aula
+        {
+            Turma = turma,
+            Inicio = DateTime.Today.AddHours(20),
+            Fim = DateTime.Today.AddHours(21)
+        };
+        dbContext.AddRange(aluno, preenchida, pendente);
+        await dbContext.SaveChangesAsync();
+        dbContext.FrequenciasAlunos.Add(new FrequenciaAluno
+        {
+            AulaId = preenchida.Id,
+            AlunoId = aluno.Id,
+            Status = StatusFrequenciaEnum.Presente
+        });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterFrequenciaAsync(new FrequenciaAdminFilter
+        {
+            Preenchida = false
+        });
+
+        Assert.Single(resultado.Aulas);
+        Assert.Equal(pendente.Id, resultado.Aulas[0].Id);
+        Assert.True(resultado.Filtro.HasActiveFilters);
+    }
+
+    [Fact]
+    public async Task ObterDocumentosAsync_FiltraPorStatusEEnvio()
+    {
+        await using var dbContext = CriarDbContext();
+        var aluno = CriarAluno();
+        var tipo = new DocumentoTipo { Nome = "RG", Ativo = true };
+        var comEnvio = new DocumentoSolicitacao
+        {
+            Aluno = aluno,
+            DocumentoTipo = tipo,
+            Status = DocumentoStatusEnum.Enviado
+        };
+        var semEnvio = new DocumentoSolicitacao
+        {
+            Aluno = aluno,
+            DocumentoTipo = tipo,
+            Status = DocumentoStatusEnum.Solicitado
+        };
+        dbContext.AddRange(comEnvio, semEnvio);
+        await dbContext.SaveChangesAsync();
+        dbContext.DocumentoEnvios.Add(new DocumentoEnvio
+        {
+            DocumentoSolicitacaoId = comEnvio.Id,
+            ArquivoUrl = "private/test.pdf",
+            NomeArquivoOriginal = "test.pdf",
+            TamanhoBytes = 10
+        });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterDocumentosAsync(new DocumentoAdminFilter
+        {
+            Status = DocumentoStatusEnum.Enviado,
+            PossuiEnvio = true
+        });
+
+        Assert.Single(resultado.Solicitacoes);
+        Assert.Equal(comEnvio.Id, resultado.Solicitacoes[0].SolicitacaoId);
+    }
+
+    [Fact]
+    public async Task ObterComunicadosAsync_AplicaBuscaEImportancia()
+    {
+        await using var dbContext = CriarDbContext();
+        dbContext.Comunicados.AddRange(
+            new Comunicado { Titulo = "Treino especial", Conteudo = "Domingo", Importante = true },
+            new Comunicado { Titulo = "Aviso comum", Conteudo = "Rotina", Importante = false });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterComunicadosAsync(new ComunicadoAdminFilter
+        {
+            Busca = "Treino",
+            Importante = true
+        });
+
+        Assert.Single(resultado.Comunicados);
+        Assert.Equal("Treino especial", resultado.Comunicados[0].Titulo);
+    }
+
+    [Fact]
+    public async Task ObterEventosAsync_FiltraTipoEProximos()
+    {
+        await using var dbContext = CriarDbContext();
+        dbContext.EventosAlunoPortal.AddRange(
+            new EventoAlunoPortal
+            {
+                Titulo = "Festival futuro",
+                Inicio = new DateTime(2026, 7, 20, 10, 0, 0),
+                Fim = new DateTime(2026, 7, 20, 12, 0, 0),
+                Tipo = EventoAlunoTipoEnum.Apresentacao
+            },
+            new EventoAlunoPortal
+            {
+                Titulo = "Workshop encerrado",
+                Inicio = new DateTime(2026, 6, 1, 10, 0, 0),
+                Fim = new DateTime(2026, 6, 1, 12, 0, 0),
+                Tipo = EventoAlunoTipoEnum.Exame
+            });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterEventosAsync(new EventoAdminFilter
+        {
+            Tipo = EventoAlunoTipoEnum.Apresentacao,
+            Proximo = true
+        });
+
+        Assert.Single(resultado.Eventos);
+        Assert.Equal("Festival futuro", resultado.Eventos[0].Titulo);
+    }
+
+    [Fact]
+    public async Task ObterConquistasAsync_FiltraCategoriaEOrigem()
+    {
+        await using var dbContext = CriarDbContext();
+        var aluno = CriarAluno();
+        var frequencia = new Insignia { Nome = "Presença", Categoria = "Frequência" };
+        var manual = new Insignia { Nome = "Especial", Categoria = "Eventos" };
+        dbContext.AddRange(aluno, frequencia, manual);
+        await dbContext.SaveChangesAsync();
+        dbContext.AlunoInsignias.AddRange(
+            new AlunoInsignia
+            {
+                AlunoId = aluno.Id,
+                InsigniaId = frequencia.Id,
+                Origem = InsigniaOrigemEnum.Automatica
+            },
+            new AlunoInsignia
+            {
+                AlunoId = aluno.Id,
+                InsigniaId = manual.Id,
+                Origem = InsigniaOrigemEnum.Manual
+            });
+        await dbContext.SaveChangesAsync();
+
+        var resultado = await CriarService(dbContext).ObterConquistasAsync(new ConquistaAdminFilter
+        {
+            Categoria = "Frequência",
+            Origem = InsigniaOrigemEnum.Automatica
+        });
+
+        Assert.Single(resultado.Conquistas);
+        Assert.Equal(frequencia.Id, resultado.Conquistas[0].InsigniaId);
+    }
+
     private static ApplicationDbContext CriarDbContext()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -293,12 +493,14 @@ public class AreaAlunoAdminServiceTests
         var clock = new TestClock();
         var currentUserService = new TestCurrentUserService();
         var auditLogger = new RecordingAuditLogger();
+        var ruleEvaluator = new InsigniaRuleEvaluator(dbContext, clock);
         var privateFileStorageService = new LocalPrivateFileStorageService(environment);
         var aulasAdminService = new AreaAlunoAulasAdminService(
             dbContext,
             clock,
             auditLogger,
-            currentUserService);
+            currentUserService,
+            ruleEvaluator);
         var documentoAdminService = new AreaAlunoDocumentoAdminService(
             dbContext,
             clock,
@@ -313,7 +515,8 @@ public class AreaAlunoAdminServiceTests
             clock);
         var conquistaAdminService = new AreaAlunoConquistaAdminService(
             dbContext,
-            clock);
+            clock,
+            ruleEvaluator);
 
         return new AreaAlunoAdminService(
             clock,

@@ -120,6 +120,8 @@ builder.Services.AddScoped<IAreaAlunoDocumentosService, AreaAlunoDocumentosServi
 builder.Services.AddScoped<IAreaAlunoComunicadosService, AreaAlunoComunicadosService>();
 builder.Services.AddScoped<IAreaAlunoConquistasService, AreaAlunoConquistasService>();
 builder.Services.AddScoped<IAreaAlunoAulasAdminService, AreaAlunoAulasAdminService>();
+builder.Services.AddScoped<IAulaRecurrenceGenerator, AulaRecurrenceGenerator>();
+builder.Services.AddScoped<IInsigniaRuleEvaluator, InsigniaRuleEvaluator>();
 builder.Services.AddScoped<IAreaAlunoDocumentoAdminService, AreaAlunoDocumentoAdminService>();
 builder.Services.AddScoped<IAreaAlunoComunicadoAdminService, AreaAlunoComunicadoAdminService>();
 builder.Services.AddScoped<IAreaAlunoEventoAdminService, AreaAlunoEventoAdminService>();
@@ -150,6 +152,7 @@ builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<Usuar
 builder.Services.Configure<OperationalMaintenanceOptions>(
     builder.Configuration.GetSection(OperationalMaintenanceOptions.SectionName));
 builder.Services.AddHostedService<OperationalMaintenanceHostedService>();
+builder.Services.AddHostedService<StudentAutomationHostedService>();
 
 var app = builder.Build();
 

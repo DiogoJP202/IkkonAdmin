@@ -35,9 +35,11 @@ public class AreaAlunoAdminService(
         };
     }
 
-    public Task<AreaAlunoAulasAdminViewModel> ObterAulasAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoAulasAdminViewModel> ObterAulasAsync(
+        AulaAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return aulasAdminService.ObterAulasAsync(cancellationToken);
+        return aulasAdminService.ObterAulasAsync(filter, cancellationToken);
     }
 
     public Task<OperationResult> CriarHorarioAsync(
@@ -106,9 +108,11 @@ public class AreaAlunoAdminService(
         return aulasAdminService.ExcluirAulaAsync(id, cancellationToken);
     }
 
-    public Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoFrequenciaAdminViewModel> ObterFrequenciaAsync(
+        FrequenciaAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return aulasAdminService.ObterFrequenciaAsync(ObterEscopoAulas(), cancellationToken);
+        return aulasAdminService.ObterFrequenciaAsync(filter, ObterEscopoAulas(), cancellationToken);
     }
 
     public Task<AreaAlunoRegistroFrequenciaViewModel?> ObterRegistroFrequenciaAsync(
@@ -126,9 +130,11 @@ public class AreaAlunoAdminService(
         return aulasAdminService.SalvarFrequenciaAsync(model, ObterEscopoAulas(usuarioId), cancellationToken);
     }
 
-    public Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(
+        DocumentoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return documentoAdminService.ObterDocumentosAsync(cancellationToken);
+        return documentoAdminService.ObterDocumentosAsync(filter, cancellationToken);
     }
 
     public Task<OperationResult> CriarDocumentoTipoAsync(
@@ -190,9 +196,11 @@ public class AreaAlunoAdminService(
         return documentoAdminService.ObterDocumentoAdminDownloadAsync(envioId, cancellationToken);
     }
 
-    public Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(
+        ComunicadoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return comunicadoAdminService.ObterComunicadosAsync(cancellationToken);
+        return comunicadoAdminService.ObterComunicadosAsync(filter, cancellationToken);
     }
 
     public Task<OperationResult> CriarComunicadoAsync(
@@ -218,9 +226,11 @@ public class AreaAlunoAdminService(
         return comunicadoAdminService.ExcluirComunicadoAsync(id, cancellationToken);
     }
 
-    public Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(
+        EventoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return eventoAdminService.ObterEventosAsync(cancellationToken);
+        return eventoAdminService.ObterEventosAsync(filter, cancellationToken);
     }
 
     public Task<OperationResult> CriarEventoAsync(
@@ -245,9 +255,11 @@ public class AreaAlunoAdminService(
         return eventoAdminService.ExcluirEventoAsync(id, cancellationToken);
     }
 
-    public Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(CancellationToken cancellationToken = default)
+    public Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(
+        ConquistaAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
-        return conquistaAdminService.ObterConquistasAsync(cancellationToken);
+        return conquistaAdminService.ObterConquistasAsync(filter, cancellationToken);
     }
 
     public Task<OperationResult> CriarInsigniaAsync(

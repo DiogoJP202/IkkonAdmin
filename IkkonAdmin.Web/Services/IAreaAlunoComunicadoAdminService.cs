@@ -5,7 +5,7 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IAreaAlunoComunicadoAdminService
 {
-    Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(CancellationToken cancellationToken = default);
+    Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(ComunicadoAdminFilter filter, CancellationToken cancellationToken = default);
     Task<int> ContarComunicadosAtivosAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<AreaAlunoComunicadoAdminItemViewModel>> ListarComunicadosRecentesAsync(
         int limite,

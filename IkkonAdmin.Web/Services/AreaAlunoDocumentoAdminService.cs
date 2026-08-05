@@ -3,6 +3,7 @@ using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 using IkkonAdmin.Web.Infrastructure.Security;
 using IkkonAdmin.Web.Infrastructure.Time;
 using IkkonAdmin.Web.Models.Entities;
@@ -18,13 +19,16 @@ public sealed class AreaAlunoDocumentoAdminService(
     IAuditLogger auditLogger,
     ICurrentUserService currentUserService) : IAreaAlunoDocumentoAdminService
 {
-    public async Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(
+        DocumentoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
         return new AreaAlunoDocumentosAdminViewModel
         {
+            Filtro = filter,
             Alunos = await ListarAlunosOpcoesAsync(cancellationToken),
             Tipos = await ListarDocumentoTiposAsync(cancellationToken),
-            Solicitacoes = await ListarDocumentosRecentesAsync(100, cancellationToken)
+            Solicitacoes = await ListarDocumentosPaginadosAsync(filter, cancellationToken)
         };
     }
 
@@ -69,6 +73,77 @@ public sealed class AreaAlunoDocumentoAdminService(
                 };
             })
             .ToList();
+    }
+
+    private async Task<PagedResult<AreaAlunoDocumentoAdminItemViewModel>> ListarDocumentosPaginadosAsync(
+        DocumentoAdminFilter filter,
+        CancellationToken cancellationToken)
+    {
+        filter.Normalize();
+        var query = dbContext.DocumentoSolicitacoes
+            .AsNoTracking()
+            .Include(x => x.Aluno)
+            .Include(x => x.DocumentoTipo)
+            .Include(x => x.Envios)
+            .AsQueryable();
+
+        if (filter.AlunoId.HasValue)
+        {
+            query = query.Where(x => x.AlunoId == filter.AlunoId.Value);
+        }
+
+        if (filter.TipoId.HasValue)
+        {
+            query = query.Where(x => x.DocumentoTipoId == filter.TipoId.Value);
+        }
+
+        if (filter.Status.HasValue)
+        {
+            query = query.Where(x => x.Status == filter.Status.Value);
+        }
+
+        if (filter.PrazoAte.HasValue)
+        {
+            query = query.Where(x => x.DataLimite.HasValue && x.DataLimite.Value <= filter.PrazoAte.Value);
+        }
+
+        if (filter.PossuiEnvio.HasValue)
+        {
+            query = filter.PossuiEnvio.Value
+                ? query.Where(x => x.Envios.Any())
+                : query.Where(x => !x.Envios.Any());
+        }
+
+        query = filter.Sort switch
+        {
+            "prazo" => query.OrderBy(x => x.DataLimite == null).ThenBy(x => x.DataLimite).ThenByDescending(x => x.Id),
+            "aluno" => query.OrderBy(x => x.Aluno!.NomeCompleto).ThenByDescending(x => x.DataSolicitacaoUtc),
+            "status" => query.OrderBy(x => x.Status).ThenByDescending(x => x.DataSolicitacaoUtc),
+            _ => query.OrderByDescending(x => x.DataSolicitacaoUtc).ThenByDescending(x => x.Id)
+        };
+
+        var paged = await query.ToPagedResultAsync(filter, cancellationToken);
+        return paged.Map(MapDocumentItem);
+    }
+
+    private static AreaAlunoDocumentoAdminItemViewModel MapDocumentItem(DocumentoSolicitacao request)
+    {
+        var lastUpload = request.Envios.OrderByDescending(x => x.EnviadoEmUtc).FirstOrDefault();
+        return new AreaAlunoDocumentoAdminItemViewModel
+        {
+            SolicitacaoId = request.Id,
+            AlunoId = request.AlunoId,
+            Aluno = request.Aluno?.NomeCompleto ?? $"Aluno #{request.AlunoId}",
+            DocumentoTipoId = request.DocumentoTipoId,
+            Tipo = request.DocumentoTipo?.Nome ?? $"Documento #{request.DocumentoTipoId}",
+            Status = request.Status,
+            DataSolicitacaoUtc = request.DataSolicitacaoUtc,
+            DataLimite = request.DataLimite,
+            ObservacaoAdministrativa = request.ObservacaoAdministrativa,
+            Envios = request.Envios.Count,
+            UltimoEnvioId = lastUpload?.Id,
+            NomeArquivoOriginal = lastUpload?.NomeArquivoOriginal
+        };
     }
 
     public async Task<OperationResult> CriarDocumentoTipoAsync(

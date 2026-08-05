@@ -20,9 +20,14 @@ public class ConfiguracaoSistemaConfiguration : IEntityTypeConfiguration<Configu
         builder.Property(x => x.ValorMensalidadePadrao).HasPrecision(10, 2);
         builder.Property(x => x.PercentualMultaAtraso).HasPrecision(5, 2);
         builder.Property(x => x.PercentualJurosMes).HasPrecision(5, 2);
+        builder.Property(x => x.GerarAulasAutomaticamente).HasDefaultValue(true);
+        builder.Property(x => x.AvaliarConquistasAutomaticamente).HasDefaultValue(true);
+        builder.Property(x => x.HorarioAutomacoesAreaAluno)
+            .HasColumnType("time")
+            .HasDefaultValue(new TimeOnly(3, 30));
+        builder.Property(x => x.HorizonteGeracaoAulasSemanas).HasDefaultValue(8);
 
         builder.Property(x => x.MensagemBoasVindasPadrao).HasMaxLength(1000);
         builder.Property(x => x.ChecklistAdmissaoPadrao).HasMaxLength(1000);
     }
 }
-

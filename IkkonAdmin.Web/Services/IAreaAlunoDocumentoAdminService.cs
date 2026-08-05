@@ -5,7 +5,7 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IAreaAlunoDocumentoAdminService
 {
-    Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(CancellationToken cancellationToken = default);
+    Task<AreaAlunoDocumentosAdminViewModel> ObterDocumentosAsync(DocumentoAdminFilter filter, CancellationToken cancellationToken = default);
     Task<int> ContarDocumentosPendentesAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<AreaAlunoDocumentoAdminItemViewModel>> ListarDocumentosRecentesAsync(
         int limite,

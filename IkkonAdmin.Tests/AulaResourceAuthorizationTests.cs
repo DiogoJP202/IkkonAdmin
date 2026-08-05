@@ -23,7 +23,9 @@ public class AulaResourceAuthorizationTests
         await dbContext.SaveChangesAsync();
 
         var service = CreateService(dbContext);
-        var result = await service.ObterFrequenciaAsync(AulaAccessScope.Restricted(ownInstructor.Id));
+        var result = await service.ObterFrequenciaAsync(
+            new FrequenciaAdminFilter(),
+            AulaAccessScope.Restricted(ownInstructor.Id));
 
         Assert.Single(result.Aulas);
         Assert.Equal(ownLesson.Id, result.Aulas.Single().Id);
@@ -132,7 +134,8 @@ public class AulaResourceAuthorizationTests
             dbContext,
             new TestClock(),
             new RecordingAuditLogger(),
-            new StubCurrentUserService());
+            new StubCurrentUserService(),
+            new InsigniaRuleEvaluator(dbContext, new TestClock()));
     }
 
     private static async Task<(UsuarioSistema First, UsuarioSistema Second, Turma Classroom)> SeedBaseAsync(

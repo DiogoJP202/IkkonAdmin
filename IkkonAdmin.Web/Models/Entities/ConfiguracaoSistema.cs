@@ -15,6 +15,10 @@ public class ConfiguracaoSistema
     public decimal PercentualJurosMes { get; set; } = 1m;
     public bool AplicarMultaJurosAutomaticamente { get; set; } = false;
     public bool GerarMensalidadesAutomaticamente { get; set; } = false;
+    public bool GerarAulasAutomaticamente { get; set; } = true;
+    public bool AvaliarConquistasAutomaticamente { get; set; } = true;
+    public TimeOnly HorarioAutomacoesAreaAluno { get; set; } = new(3, 30);
+    public int HorizonteGeracaoAulasSemanas { get; set; } = 8;
 
     public bool EnviarLembreteCobranca { get; set; } = true;
     public int DiasAntecedenciaLembrete { get; set; } = 3;
@@ -26,4 +30,3 @@ public class ConfiguracaoSistema
 
     public DateTime UltimaAtualizacaoUtc { get; set; } = DateTime.UtcNow;
 }
-

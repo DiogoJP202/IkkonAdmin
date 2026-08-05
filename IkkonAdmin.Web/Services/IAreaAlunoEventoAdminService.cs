@@ -5,7 +5,7 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IAreaAlunoEventoAdminService
 {
-    Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(CancellationToken cancellationToken = default);
+    Task<AreaAlunoEventosAdminViewModel> ObterEventosAsync(EventoAdminFilter filter, CancellationToken cancellationToken = default);
     Task<int> ContarEventosProximosAsync(CancellationToken cancellationToken = default);
     Task<OperationResult> CriarEventoAsync(
         EventoAlunoFormViewModel model,

@@ -36,6 +36,13 @@ public class ConfiguracoesFormViewModel
 
     public bool AplicarMultaJurosAutomaticamente { get; set; }
     public bool GerarMensalidadesAutomaticamente { get; set; }
+    public bool GerarAulasAutomaticamente { get; set; } = true;
+    public bool AvaliarConquistasAutomaticamente { get; set; } = true;
+
+    [Range(1, 52)]
+    public int HorizonteGeracaoAulasSemanas { get; set; } = 8;
+
+    public TimeOnly HorarioAutomacoesAreaAluno { get; set; } = new(3, 30);
 
     public bool EnviarLembreteCobranca { get; set; } = true;
 
@@ -61,4 +68,3 @@ public class ConfiguracoesResumoViewModel
     public int DesligamentosEmAberto { get; set; }
     public int ExamesProximos30Dias { get; set; }
 }
-

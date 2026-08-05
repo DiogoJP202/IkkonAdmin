@@ -5,7 +5,7 @@ namespace IkkonAdmin.Web.Services;
 
 public interface IAreaAlunoConquistaAdminService
 {
-    Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(CancellationToken cancellationToken = default);
+    Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(ConquistaAdminFilter filter, CancellationToken cancellationToken = default);
     Task<int> ContarConquistasConcedidasAsync(
         DateTime inicioUtc,
         DateTime fimUtc,

@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Time;
@@ -10,15 +11,27 @@ namespace IkkonAdmin.Web.Services;
 
 public sealed class AreaAlunoConquistaAdminService(
     ApplicationDbContext dbContext,
-    IClock clock) : IAreaAlunoConquistaAdminService
+    IClock clock,
+    IInsigniaRuleEvaluator ruleEvaluator) : IAreaAlunoConquistaAdminService
 {
-    public async Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoConquistasAdminViewModel> ObterConquistasAsync(
+        ConquistaAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
+        var insignias = await ListarInsigniasAsync(cancellationToken);
         return new AreaAlunoConquistasAdminViewModel
         {
+            Filtro = filter,
             Alunos = await ListarAlunosOpcoesAsync(cancellationToken),
-            Insignias = await ListarInsigniasAsync(cancellationToken),
-            Conquistas = await ListarConquistasAdminAsync(100, cancellationToken)
+            Insignias = insignias,
+            Categorias = insignias
+                .Select(x => x.Categoria)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x!)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x)
+                .ToList(),
+            Conquistas = await ListarConquistasAdminAsync(filter, cancellationToken)
         };
     }
 
@@ -35,6 +48,12 @@ public sealed class AreaAlunoConquistaAdminService(
         InsigniaFormViewModel model,
         CancellationToken cancellationToken = default)
     {
+        var ruleValidation = ruleEvaluator.ValidateRule(model.RegraAutomatica);
+        if (!ruleValidation.Success)
+        {
+            return ruleValidation;
+        }
+
         var nome = model.Nome.Trim();
         var existe = await dbContext.Insignias.AnyAsync(x => x.Nome == nome, cancellationToken);
         if (existe)
@@ -61,6 +80,12 @@ public sealed class AreaAlunoConquistaAdminService(
         InsigniaFormViewModel model,
         CancellationToken cancellationToken = default)
     {
+        var ruleValidation = ruleEvaluator.ValidateRule(model.RegraAutomatica);
+        if (!ruleValidation.Success)
+        {
+            return ruleValidation;
+        }
+
         var insignia = await dbContext.Insignias.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (insignia is null)
         {
@@ -213,7 +238,7 @@ public sealed class AreaAlunoConquistaAdminService(
 
     private async Task<IReadOnlyCollection<AreaAlunoInsigniaItemViewModel>> ListarInsigniasAsync(CancellationToken cancellationToken)
     {
-        return await dbContext.Insignias
+        var items = await dbContext.Insignias
             .AsNoTracking()
             .OrderBy(x => x.Nome)
             .Select(x => new AreaAlunoInsigniaItemViewModel
@@ -227,19 +252,69 @@ public sealed class AreaAlunoConquistaAdminService(
                 Ativa = x.Ativa
             })
             .ToListAsync(cancellationToken);
+
+        foreach (var item in items)
+        {
+            item.RegraAutomaticaValida = ruleEvaluator.ValidateRule(item.RegraAutomatica).Success;
+        }
+
+        return items;
     }
 
-    private async Task<IReadOnlyCollection<AreaAlunoConquistaAdminItemViewModel>> ListarConquistasAdminAsync(
-        int limite,
+    private async Task<PagedResult<AreaAlunoConquistaAdminItemViewModel>> ListarConquistasAdminAsync(
+        ConquistaAdminFilter filter,
         CancellationToken cancellationToken)
     {
-        return await dbContext.AlunoInsignias
+        filter.Normalize();
+        var query = dbContext.AlunoInsignias
             .AsNoTracking()
             .Include(x => x.Aluno)
             .Include(x => x.Insignia)
-            .OrderByDescending(x => x.ConcedidaEmUtc)
-            .Take(limite)
-            .Select(x => new AreaAlunoConquistaAdminItemViewModel
+            .AsQueryable();
+
+        if (filter.AlunoId.HasValue)
+        {
+            query = query.Where(x => x.AlunoId == filter.AlunoId.Value);
+        }
+
+        if (filter.InsigniaId.HasValue)
+        {
+            query = query.Where(x => x.InsigniaId == filter.InsigniaId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Categoria))
+        {
+            var category = filter.Categoria.Trim();
+            query = query.Where(x => x.Insignia != null && x.Insignia.Categoria == category);
+        }
+
+        if (filter.Origem.HasValue)
+        {
+            query = query.Where(x => x.Origem == filter.Origem.Value);
+        }
+
+        if (filter.Inicio.HasValue)
+        {
+            var start = filter.Inicio.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            query = query.Where(x => x.ConcedidaEmUtc >= start);
+        }
+
+        if (filter.Fim.HasValue)
+        {
+            var endExclusive = filter.Fim.Value.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            query = query.Where(x => x.ConcedidaEmUtc < endExclusive);
+        }
+
+        query = filter.Sort switch
+        {
+            "data" => query.OrderBy(x => x.ConcedidaEmUtc).ThenBy(x => x.Id),
+            "aluno" => query.OrderBy(x => x.Aluno!.NomeCompleto).ThenByDescending(x => x.ConcedidaEmUtc),
+            "insignia" => query.OrderBy(x => x.Insignia!.Nome).ThenByDescending(x => x.ConcedidaEmUtc),
+            _ => query.OrderByDescending(x => x.ConcedidaEmUtc).ThenByDescending(x => x.Id)
+        };
+
+        var paged = await query.ToPagedResultAsync(filter, cancellationToken);
+        return paged.Map(x => new AreaAlunoConquistaAdminItemViewModel
             {
                 Id = x.Id,
                 AlunoId = x.AlunoId,
@@ -249,8 +324,7 @@ public sealed class AreaAlunoConquistaAdminService(
                 ConcedidaEmUtc = x.ConcedidaEmUtc,
                 Origem = x.Origem,
                 Observacao = x.Observacao
-            })
-            .ToListAsync(cancellationToken);
+            });
     }
 
     private static string? LimparOpcional(string? valor)

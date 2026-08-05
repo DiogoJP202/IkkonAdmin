@@ -60,8 +60,24 @@
         </form>
     </section>
 
+    <section class="admin-panel-card-v2 admin-panel-filter-card mb-4">
+        <div class="admin-panel-card-header"><div><span class="admin-panel-eyebrow">Filtros</span><h2>Consultar comunicados</h2><p>Pesquise conteúdo e refine público, turma, flags e período.</p></div></div>
+        <form method="get" asp-action="Comunicados" class="admin-panel-filter-grid">
+            <div class="admin-panel-field admin-panel-field-wide"><label for="com-busca">Busca</label><input id="com-busca" name="Busca" type="search" value="@Model.Filtro.Busca" class="form-control admin-panel-control" placeholder="Título ou conteúdo" /></div>
+            <div class="admin-panel-field"><label for="com-publico">Público</label><select id="com-publico" name="Publico" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var alvo in Enum.GetValues<ComunicadoAlvoTipoEnum>()) { <option value="@alvo" selected="@(Model.Filtro.Publico == alvo)">@alvo</option> }</select></div>
+            <div class="admin-panel-field"><label for="com-turma">Turma</label><select id="com-turma" name="TurmaId" class="form-select admin-panel-control"><option value="">Todas</option>@foreach (var turma in Model.Turmas) { <option value="@turma.Id" selected="@(Model.Filtro.TurmaId == turma.Id)">@turma.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="com-importante">Importância</label><select id="com-importante" name="Importante" class="form-select admin-panel-control"><option value="">Todos</option><option value="true" selected="@(Model.Filtro.Importante == true)">Importante</option><option value="false" selected="@(Model.Filtro.Importante == false)">Comum</option></select></div>
+            <div class="admin-panel-field"><label for="com-fixado">Fixação</label><select id="com-fixado" name="Fixado" class="form-select admin-panel-control"><option value="">Todos</option><option value="true" selected="@(Model.Filtro.Fixado == true)">Fixado</option><option value="false" selected="@(Model.Filtro.Fixado == false)">Não fixado</option></select></div>
+            <div class="admin-panel-field"><label for="com-inicio">De</label><input id="com-inicio" name="Inicio" type="date" value="@Model.Filtro.Inicio?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="com-fim">Até</label><input id="com-fim" name="Fim" type="date" value="@Model.Filtro.Fim?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="com-sort">Ordenação</label><select id="com-sort" name="Sort" class="form-select admin-panel-control"><option value="">Fixados e recentes</option><option value="titulo" selected="@(Model.Filtro.Sort == "titulo")">Título</option><option value="leituras-desc" selected="@(Model.Filtro.Sort == "leituras-desc")">Mais lidos</option><option value="data" selected="@(Model.Filtro.Sort == "data")">Mais antigos</option></select></div>
+            <div class="admin-panel-field"><label for="com-page-size">Registros</label><select id="com-page-size" name="PageSize" class="form-select admin-panel-control">@foreach (var size in new[] { 20, 50, 100 }) { <option value="@size" selected="@(Model.Filtro.PageSize == size)">@size</option> }</select></div>
+            <div class="admin-panel-filter-actions"><button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button><a asp-action="Comunicados" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a></div>
+        </form>
+    </section>
+
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Comunicados publicados</h2></div>
+        <div class="admin-panel-card-header"><div><h2>Comunicados publicados (@Model.Comunicados.TotalCount)</h2><p>Página @Model.Comunicados.Page de @Model.Comunicados.TotalPages</p></div></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead>
@@ -78,7 +94,7 @@
                 <tbody>
                     @if (Model.Comunicados.Count == 0)
                     {
-                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum comunicado publicado.</td></tr>
+                        <tr><td colspan="7"><div class="admin-panel-empty">@(Model.Filtro.HasActiveFilters ? "Nenhum comunicado corresponde aos filtros." : "Nenhum comunicado cadastrado.")</div></td></tr>
                     }
                     else
                     {
@@ -149,5 +165,6 @@
                 </tbody>
             </table>
         </div>
+        <partial name="_AdminPagination" model="Model.Comunicados" />
     </section>
 </div>

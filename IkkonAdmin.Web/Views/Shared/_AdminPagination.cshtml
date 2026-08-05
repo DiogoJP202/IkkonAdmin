@@ -1,0 +1,35 @@
+@model IkkonAdmin.Web.Infrastructure.Pagination.IPagedResult
+@if (Model.TotalPages > 1)
+{
+    var currentQuery = ViewContext.HttpContext.Request.Query
+        .Where(x => !x.Key.Equals("Page", StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(x => x.Key, x => x.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+    var firstPage = Math.Max(1, Model.Page - 2);
+    var lastPage = Math.Min(Model.TotalPages, Model.Page + 2);
+
+    <div class="admin-panel-card-footer">
+        <nav aria-label="Paginação dos resultados">
+            <ul class="pagination pagination-sm admin-panel-pagination mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : null)">
+                    @{
+                        var previousRoute = new Dictionary<string, string>(currentQuery) { ["Page"] = (Model.Page - 1).ToString() };
+                    }
+                    <a class="page-link" asp-all-route-data="previousRoute" aria-label="Página anterior">Anterior</a>
+                </li>
+                @for (var page = firstPage; page <= lastPage; page++)
+                {
+                    var pageRoute = new Dictionary<string, string>(currentQuery) { ["Page"] = page.ToString() };
+                    <li class="page-item @(page == Model.Page ? "active" : null)">
+                        <a class="page-link" asp-all-route-data="pageRoute" aria-current="@(page == Model.Page ? "page" : null)">@(page)</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : null)">
+                    @{
+                        var nextRoute = new Dictionary<string, string>(currentQuery) { ["Page"] = (Model.Page + 1).ToString() };
+                    }
+                    <a class="page-link" asp-all-route-data="nextRoute" aria-label="Próxima página">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}

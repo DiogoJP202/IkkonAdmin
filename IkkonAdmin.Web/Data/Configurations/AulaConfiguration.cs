@@ -11,9 +11,13 @@ public class AulaConfiguration : IEntityTypeConfiguration<Aula>
         builder.ToTable("Aulas");
         builder.HasIndex(x => new { x.TurmaId, x.Inicio });
         builder.HasIndex(x => x.Status);
+        builder.HasIndex(x => new { x.TurmaHorarioId, x.DataOcorrenciaRecorrencia })
+            .IsUnique()
+            .HasFilter("[TurmaHorarioId] IS NOT NULL AND [DataOcorrenciaRecorrencia] IS NOT NULL");
 
         builder.Property(x => x.Inicio).HasColumnType("datetime2");
         builder.Property(x => x.Fim).HasColumnType("datetime2");
+        builder.Property(x => x.DataOcorrenciaRecorrencia).HasColumnType("date");
         builder.Property(x => x.Local).HasMaxLength(150);
 
         builder.HasOne(x => x.Turma)

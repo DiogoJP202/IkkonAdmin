@@ -75,8 +75,24 @@
         </form>
     </section>
 
+    <section class="admin-panel-card-v2 admin-panel-filter-card mb-4">
+        <div class="admin-panel-card-header"><div><span class="admin-panel-eyebrow">Filtros</span><h2>Consultar eventos</h2><p>Refine por busca, tipo, público, período e andamento.</p></div></div>
+        <form method="get" asp-action="Eventos" class="admin-panel-filter-grid">
+            <div class="admin-panel-field admin-panel-field-wide"><label for="evt-busca">Busca</label><input id="evt-busca" name="Busca" type="search" value="@Model.Filtro.Busca" class="form-control admin-panel-control" placeholder="Título, descrição ou local" /></div>
+            <div class="admin-panel-field"><label for="evt-tipo">Tipo</label><select id="evt-tipo" name="Tipo" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var tipo in Enum.GetValues<EventoAlunoTipoEnum>()) { <option value="@tipo" selected="@(Model.Filtro.Tipo == tipo)">@tipo</option> }</select></div>
+            <div class="admin-panel-field"><label for="evt-publico">Público</label><select id="evt-publico" name="Publico" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var alvo in Enum.GetValues<ComunicadoAlvoTipoEnum>()) { <option value="@alvo" selected="@(Model.Filtro.Publico == alvo)">@alvo</option> }</select></div>
+            <div class="admin-panel-field"><label for="evt-inicio">De</label><input id="evt-inicio" name="Inicio" type="date" value="@Model.Filtro.Inicio?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="evt-fim">Até</label><input id="evt-fim" name="Fim" type="date" value="@Model.Filtro.Fim?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="evt-importante">Importância</label><select id="evt-importante" name="Importante" class="form-select admin-panel-control"><option value="">Todos</option><option value="true" selected="@(Model.Filtro.Importante == true)">Importante</option><option value="false" selected="@(Model.Filtro.Importante == false)">Comum</option></select></div>
+            <div class="admin-panel-field"><label for="evt-proximo">Andamento</label><select id="evt-proximo" name="Proximo" class="form-select admin-panel-control"><option value="">Todos</option><option value="true" selected="@(Model.Filtro.Proximo == true)">Próximos</option><option value="false" selected="@(Model.Filtro.Proximo == false)">Encerrados</option></select></div>
+            <div class="admin-panel-field"><label for="evt-sort">Ordenação</label><select id="evt-sort" name="Sort" class="form-select admin-panel-control"><option value="">Data crescente</option><option value="data-desc" selected="@(Model.Filtro.Sort == "data-desc")">Data decrescente</option><option value="titulo" selected="@(Model.Filtro.Sort == "titulo")">Título</option><option value="tipo" selected="@(Model.Filtro.Sort == "tipo")">Tipo</option></select></div>
+            <div class="admin-panel-field"><label for="evt-page-size">Registros</label><select id="evt-page-size" name="PageSize" class="form-select admin-panel-control">@foreach (var size in new[] { 20, 50, 100 }) { <option value="@size" selected="@(Model.Filtro.PageSize == size)">@size</option> }</select></div>
+            <div class="admin-panel-filter-actions"><button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button><a asp-action="Eventos" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a></div>
+        </form>
+    </section>
+
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Eventos cadastrados</h2></div>
+        <div class="admin-panel-card-header"><div><h2>Eventos cadastrados (@Model.Eventos.TotalCount)</h2><p>Página @Model.Eventos.Page de @Model.Eventos.TotalPages</p></div></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead>
@@ -93,7 +109,7 @@
                 <tbody>
                     @if (Model.Eventos.Count == 0)
                     {
-                        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum evento cadastrado.</td></tr>
+                        <tr><td colspan="7"><div class="admin-panel-empty">@(Model.Filtro.HasActiveFilters ? "Nenhum evento corresponde aos filtros." : "Nenhum evento cadastrado.")</div></td></tr>
                     }
                     else
                     {
@@ -166,5 +182,6 @@
                 </tbody>
             </table>
         </div>
+        <partial name="_AdminPagination" model="Model.Eventos" />
     </section>
 </div>

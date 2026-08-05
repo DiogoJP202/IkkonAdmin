@@ -10,6 +10,9 @@
             <h1 class="admin-panel-title">Conquistas</h1>
             <p class="admin-panel-subtitle">Crie insígnias e atribua marcos de evolução aos alunos.</p>
         </div>
+        <div class="admin-panel-hero-actions">
+            <form asp-action="ProcessarConquistasAgora" method="post">@Html.AntiForgeryToken()<button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Processar regras agora</button></form>
+        </div>
     </section>
 
     <div class="admin-panel-grid-two mb-4">
@@ -33,6 +36,7 @@
                     <div class="admin-panel-field">
                         <label asp-for="NovaInsignia.RegraAutomatica">Regra automática</label>
                         <input asp-for="NovaInsignia.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" />
+                        <span class="admin-panel-help">FREQUENCIA_PRIMEIRA, FREQUENCIA_TOTAL:n ou TEMPO_ATIVO_MESES:n</span>
                     </div>
                     <div class="admin-panel-field admin-panel-field-full">
                         <label asp-for="NovaInsignia.Descricao">Descrição</label>
@@ -109,7 +113,13 @@
                                     <input form="@editFormId" name="Icone" value="@item.Icone" class="form-control admin-panel-control" maxlength="80" placeholder="Ícone" />
                                 </td>
                                 <td><input form="@editFormId" name="Categoria" value="@item.Categoria" class="form-control admin-panel-control" maxlength="80" /></td>
-                                <td><input form="@editFormId" name="RegraAutomatica" value="@item.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" /></td>
+                                <td>
+                                    <input form="@editFormId" name="RegraAutomatica" value="@item.RegraAutomatica" class="form-control admin-panel-control" maxlength="120" />
+                                    @if (!item.RegraAutomaticaValida)
+                                    {
+                                        <span class="text-danger small">Regra antiga inválida; não será executada.</span>
+                                    }
+                                </td>
                                 <td>
                                     <input form="@editFormId" type="hidden" name="Ativa" value="false" />
                                     <label class="admin-panel-inline-check">
@@ -134,8 +144,23 @@
         </div>
     </section>
 
+    <section class="admin-panel-card-v2 admin-panel-filter-card mb-4">
+        <div class="admin-panel-card-header"><div><span class="admin-panel-eyebrow">Filtros</span><h2>Consultar conquistas</h2><p>Refine por aluno, insígnia, categoria, origem ou período.</p></div></div>
+        <form method="get" asp-action="Conquistas" class="admin-panel-filter-grid">
+            <div class="admin-panel-field"><label for="conq-aluno">Aluno</label><select id="conq-aluno" name="AlunoId" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var aluno in Model.Alunos) { <option value="@aluno.Id" selected="@(Model.Filtro.AlunoId == aluno.Id)">@aluno.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="conq-insignia">Insígnia</label><select id="conq-insignia" name="InsigniaId" class="form-select admin-panel-control"><option value="">Todas</option>@foreach (var insignia in Model.Insignias) { <option value="@insignia.Id" selected="@(Model.Filtro.InsigniaId == insignia.Id)">@insignia.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="conq-categoria">Categoria</label><select id="conq-categoria" name="Categoria" class="form-select admin-panel-control"><option value="">Todas</option>@foreach (var categoria in Model.Categorias) { <option value="@categoria" selected="@(Model.Filtro.Categoria == categoria)">@categoria</option> }</select></div>
+            <div class="admin-panel-field"><label for="conq-origem">Origem</label><select id="conq-origem" name="Origem" class="form-select admin-panel-control"><option value="">Todas</option>@foreach (var origem in Enum.GetValues<InsigniaOrigemEnum>()) { <option value="@origem" selected="@(Model.Filtro.Origem == origem)">@origem</option> }</select></div>
+            <div class="admin-panel-field"><label for="conq-inicio">De</label><input id="conq-inicio" name="Inicio" type="date" value="@Model.Filtro.Inicio?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="conq-fim">Até</label><input id="conq-fim" name="Fim" type="date" value="@Model.Filtro.Fim?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="conq-sort">Ordenação</label><select id="conq-sort" name="Sort" class="form-select admin-panel-control"><option value="">Mais recentes</option><option value="data" selected="@(Model.Filtro.Sort == "data")">Mais antigas</option><option value="aluno" selected="@(Model.Filtro.Sort == "aluno")">Aluno</option><option value="insignia" selected="@(Model.Filtro.Sort == "insignia")">Insígnia</option></select></div>
+            <div class="admin-panel-field"><label for="conq-page-size">Registros</label><select id="conq-page-size" name="PageSize" class="form-select admin-panel-control">@foreach (var size in new[] { 20, 50, 100 }) { <option value="@size" selected="@(Model.Filtro.PageSize == size)">@size</option> }</select></div>
+            <div class="admin-panel-filter-actions"><button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button><a asp-action="Conquistas" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a></div>
+        </form>
+    </section>
+
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Conquistas atribuídas</h2></div>
+        <div class="admin-panel-card-header"><div><h2>Conquistas atribuídas (@Model.Conquistas.TotalCount)</h2><p>Página @Model.Conquistas.Page de @Model.Conquistas.TotalPages</p></div></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead>
@@ -151,7 +176,7 @@
                 <tbody>
                     @if (Model.Conquistas.Count == 0)
                     {
-                        <tr><td colspan="6" class="text-center text-muted py-4">Nenhuma conquista atribuída.</td></tr>
+                        <tr><td colspan="6"><div class="admin-panel-empty">@(Model.Filtro.HasActiveFilters ? "Nenhuma conquista corresponde aos filtros." : "Nenhuma conquista atribuída.")</div></td></tr>
                     }
                     else
                     {
@@ -193,5 +218,6 @@
                 </tbody>
             </table>
         </div>
+        <partial name="_AdminPagination" model="Model.Conquistas" />
     </section>
 </div>

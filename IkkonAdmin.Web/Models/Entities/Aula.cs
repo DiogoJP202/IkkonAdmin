@@ -13,6 +13,8 @@ public class Aula
     public int? TurmaHorarioId { get; set; }
     public TurmaHorario? TurmaHorario { get; set; }
 
+    public DateOnly? DataOcorrenciaRecorrencia { get; set; }
+
     public int? InstrutorUsuarioId { get; set; }
     public UsuarioSistema? InstrutorUsuario { get; set; }
 

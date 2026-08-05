@@ -13,6 +13,7 @@
         <div class="admin-panel-hero-actions">
             <a asp-action="Index" class="btn admin-panel-btn admin-panel-btn-ghost">Visão geral</a>
             <a asp-action="Frequencia" class="btn admin-panel-btn admin-panel-btn-primary">Frequência</a>
+            <form asp-action="GerarAulasAgora" method="post">@Html.AntiForgeryToken()<button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Gerar aulas agora</button></form>
         </div>
     </section>
 
@@ -250,15 +251,29 @@
         </div>
     </section>
 
+    <section class="admin-panel-card-v2 admin-panel-filter-card mb-4">
+        <div class="admin-panel-card-header"><div><span class="admin-panel-eyebrow">Filtros</span><h2>Consultar aulas cadastradas</h2><p>Filtre sem alterar os horários recorrentes ou vínculos de instrutores.</p></div></div>
+        <form method="get" asp-action="Aulas" class="admin-panel-filter-grid">
+            <div class="admin-panel-field"><label for="aula-inicio">De</label><input id="aula-inicio" name="Inicio" type="date" value="@Model.Filtro.Inicio?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="aula-fim">Até</label><input id="aula-fim" name="Fim" type="date" value="@Model.Filtro.Fim?.ToString("yyyy-MM-dd")" class="form-control admin-panel-control" /></div>
+            <div class="admin-panel-field"><label for="aula-turma">Turma</label><select id="aula-turma" name="TurmaId" class="form-select admin-panel-control"><option value="">Todas</option>@foreach (var turma in Model.Turmas) { <option value="@turma.Id" selected="@(Model.Filtro.TurmaId == turma.Id)">@turma.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="aula-instrutor">Instrutor</label><select id="aula-instrutor" name="InstrutorId" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var instrutor in Model.Instrutores) { <option value="@instrutor.Id" selected="@(Model.Filtro.InstrutorId == instrutor.Id)">@instrutor.Nome</option> }</select></div>
+            <div class="admin-panel-field"><label for="aula-status">Status</label><select id="aula-status" name="Status" class="form-select admin-panel-control"><option value="">Todos</option>@foreach (var status in Enum.GetValues<StatusAulaEnum>()) { <option value="@status" selected="@(Model.Filtro.Status == status)">@status</option> }</select></div>
+            <div class="admin-panel-field"><label for="aula-sort">Ordenação</label><select id="aula-sort" name="Sort" class="form-select admin-panel-control"><option value="">Data crescente</option><option value="data-desc" selected="@(Model.Filtro.Sort == "data-desc")">Data decrescente</option><option value="turma" selected="@(Model.Filtro.Sort == "turma")">Turma</option><option value="status" selected="@(Model.Filtro.Sort == "status")">Status</option></select></div>
+            <div class="admin-panel-field"><label for="aula-page-size">Registros</label><select id="aula-page-size" name="PageSize" class="form-select admin-panel-control">@foreach (var size in new[] { 20, 50, 100 }) { <option value="@size" selected="@(Model.Filtro.PageSize == size)">@size</option> }</select></div>
+            <div class="admin-panel-filter-actions"><button type="submit" class="btn admin-panel-btn admin-panel-btn-primary">Aplicar filtros</button><a asp-action="Aulas" class="btn admin-panel-btn admin-panel-btn-ghost">Limpar</a></div>
+        </form>
+    </section>
+
     <section class="admin-panel-card-v2">
-        <div class="admin-panel-card-header"><h2>Aulas cadastradas</h2></div>
+        <div class="admin-panel-card-header"><div><h2>Aulas cadastradas (@Model.Aulas.TotalCount)</h2><p>Página @Model.Aulas.Page de @Model.Aulas.TotalPages</p></div></div>
         <div class="table-responsive">
             <table class="table admin-panel-table align-middle mb-0">
                 <thead><tr><th>Turma</th><th>Instrutor</th><th>Início</th><th>Fim</th><th>Status</th><th>Local</th><th class="text-end">Frequência</th><th class="text-end">Ações</th></tr></thead>
                 <tbody>
                     @if (Model.Aulas.Count == 0)
                     {
-                        <tr><td colspan="8" class="text-center text-muted py-4">Nenhuma aula cadastrada.</td></tr>
+                        <tr><td colspan="8"><div class="admin-panel-empty">@(Model.Filtro.HasActiveFilters ? "Nenhuma aula corresponde aos filtros." : "Nenhuma aula cadastrada.")</div></td></tr>
                     }
                     else
                     {
@@ -314,5 +329,6 @@
                 </tbody>
             </table>
         </div>
+        <partial name="_AdminPagination" model="Model.Aulas" />
     </section>
 </div>

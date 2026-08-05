@@ -1,4 +1,5 @@
 using IkkonAdmin.Web.Infrastructure.Operations;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Enums;
 using IkkonAdmin.Web.Infrastructure.Time;
@@ -12,13 +13,16 @@ public sealed class AreaAlunoComunicadoAdminService(
     ApplicationDbContext dbContext,
     IClock clock) : IAreaAlunoComunicadoAdminService
 {
-    public async Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(CancellationToken cancellationToken = default)
+    public async Task<AreaAlunoComunicadosAdminViewModel> ObterComunicadosAsync(
+        ComunicadoAdminFilter filter,
+        CancellationToken cancellationToken = default)
     {
         return new AreaAlunoComunicadosAdminViewModel
         {
+            Filtro = filter,
             Alunos = await ListarAlunosOpcoesAsync(cancellationToken),
             Turmas = await ListarTurmasOpcoesAsync(cancellationToken),
-            Comunicados = await ListarComunicadosRecentesAsync(100, cancellationToken)
+            Comunicados = await ListarComunicadosPaginadosAsync(filter, cancellationToken)
         };
     }
 
@@ -45,27 +49,93 @@ public sealed class AreaAlunoComunicadoAdminService(
             .Take(limite)
             .ToListAsync(cancellationToken);
 
-        return comunicados
-            .Select(x =>
+        return comunicados.Select(MapComunicadoItem).ToList();
+    }
+
+    private async Task<PagedResult<AreaAlunoComunicadoAdminItemViewModel>> ListarComunicadosPaginadosAsync(
+        ComunicadoAdminFilter filter,
+        CancellationToken cancellationToken)
+    {
+        filter.Normalize();
+        var query = dbContext.Comunicados
+            .AsNoTracking()
+            .Include(x => x.Alvos)
+            .Include(x => x.Leituras)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter.Busca))
+        {
+            var search = filter.Busca.Trim();
+            query = query.Where(x => x.Titulo.Contains(search) || x.Conteudo.Contains(search));
+        }
+
+        if (filter.Publico.HasValue)
+        {
+            query = filter.Publico.Value switch
             {
-                var alvo = x.Alvos.FirstOrDefault();
-                return new AreaAlunoComunicadoAdminItemViewModel
-                {
-                    Id = x.Id,
-                    Titulo = x.Titulo,
-                    Conteudo = x.Conteudo,
-                    Importante = x.Importante,
-                    Fixado = x.Fixado,
-                    Ativo = x.Ativo,
-                    PublicadoEmUtc = x.PublicadoEmUtc,
-                    ExpiraEmUtc = x.ExpiraEmUtc,
-                    AlvoTipo = ObterAlvoTipo(alvo?.Todos == true, alvo?.AlunoId, alvo?.TurmaId),
-                    AlunoId = alvo?.AlunoId,
-                    TurmaId = alvo?.TurmaId,
-                    Leituras = x.Leituras.Count
-                };
-            })
-            .ToList();
+                ComunicadoAlvoTipoEnum.Aluno => query.Where(x => x.Alvos.Any(a => a.AlunoId.HasValue)),
+                ComunicadoAlvoTipoEnum.Turma => query.Where(x => x.Alvos.Any(a => a.TurmaId.HasValue)),
+                _ => query.Where(x => x.Alvos.Any(a => a.Todos))
+            };
+        }
+
+        if (filter.TurmaId.HasValue)
+        {
+            query = query.Where(x => x.Alvos.Any(a => a.TurmaId == filter.TurmaId.Value));
+        }
+
+        if (filter.Importante.HasValue)
+        {
+            query = query.Where(x => x.Importante == filter.Importante.Value);
+        }
+
+        if (filter.Fixado.HasValue)
+        {
+            query = query.Where(x => x.Fixado == filter.Fixado.Value);
+        }
+
+        if (filter.Inicio.HasValue)
+        {
+            var start = filter.Inicio.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            query = query.Where(x => x.PublicadoEmUtc >= start);
+        }
+
+        if (filter.Fim.HasValue)
+        {
+            var endExclusive = filter.Fim.Value.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            query = query.Where(x => x.PublicadoEmUtc < endExclusive);
+        }
+
+        query = filter.Sort switch
+        {
+            "titulo" => query.OrderBy(x => x.Titulo).ThenByDescending(x => x.PublicadoEmUtc),
+            "leituras-desc" => query.OrderByDescending(x => x.Leituras.Count).ThenByDescending(x => x.PublicadoEmUtc),
+            "data" => query.OrderBy(x => x.PublicadoEmUtc).ThenBy(x => x.Id),
+            _ => query.OrderByDescending(x => x.Fixado).ThenByDescending(x => x.PublicadoEmUtc)
+        };
+
+        var paged = await query.ToPagedResultAsync(filter, cancellationToken);
+        return paged.Map(MapComunicadoItem);
+    }
+
+    private static AreaAlunoComunicadoAdminItemViewModel MapComunicadoItem(Comunicado comunicado)
+    {
+        var target = comunicado.Alvos.FirstOrDefault();
+        return new AreaAlunoComunicadoAdminItemViewModel
+        {
+            Id = comunicado.Id,
+            Titulo = comunicado.Titulo,
+            Conteudo = comunicado.Conteudo,
+            Importante = comunicado.Importante,
+            Fixado = comunicado.Fixado,
+            Ativo = comunicado.Ativo,
+            PublicadoEmUtc = comunicado.PublicadoEmUtc,
+            ExpiraEmUtc = comunicado.ExpiraEmUtc,
+            AlvoTipo = ObterAlvoTipo(target?.Todos == true, target?.AlunoId, target?.TurmaId),
+            AlunoId = target?.AlunoId,
+            TurmaId = target?.TurmaId,
+            Leituras = comunicado.Leituras.Count
+        };
     }
 
     public async Task<OperationResult> CriarComunicadoAsync(

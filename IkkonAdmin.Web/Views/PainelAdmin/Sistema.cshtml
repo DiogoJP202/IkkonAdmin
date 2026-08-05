@@ -109,9 +109,22 @@
                     <div class="admin-panel-check-grid">
                         <label class="admin-panel-check-card"><input asp-for="Form.AplicarMultaJurosAutomaticamente" class="form-check-input" /><span>Aplicar multa e juros automaticamente</span></label>
                         <label class="admin-panel-check-card"><input asp-for="Form.GerarMensalidadesAutomaticamente" class="form-check-input" /><span>Gerar mensalidades automaticamente</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.GerarAulasAutomaticamente" class="form-check-input" /><span>Gerar aulas recorrentes automaticamente</span></label>
+                        <label class="admin-panel-check-card"><input asp-for="Form.AvaliarConquistasAutomaticamente" class="form-check-input" /><span>Avaliar conquistas automaticamente</span></label>
                         <label class="admin-panel-check-card"><input asp-for="Form.EnviarLembreteCobranca" class="form-check-input" /><span>Enviar lembrete de cobrança</span></label>
                         <label class="admin-panel-check-card"><input asp-for="Form.PermitirDesligamentoComPendencia" class="form-check-input" /><span>Permitir desligamento com pendência</span></label>
                         <label class="admin-panel-check-card"><input asp-for="Form.AtualizarNivelAutomaticamenteNaGraduacao" class="form-check-input" /><span>Atualizar nível automaticamente na graduação</span></label>
+                    </div>
+                    <div class="admin-panel-form-grid">
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.HorarioAutomacoesAreaAluno">Horário das automações</label>
+                            <input asp-for="Form.HorarioAutomacoesAreaAluno" type="time" class="form-control admin-panel-control" />
+                        </div>
+                        <div class="admin-panel-field">
+                            <label asp-for="Form.HorizonteGeracaoAulasSemanas">Horizonte de aulas (semanas)</label>
+                            <input asp-for="Form.HorizonteGeracaoAulasSemanas" type="number" min="1" max="52" class="form-control admin-panel-control" />
+                            <span asp-validation-for="Form.HorizonteGeracaoAulasSemanas" class="text-danger small"></span>
+                        </div>
                     </div>
                 </div>
 

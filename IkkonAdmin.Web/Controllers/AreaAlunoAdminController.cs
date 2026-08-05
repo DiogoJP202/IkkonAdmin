@@ -12,7 +12,9 @@ namespace IkkonAdmin.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.Funcionario)]
 public class AreaAlunoAdminController(
     IAreaAlunoAdminService areaAlunoAdminService,
-    ICurrentUserService currentUserService) : Controller
+    ICurrentUserService currentUserService,
+    IAulaRecurrenceGenerator aulaRecurrenceGenerator,
+    IInsigniaRuleEvaluator insigniaRuleEvaluator) : Controller
 {
     [HttpGet("")]
     [Authorize(Policy = AuthorizationPolicies.AreaAlunoView)]
@@ -24,10 +26,10 @@ public class AreaAlunoAdminController(
 
     [HttpGet("aulas")]
     [Authorize(Policy = AuthorizationPolicies.AulasView)]
-    public async Task<IActionResult> Aulas(CancellationToken cancellationToken)
+    public async Task<IActionResult> Aulas([FromQuery] AulaAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Aulas e horários";
-        return View(await areaAlunoAdminService.ObterAulasAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterAulasAsync(filter, cancellationToken));
     }
 
     [HttpPost("aulas/horarios")]
@@ -135,12 +137,22 @@ public class AreaAlunoAdminController(
         return RedirectToAction(nameof(Aulas));
     }
 
+    [HttpPost("aulas/gerar-agora")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.AulasCreate)]
+    public async Task<IActionResult> GerarAulasAgora(CancellationToken cancellationToken)
+    {
+        var summary = await aulaRecurrenceGenerator.GenerateAsync(cancellationToken: cancellationToken);
+        TempData["Success"] = summary.ToUserMessage();
+        return RedirectToAction(nameof(Aulas));
+    }
+
     [HttpGet("frequencia")]
     [Authorize(Policy = AuthorizationPolicies.FrequenciaView)]
-    public async Task<IActionResult> Frequencia(CancellationToken cancellationToken)
+    public async Task<IActionResult> Frequencia([FromQuery] FrequenciaAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Frequência";
-        return View(await areaAlunoAdminService.ObterFrequenciaAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterFrequenciaAsync(filter, cancellationToken));
     }
 
     [HttpGet("frequencia/{aulaId:int}")]
@@ -170,10 +182,10 @@ public class AreaAlunoAdminController(
 
     [HttpGet("documentos")]
     [Authorize(Policy = AuthorizationPolicies.DocumentosView)]
-    public async Task<IActionResult> Documentos(CancellationToken cancellationToken)
+    public async Task<IActionResult> Documentos([FromQuery] DocumentoAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Documentos";
-        return View(await areaAlunoAdminService.ObterDocumentosAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterDocumentosAsync(filter, cancellationToken));
     }
 
     [HttpPost("documentos/tipos")]
@@ -271,10 +283,10 @@ public class AreaAlunoAdminController(
 
     [HttpGet("comunicados")]
     [Authorize(Policy = AuthorizationPolicies.ComunicadosView)]
-    public async Task<IActionResult> Comunicados(CancellationToken cancellationToken)
+    public async Task<IActionResult> Comunicados([FromQuery] ComunicadoAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Comunicados";
-        return View(await areaAlunoAdminService.ObterComunicadosAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterComunicadosAsync(filter, cancellationToken));
     }
 
     [HttpPost("comunicados")]
@@ -314,10 +326,10 @@ public class AreaAlunoAdminController(
 
     [HttpGet("eventos")]
     [Authorize(Policy = AuthorizationPolicies.EventosAlunoView)]
-    public async Task<IActionResult> Eventos(CancellationToken cancellationToken)
+    public async Task<IActionResult> Eventos([FromQuery] EventoAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Eventos dos alunos";
-        return View(await areaAlunoAdminService.ObterEventosAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterEventosAsync(filter, cancellationToken));
     }
 
     [HttpPost("eventos")]
@@ -357,10 +369,10 @@ public class AreaAlunoAdminController(
 
     [HttpGet("conquistas")]
     [Authorize(Policy = AuthorizationPolicies.ConquistasView)]
-    public async Task<IActionResult> Conquistas(CancellationToken cancellationToken)
+    public async Task<IActionResult> Conquistas([FromQuery] ConquistaAdminFilter filter, CancellationToken cancellationToken)
     {
         ViewData["Title"] = "Conquistas";
-        return View(await areaAlunoAdminService.ObterConquistasAsync(cancellationToken));
+        return View(await areaAlunoAdminService.ObterConquistasAsync(filter, cancellationToken));
     }
 
     [HttpPost("conquistas/insignias")]
@@ -430,6 +442,16 @@ public class AreaAlunoAdminController(
     public async Task<IActionResult> ExcluirAlunoInsignia(int id, CancellationToken cancellationToken)
     {
         await ExecutarOperacaoAsync(areaAlunoAdminService.ExcluirAlunoInsigniaAsync(id, cancellationToken));
+        return RedirectToAction(nameof(Conquistas));
+    }
+
+    [HttpPost("conquistas/processar-agora")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = AuthorizationPolicies.ConquistasCreate)]
+    public async Task<IActionResult> ProcessarConquistasAgora(CancellationToken cancellationToken)
+    {
+        var summary = await insigniaRuleEvaluator.EvaluateAsync(cancellationToken: cancellationToken);
+        TempData["Success"] = summary.ToUserMessage();
         return RedirectToAction(nameof(Conquistas));
     }
 

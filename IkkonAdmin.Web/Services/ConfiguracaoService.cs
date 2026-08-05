@@ -35,6 +35,10 @@ public class ConfiguracaoService(
         config.PercentualJurosMes = decimal.Round(Math.Clamp(form.PercentualJurosMes, 0m, 20m), 2);
         config.AplicarMultaJurosAutomaticamente = form.AplicarMultaJurosAutomaticamente;
         config.GerarMensalidadesAutomaticamente = form.GerarMensalidadesAutomaticamente;
+        config.GerarAulasAutomaticamente = form.GerarAulasAutomaticamente;
+        config.AvaliarConquistasAutomaticamente = form.AvaliarConquistasAutomaticamente;
+        config.HorarioAutomacoesAreaAluno = form.HorarioAutomacoesAreaAluno;
+        config.HorizonteGeracaoAulasSemanas = Math.Clamp(form.HorizonteGeracaoAulasSemanas, 1, 52);
         config.EnviarLembreteCobranca = form.EnviarLembreteCobranca;
         config.DiasAntecedenciaLembrete = Math.Clamp(form.DiasAntecedenciaLembrete, 0, 30);
         config.MensagemBoasVindasPadrao = LimparOpcional(form.MensagemBoasVindasPadrao);
@@ -60,6 +64,10 @@ public class ConfiguracaoService(
         config.PercentualJurosMes = 1m;
         config.AplicarMultaJurosAutomaticamente = false;
         config.GerarMensalidadesAutomaticamente = false;
+        config.GerarAulasAutomaticamente = true;
+        config.AvaliarConquistasAutomaticamente = true;
+        config.HorarioAutomacoesAreaAluno = new TimeOnly(3, 30);
+        config.HorizonteGeracaoAulasSemanas = 8;
         config.EnviarLembreteCobranca = true;
         config.DiasAntecedenciaLembrete = 3;
         config.MensagemBoasVindasPadrao = null;

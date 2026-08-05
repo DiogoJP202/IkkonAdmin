@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using IkkonAdmin.Web.Enums;
+using IkkonAdmin.Web.Infrastructure.Pagination;
 
 namespace IkkonAdmin.Web.Models.ViewModels;
 
@@ -18,6 +19,7 @@ public class AreaAlunoAdminDashboardViewModel
 
 public class AreaAlunoAulasAdminViewModel
 {
+    public AulaAdminFilter Filtro { get; set; } = new();
     public TurmaHorarioFormViewModel NovoHorario { get; set; } = new();
     public TurmaInstrutorFormViewModel NovoInstrutor { get; set; } = new();
     public AulaFormViewModel NovaAula { get; set; } = new();
@@ -25,12 +27,15 @@ public class AreaAlunoAulasAdminViewModel
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Instrutores { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoHorarioAdminItemViewModel> Horarios { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoInstrutorAdminItemViewModel> TurmaInstrutores { get; set; } = [];
-    public IReadOnlyCollection<AreaAlunoAulaAdminItemViewModel> Aulas { get; set; } = [];
+    public PagedResult<AreaAlunoAulaAdminItemViewModel> Aulas { get; set; } = PagedResult<AreaAlunoAulaAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoFrequenciaAdminViewModel
 {
-    public IReadOnlyCollection<AreaAlunoAulaAdminItemViewModel> Aulas { get; set; } = [];
+    public FrequenciaAdminFilter Filtro { get; set; } = new();
+    public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Turmas { get; set; } = [];
+    public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Instrutores { get; set; } = [];
+    public PagedResult<AreaAlunoAulaAdminItemViewModel> Aulas { get; set; } = PagedResult<AreaAlunoAulaAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoRegistroFrequenciaViewModel
@@ -62,36 +67,41 @@ public class FrequenciaRegistroItemViewModel
 
 public class AreaAlunoDocumentosAdminViewModel
 {
+    public DocumentoAdminFilter Filtro { get; set; } = new();
     public DocumentoTipoFormViewModel NovoTipo { get; set; } = new();
     public DocumentoSolicitacaoFormViewModel NovaSolicitacao { get; set; } = new();
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Alunos { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoDocumentoTipoItemViewModel> Tipos { get; set; } = [];
-    public IReadOnlyCollection<AreaAlunoDocumentoAdminItemViewModel> Solicitacoes { get; set; } = [];
+    public PagedResult<AreaAlunoDocumentoAdminItemViewModel> Solicitacoes { get; set; } = PagedResult<AreaAlunoDocumentoAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoComunicadosAdminViewModel
 {
+    public ComunicadoAdminFilter Filtro { get; set; } = new();
     public ComunicadoFormViewModel NovoComunicado { get; set; } = new();
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Alunos { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Turmas { get; set; } = [];
-    public IReadOnlyCollection<AreaAlunoComunicadoAdminItemViewModel> Comunicados { get; set; } = [];
+    public PagedResult<AreaAlunoComunicadoAdminItemViewModel> Comunicados { get; set; } = PagedResult<AreaAlunoComunicadoAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoEventosAdminViewModel
 {
+    public EventoAdminFilter Filtro { get; set; } = new();
     public EventoAlunoFormViewModel NovoEvento { get; set; } = new();
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Alunos { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Turmas { get; set; } = [];
-    public IReadOnlyCollection<AreaAlunoEventoAdminItemViewModel> Eventos { get; set; } = [];
+    public PagedResult<AreaAlunoEventoAdminItemViewModel> Eventos { get; set; } = PagedResult<AreaAlunoEventoAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoConquistasAdminViewModel
 {
+    public ConquistaAdminFilter Filtro { get; set; } = new();
     public InsigniaFormViewModel NovaInsignia { get; set; } = new();
     public AlunoInsigniaFormViewModel NovaAtribuicao { get; set; } = new();
     public IReadOnlyCollection<AreaAlunoOpcaoViewModel> Alunos { get; set; } = [];
     public IReadOnlyCollection<AreaAlunoInsigniaItemViewModel> Insignias { get; set; } = [];
-    public IReadOnlyCollection<AreaAlunoConquistaAdminItemViewModel> Conquistas { get; set; } = [];
+    public IReadOnlyCollection<string> Categorias { get; set; } = [];
+    public PagedResult<AreaAlunoConquistaAdminItemViewModel> Conquistas { get; set; } = PagedResult<AreaAlunoConquistaAdminItemViewModel>.Empty();
 }
 
 public class AreaAlunoOpcaoViewModel
@@ -387,6 +397,7 @@ public class AreaAlunoInsigniaItemViewModel
     public string? Icone { get; set; }
     public string? Categoria { get; set; }
     public string? RegraAutomatica { get; set; }
+    public bool RegraAutomaticaValida { get; set; } = true;
     public bool Ativa { get; set; }
 }
 
