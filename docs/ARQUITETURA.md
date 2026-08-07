@@ -59,7 +59,7 @@ Exemplos:
 - `BlogWorkflowService`
 - `BlogVersionService`
 - `BlogCategoriaService` e `BlogMediaService`
-- `DashboardService`
+- `DashboardQueryService`
 - `GoogleAgendaService`
 - `UserSettingsService`
 
@@ -180,9 +180,14 @@ Componentes principais:
 
 - `IClock`: fonte de tempo injetável para regras e testes.
 - `ICurrentUserService`: usuário autenticado atual sem espalhar leitura de claims pelos controllers/services.
-- `IFileStorageService`: gravação de arquivos em storage local controlado.
+- `IFileStorageService`: mídia pública em storage local controlado.
+- `IPrivateFileStorageService`: documentos privados em storage local no
+  desenvolvimento ou S3 compatível em produção.
+- `IDocumentFileValidator`: validação de tamanho, extensão e assinatura de
+  documentos enviados.
 - `IAuditLogger`: registro de ações sensíveis em `AuditoriaLog`.
-- `OperationResult`: contrato padronizado de sucesso, validação e item não encontrado.
+- `OperationResult`: contrato padronizado de sucesso, validação, item não
+  encontrado, acesso proibido e conflito.
 
 Essas abstrações devem ser preferidas em novas features para reduzir acoplamento com HTTP, filesystem e relógio do sistema.
 

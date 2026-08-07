@@ -6,7 +6,8 @@ Este documento é o procedimento operacional do IkkonAdmin em produção. O banc
 
 - Aplicação: ASP.NET Core MVC em container ou Azure App Service.
 - Banco: SQL Server/Azure SQL, atualizado somente por migration explícita.
-- Arquivos públicos: storage público atual de imagens do blog e perfis.
+- Arquivos públicos: `wwwroot/uploads` pelo provider local atual; o diretório
+  precisa ser persistido e incluído no backup do ambiente.
 - Documentos de alunos: bucket S3 privado, acessado somente pelo backend.
 - Data Protection: key ring em volume persistente; opcionalmente protegido por certificado PFX.
 - Fuso das automações: `America/Sao_Paulo`.
@@ -34,6 +35,11 @@ DataProtection__CertificatePassword=<secret, opcional>
 ```
 
 Prefira identidade gerenciada/IAM role a chaves estáticas. Nunca salve connection strings, JSON do Google, chaves S3, PFX ou senhas em `appsettings.json`.
+
+O provider externo implementado nesta versão atende somente documentos privados.
+Se o host tiver filesystem efêmero, não habilite upload de capa/conteúdo do blog
+ou foto de perfil até persistir `wwwroot/uploads` ou implementar um provider
+externo também para mídia pública.
 
 Google Agenda, quando habilitado:
 
@@ -81,12 +87,22 @@ Objetos não possuem URL pública. O banco guarda somente uma chave lógica e o 
 6. Verificar `/health/live` e `/health/ready`.
 7. Executar smoke test de login, navegação, download privado e blog PT/EN/JA.
 
+Antes do primeiro deploy, execute também o teste de migrations com SQL Server
+real (`RUN_SQL_INTEGRATION_TESTS=1`) e o Playwright mutável em um banco isolado.
+O workflow Azure atual executa a suíte .NET padrão, mas não ativa automaticamente
+Testcontainers nem o runner visual. O teste SQL requer Docker ativo; o script
+visual instala o Chromium quando necessário.
+
 Comandos equivalentes:
 
 ```powershell
 dotnet restore .\IkkonAdmin.slnx
 dotnet build .\IkkonAdmin.slnx -c Release --no-restore
 dotnet test .\IkkonAdmin.Tests\IkkonAdmin.Tests.csproj -c Release --no-build
+$env:RUN_SQL_INTEGRATION_TESTS='1'
+dotnet test .\IkkonAdmin.Tests\IkkonAdmin.Tests.csproj -c Release --no-build --filter FullyQualifiedName~SqlServerMigrationIntegrationTests
+$env:ConnectionStrings__DefaultConnection='<SQL Server isolado para E2E>'
+pwsh -NoProfile -File .\scripts\visual-regression.ps1 -RunMutableFlows
 dotnet tool restore
 dotnet ef database update --project .\IkkonAdmin.Web --startup-project .\IkkonAdmin.Web --connection "$env:ConnectionStrings__DefaultConnection" -c Release --no-build
 dotnet publish .\IkkonAdmin.Web -c Release --no-build -o .\publish
@@ -123,6 +139,7 @@ Não execute `database update <migration-antiga>` em produção sem revisar perd
 - transaction log: a cada 15 minutos quando o banco estiver em recovery model Full;
 - bucket privado com versionamento: versões antigas por 35 dias;
 - objeto atual não expira enquanto estiver referenciado no banco;
+- `wwwroot/uploads` persistente: backup junto à política de arquivos públicos;
 - teste de restauração trimestral, com evidência de duração, integridade e responsável.
 
 O backup deve estar em conta/região separada quando o provedor permitir. Restrinja exclusão de backups e use MFA/dupla aprovação para alterar retenção.

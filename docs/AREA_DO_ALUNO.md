@@ -166,13 +166,19 @@ Limite atual:
 10 MB por arquivo
 ```
 
-Os documentos ficam em:
+Em desenvolvimento, os documentos ficam em:
 
 ```text
 App_Data/uploads/documentos
 ```
 
-Esse diretório fica fora de `wwwroot`; o download passa por controller/service para validar autorização.
+Em produção, `IPrivateFileStorageService` usa um bucket S3 compatível, privado,
+criptografado e sem URL pública. Em ambos os casos, o download passa por
+controller/service, valida o vínculo com o aluno ou a permissão administrativa e
+responde com `no-store` e `nosniff`.
+
+O upload valida arquivo vazio, limite de 10 MB, extensão e assinatura binária de
+PDF, JPEG, PNG ou WebP. O MIME informado pelo navegador não é confiável.
 
 ### Comunicados
 
@@ -340,6 +346,17 @@ Entidades:
 
 Instrutor é inicialmente um `UsuarioSistema` com perfil administrativo/funcionário, não um novo tipo de usuário.
 
+A listagem administrativa aceita período, turma, instrutor e status. A geração
+recorrente usa `IAulaRecurrenceGenerator`, considera apenas horários e turmas
+ativos, escolhe o instrutor principal vigente e cria uma ocorrência única por
+horário/data. A rotina não sobrescreve aulas já existentes, inclusive editadas,
+reagendadas ou canceladas.
+
+Ela pode ser executada pela ação administrativa **Gerar agora** ou diariamente
+por `StudentAutomationHostedService`. Horário, ativação e horizonte são
+configuráveis; o horizonte padrão é de oito semanas e as datas usam o fuso
+`America/Sao_Paulo`.
+
 ### Frequência
 
 Entidade:
@@ -360,6 +377,11 @@ Campos principais:
 
 O registro deve ser único por aula e aluno.
 
+A listagem administrativa aceita período, turma, instrutor e situação de
+preenchimento. Admin e usuários com `AREA_ALUNO_MANAGE` possuem acesso global.
+Instrutores só listam e alteram aulas em seu escopo: o instrutor explícito da
+aula ou, quando ele não existe, um vínculo ativo com a turma na data da aula.
+
 ### Documentos
 
 Entidades:
@@ -374,6 +396,10 @@ Permissões:
 - `DOCUMENTOS_CREATE`
 - `DOCUMENTOS_EDIT`
 - `DOCUMENTOS_APPROVE`
+
+A listagem administrativa aceita aluno, tipo, status, prazo e existência de
+envio. Upload, download, aprovação e recusa são auditados; arquivos privados
+são validados por extensão e assinatura binária antes do armazenamento.
 
 ### Comunicados
 
@@ -417,6 +443,20 @@ Permissões:
 - `CONQUISTAS_CREATE`
 - `CONQUISTAS_EDIT`
 
+`IInsigniaRuleEvaluator` reconhece as regras `FREQUENCIA_PRIMEIRA`,
+`FREQUENCIA_TOTAL:n` e `TEMPO_ATIVO_MESES:n`. A avaliação ocorre após o registro
+de frequência, diariamente e pela ação administrativa **Processar agora**. O
+índice único de aluno/insígnia e o tratamento de concorrência impedem
+duplicidade; regras desconhecidas são informadas e não executadas.
+
+### Listagens administrativas
+
+Aulas, frequência, documentos, comunicados, eventos e conquistas usam
+`PageRequest` e `PagedResult<T>`, com 20 itens por padrão e opções de 20, 50 e
+100. Filtros e ordenação são controlados no servidor e preservados durante a
+paginação. As telas distinguem ausência de cadastros de uma busca sem resultado
+e oferecem limpeza dos filtros quando aplicável.
+
 ## Permissões administrativas
 
 Grupo principal:
@@ -447,8 +487,6 @@ Submódulos:
 
 ## Pontos de evolução
 
-- Auditoria mais detalhada para aprovação/recusa de documentos.
-- Storage externo para documentos em produção.
-- Regras automáticas de conquistas mais robustas.
-- Geração automática de aulas futuras a partir de recorrências.
-- Permissão limitada para instrutores registrarem frequência apenas nas turmas em que atuam.
+- Integrar varredura antimalware antes de disponibilizar documentos enviados.
+- Externalizar também a mídia pública de blog e perfis para hosts com filesystem efêmero.
+- Adicionar novos tipos de regra automática de conquista somente com validação, idempotência e testes de concorrência.

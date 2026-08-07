@@ -15,6 +15,12 @@ O banco usa SQL Server via Entity Framework Core.
 - `AuditoriaLogs`.
 - `InventarioItens`, `InventarioMovimentacoes`.
 - `GoogleAgendaConexoes`.
+- `BlogPosts`, `BlogCategories`, `BlogTags`, `BlogPostTags`.
+- `TurmaHorarios`, `TurmaInstrutores`, `Aulas`, `FrequenciasAlunos`.
+- `EventosAlunoPortal`, `EventosAlunoPortalAlvos`.
+- `Comunicados`, `ComunicadosAlvos`, `ComunicadosLeituras`.
+- `DocumentoTipos`, `DocumentoSolicitacoes`, `DocumentoEnvios`.
+- `Insignias`, `AlunoInsignias`.
 
 ## Configurações EF Core
 
@@ -46,6 +52,12 @@ Padrão:
 - `UsuarioSistema` 0:1 `Aluno` via `AlunoId`.
 - `InventarioItem` 1:N `InventarioMovimentacao`.
 - `GoogleAgendaConexao` referencia usuário que conectou.
+- `Turma` 1:N `TurmaHorario`, `TurmaInstrutor` e `Aula`.
+- `Aula` 1:N `FrequenciaAluno`; cada aluno possui no máximo uma frequência por aula.
+- `DocumentoSolicitacao` 1:N `DocumentoEnvio`.
+- `Comunicado` e `EventoAlunoPortal` possuem alvos por aluno, turma ou público geral.
+- `Aluno` N:N `Insignia` via `AlunoInsignia`.
+- `BlogPost` N:N `BlogTag` via `BlogPostTag` e pertence opcionalmente a uma categoria.
 
 ## Índices e restrições relevantes
 
@@ -58,6 +70,11 @@ Padrão:
 - `PermissaoSistema.Codigo` único.
 - `InventarioItem.CodigoInterno` único filtrado quando preenchido/ativo, conforme configuration.
 - `InventarioItem` possui índices para categoria, tipo, status e ativo.
+- `FrequenciaAluno` possui índice único por `{AulaId, AlunoId}`.
+- `AlunoInsignia` possui índice único por `{AlunoId, InsigniaId}`.
+- `Aula` possui índice único filtrado por `{TurmaHorarioId, DataOcorrenciaRecorrencia}` para impedir duplicidade na geração recorrente.
+- `BlogPost.Slug`, `BlogCategory.Name`, `BlogCategory.Slug`, `BlogTag.Name` e `BlogTag.Slug` são únicos.
+- `DocumentoTipo.Nome` e `Insignia.Nome` são únicos.
 
 ## Campos recorrentes
 
@@ -88,6 +105,11 @@ Principais migrations identificadas:
 - `AddRoleTipoAcessoAndPermissionExpansion`.
 - `AddGoogleAgendaAndInventario`.
 - `AddGoogleAgendaOAuthConnection`.
+- `AddBlogModuleBase`.
+- `AddAreaAlunoPortal`.
+- `AddBlogPostLanguageVersions`.
+- `AddAuditCorrelation`.
+- `AddStudentAutomations`.
 
 ## Aplicação de migrations
 

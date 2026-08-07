@@ -103,22 +103,22 @@ Padrão atual:
 
 - `*QueryService` para consultas, listas, filtros e detalhes.
 - `*Service` para comandos e regras que alteram estado.
-- `OperationResult` ou `OperationResult<T>` para sucesso, validação e `NotFound`.
+- `OperationResult` ou `OperationResult<T>` para sucesso, validação,
+  `NotFound`, `Forbidden` e `Conflict`.
 - `IClock`, `ICurrentUserService`, `IFileStorageService` e `IAuditLogger` para infraestrutura transversal.
 
 Services existentes por módulo:
 
 - `AlunoService`, `TurmaService`, `FinanceiroService`.
 - `AdmissaoService`, `DesligamentoService`, `GraduacaoService`.
-- `DashboardService`, `ConfiguracaoService`.
-- `AuthService`, `AreaAlunoService`, `AdminPainelService`.
+- `DashboardQueryService`, `ConfiguracaoQueryService`, `ConfiguracaoService`.
+- `AuthService`, `AreaAlunoService`, `AdminPainelQueryService`, `AdminPainelService`.
 - `InventarioService`, `GoogleAgendaService`, `UserSettingsService`.
 - `BlogService` e services auxiliares de workflow, idioma, versão, mídia, slug e tags.
 
-Contratos específicos ainda pendentes de migração para `OperationResult`:
-
-- `BlogOperationResult`.
-- `AdminOperationResult`.
+Os contratos legados `BlogOperationResult`, `AdminOperationResult` e
+`UserSettingsOperationResult` foram removidos. Um teste arquitetural impede que
+voltem a ser declarados.
 
 ## Separação entre público e administrativo
 

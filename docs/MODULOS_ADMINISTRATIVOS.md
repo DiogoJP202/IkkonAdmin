@@ -185,7 +185,7 @@ Funcionalidades:
 - nível pretendido;
 - resultado;
 - histórico de nível do aluno;
-- base futura para conquistas automáticas.
+- base para uma futura regra automática de conquista por graduação; as regras atuais cobrem frequência e tempo de vínculo.
 
 ## Inventário
 
@@ -301,6 +301,10 @@ Funcionalidades:
 - comunicados;
 - eventos internos;
 - insígnias e atribuições.
+- filtros, ordenação e paginação de 20, 50 ou 100 registros;
+- geração diária ou manual de aulas recorrentes, com horizonte configurável;
+- avaliação diária, pós-frequência ou manual de conquistas automáticas;
+- escopo de frequência limitado às próprias turmas/aulas para instrutores.
 
 Detalhes: [Área do Aluno](./AREA_DO_ALUNO.md).
 

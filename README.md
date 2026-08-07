@@ -158,10 +158,10 @@ dotnet restore IkkonAdmin.Web/IkkonAdmin.Web.csproj
 
 ### Configurar banco
 
-Arquivo:
+Crie um arquivo local não versionado:
 
 ```text
-IkkonAdmin.Web/appsettings.json
+IkkonAdmin.Web/appsettings.Development.json
 ```
 
 Exemplo:
@@ -230,12 +230,16 @@ Resumo:
 | Funcionário | `funcionario.operacional` | `Func@123` | `/admin` |
 | Aluno | `aluno.demo` | `Aluno@123` | `/area-do-aluno` |
 
-> Credenciais apenas para desenvolvimento e demonstração. Em produção, altere todas as senhas.
+> Credenciais exclusivas de desenvolvimento e demonstração; elas não são criadas em produção.
+
+> O seed demonstrativo não roda em `Production`. O primeiro administrador de
+> produção é criado somente pelo bootstrap secreto descrito no runbook.
 
 ## Documentação
 
 Documentação técnica e funcional separada:
 
+- [Índice da documentação](./docs/README.md)
 - [Arquitetura e convenções](./docs/ARQUITETURA.md)
 - [Padrões de serviços e operações](./docs/PADROES_DE_SERVICOS_E_OPERACOES.md)
 - [Área do Aluno](./docs/AREA_DO_ALUNO.md)

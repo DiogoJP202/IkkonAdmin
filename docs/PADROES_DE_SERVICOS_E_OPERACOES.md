@@ -50,7 +50,8 @@ Tipos principais:
 - `OperationResult`: operações sem valor de retorno;
 - `OperationResult<T>`: operações que retornam um valor, como o `Id` criado;
 - `OperationError`: erro opcionalmente associado a um campo;
-- `OperationResultStatus`: `Success`, `ValidationError` ou `NotFound`.
+- `OperationResultStatus`: `Success`, `ValidationError`, `NotFound`, `Forbidden`
+  ou `Conflict`.
 
 Use `OperationResult` quando o service precisa informar sucesso, falha de validação ou item inexistente sem jogar exceção para fluxos esperados.
 
@@ -92,7 +93,9 @@ result.AddToTempData(TempData);
 return RedirectToAction(nameof(Index));
 ```
 
-Para actions JSON ou modais administrativos, o controller pode retornar `BadRequest`, `NotFound` ou `Ok` com base no mesmo status.
+Para actions JSON ou modais administrativos, use também
+`result.ToFailureActionResult(this)` para mapear `NotFound`, `Forbidden` e
+`Conflict`; validações continuam voltando para `ModelState` ou `BadRequest`.
 
 ## Infraestrutura transversal
 
@@ -103,6 +106,10 @@ Padrões já disponíveis:
 - `IClock` e `SystemClock`: fonte única de tempo para auditoria, vencimentos, filtros e testes.
 - `ICurrentUserService` e `HttpCurrentUserService`: leitura centralizada do usuário autenticado.
 - `IFileStorageService` e `LocalFileStorageService`: gravação de arquivos com raiz controlada.
+- `IPrivateFileStorageService`: documentos privados, com implementação local em
+  Development e S3 compatível em Production.
+- `IDocumentFileValidator`: tamanho, extensão, arquivo vazio e assinatura real
+  de PDF, JPEG, PNG e WebP.
 - `IAuditLogger` e `EfAuditLogger`: registro de ações sensíveis.
 
 Evite chamar `DateTime.UtcNow`, `User.FindFirstValue` ou lógica de path diretamente em services novos quando já houver uma abstração disponível.
@@ -144,6 +151,8 @@ Módulos com consultas separadas e comandos retornando `OperationResult`:
 - área do aluno administrativa;
 - configurações de conta;
 - autenticação com `OperationResult<AuthSession>`.
+- blog editorial e categorias;
+- painel administrativo avançado.
 
 Módulos com consulta especializada:
 
@@ -153,14 +162,12 @@ Módulos com consulta especializada:
 - blog administrativo e público;
 - configurações do sistema.
 
-## Pendências conhecidas
+## Contrato consolidado
 
-Alguns contratos ainda usam tipos específicos e devem ser migrados em uma próxima etapa, se fizer sentido:
-
-- `BlogOperationResult`, usado pelo fluxo editorial do blog e categorias;
-- `AdminOperationResult`, usado por partes do painel administrativo avançado.
-
-Ao migrar, preservar mensagens, status HTTP/redirects e comportamento visual existente.
+`BlogOperationResult`, `AdminOperationResult` e `UserSettingsOperationResult`
+foram removidos. Não crie resultados específicos por módulo quando
+`OperationResult` ou `OperationResult<T>` representar o mesmo fluxo. O teste
+`OperationResultArchitectureTests` protege essa convenção.
 
 ## Testes
 

@@ -1,10 +1,18 @@
 # Modulo de Blog - Fase 1 - desenho tecnico
 
+> Documento histórico de planejamento, preservado para registrar as decisões da
+> Fase 1. Ele não descreve integralmente a implementação atual. Para manutenção,
+> consulte [Blog e idiomas](../BLOG_E_IDIOMAS.md),
+> [Arquitetura](../ARQUITETURA.md) e
+> [Uploads e storage](../UPLOADS_E_STORAGE.md).
+
 ## Objetivo
 
 Definir o desenho tecnico da primeira versao do modulo de Blog do IkkonAdmin, respeitando a arquitetura atual do projeto, os padroes visuais ja usados no admin e no site publico, o modelo de permissoes existente e a estrategia atual de upload local.
 
-Esta fase nao implementa schema, controllers ou views finais. Ela fecha as decisoes necessarias para a Fase 2 com baixo risco de retrabalho.
+Na época em que foi escrito, este documento ainda não implementava schema,
+controllers ou views finais. As fases posteriores já foram concluídas e podem
+ter evoluído as decisões registradas abaixo.
 
 ## Base real do projeto
 

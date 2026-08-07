@@ -10,11 +10,12 @@ Atualmente existem três grupos principais:
 2. fotos públicas de perfil;
 3. documentos privados enviados por alunos.
 
-O padrão de infraestrutura para novos uploads é:
+Os contratos de infraestrutura são:
 
 ```text
-IFileStorageService
-LocalFileStorageService
+Mídia pública: IFileStorageService -> LocalFileStorageService
+Documento privado (Development): IPrivateFileStorageService -> LocalPrivateFileStorageService
+Documento privado (Production): IPrivateFileStorageService -> S3PrivateFileStorageService
 ```
 
 Services novos devem depender da interface, não de paths montados manualmente. Documentos privados usam `IPrivateFileStorageService`; arquivos públicos continuam usando `IFileStorageService`.
@@ -111,6 +112,10 @@ Formatos aceitos:
 - `.png`
 - `.webp`
 
+Além de extensão, tamanho e arquivo vazio, documentos são validados pela
+assinatura binária esperada de PDF, JPEG, PNG ou WebP. O `ContentType` enviado
+pelo navegador não é considerado prova do formato.
+
 Fotos de perfil são públicas porque aparecem na interface autenticada e podem ser servidas diretamente pelo app.
 
 ## Documentos do aluno
@@ -177,22 +182,23 @@ Em Docker Compose local, use volumes quando quiser preservar uploads entre recri
 
 Sem volume, arquivos criados dentro do container podem desaparecer ao recriar a imagem/container.
 
-## Render Free
+## Hospedagens com filesystem efêmero
 
-O filesystem do Render Free é efêmero. Isso significa que uploads locais não são armazenamento confiável.
-
-Para demonstrações simples, pode funcionar temporariamente. Para uso real, use storage persistente externo.
+Documentos privados não dependem do disco da aplicação em `Production`, pois o
+startup exige S3. Imagens públicas do blog e fotos de perfil ainda usam
+`wwwroot/uploads`; portanto, em Render e hosts equivalentes, essa pasta precisa
+estar em volume persistente e entrar no backup. Sem isso, uploads públicos podem
+desaparecer após deploy, recriação ou movimentação do container.
 
 ## Azure App Service
 
-Azure App Service possui filesystem persistente no plano da aplicação, mas ainda assim é recomendável avaliar storage externo para arquivos sensíveis ou crescimento de volume.
+Azure App Service possui filesystem persistente no plano da aplicação, mas a
+pasta pública de uploads ainda deve entrar no backup e ser validada após cada
+estratégia de deploy.
 
-Opções recomendadas:
-
-- Azure Blob Storage;
-- Amazon S3;
-- Cloudflare R2;
-- outro storage de objetos compatível.
+Para documentos privados, a implementação atual suporta Amazon S3, Cloudflare
+R2 e outros serviços compatíveis com a API S3. Azure Blob exigiria uma nova
+implementação de `IPrivateFileStorageService`.
 
 ## Recomendação para produção
 
@@ -219,3 +225,5 @@ Consulte [Runbook de produção](./PRODUCTION_RUNBOOK.md) para variáveis, backu
 6. Validar autorização no download.
 7. Garantir que a pasta não será commitada.
 8. Documentar a pasta e a política de retenção.
+9. Para formato sensível, validar assinatura binária e não confiar no MIME do cliente.
+10. Definir se a política exige varredura antivírus; essa integração ainda não está implementada.

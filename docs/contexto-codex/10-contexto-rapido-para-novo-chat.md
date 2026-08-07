@@ -49,11 +49,14 @@ Permissões:
 
 Uploads:
 
-- Uploads passam por `IFileStorageService` / `LocalFileStorageService`.
+- Mídia pública passa por `IFileStorageService` / `LocalFileStorageService`.
 - Foto de perfil em `UserSettingsService`: `wwwroot/uploads/perfis`, até 2 MB.
 - Blog em `BlogMediaService`: `wwwroot/uploads/blog/capas` e `wwwroot/uploads/blog/conteudo`.
-- Documentos do aluno: `App_Data/uploads/documentos`, fora de `wwwroot`, até 10 MB.
+- Documentos do aluno: `IPrivateFileStorageService`, local fora de `wwwroot` em
+  Development e S3 compatível em Production, até 10 MB.
 - Extensões comuns: JPG/JPEG/PNG/WEBP; documentos também aceitam PDF.
+- Documentos validam extensão, tamanho e assinatura binária; antivírus externo
+  ainda não está integrado.
 - Não há media library genérica.
 
 Rotas:

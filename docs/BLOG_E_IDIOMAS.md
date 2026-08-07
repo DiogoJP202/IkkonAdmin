@@ -10,6 +10,8 @@ Este documento descreve o módulo de blog, o workflow editorial e o suporte a id
 |---|---|
 | `/blog` | Listagem pública |
 | `/blog/{slug}` | Detalhe do post |
+| `/pt/blog`, `/en/blog`, `/ja/blog` | Listagem localizada |
+| `/{culture}/blog/{slug}` | Detalhe localizado |
 
 ### Administrativas
 
@@ -79,7 +81,11 @@ O blog foi dividido em services menores para separar consulta, workflow editoria
 - `BlogDateTimeService`: datas de publicação/agendamento.
 - `BlogMediaService`: upload de capa e imagens do conteúdo.
 
-O retorno operacional do blog ainda usa `BlogOperationResult`. A migração para `OperationResult` deve preservar o comportamento editorial existente e pode ser feita em uma etapa própria.
+Os comandos editoriais usam `OperationResult` ou `OperationResult<int>`. O `Id`
+criado é retornado em `Value`; falhas são convertidas de forma consistente para
+`ModelState`, `TempData`, `NotFound`, `Forbid` ou `Conflict` conforme o status.
+Os tipos legados específicos do blog foram removidos e um teste arquitetural
+impede sua reintrodução.
 
 ## Idiomas de post
 

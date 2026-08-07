@@ -7,8 +7,12 @@ Definidas em `Program.cs`:
 - `/`: `InstitucionalController.Index`.
 - `/escola`: `InstitucionalController.Escola`.
 - `/eventos`: `InstitucionalController.Eventos`.
+- `/blog` e `/blog/{slug}`: `BlogController`.
+- `/pt`, `/en`, `/ja` e respectivas rotas localizadas: site público internacional.
 - `/institucional/{action=Index}/{id?}`: rota complementar institucional.
-- `/health`: endpoint de health check anônimo.
+- `/health` e `/health/live`: liveness anônimo.
+- `/health/ready`: readiness de SQL Server e storage privado.
+- `/health/sql` e `/health/storage`: diagnósticos isolados.
 
 Também são públicas:
 
@@ -71,6 +75,12 @@ Rotas:
 - `/area-do-aluno/perfil`.
 - `/area-do-aluno/financeiro`.
 - `/area-do-aluno/turmas`.
+- `/area-do-aluno/aulas`.
+- `/area-do-aluno/frequencia`.
+- `/area-do-aluno/documentos`.
+- `/area-do-aluno/comunicados`.
+- `/area-do-aluno/eventos`.
+- `/area-do-aluno/conquistas`.
 - `/area-do-aluno/acessoindisponivel`.
 
 Também existe rota mapeada:
@@ -84,7 +94,9 @@ Também existe rota mapeada:
 - Auth aluno: `AlunoAuthController`.
 - Portal do aluno: `AlunoAreaController`.
 - Admin operacional: `HomeController`, `AlunosController`, `TurmasController`, `FinanceiroController`, `AdmissoesController`, `DesligamentosController`, `GraduacoesController`.
-- Admin especializado: `GoogleAgendaController`, `InventarioController`, `PainelAdminController`.
+- Admin especializado: `GoogleAgendaController`, `InventarioController`,
+  `PainelAdminController`, `BlogAdminController`, `BlogCategoriasController` e
+  `AreaAlunoAdminController`.
 
 ## Convenção para novas rotas públicas
 
@@ -95,7 +107,7 @@ Para novas páginas públicas, preferir:
 - Layout `_PublicLayout.cshtml`.
 - Sem `[Authorize]`.
 
-Exemplo futuro:
+Exemplos atuais:
 
 - `/blog`.
 - `/blog/{slug}`.
@@ -109,9 +121,8 @@ Para novas features administrativas, preferir:
 - Sempre aplicar `[Authorize]` com policy adequada.
 - Incluir link na sidebar somente se o usuário tiver permissão.
 
-Exemplo futuro:
+Exemplos atuais:
 
 - `/admin/blog`.
 - `/admin/blog/criar`.
 - `/admin/blog/editar/{id}`.
-

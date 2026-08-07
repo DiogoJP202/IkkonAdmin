@@ -41,13 +41,14 @@ Observação:
 
 - Para evitar hibernação no App Service, use plano dedicado que suporte Always On. Planos Free/Shared são para desenvolvimento/teste e têm limitações.
 
-## Opção B - Mais barata para teste rápido
+## Opção B - Render com Docker
 
 Use:
 
-- App: Render Web Service com Docker
+- App: Render Web Service `starter` com Docker
 - Banco: Azure SQL Database Free Offer
-- Keep-alive: UptimeRobot, Better Stack ou cron-job.org chamando `/health`
+- Documentos privados: bucket S3 compatível
+- Health check: `/health/ready`
 
 Vantagens:
 
@@ -57,9 +58,12 @@ Vantagens:
 
 Limitações:
 
-- Render Free hiberna após período sem tráfego.
-- O filesystem do Render Free é efêmero, então uploads locais não devem ser usados como armazenamento permanente.
-- Para uma demonstração, o keep-alive pode reduzir cold starts, mas isso não substitui um plano pago/sempre ativo.
+- O blueprint atual usa plano `starter`, migration bundle no pre-deploy e disco
+  persistente para o key ring de Data Protection.
+- Documentos privados não usam o disco do container; o startup de produção exige S3.
+- Imagens públicas do blog e perfis ainda usam `wwwroot/uploads`. Em um host com
+  filesystem efêmero, persistir essa pasta ou não permitir uploads públicos até
+  existir um provider externo para mídia pública.
 
 ## Por que não Vercel agora?
 
@@ -117,7 +121,20 @@ Configure no Render:
 ```text
 ASPNETCORE_ENVIRONMENT=Production
 ConnectionStrings__DefaultConnection=<connection-string-do-azure-sql>
+
+PrivateFileStorage__Provider=S3
+PrivateFileStorage__BucketName=<bucket-privado>
+PrivateFileStorage__Region=<região>
+PrivateFileStorage__ServiceUrl=<endpoint-opcional-S3-compatível>
+PrivateFileStorage__AccessKeyId=<secret-ou-vazio-com-IAM-role>
+PrivateFileStorage__SecretAccessKey=<secret-ou-vazio-com-IAM-role>
+
+DataProtection__KeysPath=/var/ikkon/dataprotection
 ```
+
+`AccessKeyId` e `SecretAccessKey` devem ser fornecidos juntos. O bucket precisa
+bloquear acesso público, usar criptografia, versionamento e credencial limitada
+ao prefixo de documentos.
 
 Exemplo de connection string para Azure SQL:
 
@@ -142,21 +159,22 @@ Se não for testar Google Agenda agora, pode deixar essas variáveis sem configu
 
 ## Uploads e storage
 
-O sistema salva arquivos em duas áreas diferentes:
+O sistema trata arquivos em duas áreas diferentes:
 
-- imagens públicas do blog em `wwwroot/uploads/blog`;
-- documentos privados de alunos em `App_Data/uploads/documentos`.
+- imagens públicas do blog e perfis em `wwwroot/uploads`;
+- documentos privados pelo `IPrivateFileStorageService`.
 
-Em desenvolvimento local isso é suficiente. Em hospedagens com filesystem efêmero, como Render Free, esses arquivos podem ser perdidos quando o container for recriado ou movido.
+Em `Development`, documentos privados ficam em `App_Data/uploads/documentos`.
+Em `Production`, o startup recusa provider local e exige S3 compatível.
 
-Para demonstração simples, uploads locais podem ser aceitos com essa limitação conhecida. Para ambiente real, use storage persistente externo:
-
-- Azure Blob Storage;
-- Amazon S3;
-- Cloudflare R2;
-- outro storage de objetos.
+Amazon S3, Cloudflare R2 e outros serviços compatíveis com a API S3 são
+suportados para documentos. Azure Blob não possui implementação no projeto atual.
 
 Documentos de aluno não devem ser movidos para uma pasta pública sem controle de autorização. Eles precisam continuar passando por download autenticado/autorizado.
+
+O storage público de blog/perfil ainda é local. Em Render ou outro filesystem
+efêmero, essa pasta precisa de volume persistente e backup; caso contrário, os
+arquivos podem desaparecer em um novo deploy.
 
 Guia detalhado: [Uploads e storage](./docs/UPLOADS_E_STORAGE.md).
 
@@ -175,21 +193,23 @@ Use **Azure SQL Database Free Offer** para manter compatibilidade com SQL Server
 
 Migrations não são executadas pelo processo web em Production. A pipeline deve executar `dotnet ef database update` antes da publicação; qualquer falha interrompe o deploy. O startup recusa schema com migrations pendentes.
 
-## Keep-alive para Render Free
+## Monitoramento externo
 
-Se usar Render Free, configure um monitor HTTP chamando:
+Configure o monitor de processo em:
 
 ```text
-https://seu-app.onrender.com/health
+https://seu-app.onrender.com/health/live
 ```
 
-Sugestões:
+Configure também um monitor de dependências em:
 
-- UptimeRobot: monitor HTTP a cada 5 minutos no plano gratuito.
-- Better Stack: monitor HTTP gratuito com intervalo mínimo de 3 minutos.
-- cron-job.org: cron HTTP gratuito, podendo executar até uma vez por minuto.
+```text
+https://seu-app.onrender.com/health/ready
+```
 
-Para evitar abuso, use intervalo de 5 minutos. É suficiente para manter tráfego periódico em ambiente de teste.
+`live` indica que o processo está ativo; `ready` falha quando SQL Server ou
+storage privado não estão disponíveis. Monitoramento não deve ser usado para
+contornar hibernação de plano gratuito.
 
 ## Checklist de publicação
 
@@ -199,19 +219,21 @@ Para evitar abuso, use intervalo de 5 minutos. É suficiente para manter tráfeg
 4. Criar Web Service no Render ou App Service na Azure.
 5. Configurar `ConnectionStrings__DefaultConnection`.
 6. Configurar `ASPNETCORE_ENVIRONMENT=Production`.
-7. Fazer deploy.
-8. Acessar `/health`.
-9. Acessar `/auth/login`.
-10. Criar o primeiro administrador pelo bootstrap secreto, caso o banco ainda não tenha admin.
-11. Remover as variáveis de bootstrap imediatamente após o primeiro acesso.
+7. Configurar S3 privado e Data Protection persistente.
+8. Configurar o bootstrap secreto somente se ainda não houver administrador.
+9. Executar o deploy; a migration deve ocorrer antes da publicação.
+10. Validar `/health/live` e `/health/ready`.
+11. Testar `/auth/login`, blog PT/EN/JA e um upload/download privado.
+12. Remover as variáveis de bootstrap imediatamente após o primeiro acesso.
 
 ## Observações importantes
 
 - Não suba arquivos da pasta `secrets/` ou `.secrets/` para o GitHub.
 - Não use LocalDB em produção ou hospedagem cloud.
-- Não conte com filesystem local para uploads em Render Free.
+- Não use provider local para documentos em produção; o startup bloqueia essa configuração.
+- Não conte com filesystem efêmero para mídia pública em `wwwroot/uploads`.
 - Para cliente testar o sistema inteiro sem lentidão, a melhor opção é plano pago pequeno ou Azure App Service com Always On.
-- Para demonstração inicial, Render Free + Azure SQL Free + UptimeRobot resolve com baixo custo.
+- O `render.yaml` versionado usa plano `starter`, S3 privado e migration bundle no pre-deploy.
 
 ## Deploy no Azure App Service com GitHub Actions
 
@@ -236,14 +258,25 @@ Em `App settings`, configure:
 ASPNETCORE_ENVIRONMENT=Production
 GoogleAgenda__RedirectUri=https://ikkon-admin-demo.azurewebsites.net/admin/agenda/google/callback
 GoogleAgenda__OAuthClientSecretsPath=
+PrivateFileStorage__Provider=S3
+PrivateFileStorage__BucketName=<bucket-privado>
+PrivateFileStorage__Region=<região>
+PrivateFileStorage__ServiceUrl=<endpoint-opcional>
+PrivateFileStorage__AccessKeyId=<secret-ou-vazio-com-role>
+PrivateFileStorage__SecretAccessKey=<secret-ou-vazio-com-role>
+DataProtection__KeysPath=/home/data-protection
 ```
+
+O exemplo de `DataProtection__KeysPath` é para App Service Linux. Em Windows,
+use um diretório persistente sob `D:\home`. Se a aplicação usar PFX para proteger
+o key ring, configure também caminho e senha conforme o runbook.
 
 Em `Connection strings`, configure:
 
 ```text
 Name: DefaultConnection
 Type: SQLAzure
-Value: Server=tcp:tonnyserver.database.windows.net,1433;Initial Catalog=Ikkon_DataBase;Persist Security Info=False;User ID=tonny;Password=<senha>;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+Value: Server=tcp:<servidor>.database.windows.net,1433;Initial Catalog=<banco>;Persist Security Info=False;User ID=<usuario>;Password=<senha>;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 ```
 
 ### 2. Habilitar publish profile para o deploy simples
@@ -307,8 +340,10 @@ Ele faz:
 2. setup do .NET 10;
 3. restore;
 4. build em Release;
-5. publish;
-6. deploy para o App Service `ikkon-admin-demo`.
+5. testes automatizados;
+6. aplicação explícita das migrations usando `PRODUCTION_DB_CONNECTION_STRING`;
+7. publish;
+8. deploy para o App Service `ikkon-admin-demo`.
 
 ### 6. Rodar o deploy
 
@@ -323,12 +358,14 @@ GitHub > Actions > Deploy IkkonAdmin to Azure App Service > Run workflow
 Depois do deploy, acesse:
 
 ```text
-https://ikkon-admin-demo.azurewebsites.net/health
+https://ikkon-admin-demo.azurewebsites.net/health/live
+https://ikkon-admin-demo.azurewebsites.net/health/ready
 https://ikkon-admin-demo.azurewebsites.net/
 https://ikkon-admin-demo.azurewebsites.net/auth/login
 ```
 
-Se `/health` funcionar e `/auth/login` abrir, o app subiu corretamente.
+O deploy só está saudável quando `live` e `ready` respondem com sucesso e o
+smoke test autenticado funciona.
 
 Se o login falhar por banco, revise:
 

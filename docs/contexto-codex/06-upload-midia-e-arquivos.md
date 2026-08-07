@@ -21,9 +21,13 @@ Imagens do blog são salvas em:
 - `IkkonAdmin.Web/wwwroot/uploads/blog/capas`;
 - `IkkonAdmin.Web/wwwroot/uploads/blog/conteudo`.
 
-Documentos do aluno são salvos fora do `wwwroot`:
+Em `Development`, documentos do aluno são salvos fora do `wwwroot`:
 
 - `IkkonAdmin.Web/App_Data/uploads/documentos`.
+
+Em `Production`, documentos usam bucket privado S3 compatível. O banco guarda
+somente a chave lógica do objeto; o navegador nunca recebe caminho físico nem
+URL pública do bucket.
 
 O caminho público salvo no banco segue o formato:
 
@@ -31,10 +35,13 @@ O caminho público salvo no banco segue o formato:
 
 ## Implementação atual de upload
 
-Abstração de infraestrutura:
+Abstrações de infraestrutura:
 
-- `IFileStorageService`;
-- `LocalFileStorageService`.
+- mídia pública: `IFileStorageService` e `LocalFileStorageService`;
+- documentos privados: `IPrivateFileStorageService`;
+- implementação local: `LocalPrivateFileStorageService`;
+- implementação de produção: `S3PrivateFileStorageService`;
+- validação de documentos: `IDocumentFileValidator` e `DocumentFileValidator`.
 
 Services responsáveis:
 
@@ -53,8 +60,11 @@ Validações:
 
 - extensões permitidas por módulo;
 - tamanho máximo por módulo;
+- arquivo não vazio;
+- assinatura binária de PDF, JPEG, PNG e WebP para documentos privados;
+- MIME canônico determinado pelo backend, sem confiar no `ContentType` do cliente;
 - nome gerado pelo sistema;
-- pasta controlada por `IFileStorageService`;
+- raiz/chave controlada pelo service de storage correspondente;
 - exclusão do arquivo anterior somente quando o caminho pertence ao prefixo esperado.
 
 ## Mídia pública atual
@@ -89,18 +99,26 @@ Credenciais reais não devem ser commitadas.
 
 - Não existe biblioteca de imagens ou media manager.
 - Não foi identificado processamento de imagem, thumbnail ou compressão.
-- Não foi identificado antivírus ou verificação MIME profunda.
+- Não há varredura antivírus externa; a extensão futura deve ocorrer antes de o
+  objeto ficar disponível para download.
 - Não há upload direto de vídeo.
-- Não há armazenamento externo, como Azure Blob ou S3, identificado no projeto atual.
+- Mídia pública de blog/perfil continua em `wwwroot/uploads`; hosts com
+  filesystem efêmero precisam persistir e incluir essa pasta no backup.
+- O provider privado implementado é S3 compatível; Azure Blob exigiria uma nova
+  implementação de `IPrivateFileStorageService`.
 
 ## Cuidados de segurança
 
 - Validar extensão e tamanho no backend.
+- Para documentos privados, validar a assinatura binária real.
 - Não confiar apenas em `accept` do input.
+- Não confiar no `ContentType` enviado pelo navegador.
 - Gerar nome seguro; nunca usar nome original diretamente.
 - Salvar arquivos públicos em `wwwroot/uploads/...`.
-- Salvar arquivos privados fora de `wwwroot`, como `App_Data/uploads/documentos`.
-- Salvar no banco apenas URL pública relativa, não caminho físico.
+- Salvar arquivos privados fora de `wwwroot` em Development e em bucket privado
+  S3 em Production.
+- Salvar no banco URL pública relativa somente para mídia pública; para arquivos
+  privados, guardar apenas chave lógica.
 - Não permitir sobrescrita de arquivos existentes.
 - Evitar renderizar uploads como HTML executável.
 - Para imagens em conteúdo rico, validar também tipo e tamanho.
@@ -115,8 +133,12 @@ Para um novo módulo com upload:
 3. Validar extensão permitida.
 4. Definir limite de tamanho explícito.
 5. Gerar nome com `Guid`.
-6. Salvar com `IFileStorageService`.
-7. Persistir URL pública relativa apenas quando o arquivo for público.
-8. Apagar arquivo anterior somente se ele pertencer ao diretório esperado.
-9. Não implementar upload de vídeo local sem uma estratégia dedicada.
+6. Usar `IFileStorageService` para mídia pública ou
+   `IPrivateFileStorageService` para conteúdo privado.
+7. Validar assinatura binária quando o formato for sensível.
+8. Persistir URL pública relativa apenas quando o arquivo for público; persistir
+   chave lógica quando for privado.
+9. Apagar arquivo anterior somente se ele pertencer ao diretório/prefixo esperado.
+10. Definir retenção, backup, auditoria e necessidade de antivírus.
+11. Não implementar upload de vídeo local sem uma estratégia dedicada.
 
