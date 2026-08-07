@@ -117,7 +117,8 @@ Arquivos de controllers, serviços de negócio, entidades, banco e integrações
 - `AdminCssModuleResolver`: mantém em um único ponto a relação entre controller e módulos CSS.
 - `ikkon-account.css`: concentra configurações usadas por administradores e alunos.
 - `ikkon-internal-themes.css`: mantém variações escuras em uma camada transversal.
-- `IkkonAdmin.VisualTests`: captura e compara 14 estados de referência em Chromium.
+- `IkkonAdmin.VisualTests`: captura e compara 42 estados de referência em Chromium,
+  valida PT/EN/JA e oferece fluxos mutáveis isolados para documentos privados.
 
 ### Consolidados
 
@@ -219,7 +220,10 @@ Cada grupo informa finalidade, uso, variações, regras, exemplo e o que evitar.
 - Assets: todas as referências locais literais das views públicas e dos CSS existem.
 - Comparação controlada antes/depois da migração CSS: 10 de 10 screenshots idênticos byte a byte.
 - Auditoria interna: nenhum dos 122 seletores públicos específicos é usado pelos layouts administrativos, de autenticação ou do aluno.
-- Regressão visual reproduzível: 14 de 14 baselines com 0,0000% de pixels alterados, incluindo os dois logins.
+- Regressão visual reproduzível: 42 de 42 baselines com 0,0000% de pixels alterados,
+  incluindo os dois logins e todas as páginas do aluno em desktop/mobile.
+- Fluxo Playwright mutável validado com cleanup: upload e download pelo aluno,
+  download e aprovação pelo administrador, além de logout dos dois perfis.
 - Auditoria NuGet: nenhum pacote vulnerável; `AngleSharp 0.17.1` foi substituído por `1.6.0`.
 - Não houve mudança em controller, regra de negócio, consulta do blog, banco ou integração.
 - Os componentes consolidados mantêm as classes CSS, ordem dos elementos, textos, URLs, `target`, `rel`, `alt`, lazy loading, badges, tags e rótulos existentes.

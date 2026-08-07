@@ -3,7 +3,8 @@ param(
     [string]$BaseUrl = "http://localhost:5037",
     [switch]$UpdateBaseline,
     [switch]$UseExistingServer,
-    [switch]$SkipBrowserInstall
+    [switch]$SkipBrowserInstall,
+    [switch]$RunMutableFlows
 )
 
 $ErrorActionPreference = "Stop"
@@ -85,12 +86,23 @@ try {
     }
 
     $mode = if ($UpdateBaseline) { "update" } else { "compare" }
-    Invoke-Dotnet run `
-        --project $visualProject `
-        --no-build `
-        -- `
-        $mode `
-        --base-url $BaseUrl
+    $runnerArguments = @(
+        "run",
+        "--project", $visualProject,
+        "--no-build",
+        "--",
+        $mode,
+        "--base-url", $BaseUrl
+    )
+    if ($RunMutableFlows) {
+        if ([string]::IsNullOrWhiteSpace($env:ConnectionStrings__DefaultConnection)) {
+            throw "RunMutableFlows exige ConnectionStrings__DefaultConnection para criar e limpar o cenário E2E."
+        }
+
+        $runnerArguments += "--mutable-flows"
+    }
+
+    Invoke-Dotnet @runnerArguments
 }
 finally {
     if ($null -ne $webProcess -and -not $webProcess.HasExited) {

@@ -35,7 +35,8 @@
                 {
                     var tone = AlunoPortalPresentation.StatusTone(documento.Status);
                     var inputId = $"arquivo-{documento.SolicitacaoId}";
-                    <article class="aluno-portal-document-card aluno-portal-document-card--@tone">
+                    <article class="aluno-portal-document-card aluno-portal-document-card--@tone"
+                             data-document-request="@documento.SolicitacaoId">
                         <div class="aluno-portal-card-topline">
                             <div>
                                 <h3>@documento.Tipo</h3>
@@ -73,7 +74,8 @@
                                 </span>
                                 <a class="aluno-portal-button aluno-portal-button--quiet"
                                    asp-action="BaixarDocumento"
-                                   asp-route-envioId="@documento.UltimoEnvioId.Value">
+                                   asp-route-envioId="@documento.UltimoEnvioId.Value"
+                                   data-document-download="@documento.SolicitacaoId">
                                     @I18n["Baixar arquivo", "Download file", "ダウンロード"]
                                 </a>
                             </div>

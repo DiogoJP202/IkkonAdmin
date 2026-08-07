@@ -12,4 +12,8 @@
     <PackageReference Include="Microsoft.Playwright" Version="1.61.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IkkonAdmin.Web\IkkonAdmin.Web.csproj" />
+  </ItemGroup>
+
 </Project>

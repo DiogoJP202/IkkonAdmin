@@ -147,7 +147,9 @@
                         {
                             var editFormId = $"solicitacao-doc-edit-{item.SolicitacaoId}";
                             var deleteFormId = $"solicitacao-doc-delete-{item.SolicitacaoId}";
-                            <tr>
+                            var approveFormId = $"solicitacao-doc-approve-{item.SolicitacaoId}";
+                            var rejectFormId = $"solicitacao-doc-reject-{item.SolicitacaoId}";
+                            <tr data-document-request="@item.SolicitacaoId">
                                 <td>
                                     <select form="@editFormId" name="AlunoId" class="form-select admin-panel-control">
                                         @foreach (var aluno in Model.Alunos)
@@ -176,7 +178,9 @@
                                 <td>
                                     @if (item.UltimoEnvioId.HasValue)
                                     {
-                                        <a asp-action="BaixarDocumento" asp-route-envioId="@item.UltimoEnvioId.Value">@item.NomeArquivoOriginal</a>
+                                        <a asp-action="BaixarDocumento"
+                                           asp-route-envioId="@item.UltimoEnvioId.Value"
+                                           data-document-download="@item.SolicitacaoId">@item.NomeArquivoOriginal</a>
                                     }
                                     else
                                     {
@@ -188,6 +192,33 @@
                                     <div class="admin-panel-row-actions justify-content-end">
                                         <form id="@editFormId" asp-action="AtualizarDocumentoSolicitacao" asp-route-id="@item.SolicitacaoId" method="post">@Html.AntiForgeryToken()</form>
                                         <button form="@editFormId" class="btn admin-panel-btn-table is-primary" type="submit">Salvar</button>
+                                        @if (item.UltimoEnvioId.HasValue && item.Status == DocumentoStatusEnum.Enviado)
+                                        {
+                                            <form id="@approveFormId" asp-action="AvaliarDocumento" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="SolicitacaoId" value="@item.SolicitacaoId" />
+                                                <input type="hidden" name="Status" value="@DocumentoStatusEnum.Aprovado" />
+                                                <input type="hidden" name="ObservacaoAdministrativa" value="@item.ObservacaoAdministrativa" />
+                                            </form>
+                                            <button form="@approveFormId"
+                                                    class="btn admin-panel-btn-table is-success"
+                                                    type="submit"
+                                                    data-document-approve="@item.SolicitacaoId">
+                                                Aprovar
+                                            </button>
+                                            <form id="@rejectFormId" asp-action="AvaliarDocumento" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="SolicitacaoId" value="@item.SolicitacaoId" />
+                                                <input type="hidden" name="Status" value="@DocumentoStatusEnum.Recusado" />
+                                                <input type="hidden" name="ObservacaoAdministrativa" value="@item.ObservacaoAdministrativa" />
+                                            </form>
+                                            <button form="@rejectFormId"
+                                                    class="btn admin-panel-btn-table is-warning"
+                                                    type="submit"
+                                                    data-document-reject="@item.SolicitacaoId">
+                                                Recusar
+                                            </button>
+                                        }
                                         <form id="@deleteFormId" asp-action="ExcluirDocumentoSolicitacao" asp-route-id="@item.SolicitacaoId" method="post">@Html.AntiForgeryToken()</form>
                                         <button form="@deleteFormId" class="btn admin-panel-btn-table is-danger" type="submit">Excluir</button>
                                     </div>

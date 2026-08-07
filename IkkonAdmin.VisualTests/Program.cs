@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Playwright;
 
@@ -87,6 +88,8 @@ foreach (var viewport in viewports)
         await CaptureAndCompareAsync(route.Name, viewport, page);
     }
 
+    await ValidateBlogLocalesAsync(viewport, page);
+
     await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, "/aluno/login"));
     await page.Locator("#LoginOuEmail").FillAsync("aluno.demo");
     await page.Locator("#Senha").FillAsync("Aluno@123");
@@ -174,6 +177,25 @@ foreach (var viewport in viewports)
     }
 
     await CaptureAndCompareAsync("aluno-dashboard-ja", viewport, page);
+
+    if (options.RunMutableFlows && viewport.Name == "desktop")
+    {
+        var connectionString = Environment.GetEnvironmentVariable(
+            "ConnectionStrings__DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Os fluxos mutáveis exigem ConnectionStrings__DefaultConnection.");
+        }
+
+        await ValidateStudentDocumentFlowAsync(
+            page,
+            connectionString,
+            Path.Combine(repoRoot, "IkkonAdmin.Web"));
+        Console.WriteLine(
+            "[ok] fluxo mutável: upload/download do aluno, download/aprovação admin e cleanup");
+        continue;
+    }
 
     if (viewport.Name == "mobile")
     {
@@ -374,6 +396,143 @@ async Task ValidateMobileDrawerAsync(VisualViewport viewport, IPage page)
     }
 }
 
+async Task ValidateBlogLocalesAsync(VisualViewport viewport, IPage page)
+{
+    foreach (var locale in new[]
+             {
+                 new BlogLocaleExpectation("pt-BR", "/blog", "/pt/blog"),
+                 new BlogLocaleExpectation("en", "/en/blog", "/en/blog"),
+                 new BlogLocaleExpectation("ja", "/ja/blog", "/ja/blog")
+             })
+    {
+        await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, locale.Path));
+        var language = await page.Locator("html").GetAttributeAsync("lang");
+        if (!string.Equals(language, locale.Language, StringComparison.OrdinalIgnoreCase))
+        {
+            failures.Add(
+                $"blog-{locale.Language}-{viewport.Name}: lang esperado " +
+                $"'{locale.Language}', encontrado '{language ?? "ausente"}'");
+        }
+
+        var canonicalHref = await page
+            .Locator("link[rel='canonical']")
+            .GetAttributeAsync("href");
+        var canonicalPath = Uri.TryCreate(canonicalHref, UriKind.Absolute, out var canonical)
+            ? canonical.AbsolutePath
+            : null;
+        if (!string.Equals(canonicalPath, locale.CanonicalPath, StringComparison.Ordinal))
+        {
+            failures.Add(
+                $"blog-{locale.Language}-{viewport.Name}: canonical esperado " +
+                $"'{locale.CanonicalPath}', encontrado '{canonicalPath ?? "ausente"}'");
+        }
+
+        var alternateCount = await page.Locator("link[rel='alternate'][hreflang]").CountAsync();
+        if (alternateCount < 3)
+        {
+            failures.Add(
+                $"blog-{locale.Language}-{viewport.Name}: alternates PT/EN/JA incompletos");
+        }
+    }
+}
+
+async Task ValidateStudentDocumentFlowAsync(
+    IPage page,
+    string connectionString,
+    string webContentRoot)
+{
+    await using var scenario = await StudentDocumentScenario.CreateAsync(
+        connectionString,
+        webContentRoot);
+
+    await NavigateAndSettleAsync(
+        page,
+        BuildUrl(
+            options.BaseUrl,
+            "/idioma/alterar?culture=pt-BR&returnUrl=%2Farea-do-aluno%2Fdocumentos"));
+    var studentCard = page.Locator(
+        $".aluno-portal-document-card[data-document-request='{scenario.RequestId}']");
+    if (await studentCard.CountAsync() != 1)
+    {
+        throw new InvalidOperationException(
+            "A solicitação temporária não apareceu na área do aluno.");
+    }
+
+    await studentCard.Locator("input[type='file']").SetInputFilesAsync(new FilePayload
+    {
+        Name = "documento-e2e.pdf",
+        MimeType = "application/pdf",
+        Buffer = Encoding.ASCII.GetBytes(
+            "%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF")
+    });
+    await studentCard.Locator("button[type='submit']").ClickAsync();
+    await SettleAsync(page);
+
+    studentCard = page.Locator(
+        $".aluno-portal-document-card[data-document-request='{scenario.RequestId}']");
+    await studentCard
+        .Locator($"[data-document-download='{scenario.RequestId}']")
+        .WaitForAsync();
+    var studentDownload = await page.RunAndWaitForDownloadAsync(() =>
+        studentCard.Locator($"[data-document-download='{scenario.RequestId}']").ClickAsync());
+    await ValidateDownloadAsync("aluno", studentDownload);
+
+    await page.Locator("form[action='/aluno/sair'] button[type='submit']").ClickAsync();
+    await page.WaitForURLAsync("**/aluno/login**");
+
+    await NavigateAndSettleAsync(page, BuildUrl(options.BaseUrl, "/auth/login"));
+    await page.Locator("label[for='tipoAdmin']").ClickAsync();
+    await page.Locator("#LoginOuEmail").FillAsync("funcionario.admin");
+    await page.Locator("#Senha").FillAsync("Ikkon@123");
+    await page.Locator(".auth-submit").ClickAsync();
+    await page.WaitForURLAsync("**/admin/painel**");
+    await NavigateAndSettleAsync(
+        page,
+        BuildUrl(options.BaseUrl, "/admin/area-aluno/documentos"));
+
+    var adminRow = page.Locator(
+        $"table tbody tr[data-document-request='{scenario.RequestId}']");
+    var adminDownload = await page.RunAndWaitForDownloadAsync(() =>
+        adminRow.Locator($"[data-document-download='{scenario.RequestId}']").ClickAsync());
+    await ValidateDownloadAsync("admin", adminDownload);
+
+    await adminRow
+        .Locator($"[data-document-approve='{scenario.RequestId}']")
+        .ClickAsync();
+    await SettleAsync(page);
+
+    adminRow = page.Locator(
+        $"table tbody tr[data-document-request='{scenario.RequestId}']");
+    var status = await adminRow.Locator("select[name='Status']").InputValueAsync();
+    if (!string.Equals(status, "Aprovado", StringComparison.Ordinal))
+    {
+        failures.Add($"documento-e2e: status esperado 'Aprovado', encontrado '{status}'");
+    }
+
+    await page.Locator("form[action='/auth/logout'] button[type='submit']").ClickAsync();
+    await page.WaitForURLAsync(options.BaseUrl.TrimEnd('/') + "/");
+}
+
+async Task ValidateDownloadAsync(string actor, IDownload download)
+{
+    var failure = await download.FailureAsync();
+    if (!string.IsNullOrWhiteSpace(failure))
+    {
+        failures.Add($"documento-e2e-{actor}: download falhou: {failure}");
+        return;
+    }
+
+    if (!string.Equals(
+            download.SuggestedFilename,
+            "documento-e2e.pdf",
+            StringComparison.OrdinalIgnoreCase))
+    {
+        failures.Add(
+            $"documento-e2e-{actor}: nome baixado inesperado " +
+            $"'{download.SuggestedFilename}'");
+    }
+}
+
 static async Task<VisualComparison> CompareImagesAsync(
     IPage page,
     string expectedPath,
@@ -569,6 +728,11 @@ static void RecreateDirectory(string path)
 
 internal sealed record VisualRoute(string Name, string Path);
 
+internal sealed record BlogLocaleExpectation(
+    string Language,
+    string Path,
+    string CanonicalPath);
+
 internal sealed record VisualViewport(string Name, int Width, int Height);
 
 internal sealed record VisualComparison
@@ -600,6 +764,7 @@ internal sealed record StudentPageMeasurements
 
 internal sealed record RunnerOptions(
     bool UpdateBaseline,
+    bool RunMutableFlows,
     string BaseUrl,
     string? BaselineDirectory,
     string? BrowserChannel,
@@ -609,6 +774,7 @@ internal sealed record RunnerOptions(
     public static RunnerOptions Parse(string[] arguments)
     {
         var updateBaseline = false;
+        var runMutableFlows = false;
         var baseUrl = "http://localhost:5037";
         string? baselineDirectory = null;
         string? browserChannel = null;
@@ -625,6 +791,9 @@ internal sealed record RunnerOptions(
                     break;
                 case "compare":
                     updateBaseline = false;
+                    break;
+                case "--mutable-flows":
+                    runMutableFlows = true;
                     break;
                 case "--base-url":
                     baseUrl = ReadValue(arguments, ref index, "--base-url");
@@ -665,6 +834,7 @@ internal sealed record RunnerOptions(
 
         return new RunnerOptions(
             updateBaseline,
+            runMutableFlows,
             baseUrl,
             baselineDirectory,
             browserChannel,

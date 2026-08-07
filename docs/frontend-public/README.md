@@ -177,6 +177,9 @@ O projeto `IkkonAdmin.VisualTests` usa Playwright em Chromium e compara pixels s
 - compila a solução;
 - inicia a aplicação escondida em ambiente Development;
 - valida entrada, home, escola, eventos, blog e os logins administrativo/do aluno;
+- valida o blog em PT/EN/JA, incluindo `lang`, canonical e alternates;
+- percorre todas as páginas do aluno, tema escuro, japonês, filtro de frequência,
+  gaveta móvel por teclado e logout;
 - captura `1440x1000` e `390x844`;
 - conclui animações antes da captura;
 - compara com tolerância padrão de 0,1% dos pixels;
@@ -190,6 +193,18 @@ pwsh -NoProfile -File scripts/visual-regression.ps1
 ```
 
 Use `-SkipBrowserInstall` nas execuções seguintes. Se a aplicação já estiver aberta na mesma URL, use também `-UseExistingServer`.
+
+Para validar também os fluxos que alteram dados, use um banco de desenvolvimento
+descartável ou isolado e informe a connection string pelo ambiente:
+
+```powershell
+$env:ConnectionStrings__DefaultConnection='<SQL Server de teste>'
+pwsh -NoProfile -File scripts/visual-regression.ps1 -SkipBrowserInstall -RunMutableFlows
+```
+
+Essa modalidade envia e baixa um PDF como aluno, baixa e aprova o documento como
+administrador e remove a solicitação, o tipo temporário e o arquivo ao terminar,
+além das auditorias vinculadas a esses IDs, inclusive quando o cenário falha.
 
 Atualize o baseline somente quando a mudança visual for intencional e tiver sido revisada:
 
@@ -208,6 +223,8 @@ Rotas de regressão:
 - `/blog`
 - `/auth/login`
 - `/aluno/login`
+- todas as rotas em `/area-do-aluno` e `/configuracoes`
+- `/pt/blog`, `/en/blog` e `/ja/blog` para os contratos internacionais
 
 ## Pontos de manutenção
 
