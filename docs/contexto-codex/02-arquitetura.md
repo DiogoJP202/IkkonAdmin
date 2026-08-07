@@ -82,12 +82,18 @@ modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assemb
 
 As migrations ficam em `IkkonAdmin.Web/Data/Migrations`.
 
-`DatabaseBootstrap.EnsureDatabaseReady` roda no startup e executa:
+Em `Development`, `DatabaseBootstrap.EnsureDatabaseReady` mantém a conveniência
+local e executa:
 
-- baseline quando schema principal já existe;
+- baseline quando o schema principal já existe;
 - `dbContext.Database.Migrate()`;
 - garantia do schema `AlunosTurmas`;
-- `SeedData.Initialize`.
+- seed estrutural e dados demonstrativos.
+
+Em `Production`, o processo web não altera o schema. A pipeline aplica as
+migrations explicitamente antes do deploy; no startup, a aplicação apenas testa
+a conexão, recusa migrations pendentes, executa o seed estrutural idempotente e,
+quando configurado, o bootstrap único do primeiro administrador.
 
 ## Services, queries e operações
 

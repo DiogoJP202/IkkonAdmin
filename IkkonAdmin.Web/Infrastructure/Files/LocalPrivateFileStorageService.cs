@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace IkkonAdmin.Web.Infrastructure.Files;
 
-public sealed class LocalPrivateFileStorageService(IWebHostEnvironment environment) : IPrivateFileStorageService
+public sealed class LocalPrivateFileStorageService(IWebHostEnvironment environment) :
+    IPrivateFileStorageService,
+    IPrivateFileStorageHealthProbe
 {
     private string RootPath => Path.Combine(environment.ContentRootPath, "App_Data", "uploads", "documentos");
 
@@ -59,6 +61,23 @@ public sealed class LocalPrivateFileStorageService(IWebHostEnvironment environme
         }
 
         return Task.CompletedTask;
+    }
+
+    public async Task CheckAvailabilityAsync(CancellationToken cancellationToken = default)
+    {
+        Directory.CreateDirectory(RootPath);
+        var probePath = Path.Combine(RootPath, $".health-{Guid.NewGuid():N}.tmp");
+        try
+        {
+            await File.WriteAllBytesAsync(probePath, [0x49, 0x4B], cancellationToken);
+        }
+        finally
+        {
+            if (File.Exists(probePath))
+            {
+                File.Delete(probePath);
+            }
+        }
     }
 
     private string ResolvePhysicalPath(string storageKey)

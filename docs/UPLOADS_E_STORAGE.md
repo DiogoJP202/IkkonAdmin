@@ -17,7 +17,7 @@ IFileStorageService
 LocalFileStorageService
 ```
 
-Services novos devem depender da interface, não de paths montados manualmente.
+Services novos devem depender da interface, não de paths montados manualmente. Documentos privados usam `IPrivateFileStorageService`; arquivos públicos continuam usando `IFileStorageService`.
 
 ## Blog
 
@@ -128,6 +128,8 @@ Pasta:
 IkkonAdmin.Web/App_Data/uploads/documentos
 ```
 
+Essa implementação local é exclusiva de Development. Em Production, o startup exige `PrivateFileStorage:Provider=S3` e usa `S3PrivateFileStorageService`.
+
 Limite:
 
 ```text
@@ -194,14 +196,18 @@ Opções recomendadas:
 
 ## Recomendação para produção
 
-Para produção, migrar uploads para storage externo com:
+Em produção, documentos privados usam storage S3 compatível com:
 
-- URLs públicas controladas para imagens do blog;
-- URLs privadas ou assinadas para documentos de aluno;
+- bucket sem acesso público;
+- criptografia SSE-S3 e versionamento;
+- download por stream autenticado, sem URL do objeto exposta ao navegador;
+- credencial de privilégio mínimo limitada ao prefixo de documentos;
 - validação de extensão e tamanho no backend;
 - nomes gerados por GUID;
 - preservação do nome original apenas como metadado;
 - logs/auditoria para downloads sensíveis.
+
+Consulte [Runbook de produção](./PRODUCTION_RUNBOOK.md) para variáveis, backup, restore e rotação.
 
 ## Checklist ao adicionar novo upload
 

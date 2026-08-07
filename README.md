@@ -243,15 +243,17 @@ Documentação técnica e funcional separada:
 - [Módulos administrativos e permissões](./docs/MODULOS_ADMINISTRATIVOS.md)
 - [Uploads e storage](./docs/UPLOADS_E_STORAGE.md)
 - [Deploy](./DEPLOYMENT.md)
+- [Runbook de produção](./docs/PRODUCTION_RUNBOOK.md)
 - [Google Agenda](./GOOGLE_AGENDA_SETUP.md)
 - [Usuários de acesso](./USUARIOS_ACESSO.md)
 
 ## Deploy
 
-O guia de publicação fica em [DEPLOYMENT.md](./DEPLOYMENT.md). O endpoint de healthcheck disponível é:
+O guia de demonstração fica em [DEPLOYMENT.md](./DEPLOYMENT.md); produção segue o [runbook](./docs/PRODUCTION_RUNBOOK.md). Os principais health checks são:
 
 ```text
-/health
+/health/live
+/health/ready
 ```
 
 Para ambientes com uploads reais, leia também [Uploads e storage](./docs/UPLOADS_E_STORAGE.md).

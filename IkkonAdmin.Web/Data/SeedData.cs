@@ -10,6 +10,12 @@ public static class SeedData
 {
     public static void Initialize(ApplicationDbContext context)
     {
+        InitializeStructural(context);
+        InitializeDemoData(context);
+    }
+
+    public static void InitializeStructural(ApplicationDbContext context)
+    {
         if (!context.ConfiguracoesSistema.Any())
         {
             context.ConfiguracoesSistema.Add(new ConfiguracaoSistema
@@ -32,6 +38,11 @@ public static class SeedData
             context.SaveChanges();
         }
 
+        SeedAccessControl(context);
+    }
+
+    private static void InitializeDemoData(ApplicationDbContext context)
+    {
         if (context.Alunos.Any())
         {
             SeedInventario(context);
@@ -505,7 +516,6 @@ public static class SeedData
             context.SaveChanges();
         }
 
-        SeedAccessControl(context);
     }
 
     private static void SeedAccessControl(ApplicationDbContext context)

@@ -36,14 +36,18 @@ services:
       GoogleAgenda__OAuthClientSecretsPath: ""
       GoogleAgenda__RedirectUri: http://localhost:${IKKONADMIN_HTTP_PORT:-8080}/admin/agenda/google/callback
       GoogleAgenda__TimeZone: America/Sao_Paulo
+      PrivateFileStorage__Provider: Local
+      DataProtection__KeysPath: /root/.aspnet/DataProtection-Keys
     ports:
       - "${IKKONADMIN_HTTP_PORT:-8080}:8080"
     volumes:
       - app-uploads:/app/wwwroot/uploads
+      - app-private-files:/app/App_Data/uploads/documentos
       - app-dataprotection:/root/.aspnet/DataProtection-Keys
     restart: unless-stopped
 
 volumes:
   sqlserver-data:
   app-uploads:
+  app-private-files:
   app-dataprotection:

@@ -91,21 +91,32 @@ Principais migrations identificadas:
 
 ## Aplicação de migrations
 
-No startup, `DatabaseBootstrap.EnsureDatabaseReady` executa `dbContext.Database.Migrate()`.
+Em `Development`, `DatabaseBootstrap.EnsureDatabaseReady` executa
+`dbContext.Database.Migrate()` e preserva as compatibilidades locais de baseline
+e de `AlunosTurmas`.
 
-Também há lógica de baseline para banco criado por script manual e uma garantia específica para `AlunosTurmas`.
+Em `Production`, migrations são uma etapa explícita e bloqueante da pipeline. O
+processo web não executa reparos nem migrations: ele verifica a conectividade e
+encerra o startup quando há migrations pendentes. Consulte
+`docs/PRODUCTION_RUNBOOK.md` para deploy, rollback e restauração.
 
 ## Seed inicial
 
-`SeedData.Initialize` cria:
+`SeedData.InitializeStructural` cria somente:
 
 - Configurações padrão.
+- Roles e permissões base.
+
+Em `Development`, `SeedData.Initialize` complementa o seed estrutural com:
+
 - Turmas e alunos demo.
 - Mensalidades, pagamentos, descontos e acordos.
 - Admissão, desligamento e graduação demo.
 - Inventário demo.
 - Usuários demo.
-- Roles e permissões base.
+
+Produção nunca recebe dados ou credenciais demonstrativas. O primeiro
+administrador pode ser criado uma única vez por variáveis secretas de bootstrap.
 
 ## Cuidados antes de alterar o banco
 
@@ -117,4 +128,3 @@ Também há lógica de baseline para banco criado por script manual e uma garant
 - Verificar impacto em banco Azure/produção.
 - Não remover colunas/tabelas sem plano de migração de dados.
 - Manter índices coerentes para telas com filtros.
-

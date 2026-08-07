@@ -33,10 +33,27 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore IkkonAdmin.slnx
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+        run: dotnet build IkkonAdmin.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test IkkonAdmin.Tests/IkkonAdmin.Tests.csproj --configuration Release --no-build
+
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      - name: Apply production migrations
+        env:
+          PRODUCTION_DB_CONNECTION_STRING: ${{ secrets.PRODUCTION_DB_CONNECTION_STRING }}
+        run: >-
+          dotnet ef database update
+          --project ${{ env.PROJECT_PATH }}
+          --startup-project ${{ env.PROJECT_PATH }}
+          --connection "$PRODUCTION_DB_CONNECTION_STRING"
+          --configuration Release
+          --no-build
 
       - name: Publish
         run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}

@@ -1,6 +1,7 @@
 using IkkonAdmin.Web.Data;
 using IkkonAdmin.Web.Infrastructure.Auditing;
 using IkkonAdmin.Web.Infrastructure.Files;
+using IkkonAdmin.Web.Infrastructure.Health;
 using IkkonAdmin.Web.Infrastructure.Localization;
 using IkkonAdmin.Web.Infrastructure.Maintenance;
 using IkkonAdmin.Web.Infrastructure.Security;
@@ -10,11 +11,15 @@ using IkkonAdmin.Web.Security;
 using IkkonAdmin.Web.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 var culturaPadrao = CultureInfo.GetCultureInfo("pt-BR");
@@ -36,11 +41,46 @@ builder.Services.AddSingleton<IClock, SystemClock>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, HttpCurrentUserService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
-builder.Services.AddScoped<IPrivateFileStorageService, LocalPrivateFileStorageService>();
+builder.Services.AddPrivateFileStorage(builder.Configuration, builder.Environment);
 builder.Services.AddSingleton<IDocumentFileValidator, DocumentFileValidator>();
 builder.Services.AddScoped<IAuditLogger, EfAuditLogger>();
 builder.Services.AddSingleton<IBlogPostActionAuthorizer, BlogPostActionAuthorizer>();
-builder.Services.AddDataProtection();
+var dataProtection = builder.Services
+    .AddDataProtection()
+    .SetApplicationName("IkkonAdmin");
+var dataProtectionKeysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrWhiteSpace(dataProtectionKeysPath))
+{
+    Directory.CreateDirectory(dataProtectionKeysPath);
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+}
+else if (builder.Environment.IsProduction())
+{
+    throw new InvalidOperationException(
+        "DataProtection:KeysPath deve apontar para um volume persistente em produção.");
+}
+
+var dataProtectionCertificatePath = builder.Configuration["DataProtection:CertificatePath"];
+if (!string.IsNullOrWhiteSpace(dataProtectionCertificatePath))
+{
+    var certificate = X509CertificateLoader.LoadPkcs12FromFile(
+        dataProtectionCertificatePath,
+        builder.Configuration["DataProtection:CertificatePassword"]);
+    dataProtection.ProtectKeysWithCertificate(certificate);
+}
+
+var previousDataProtectionCertificates = builder.Configuration
+    .GetSection("DataProtection:UnprotectCertificatePaths")
+    .Get<string[]>()?
+    .Where(path => !string.IsNullOrWhiteSpace(path))
+    .Select(path => X509CertificateLoader.LoadPkcs12FromFile(
+        path,
+        builder.Configuration["DataProtection:CertificatePassword"]))
+    .ToArray() ?? [];
+if (previousDataProtectionCertificates.Length > 0)
+{
+    dataProtection.UnprotectKeysWithAnyCertificate(previousDataProtectionCertificates);
+}
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var culturasSuportadas = new[] { culturaPadrao, culturaIngles, culturaJapones };
@@ -72,6 +112,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             warnings
                 .Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning)
                 .Ignore(RelationalEventId.BoolWithDefaultWarning)));
+builder.Services
+    .AddHealthChecks()
+    .AddCheck(
+        "application",
+        () => HealthCheckResult.Healthy("Aplicação em execução."),
+        tags: ["live"])
+    .AddDbContextCheck<ApplicationDbContext>(
+        "sql",
+        tags: ["ready", "sql"])
+    .AddCheck<PrivateFileStorageHealthCheck>(
+        "storage",
+        tags: ["ready", "storage"]);
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -149,6 +201,9 @@ builder.Services.Configure<GoogleAgendaOptions>(builder.Configuration.GetSection
 builder.Services.AddScoped<IGoogleAgendaConnectionService, GoogleAgendaConnectionService>();
 builder.Services.AddHttpClient<IGoogleAgendaService, GoogleAgendaService>();
 builder.Services.AddScoped<IPasswordHasher<UsuarioSistema>, PasswordHasher<UsuarioSistema>>();
+builder.Services.Configure<InitialAdminBootstrapOptions>(
+    builder.Configuration.GetSection(InitialAdminBootstrapOptions.SectionName));
+builder.Services.AddScoped<InitialAdminBootstrap>();
 builder.Services.Configure<OperationalMaintenanceOptions>(
     builder.Configuration.GetSection(OperationalMaintenanceOptions.SectionName));
 builder.Services.AddHostedService<OperationalMaintenanceHostedService>();
@@ -156,7 +211,7 @@ builder.Services.AddHostedService<StudentAutomationHostedService>();
 
 var app = builder.Build();
 
-if (!app.Environment.IsEnvironment("Testing"))
+if (app.Environment.IsDevelopment())
 {
     try
     {
@@ -169,6 +224,25 @@ if (!app.Environment.IsEnvironment("Testing"))
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Erro ao executar DatabaseBootstrap.EnsureDatabaseReady no startup.");
     }
+}
+else if (!app.Environment.IsEnvironment("Testing"))
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (!dbContext.Database.CanConnect())
+    {
+        throw new InvalidOperationException("Não foi possível conectar ao SQL Server de produção.");
+    }
+
+    var pendingMigrations = dbContext.Database.GetPendingMigrations().ToArray();
+    if (pendingMigrations.Length > 0)
+    {
+        throw new InvalidOperationException(
+            $"Migrations pendentes: {string.Join(", ", pendingMigrations)}. Execute-as antes de iniciar a aplicação.");
+    }
+
+    SeedData.InitializeStructural(dbContext);
+    scope.ServiceProvider.GetRequiredService<InitialAdminBootstrap>().CreateOnlyWhenNoAdminExists();
 }
 
 if (!app.Environment.IsDevelopment())
@@ -199,13 +273,31 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-app.MapMethods("/health", new[] { "GET", "HEAD" }, () => Results.Ok(new
+app.MapHealthChecks("/health", new HealthCheckOptions
 {
-    status = "ok",
-    application = "IkkonAdmin",
-    checkedAtUtc = DateTimeOffset.UtcNow
-}))
-.AllowAnonymous();
+    Predicate = registration => registration.Tags.Contains("live"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("live"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("ready"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/sql", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("sql"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+}).AllowAnonymous();
+app.MapHealthChecks("/health/storage", new HealthCheckOptions
+{
+    Predicate = registration => registration.Tags.Contains("storage"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+}).AllowAnonymous();
 
 app.MapControllerRoute(
     name: "localized-home",

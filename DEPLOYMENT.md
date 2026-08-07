@@ -2,6 +2,8 @@
 
 Este guia descreve uma forma simples de colocar o IkkonAdmin no ar para validação do cliente.
 
+> Para produção com dados reais, use o [runbook de produção](./docs/PRODUCTION_RUNBOOK.md). Ele substitui as recomendações simplificadas de demonstração sobre migrations, storage, secrets, backup e rollback.
+
 ## Decisão recomendada para esta fase
 
 Como o projeto é **ASP.NET Core MVC com Razor Views**, o frontend e o backend estão no mesmo processo da aplicação. Por isso, a opção mais simples agora é publicar o projeto inteiro como **um único serviço web**.
@@ -72,20 +74,23 @@ Backend separado em API ASP.NET Core
 
 Isso pode ser feito no futuro, mas não é necessário para validar o sistema com o cliente agora.
 
-## Endpoint de healthcheck
+## Endpoints de healthcheck
 
-Foi criado o endpoint:
+Os endpoints disponíveis são:
 
 ```text
-/health
+/health/live
+/health/ready
+/health/sql
+/health/storage
 ```
 
-Ele retorna uma resposta simples em JSON e pode ser usado por Render, UptimeRobot, Better Stack ou cron-job.org.
+Use `/health/live` para liveness e `/health/ready` para receber tráfego somente quando SQL Server e storage privado estiverem disponíveis.
 
 Exemplo:
 
 ```text
-https://seu-app.onrender.com/health
+https://seu-app.onrender.com/health/ready
 ```
 
 ## Deploy no Render com Docker
@@ -168,7 +173,7 @@ Use **Azure SQL Database Free Offer** para manter compatibilidade com SQL Server
 5. Copiar a connection string ADO.NET.
 6. Configurar `ConnectionStrings__DefaultConnection` no provedor de hospedagem.
 
-O sistema executa migrations no startup via `DatabaseBootstrap.EnsureDatabaseReady`, então o banco deve ser criado/atualizado automaticamente ao iniciar, desde que a connection string esteja correta e o usuário tenha permissão.
+Migrations não são executadas pelo processo web em Production. A pipeline deve executar `dotnet ef database update` antes da publicação; qualquer falha interrompe o deploy. O startup recusa schema com migrations pendentes.
 
 ## Keep-alive para Render Free
 
@@ -197,8 +202,8 @@ Para evitar abuso, use intervalo de 5 minutos. É suficiente para manter tráfeg
 7. Fazer deploy.
 8. Acessar `/health`.
 9. Acessar `/auth/login`.
-10. Entrar com usuário admin de demonstração.
-11. Configurar keep-alive se estiver no Render Free.
+10. Criar o primeiro administrador pelo bootstrap secreto, caso o banco ainda não tenha admin.
+11. Remover as variáveis de bootstrap imediatamente após o primeiro acesso.
 
 ## Observações importantes
 

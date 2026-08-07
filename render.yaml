@@ -2,9 +2,10 @@
   - type: web
     name: ikkonadmin-web
     runtime: docker
-    plan: free
+    plan: starter
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /health
+    preDeployCommand: ./efbundle --connection "$ConnectionStrings__DefaultConnection"
+    healthCheckPath: /health/ready
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
@@ -22,3 +23,35 @@
         sync: false
       - key: GoogleAgenda__TimeZone
         value: America/Sao_Paulo
+      - key: PrivateFileStorage__Provider
+        value: S3
+      - key: PrivateFileStorage__BucketName
+        sync: false
+      - key: PrivateFileStorage__Region
+        sync: false
+      - key: PrivateFileStorage__ServiceUrl
+        sync: false
+      - key: PrivateFileStorage__ForcePathStyle
+        value: "false"
+      - key: PrivateFileStorage__AccessKeyId
+        sync: false
+      - key: PrivateFileStorage__SecretAccessKey
+        sync: false
+      - key: DataProtection__KeysPath
+        value: /var/ikkon/dataprotection
+      - key: DataProtection__CertificatePath
+        sync: false
+      - key: DataProtection__CertificatePassword
+        sync: false
+      - key: InitialAdminBootstrap__Login
+        sync: false
+      - key: InitialAdminBootstrap__Email
+        sync: false
+      - key: InitialAdminBootstrap__DisplayName
+        sync: false
+      - key: InitialAdminBootstrap__Password
+        sync: false
+    disk:
+      name: ikkonadmin-persistent-data
+      mountPath: /var/ikkon
+      sizeGB: 1
