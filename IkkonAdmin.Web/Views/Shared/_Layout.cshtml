@@ -19,6 +19,9 @@
     <link rel="icon" type="image/png" href="~/Images/Ikkon_Icon.png" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     @await RenderSectionAsync("Styles", required: false)
+    @* Tokens da marca antes da fundação: é deles que a fundação deriva as
+       variáveis do painel, alinhando-o à Área do Aluno e ao site público. *@
+    <link rel="stylesheet" href="~/css/ikkon-tokens.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-internal-foundation.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/ikkon-admin-core.css" asp-append-version="true" />
     @foreach (var cssModule in adminCssModules)
