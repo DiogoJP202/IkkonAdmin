@@ -290,7 +290,12 @@ body.admin-sidebar-collapsed .sidebar-user-card {
   flex-direction: column;
 }
 
+/* Fixa no topo como no portal do aluno: em listas longas o cabecalho da tela
+   e as acoes de sessao continuam alcancaveis sem rolar de volta. */
 .admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
   background: var(--brand-surface);
   border-bottom: 1px solid var(--admin-border);
   padding: 0.95rem 1.4rem;
