@@ -21,6 +21,34 @@ public sealed class SeoArchitectureTests
     }
 
     [Theory]
+    [InlineData("https://ikkontaiko.com/blog", "en-US")]
+    [InlineData("http://ikkontaiko.com/blog", "ja-JP")]
+    public void LocalizePath_LeavesAbsoluteHttpUrlsUntouched(string url, string culture)
+    {
+        Assert.Equal(url, PublicSiteLocales.LocalizePath(url, culture));
+    }
+
+    /// <summary>
+    /// Regressão: no Linux um caminho iniciado por "/" satisfaz
+    /// <c>UriKind.Absolute</c> como caminho de arquivo. Quando o curto-circuito
+    /// de URL absoluta não checava o esquema, todo link raiz-relativo era
+    /// devolvido sem o prefixo de idioma no ambiente publicado.
+    /// </summary>
+    [Theory]
+    [InlineData("/escola")]
+    [InlineData("/blog")]
+    [InlineData("/")]
+    public void LocalizePath_AlwaysPrefixesRootRelativePaths(string path)
+    {
+        foreach (var locale in PublicSiteLocales.All)
+        {
+            var localized = PublicSiteLocales.LocalizePath(path, locale.Culture);
+
+            Assert.StartsWith($"/{locale.Segment}", localized, StringComparison.Ordinal);
+        }
+    }
+
+    [Theory]
     [InlineData("/pt", "/")]
     [InlineData("/en/escola", "/escola")]
     [InlineData("/ja/blog/post?ref=home", "/blog/post?ref=home")]
