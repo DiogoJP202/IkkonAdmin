@@ -48,11 +48,24 @@
             "120名以上の生徒、2つの教室、サンパウロ最大級の日本文化祭（日本祭り、桜祭り）への出演。")
     };
 
-    var parceiros = new[]
+    var parceiros = new (string Nome, string Logo)[]
     {
-        "Warner Bros. Pictures", "Globo", "Nissan", "Volkswagen", "Komatsu", "Yamaha",
-        "Asics", "Mizuno", "Track & Field", "Daiichi-Sankyo", "Bosch", "Fujifilm",
-        "TV Gazeta", "Assaí Atacadista", "Jungle Fight", "Iguana Sports"
+        ("Warner Bros. Pictures", "warner-bros.png"),
+        ("Globo", "globo.webp"),
+        ("Nissan", "nissan.png"),
+        ("Volkswagen", "volkswagen.png"),
+        ("Komatsu", "komatsu.webp"),
+        ("Yamaha", "yamaha.webp"),
+        ("Asics", "asics.png"),
+        ("Mizuno", "mizuno.png"),
+        ("Track & Field", "track-field.jpg"),
+        ("Daiichi-Sankyo", "daiichi-sankyo.webp"),
+        ("Bosch", "bosch.png"),
+        ("Fujifilm", "fujifilm.png"),
+        ("TV Gazeta", "tv-gazeta.webp"),
+        ("Assaí Atacadista", "assai-atacadista.webp"),
+        ("Jungle Fight", "jungle-fight.png"),
+        ("Iguana Sports", "iguana-sports.jpg")
     };
 }
 
@@ -140,7 +153,14 @@
             <ul class="ikkon-partner-grid">
                 @foreach (var parceiro in parceiros)
                 {
-                    <li class="ikkon-partner-card">@parceiro</li>
+                    <li class="ikkon-partner-card">
+                        <img class="ikkon-partner-logo"
+                             src="~/design-ikkon/logos/@parceiro.Logo"
+                             asp-append-version="true"
+                             alt=""
+                             loading="lazy" />
+                        <span class="ikkon-partner-name">@parceiro.Nome</span>
+                    </li>
                 }
             </ul>
         </div>

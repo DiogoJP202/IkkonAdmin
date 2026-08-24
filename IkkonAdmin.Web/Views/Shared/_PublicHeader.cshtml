@@ -6,7 +6,9 @@
 }
 
 <header class="institucional-header fixed-top">
-    <nav class="navbar navbar-expand-lg">
+    @* O menu tem 9 links, seletor de idioma e CTA: só cabe na horizontal a partir
+       de 1200px. Abaixo disso o header usa o menu colapsado. *@
+    <nav class="navbar navbar-expand-xl">
         <div class="container-xxl px-3 px-lg-4">
             <a class="navbar-brand institucional-brand" href="@I18n.LocalizePath("/?entrada=1")">
                 <span class="institucional-brand-mark" aria-hidden="true">
@@ -22,7 +24,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navLanding">
-                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-2">
                     <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="@I18n.LocalizePath("/")" aria-current="@(current == "home" ? "page" : null)">@I18n["Home", "Home", "ホーム"]</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "sobre" ? "active" : string.Empty)" href="@I18n.LocalizePath("/sobre")" aria-current="@(current == "sobre" ? "page" : null)">@I18n["Sobre Nós", "About Us", "私たちについて"]</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "aulas" ? "active" : string.Empty)" href="@I18n.LocalizePath("/aulas")" aria-current="@(current == "aulas" ? "page" : null)">@I18n["Aulas", "Classes", "クラス"]</a></li>
@@ -32,7 +34,7 @@
                     <li class="nav-item"><a class="nav-link" href="@I18n.LocalizePath("/aulas#faq")">FAQ</a></li>
                     <li class="nav-item"><a class="nav-link" href="/aluno/login">@I18n["Área do aluno", "Student area", "生徒エリア"]</a></li>
                     <li class="nav-item"><a class="nav-link" href="/auth/login">@I18n["Área interna", "Staff area", "スタッフエリア"]</a></li>
-                    <li class="nav-item ms-lg-2">
+                    <li class="nav-item ms-xl-2">
                         <div class="institucional-language-list" aria-label="@I18n["Selecionar idioma", "Select language", "言語を選択"]">
                             <a class="institucional-language-link @LanguageClass("pt-BR")"
                                asp-controller="Idioma"
@@ -51,7 +53,7 @@
                                asp-route-returnUrl="@LanguageReturnUrl("ja-JP")">日本語</a>
                         </div>
                     </li>
-                    <li class="nav-item ms-lg-2">
+                    <li class="nav-item ms-xl-2">
                         <a class="btn btn-sm btn-danger institucional-nav-cta" href="@I18n.LocalizePath("/contato")">@I18n["Contato", "Contact", "お問い合わせ"]</a>
                     </li>
                 </ul>

@@ -241,8 +241,10 @@ body.institucional-body {
 
 /* Shared buttons and headings */
 
-/* Cápsula do design: Lato 700 15px, tracking curto, 14px/30px, sem caixa alta. */
-.institucional-page .btn {
+/* Cápsula do design: Lato 700 15px, tracking curto, 14px/30px, sem caixa alta.
+   A pílula do menu é exceção: ela tem escala própria (`.institucional-nav-cta`,
+   acima) e, sem o `:not`, herdaria daqui 15px/30px e estouraria a barra. */
+.institucional-page .btn:not(.institucional-nav-cta) {
   border-radius: var(--ikkon-radius-pill);
   border-width: 1.5px;
   padding: 0.875rem 1.875rem;
@@ -776,10 +778,6 @@ body.institucional-body {
   letter-spacing: 0.04em;
 }
 
-.institucional-diferenciais {
-  background: var(--ikkon-cream);
-}
-
 .institucional-pillar {
   position: relative;
   height: 100%;
@@ -819,92 +817,8 @@ body.institucional-body {
   background: var(--ikkon-cream);
 }
 
-.public-event-types {
-  background: var(--ikkon-white);
-}
-
 .public-event-type-grid {
   gap: 1rem;
-}
-
-.institucional-eventos {
-  border-block: 0;
-  background:
-    linear-gradient(rgba(0, 22, 42, 0.94), rgba(0, 22, 42, 0.96)),
-    url("/design-ikkon/assets/textura-pontos.png") center / cover;
-}
-
-.institucional-eventos .institucional-kicker {
-  color: var(--ikkon-red);
-}
-
-.institucional-eventos .institucional-section-title {
-  color: var(--ikkon-cream);
-}
-
-.institucional-eventos-copy {
-  color: rgba(247, 244, 231, 0.75);
-}
-
-.institucional-eventos-wrap {
-  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-  gap: clamp(2rem, 5vw, 4.5rem);
-}
-
-.institucional-eventos-media-card {
-  min-height: 34rem;
-  border: 1px solid var(--ikkon-line-dark);
-  border-radius: 0;
-  background: var(--ikkon-navy);
-  box-shadow: none;
-}
-
-.institucional-eventos-photo {
-  transform: scale(1.02);
-}
-
-.institucional-evento-dot {
-  width: 0.65rem;
-  height: 0.65rem;
-  border-color: rgba(247, 244, 231, 0.72);
-  background: transparent;
-}
-
-.institucional-evento-dot.is-active {
-  border-color: var(--ikkon-red);
-  background: var(--ikkon-red);
-}
-
-.institucional-mma-box {
-  border: 1px solid var(--ikkon-line-dark);
-  border-left: 3px solid var(--ikkon-red);
-  border-radius: 0;
-  background: rgba(247, 244, 231, 0.05);
-  color: rgba(247, 244, 231, 0.78);
-}
-
-.institucional-mma-question {
-  color: var(--ikkon-cream);
-  font-family: var(--ikkon-font-brand);
-}
-
-.institucional-evento-stat {
-  min-height: 8rem;
-  border: 1px solid var(--ikkon-line-dark);
-  border-radius: 0;
-  background: transparent;
-}
-
-.institucional-evento-stat strong {
-  color: var(--ikkon-red);
-  font-family: var(--ikkon-font-brand);
-  font-weight: 700;
-}
-
-.institucional-evento-stat span {
-  color: rgba(247, 244, 231, 0.76);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .public-video-section {
@@ -2401,15 +2315,36 @@ body.institucional-body {
 }
 
 .ikkon-partner-card {
-  display: grid;
-  min-height: 64px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  min-height: 132px;
   border: 1px solid rgba(0, 32, 62, 0.22);
-  padding: 0.75rem 0.5rem;
+  padding: 1.125rem 0.75rem 0.875rem;
   background: var(--ikkon-white);
   color: var(--ikkon-copy);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-align: center;
+}
+
+/* Caixa óptica única: todo logo ocupa a mesma altura e é centralizado nela,
+   independentemente da proporção original do arquivo. O limite de largura
+   impede que assinaturas horizontais (Yamaha, Komatsu, TV Gazeta) atravessem
+   o card inteiro e pareçam maiores que as marcas quadradas. */
+.ikkon-partner-logo {
+  display: block;
+  width: 78%;
+  height: 52px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.ikkon-partner-name {
+  display: block;
+  margin-top: auto;
+  line-height: 1.35;
 }

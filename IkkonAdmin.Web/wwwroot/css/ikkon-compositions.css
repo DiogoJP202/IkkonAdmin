@@ -733,10 +733,6 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   object-fit: cover;
 }
 
-.ikkon-gallery-copy {
-  max-width: 48ch;
-}
-
 .ikkon-gallery-grid {
   display: grid;
   grid-auto-rows: 260px;
