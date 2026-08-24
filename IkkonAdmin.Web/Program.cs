@@ -22,6 +22,19 @@ using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// O log padrão é enxuto: sem isso o EF Core registra cada SQL executado e a URL
+// do servidor sai depois de ~160 linhas, junto com qualquer erro real.
+// `IKKON_LOGS=verbose` devolve o detalhe completo quando for preciso investigar.
+if (string.Equals(
+        Environment.GetEnvironmentVariable("IKKON_LOGS"),
+        "verbose",
+        StringComparison.OrdinalIgnoreCase))
+{
+    builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Information);
+    builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Information);
+}
+
 var culturaPadrao = CultureInfo.GetCultureInfo("pt-BR");
 var culturaIngles = CultureInfo.GetCultureInfo("en-US");
 var culturaJapones = CultureInfo.GetCultureInfo("ja-JP");
