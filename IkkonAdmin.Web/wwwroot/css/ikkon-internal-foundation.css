@@ -3,25 +3,31 @@
  * Mantém a ordem relativa das regras extraídas do antigo site.css.
  */
 
+/*
+ * A paleta do painel deriva dos tokens da marca e espelha os valores da Área do
+ * Aluno (`--aluno-*` em ikkon-aluno.css), para que as duas áreas internas e o
+ * site público sejam a mesma identidade. O tema escuro redefine estas mesmas
+ * variáveis em ikkon-internal-themes.css e não é afetado por este bloco.
+ */
 :root {
-  --admin-sidebar-bg: #243447;
-  --admin-sidebar-hover: #334c67;
-  --admin-sidebar-active: #3f5e7f;
-  --admin-bg: #f3f5f8;
-  --admin-border: #dde3ea;
-  --admin-text: #1f2b3a;
+  --admin-sidebar-bg: var(--ikkon-navy);
+  --admin-sidebar-hover: rgba(247, 244, 231, 0.08);
+  --admin-sidebar-active: rgba(247, 244, 231, 0.11);
+  --admin-bg: var(--ikkon-cream);
+  --admin-border: rgba(0, 32, 62, 0.17);
+  --admin-text: #183b59;
 
-  --brand-primary: #2f4f6f;
-  --brand-secondary: #816241;
-  --brand-surface: #ffffff;
-  --brand-surface-soft: #f6f8fb;
-  --brand-title: #17202b;
-  --brand-body: #334155;
+  --brand-primary: var(--ikkon-red);
+  --brand-secondary: var(--ikkon-navy);
+  --brand-surface: var(--ikkon-white);
+  --brand-surface-soft: #fbfaf4;
+  --brand-title: var(--ikkon-navy);
+  --brand-body: #183b59;
 
-  --status-success: #2e7d4f;
-  --status-warning: #b27f2e;
-  --status-danger: #b23f3f;
-  --status-info: #3d6f96;
+  --status-success: #23734b;
+  --status-warning: #9a5b0b;
+  --status-danger: #b72d33;
+  --status-info: #176b91;
 }
 
 html,
