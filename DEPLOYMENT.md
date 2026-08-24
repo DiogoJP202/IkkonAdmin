@@ -2,6 +2,13 @@
 
 Este guia descreve uma forma simples de colocar o IkkonAdmin no ar para validação do cliente.
 
+> **Não há ambiente publicado no momento.** O App Service `ikkon-admin-demo` e o
+> Azure SQL associado foram cancelados em agosto de 2026. As instruções de Azure
+> mais abaixo descrevem um ambiente que não existe mais — trate-as como receita
+> para recriar, não como descrição do que está no ar. O workflow
+> `.github/workflows/deploy-azure.yml` continua no repositório, mas só roda sob
+> demanda e depende do secret `PRODUCTION_DB_CONNECTION_STRING`, hoje ausente.
+
 > Para produção com dados reais, use o [runbook de produção](./docs/PRODUCTION_RUNBOOK.md). Ele substitui as recomendações simplificadas de demonstração sobre migrations, storage, secrets, backup e rollback.
 
 ## Decisão recomendada para esta fase

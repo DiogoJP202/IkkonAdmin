@@ -1,9 +1,14 @@
 ﻿name: Deploy IkkonAdmin to Azure App Service
 
+# O App Service `ikkon-admin-demo` e o Azure SQL foram cancelados em agosto de
+# 2026: não há ambiente publicado no momento. O disparo automático em push para
+# `main` foi removido para o pipeline não falhar a cada commit; o workflow segue
+# aqui, executável sob demanda, para quando houver hospedagem nova.
+#
+# Para reativar a publicação contínua: devolver o bloco `push:` abaixo e criar o
+# secret PRODUCTION_DB_CONNECTION_STRING (hoje ausente), além de revisar
+# AZURE_WEBAPP_NAME e AZURE_WEBAPP_PUBLISH_PROFILE.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
