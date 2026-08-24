@@ -813,7 +813,7 @@
 
   color: #171923;
 
-  font-family: "Noto Serif JP", Georgia, serif;
+  font-family: var(--ikkon-font-brand);
 
   font-size: clamp(1.65rem, 3vw, 2.45rem);
 

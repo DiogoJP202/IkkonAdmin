@@ -203,7 +203,7 @@
 .admin-panel-title {
   margin: 0;
   color: var(--panel-ink);
-  font-family: "Noto Serif JP", Georgia, serif;
+  font-family: var(--ikkon-font-brand);
   font-size: clamp(1.55rem, 3vw, 2.45rem);
   font-weight: 900;
   letter-spacing: -0.04em;
@@ -475,7 +475,7 @@
 .admin-panel-permission-group h3 {
   margin: 0;
   color: var(--panel-ink);
-  font-family: "Noto Serif JP", Georgia, serif;
+  font-family: var(--ikkon-font-brand);
   font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: -0.025em;
