@@ -12,18 +12,15 @@
     reveal: ".reveal",
     header: ".institucional-header",
     nav: "#navLanding",
-    navLink: ".nav-link",
-    eventGallery: "#eventosGaleria",
-    eventGalleryWrap: ".institucional-eventos-media-wrap",
-    eventSlide: ".institucional-eventos-photo",
-    eventDot: ".institucional-evento-dot"
+    navLink: ".nav-link"
   });
 
   const GATEWAY_STORAGE_KEY = "ikkon-gateway-seen";
   const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-  const MOBILE_NAV_MAX_WIDTH = 992;
+  /* Precisa acompanhar o `navbar-expand-xl` do header: abaixo de 1200px o menu
+     é colapsado e clicar num link tem que fechá-lo. */
+  const MOBILE_NAV_MAX_WIDTH = 1200;
   const HERO_INTERVAL_MS = 4300;
-  const EVENT_GALLERY_INTERVAL_MS = 5200;
   const SWIPE_THRESHOLD_PX = 45;
 
   const queryAll = (selector, root = document) =>
@@ -354,58 +351,6 @@
     });
   };
 
-  const initEventGallery = () => {
-    const gallery = document.querySelector(SELECTORS.eventGallery);
-
-    if (!gallery) {
-      return;
-    }
-
-    const galleryWrap = gallery.closest(SELECTORS.eventGalleryWrap);
-    const slides = queryAll(SELECTORS.eventSlide, gallery);
-    const dots = queryAll(SELECTORS.eventDot, galleryWrap ?? document);
-
-    if (slides.length < 2) {
-      return;
-    }
-
-    const rotator = createAutoRotator({
-      itemCount: slides.length,
-      initialIndex: slides.findIndex(slide => slide.classList.contains("is-active")),
-      intervalMs: EVENT_GALLERY_INTERVAL_MS,
-      render: activeIndex => {
-        slides.forEach((slide, index) => {
-          const active = index === activeIndex;
-          slide.classList.toggle("is-active", active);
-          slide.setAttribute("aria-hidden", active ? "false" : "true");
-        });
-
-        dots.forEach((dot, index) => {
-          const active = index === activeIndex;
-          dot.classList.toggle("is-active", active);
-          dot.setAttribute("aria-selected", active ? "true" : "false");
-          dot.setAttribute("tabindex", active ? "0" : "-1");
-        });
-      }
-    });
-
-    bindDotNavigation({ dots, itemCount: slides.length, rotator });
-
-    if (galleryWrap) {
-      galleryWrap.addEventListener("mouseenter", rotator.pause);
-      galleryWrap.addEventListener("mouseleave", rotator.resume);
-      galleryWrap.addEventListener("focusin", rotator.pause);
-      galleryWrap.addEventListener("focusout", event => {
-        if (!galleryWrap.contains(event.relatedTarget)) {
-          rotator.resume();
-        }
-      });
-    }
-
-    document.addEventListener("visibilitychange", rotator.resume);
-    rotator.start();
-  };
-
   // O projeto não possui envio de e-mail: o formulário de contato monta a
   // mensagem e entrega no WhatsApp, que é o canal oficial da escola.
   const initWhatsAppForms = () => {
@@ -442,7 +387,6 @@
     initHeroCarousels();
     initRevealAnimations();
     initPublicHeader();
-    initEventGallery();
     initWhatsAppForms();
   };
 

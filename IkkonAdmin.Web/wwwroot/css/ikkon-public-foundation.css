@@ -357,10 +357,6 @@
   font-weight: 500;
 }
 
-.institucional-diferenciais {
-  background: var(--land-surface);
-}
-
 .institucional-pillar {
   height: 100%;
   border: 1px solid #e4ddd2;
@@ -377,147 +373,6 @@
 .institucional-pillar p {
   margin: 0;
   color: #6d665c;
-}
-
-.institucional-eventos {
-  background: #f2f2f2;
-  border-top: 1px solid #e3ddd4;
-  border-bottom: 1px solid #e3ddd4;
-}
-
-.institucional-eventos .institucional-kicker {
-  color: #8b1e21;
-}
-
-.institucional-eventos-wrap {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
-  gap: 1.35rem;
-  align-items: stretch;
-}
-
-.institucional-eventos-content {
-  padding-block: 0.35rem;
-}
-
-.institucional-eventos-copy {
-  max-width: 58ch;
-}
-
-.institucional-eventos-media-wrap {
-  display: grid;
-  gap: 0.72rem;
-  align-content: start;
-}
-
-.institucional-eventos-media-card {
-  position: relative;
-  border-radius: 1rem;
-  min-height: 32rem;
-  border: 1px solid #d9d2c6;
-  box-shadow: 0 18px 28px rgba(25, 23, 20, 0.14);
-  background: #ddd6cc;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.institucional-eventos-media-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(170deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0)),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0));
-  z-index: 2;
-  pointer-events: none;
-}
-
-.institucional-eventos-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1.04);
-  transition: opacity 320ms ease-out, transform 5.2s ease-out;
-}
-
-.institucional-eventos-photo.is-active {
-  opacity: 1;
-  transform: scale(1);
-  z-index: 1;
-}
-
-.institucional-eventos-dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-}
-
-.institucional-evento-dot {
-  width: 0.72rem;
-  height: 0.72rem;
-  border-radius: 999px;
-  border: 1px solid #b6afa2;
-  background: #ebe6dc;
-  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
-}
-
-.institucional-evento-dot:hover {
-  transform: translateY(-1px);
-  background: #dbd4c7;
-}
-
-.institucional-evento-dot.is-active {
-  background: var(--land-primary);
-  border-color: var(--land-primary);
-}
-
-.institucional-evento-dot:focus-visible {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(125, 14, 19, 0.2);
-}
-
-.institucional-mma-box {
-  background: #f7f7f7;
-  border-radius: 0.32rem;
-  border-left: 4px solid var(--land-primary);
-  padding: 1.05rem 1.05rem 1.1rem;
-  color: #3e3932;
-}
-
-.institucional-mma-question {
-  font-weight: 700;
-  color: #2d2924;
-  font-size: clamp(1.2rem, 2.4vw, 1.9rem);
-  line-height: 1.15;
-}
-
-.institucional-evento-stat {
-  border: 1px solid #dcd4c8;
-  border-radius: 0.84rem;
-  background: #f9f7f3;
-  min-height: 7.8rem;
-  display: grid;
-  place-content: center;
-  text-align: center;
-}
-
-.institucional-evento-stat strong {
-  color: var(--land-primary);
-  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-  line-height: 1;
-  font-weight: 500;
-  font-family: "Noto Serif JP", "Georgia", serif;
-}
-
-.institucional-evento-stat span {
-  margin-top: 0.62rem;
-  color: #4f4a42;
-  font-size: 0.84rem;
-  font-weight: 500;
 }
 
 .institucional-faq .accordion-item {
@@ -771,12 +626,6 @@
   border-bottom: 1px solid var(--land-border);
 }
 
-.public-event-types {
-  background:
-    radial-gradient(700px 220px at 110% 0%, rgba(139, 30, 33, 0.08), transparent 60%),
-    linear-gradient(180deg, #f5f1ea 0%, #f0ece5 100%);
-}
-
 .public-event-type-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -872,14 +721,6 @@
     min-height: 23rem;
   }
 
-  .institucional-eventos-wrap {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .institucional-eventos-media-card {
-    min-height: 25rem;
-  }
-
   .public-path-grid,
   .public-video-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -912,10 +753,6 @@
     font-size: 0.75rem;
   }
 
-  .institucional-eventos-media-card {
-    min-height: 19rem;
-  }
-
   .institucional-about-title {
     font-size: clamp(1.75rem, 9vw, 2.45rem);
     margin-bottom: 0.95rem;
@@ -945,8 +782,6 @@
   .public-path-card,
   .public-video-card,
   .institucional-header,
-  .institucional-eventos-photo,
-  .institucional-evento-dot,
   .reveal {
     transition: none;
     animation: none;

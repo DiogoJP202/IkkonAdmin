@@ -2,36 +2,10 @@
 
 /* Responsive */
 
+/* O menu expande em xl (1200px), então tudo abaixo disso é menu colapsado. */
 @media (max-width: 1199.98px) {
-  .institucional-header .nav-link {
-    font-size: 0.62rem;
-    letter-spacing: 0.07em;
-  }
-
-  .institucional-header .navbar-nav {
-    column-gap: 0.3rem !important;
-  }
-
   .institucional-brand-lines small {
     display: none;
-  }
-}
-
-@media (max-width: 991.98px) {
-  /* As grades editoriais são de duas colunas só no desktop; abaixo disso elas
-     precisam empilhar, senão a coluna de texto fica com poucos pixels. */
-  .ikkon-contact-grid,
-  .ikkon-meaning-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
-  }
-
-  .ikkon-meaning-seal {
-    width: 160px;
-  }
-
-  .ikkon-partner-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .institucional-header,
@@ -58,6 +32,50 @@
   .institucional-nav-cta {
     margin-top: 0.35rem;
   }
+}
+
+/* Faixa estreita do menu horizontal. Entre 1200px e ~1288px o container ainda
+   não atingiu o `max-width: 1240px`, então a barra tem menos espaço útil aqui do
+   que em telas maiores e os rótulos precisam da escala compacta. */
+@media (min-width: 1200px) and (max-width: 1299.98px) {
+  .institucional-header .nav-link {
+    font-size: 0.62rem;
+    letter-spacing: 0.07em;
+  }
+
+  .institucional-header .navbar-nav {
+    column-gap: 0.3rem !important;
+  }
+}
+
+/* A partir daqui o container está no teto de 1240px: cabem os rótulos em tamanho
+   cheio, desde que o tracking e o respiro lateral fiquem contidos. */
+@media (min-width: 1300px) {
+  .institucional-header .nav-link {
+    letter-spacing: 0.08em;
+  }
+
+  .institucional-header .navbar-nav .nav-link {
+    padding-inline: 0.375rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  /* As grades editoriais são de duas colunas só no desktop; abaixo disso elas
+     precisam empilhar, senão a coluna de texto fica com poucos pixels. */
+  .ikkon-contact-grid,
+  .ikkon-meaning-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .ikkon-meaning-seal {
+    width: 160px;
+  }
+
+  .ikkon-partner-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 
   .institucional-hero,
   .public-area-hero,
@@ -66,7 +84,6 @@
   }
 
   .institucional-about-wrap,
-  .institucional-eventos-wrap,
   .public-blog-detail-layout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -77,10 +94,6 @@
 
   .institucional-about-image {
     width: 72%;
-  }
-
-  .institucional-eventos-media-card {
-    min-height: 28rem;
   }
 
   .public-blog-detail-aside {
@@ -188,10 +201,6 @@
 
   .institucional-about-content {
     padding-top: 0;
-  }
-
-  .institucional-eventos-media-card {
-    min-height: 21rem;
   }
 
   .public-blog-filter-panel {

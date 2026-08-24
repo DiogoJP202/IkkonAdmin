@@ -358,7 +358,8 @@
   touch-action: pan-y;
 }
 
-@media (max-width: 991.98px) {
+/* Estilos do menu colapsado. O header expande em xl, então valem até 1199.98px. */
+@media (max-width: 1199.98px) {
   .institucional-header .navbar-collapse {
     max-height: calc(100dvh - 64px);
     padding-bottom: 1rem;
@@ -414,9 +415,10 @@
     justify-content: center;
     margin-top: 0.2rem;
   }
+}
 
+@media (max-width: 991.98px) {
   .institucional-about-wrap,
-  .institucional-eventos-wrap,
   .public-blog-detail-layout {
     gap: 2.5rem;
   }
@@ -991,64 +993,6 @@
     gap: 0.8rem;
   }
 
-  .institucional-eventos-wrap {
-    gap: 2rem;
-  }
-
-  .institucional-mma-box {
-    padding: 1.1rem;
-  }
-
-  .institucional-evento-stat {
-    min-height: 7rem;
-    padding: 1rem;
-  }
-
-  .institucional-eventos-media-card {
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-  }
-
-  .institucional-eventos-dots {
-    gap: 0.15rem;
-  }
-
-  .institucional-evento-dot {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    background: transparent;
-    place-items: center;
-  }
-
-  .institucional-evento-dot::before {
-    width: 10px;
-    height: 10px;
-    border: 1px solid rgba(247, 244, 231, 0.72);
-    border-radius: 50%;
-    background: transparent;
-    content: "";
-  }
-
-  .institucional-evento-dot.is-active {
-    border: 0;
-    background: transparent;
-  }
-
-  .institucional-evento-dot.is-active::before {
-    border-color: var(--ikkon-red);
-    background: var(--ikkon-red);
-  }
-
-  .ikkon-gallery-section .d-flex {
-    align-items: flex-start;
-  }
-
-  .ikkon-gallery-copy {
-    max-width: none;
-  }
-
   .ikkon-gallery-grid {
     grid-auto-rows: auto;
     gap: 0.65rem;
@@ -1064,7 +1008,6 @@
     padding-inline: 1rem;
   }
 
-  .institucional-eventos-media-card,
   .ikkon-gallery-grid figure {
     aspect-ratio: 1 / 1;
   }

@@ -1,7 +1,6 @@
 @{
     Layout = "_PublicLayout";
     ViewData["PublicSection"] = "eventos";
-    ViewData["ContactMode"] = "eventos";
     ViewData["JapaneseLandingEnabled"] = true;
     ViewData["HeroCarouselMode"] = "eventos";
 
@@ -38,81 +37,6 @@
         </div>
     </section>
 
-    <section class="institucional-section public-event-types reveal">
-        <div class="container-xxl px-3 px-lg-4">
-            <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">@I18n["Formatos", "Formats", "形式"]</p>
-                <h2 class="institucional-section-title">@I18n["Tipos de eventos", "Event types", "イベントの種類"]</h2>
-            </div>
-            <div class="public-event-type-grid mt-4">
-                <article class="institucional-card"><h3>@I18n["Eventos culturais", "Cultural events", "文化イベント"]</h3><p>@I18n["Programações ligadas à cultura japonesa, música, comunidade e arte.", "Programs connected to Japanese culture, music, community, and art.", "日本文化、音楽、コミュニティ、芸術に関わるプログラム。"]</p></article>
-                <article class="institucional-card"><h3>@I18n["Festivais japoneses", "Japanese festivals", "日本祭り"]</h3><p>@I18n["Apresentações com energia coletiva e repertório adequado ao público.", "Performances with collective energy and repertoire suited to the audience.", "観客に合わせた演目と一体感のある公演。"]</p></article>
-                <article class="institucional-card"><h3>@I18n["Eventos corporativos", "Corporate events", "企業イベント"]</h3><p>@I18n["Aberturas, ativações, celebrações e momentos de impacto ao vivo.", "Openings, activations, celebrations, and live impact moments.", "オープニング、演出、祝賀、印象的なライブ演奏。"]</p></article>
-                <article class="institucional-card"><h3>@I18n["Cerimônias e celebrações", "Ceremonies and celebrations", "式典・祝賀"]</h3><p>@I18n["Presença marcante para ocasiões especiais e encontros institucionais.", "A memorable presence for special occasions and institutional gatherings.", "特別な機会や団体の集まりに記憶に残る存在感を。"]</p></article>
-                <article class="institucional-card"><h3>@I18n["Escolas e instituições", "Schools and institutions", "学校・団体"]</h3><p>@I18n["Experiências culturais para públicos educacionais e projetos sociais.", "Cultural experiences for educational audiences and social projects.", "教育現場や社会プロジェクト向けの文化体験。"]</p></article>
-                <article class="institucional-card"><h3>@I18n["Ações especiais", "Special activations", "特別企画"]</h3><p>@I18n["Formatos adaptados para eventos esportivos, lançamentos e produções.", "Formats adapted for sports events, launches, and productions.", "スポーツイベント、ローンチ、制作に合わせた形式。"]</p></article>
-            </div>
-        </div>
-    </section>
-
-    <section id="galeria" class="institucional-section institucional-eventos reveal">
-        <div class="container-xxl px-3 px-lg-4">
-            <div class="institucional-eventos-wrap">
-                <div class="institucional-eventos-content">
-                    <p class="institucional-kicker mb-2">@I18n["Destaques", "Highlights", "ハイライト"]</p>
-                    <h2 class="institucional-section-title">@I18n["Presença cultural em diferentes palcos", "Cultural presence on different stages", "さまざまな舞台での文化的な存在感"]</h2>
-                    <p class="institucional-copy institucional-eventos-copy mb-0">
-                        @I18n["A apresentação é pensada para cada contexto, preservando a força dos tambores japoneses e a leitura do público presente.", "Each performance is designed for its context, preserving the strength of the Japanese drums and the connection with the audience present.", "それぞれの場に合わせて公演を設計し、日本の太鼓の力と観客とのつながりを大切にします。"]
-                    </p>
-
-                    <article class="institucional-mma-box mt-4">
-                        <p class="institucional-mma-question mb-2">@I18n["\"Vocês tocam em eventos de MMA?\"", "\"Do you perform at MMA events?\"", "「MMAイベントでも演奏しますか？」"]</p>
-                        <p class="mb-0">
-                            @I18n["Sim. A IKKON também participa de eventos esportivos, festivais culturais, shows e apresentações especiais.", "Yes. IKKON also participates in sports events, cultural festivals, shows, and special performances.", "はい。IKKONはスポーツイベント、文化祭、ショー、特別公演にも参加しています。"]
-                        </p>
-                    </article>
-
-                    <div class="row g-3 mt-1">
-                        <div class="col-12 col-sm-6">
-                            <article class="institucional-evento-stat">
-                                <strong>10+</strong>
-                                <span>@I18n["Anos de trajetória", "Years of history", "年の歩み"]</span>
-                            </article>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <article class="institucional-evento-stat">
-                                <strong>100+</strong>
-                                <span>@I18n["Apresentações", "Performances", "公演"]</span>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-
-                <partial name="_PublicEventosGallery" />
-            </div>
-        </div>
-    </section>
-
-    <section class="institucional-section ikkon-gallery-section reveal">
-        <div class="container-xxl px-3 px-lg-4">
-            <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
-                <div>
-                    <p class="institucional-kicker mb-2">@I18n["Galeria", "Gallery", "ギャラリー"]</p>
-                    <h2 class="institucional-section-title">@I18n["O taiko em movimento", "Taiko in motion", "躍動する和太鼓"]</h2>
-                </div>
-                <p class="institucional-copy ikkon-gallery-copy mb-0">@I18n["Aulas, ensaios e apresentações que revelam a intensidade de tocar juntos.", "Classes, rehearsals, and performances that reveal the intensity of playing together.", "共に打つ力が伝わる、レッスン、稽古、公演の記録です。"]</p>
-            </div>
-            <div class="ikkon-gallery-grid">
-                @for (var photoNumber = 1; photoNumber <= 6; photoNumber++)
-                {
-                    <figure>
-                        <img src="~/design-ikkon/photos/galeria-@(photoNumber).webp" alt="@I18n[$"Registro de taiko {photoNumber}", $"Taiko moment {photoNumber}", $"和太鼓の記録 {photoNumber}"]" loading="lazy" />
-                    </figure>
-                }
-            </div>
-        </div>
-    </section>
-
     <section class="institucional-section public-video-section reveal">
         <div class="container-xxl px-3 px-lg-4">
             <div class="institucional-section-head text-center mx-auto">
@@ -123,6 +47,5 @@
         </div>
     </section>
 
-    <partial name="_PublicContactCta" />
     <partial name="_PublicFooter" />
 </div>

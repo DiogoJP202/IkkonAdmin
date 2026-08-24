@@ -1,6 +1,12 @@
+@*
+    Página de Contato conforme ClaudeDesign/SiteIkkon.dc.html (seção "Contato") e
+    os textos de `t.contato` em ClaudeDesign/i18n.js, nos três idiomas.
+
+    O design vai da seção direto ao rodapé: aqui não entra `_PublicContactCta`,
+    senão endereços e mapas apareceriam duas vezes na mesma página.
+*@
 @{
     Layout = "_PublicLayout";
-    ViewData["ContactMode"] = "geral";
     ViewData["HeroCarouselMode"] = "home";
 
     var unidades = PublicContentCatalog.Unidades(I18n);
@@ -19,7 +25,7 @@
             <p class="ikkon-editorial-intro">@I18n[
                 "Venha conhecer o taiko de perto — agende uma aula experimental ou fale com a gente.",
                 "Come experience taiko up close — book a trial class or talk to us.",
-                "和太鼓を間近で体験しませんか。体験レッスンのご予約やご相談をお待ちしています。"]</p>
+                "太鼓を間近で体験してください。体験レッスンのご予約やご相談はこちらから。"]</p>
 
             <div class="ikkon-contact-grid">
                 <div class="ikkon-contact-places">
@@ -28,6 +34,8 @@
                         <article class="ikkon-place-card">
                             <strong>@unidade.Name</strong>
                             <span>@unidade.Address</span>
+                            @* O mapa inteiro é o link para as direções; o iframe fica sem
+                               captura de ponteiro para o clique chegar ao <a>. *@
                             <a class="ikkon-place-map"
                                href="@unidade.DirectionsUrl"
                                target="_blank"
@@ -44,11 +52,13 @@
 
                     <p class="ikkon-contact-hours">
                         <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" aria-hidden="true" />
-                        <span>@I18n["Aulas de segunda a sábado", "Classes Monday to Saturday", "レッスンは月曜から土曜まで"]</span>
+                        <span>@I18n["Aulas de segunda a sábado", "Classes Monday to Saturday", "レッスンは月曜〜土曜"]</span>
                     </p>
                 </div>
 
                 <div class="ikkon-contact-channels">
+                    @* No design o botão é inerte. Aqui ele abre o WhatsApp com a
+                       mensagem já montada — ver `data-whatsapp-form` em landing.js. *@
                     <form class="ikkon-contact-form" data-whatsapp-form data-whatsapp-number="5511937799916">
                         <label>
                             <span>@I18n["Nome", "Name", "お名前"]</span>
@@ -63,7 +73,7 @@
                             <textarea name="mensagem" rows="5" required></textarea>
                         </label>
                         <button type="submit" class="btn btn-danger">
-                            <span>@I18n["Enviar mensagem", "Send message", "メッセージを送る"]</span>
+                            <span>@I18n["Enviar mensagem", "Send message", "送信"]</span>
                             <span class="ikkon-cta-arrow" aria-hidden="true">⟶</span>
                         </button>
                         <p class="ikkon-contact-form-note">@I18n[
@@ -101,6 +111,5 @@
         </div>
     </section>
 
-    <partial name="_PublicContactCta" />
     <partial name="_PublicFooter" />
 </div>

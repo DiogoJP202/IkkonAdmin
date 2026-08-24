@@ -24,6 +24,10 @@ logs/
 IkkonAdmin.Web/wwwroot/uploads/
 IkkonAdmin.Web/App_Data/
 
+# Assets de origem entregues pela escola. As versões tratadas e servidas ficam
+# em IkkonAdmin.Web/wwwroot/design-ikkon/, que é o que o site usa.
+/Logos/
+
 # NuGet
 *.nupkg
 *.snupkg
