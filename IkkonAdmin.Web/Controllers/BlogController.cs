@@ -197,14 +197,16 @@ public class BlogController(IBlogPublicService blogPublicService, IViewTextServi
             return null;
         }
 
-        if (Uri.TryCreate(publicUrl, UriKind.Absolute, out var absoluteUri))
-        {
-            return absoluteUri.ToString();
-        }
-
+        // O caminho raiz-relativo é avaliado primeiro: no Linux ele também
+        // satisfaz `UriKind.Absolute` e seria devolvido como URL file://.
         if (publicUrl.StartsWith("/", StringComparison.Ordinal))
         {
             return $"{Request.Scheme}://{Request.Host}{publicUrl}";
+        }
+
+        if (Uri.TryCreate(publicUrl, UriKind.Absolute, out var absoluteUri))
+        {
+            return absoluteUri.ToString();
         }
 
         return $"{Request.Scheme}://{Request.Host}/{publicUrl.TrimStart('~', '/')}";

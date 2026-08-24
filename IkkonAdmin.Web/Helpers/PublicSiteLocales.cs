@@ -71,7 +71,7 @@ public static class PublicSiteLocales
 
     public static string LocalizePath(string? path, string? culture)
     {
-        if (Uri.TryCreate(path, UriKind.Absolute, out _))
+        if (IsAbsoluteHttpUrl(path))
         {
             return path!;
         }
@@ -119,4 +119,14 @@ public static class PublicSiteLocales
             ? normalizedPath.TrimEnd('/')
             : normalizedPath;
     }
+
+    /// <summary>
+    /// No Linux, <c>Uri.TryCreate("/escola", UriKind.Absolute, ...)</c> tem
+    /// sucesso, porque um caminho iniciado por "/" é um caminho de arquivo
+    /// absoluto. Sem checar o esquema, todo link raiz-relativo escapava sem o
+    /// prefixo de idioma quando publicado em container/App Service Linux.
+    /// </summary>
+    private static bool IsAbsoluteHttpUrl(string? value) =>
+        Uri.TryCreate(value, UriKind.Absolute, out var uri)
+        && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }
