@@ -1,7 +1,7 @@
 @{
     Layout = "_PublicLayout";
     ViewData["ContactMode"] = "escola";
-    ViewData["HeroCarouselMode"] = "escola";
+    ViewData["HeroCarouselMode"] = "aulas";
 
     var pageIntro = new PublicPageIntroViewModel(
         I18n["Conheça o taiko", "Discover taiko", "和太鼓を知る"],
@@ -15,7 +15,7 @@
             "和太鼓は、日本の太鼓、音楽、身体表現、仲間との協力を結ぶ芸能です。言葉の意味と、教室や舞台での魅力をご紹介します。"],
         new(
             I18n["Experimentar uma aula", "Try a class", "体験レッスン"],
-            I18n.LocalizePath("/escola"),
+            I18n.LocalizePath("/aulas"),
             "btn btn-danger btn-lg"),
         new(
             I18n["Ver apresentações", "See performances", "公演を見る"],
@@ -103,7 +103,7 @@
                     <span>@I18n["Aprender", "Learn", "学ぶ"]</span>
                     <h2>@I18n["Comece a praticar taiko", "Start practicing taiko", "和太鼓を始める"]</h2>
                     <p>@I18n["Conheça as aulas, o método e as respostas para quem está começando.", "Explore classes, the teaching approach, and answers for new students.", "レッスン、指導方法、初心者向けのよくある質問をご覧ください。"]</p>
-                    <a class="btn btn-dark" href="@I18n.LocalizePath("/escola")">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
+                    <a class="btn btn-dark" href="@I18n.LocalizePath("/aulas")">@I18n["Conhecer a escola", "Discover the school", "教室について"]</a>
                 </article>
                 <article class="public-path-card public-path-card-eventos">
                     <span>@I18n["Assistir", "Experience", "観る"]</span>
@@ -115,6 +115,5 @@
         </div>
     </section>
 
-    <partial name="_PublicContactCta" />
     <partial name="_PublicFooter" />
 </div>

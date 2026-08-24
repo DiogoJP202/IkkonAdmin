@@ -23,11 +23,13 @@
             </button>
             <div class="collapse navbar-collapse" id="navLanding">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="@I18n.LocalizePath("/")" aria-current="@(current == "home" ? "page" : null)">@I18n["Início", "Home", "ホーム"]</a></li>
-                    <li class="nav-item"><a class="nav-link @(current == "escola" ? "active" : string.Empty)" href="@I18n.LocalizePath("/escola")" aria-current="@(current == "escola" ? "page" : null)">@I18n["Escola", "School", "教室"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "home" ? "active" : string.Empty)" href="@I18n.LocalizePath("/")" aria-current="@(current == "home" ? "page" : null)">@I18n["Home", "Home", "ホーム"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "sobre" ? "active" : string.Empty)" href="@I18n.LocalizePath("/sobre")" aria-current="@(current == "sobre" ? "page" : null)">@I18n["Sobre Nós", "About Us", "私たちについて"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "aulas" ? "active" : string.Empty)" href="@I18n.LocalizePath("/aulas")" aria-current="@(current == "aulas" ? "page" : null)">@I18n["Aulas", "Classes", "クラス"]</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "eventos" ? "active" : string.Empty)" href="@I18n.LocalizePath("/eventos")" aria-current="@(current == "eventos" ? "page" : null)">@I18n["Eventos", "Events", "イベント"]</a></li>
+                    <li class="nav-item"><a class="nav-link @(current == "galeria" ? "active" : string.Empty)" href="@I18n.LocalizePath("/galeria")" aria-current="@(current == "galeria" ? "page" : null)">@I18n["Galeria", "Gallery", "ギャラリー"]</a></li>
                     <li class="nav-item"><a class="nav-link @(current == "blog" ? "active" : string.Empty)" href="@I18n.LocalizePath("/blog")" aria-current="@(current == "blog" ? "page" : null)">Blog</a></li>
-                    <li class="nav-item"><a class="nav-link" href="@I18n.LocalizePath("/escola#faq")">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="@I18n.LocalizePath("/aulas#faq")">FAQ</a></li>
                     <li class="nav-item"><a class="nav-link" href="/aluno/login">@I18n["Área do aluno", "Student area", "生徒エリア"]</a></li>
                     <li class="nav-item"><a class="nav-link" href="/auth/login">@I18n["Área interna", "Staff area", "スタッフエリア"]</a></li>
                     <li class="nav-item ms-lg-2">

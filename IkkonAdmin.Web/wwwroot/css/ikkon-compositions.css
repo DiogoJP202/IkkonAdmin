@@ -19,7 +19,7 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   height: 100dvh;
   min-height: 100dvh;
   box-sizing: border-box;
-  padding: 1.5rem clamp(1.25rem, 4vw, 4rem) 1.25rem;
+  padding: min(1.5rem, 2.67vh) clamp(1.25rem, 4vw, 4rem) min(1.25rem, 2.22vh);
   background: var(--ikkon-cream);
   color: var(--ikkon-navy);
   overflow: hidden;
@@ -39,6 +39,9 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   transition: opacity 500ms ease;
 }
 
+/* Cada foto ocupa apenas a metade do seu próprio caminho: a da escola à
+   esquerda, a do ensemble à direita. O mockup usa a foto em tela cheia, mas o
+   split por metade é o comportamento pedido e mantém os dois lados legíveis. */
 .ikkon-gateway::before {
   right: 50%;
   background-image: url("/design-ikkon/photos/gateway-aulas.webp");
@@ -49,9 +52,11 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   background-image: url("/design-ikkon/photos/gateway-shows.webp");
 }
 
+/* Intensidade do design: foto sob véu creme de 62%. Sobre o fundo creme, a
+   foto a 38% resulta exatamente na mesma cor composta. */
 .ikkon-gateway.is-school-hover::before,
 .ikkon-gateway.is-events-hover::after {
-  opacity: 0.14;
+  opacity: 0.38;
 }
 
 .ikkon-gateway.is-hidden {
@@ -67,13 +72,12 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
 }
 
 .ikkon-gateway-language a {
-  border-bottom: 1px solid transparent;
-  color: rgba(0, 32, 62, 0.58);
-  font-size: 0.67rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  border-bottom: 2px solid transparent;
+  color: var(--ikkon-copy);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
   text-decoration: none;
-  text-transform: uppercase;
 }
 
 .ikkon-gateway-language a:hover,
@@ -94,76 +98,73 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
 .ikkon-gateway-emblem {
   position: relative;
   display: grid;
-  width: 58px;
-  height: 58px;
+  width: min(56px, 6.22vh);
+  height: min(56px, 6.22vh);
   place-items: center;
 }
 
 .ikkon-gateway-emblem img:first-child {
-  width: 55px;
-  height: 55px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
+/* No design a entrada usa somente o emblema; o selo aparece no header interno. */
 .ikkon-gateway-emblem img:last-child {
-  position: absolute;
-  right: -9px;
-  bottom: -3px;
-  width: 19px;
-  height: 25px;
-  object-fit: contain;
+  display: none;
 }
 
 .ikkon-gateway-brand > strong {
-  margin-top: 0.45rem;
+  margin-top: min(1rem, 1.78vh);
   font-family: var(--ikkon-font-brand);
-  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
-  font-weight: 900;
-  letter-spacing: 0.13em;
+  font-size: min(1.875rem, 3.33vh);
+  font-weight: 700;
+  letter-spacing: 0.05em;
   line-height: 1;
 }
 
 .ikkon-gateway-brand > span:not(.ikkon-gateway-emblem) {
-  margin-top: 0.25rem;
+  margin-top: min(0.5rem, 0.89vh);
   color: var(--ikkon-red);
-  font-size: 0.59rem;
-  font-weight: 900;
-  letter-spacing: 0.22em;
+  font-size: min(0.75rem, 1.33vh);
+  font-weight: 700;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
 }
 
 .ikkon-gateway-brand h2 {
-  margin: 0.7rem 0 0;
+  margin: min(1.125rem, 2vh) 0 0;
   color: var(--ikkon-navy);
-  font-family: var(--ikkon-font-body);
-  font-size: clamp(0.78rem, 1vw, 0.92rem);
+  font-family: var(--ikkon-font-brand);
+  font-size: min(2.5rem, 4.44vh);
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: normal;
+  line-height: 1.1;
+  text-transform: none;
 }
 
 .ikkon-gateway-paths {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-  width: min(100%, 1080px);
+  width: min(100%, 1160px);
   min-height: 0;
-  margin: 0.9rem auto 0;
+  margin: min(2.75rem, 4.89vh) auto 0;
 }
 
 .ikkon-gateway-divider {
   align-self: stretch;
-  background: rgba(0, 32, 62, 0.17);
+  background: var(--ikkon-line);
 }
 
 .ikkon-gateway-path {
   display: grid;
-  grid-template-rows: auto auto 4.25rem 4.35rem auto;
+  grid-template-rows: auto auto min(6.25rem, 11.1vh) min(5.125rem, 9.11vh) auto;
   min-width: 0;
   align-content: center;
   align-items: center;
   justify-items: center;
-  padding: 0.5rem clamp(1rem, 4vw, 4rem);
+  padding: min(1.5rem, 2.67vh) clamp(1rem, 4vw, 3rem) min(2rem, 3.56vh);
   color: var(--ikkon-navy);
   text-align: center;
   text-decoration: none;
@@ -177,47 +178,52 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
 .ikkon-gateway-photo {
   position: relative;
   display: grid;
-  width: min(clamp(190px, 24vw, 286px), 32vh);
+  width: min(clamp(190px, 24vw, 300px), 33.3vh);
   aspect-ratio: 1;
   place-items: center;
+  transition: scale 220ms ease;
 }
 
-.ikkon-gateway-ring {
+/* O seletor precisa vencer `.institucional-page img { max-width: 100% }`.
+   Sem isso a largura do aro é cortada para 100%, a altura continua em 108% e o
+   anel fica menor e deslocado para a esquerda em relação à foto. */
+.ikkon-gateway-photo .ikkon-gateway-ring {
   position: absolute;
   inset: -4%;
   width: 108%;
   height: 108%;
+  max-width: none;
   object-fit: contain;
   transition: rotate 500ms ease, scale 500ms ease;
 }
 
 .ikkon-gateway-image {
-  width: 78%;
+  width: 75%;
   aspect-ratio: 1;
   border-radius: 50%;
   filter: saturate(0.88) contrast(1.04);
   object-fit: cover;
-  transition: filter 400ms ease, scale 400ms ease;
+  transition: filter 400ms ease;
 }
 
-.ikkon-gateway-path:hover .ikkon-gateway-ring,
-.ikkon-gateway-path:focus .ikkon-gateway-ring {
-  rotate: 8deg;
-  scale: 1.04;
+/* O design escala o conjunto aro + foto; o aro não gira. */
+.ikkon-gateway-path:hover .ikkon-gateway-photo,
+.ikkon-gateway-path:focus .ikkon-gateway-photo {
+  scale: 1.08;
 }
 
 .ikkon-gateway-path:hover .ikkon-gateway-image,
 .ikkon-gateway-path:focus .ikkon-gateway-image {
   filter: saturate(1) contrast(1.08);
-  scale: 1.025;
 }
 
 .ikkon-gateway-path small {
-  margin-top: 0.35rem;
-  color: var(--ikkon-red);
-  font-size: 0.62rem;
-  font-weight: 900;
-  letter-spacing: 0.17em;
+  margin-top: min(0.5rem, 0.89vh);
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: min(0.9375rem, 1.67vh);
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
@@ -225,38 +231,44 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   display: grid;
   width: 100%;
   max-width: 27ch;
-  height: 4.25rem;
+  height: min(6.25rem, 11.1vh);
   align-items: center;
-  margin-top: 0.28rem;
+  margin-top: min(0.5rem, 0.89vh);
   font-family: var(--ikkon-font-brand);
-  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  font-size: min(2.375rem, 4.22vh);
+  font-weight: 700;
+  letter-spacing: 0.06em;
   line-height: 1.2;
+}
+
+/* O mockup usa a display Korosu no caminho da escola. */
+.ikkon-gateway-path-school > strong {
+  font-family: var(--ikkon-font-display);
 }
 
 .ikkon-gateway-path p {
   display: grid;
-  max-width: 42ch;
-  height: 4.35rem;
+  max-width: 380px;
+  height: min(5.125rem, 9.11vh);
   align-items: center;
-  margin: 0;
-  color: rgba(0, 32, 62, 0.67);
-  font-size: 0.8rem;
-  line-height: 1.5;
+  margin: min(0.875rem, 1.56vh) 0 0;
+  color: var(--ikkon-copy);
+  font-size: min(1rem, 1.78vh);
+  line-height: 1.7;
 }
 
 .ikkon-gateway-cta {
-  margin-top: 0.7rem;
-  border-bottom: 1px solid var(--ikkon-red);
+  margin-top: min(1rem, 1.78vh);
   color: var(--ikkon-red);
-  font-size: 0.67rem;
-  font-weight: 900;
-  letter-spacing: 0.11em;
+  font-size: min(0.8125rem, 1.44vh);
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .ikkon-gateway-skip {
   width: fit-content;
-  margin: 0.5rem auto 0;
+  margin: min(0.5rem, 0.89vh) auto 0;
   border: 0;
   border-bottom: 1px solid rgba(0, 32, 62, 0.32);
   background: transparent;
@@ -381,8 +393,8 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   object-position: center 40%;
 }
 
-.ikkon-hero-carousel-escola .ikkon-hero-carousel-slide:nth-child(1),
-.ikkon-hero-carousel-escola .ikkon-hero-carousel-slide:nth-child(2) {
+.ikkon-hero-carousel-aulas .ikkon-hero-carousel-slide:nth-child(1),
+.ikkon-hero-carousel-aulas .ikkon-hero-carousel-slide:nth-child(2) {
   object-position: center 46%;
 }
 
@@ -436,24 +448,25 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   margin: 0;
   color: var(--ikkon-navy);
   font-family: var(--ikkon-font-brand);
-  font-size: clamp(4.3rem, 9vw, 7.8rem);
+  font-size: clamp(3.5rem, 6.4vw, 5.75rem);
   font-weight: 900;
-  letter-spacing: 0.035em;
-  line-height: 0.9;
+  letter-spacing: 0.03em;
+  line-height: 1;
 }
 
 .ikkon-home-display-subtitle {
   margin: 1rem 0 1.25rem;
-  color: var(--ikkon-red);
+  color: var(--ikkon-navy);
   font-family: var(--ikkon-font-display);
-  font-size: clamp(1.25rem, 2.1vw, 2rem);
+  font-size: clamp(1.25rem, 1.875vw, 1.6875rem);
   letter-spacing: 0.06em;
   line-height: 1.1;
-  text-transform: uppercase;
 }
 
 .ikkon-home-intro-copy .institucional-copy {
-  max-width: 57ch;
+  max-width: 500px;
+  font-size: 1.125rem;
+  line-height: 1.7;
 }
 
 .ikkon-home-photo-composition {
@@ -490,41 +503,41 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   aspect-ratio: 1;
 }
 
+/* Faixa de números do design: filete em cima e embaixo, divisórias à esquerda
+   de cada célula, número em azul e rótulo em vermelho. */
 .ikkon-home-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: clamp(3rem, 7vw, 6rem);
+  margin-top: clamp(3rem, 7vw, 4rem);
+  padding: 1.75rem 0;
   border-top: 1px solid var(--ikkon-line);
+  border-bottom: 1px solid var(--ikkon-line);
 }
 
 .ikkon-home-stats > div {
   display: flex;
-  min-height: 130px;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  padding: 1.5rem;
-  border-right: 1px solid var(--ikkon-line);
+  padding: 0.25rem 0.75rem;
+  border-left: 1px solid rgba(0, 32, 62, 0.12);
   text-align: center;
 }
 
-.ikkon-home-stats > div:last-child {
-  border-right: 0;
-}
-
 .ikkon-home-stats strong {
-  color: var(--ikkon-red);
+  color: var(--ikkon-navy);
   font-family: var(--ikkon-font-brand);
-  font-size: clamp(1.65rem, 3vw, 2.75rem);
+  font-size: 1.875rem;
+  font-weight: 700;
   line-height: 1;
 }
 
 .ikkon-home-stats span {
-  margin-top: 0.55rem;
-  color: var(--ikkon-copy);
-  font-size: 0.66rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  margin-top: 0.25rem;
+  color: var(--ikkon-red);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
@@ -533,46 +546,143 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
   background: #efeada;
 }
 
+/* Níveis no design: três cards brancos soltos, título Korosu em vermelho. */
 .ikkon-level-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 3rem;
-  border-top: 2px solid var(--ikkon-red);
-  border-left: 1px solid rgba(231, 52, 57, 0.45);
+  gap: 1.375rem;
+  margin-bottom: 2.25rem;
 }
 
 .ikkon-level-card {
-  min-height: 300px;
-  padding: clamp(1.5rem, 3vw, 2.6rem);
-  border-right: 1px solid rgba(231, 52, 57, 0.45);
-  border-bottom: 1px solid rgba(231, 52, 57, 0.45);
-  background: rgba(247, 244, 231, 0.72);
-}
-
-.ikkon-level-card > span {
-  color: rgba(231, 52, 57, 0.5);
-  font-family: var(--ikkon-font-brand);
-  font-size: 2.75rem;
-  line-height: 1;
-}
-
-.ikkon-level-card > p:first-of-type {
-  margin: 2.2rem 0 0.35rem;
-  color: var(--ikkon-red);
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1.75rem;
+  background: var(--ikkon-white);
+  box-shadow: var(--ikkon-shadow-card);
 }
 
 .ikkon-level-card h3 {
   margin: 0;
-  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  color: var(--ikkon-red);
+  font-family: var(--ikkon-font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
 }
 
-.ikkon-level-card > p:last-child {
-  margin: 1rem 0 0;
+.ikkon-level-card p {
+  margin: 0;
   color: var(--ikkon-copy);
+  font-size: 0.90625rem;
+  line-height: 1.65;
+}
+
+/* Bloco do método: moldura vermelha de 2px sobre branco. */
+.ikkon-method-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 3.25rem;
+  border: var(--ikkon-border-frame);
+  padding: 2.125rem 2.375rem;
+  background: var(--ikkon-white);
+}
+
+.ikkon-method-panel-title {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ikkon-method-panel p {
+  margin: 0;
+  color: var(--ikkon-copy);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.ikkon-editorial-intro {
+  max-width: 680px;
+  margin: 0 0 2.75rem;
+  color: var(--ikkon-copy);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.ikkon-editorial-note-spaced {
+  margin-bottom: 2.25rem;
+}
+
+/* Faixa do Ensemble: azul de borda a borda, com textura e pincelada no canto. */
+.ikkon-ensemble-band {
+  position: relative;
+  padding: clamp(3.5rem, 7vw, 5.5rem) 2rem;
+  background: var(--ikkon-navy);
+  color: var(--ikkon-cream);
+  overflow: hidden;
+}
+
+.ikkon-ensemble-band::before {
+  position: absolute;
+  inset: 0;
+  background: url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  content: "";
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.ikkon-ensemble-band::after {
+  position: absolute;
+  top: -100px;
+  right: -120px;
+  width: 420px;
+  height: 420px;
+  background: url("/design-ikkon/assets/pincelada-enso-navy.png") center / contain no-repeat;
+  content: "";
+  filter: brightness(3);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.ikkon-ensemble-band-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  max-width: 880px;
+  flex-direction: column;
+  gap: 1.375rem;
+  margin-inline: auto;
+}
+
+.ikkon-ensemble-band-inner h1 {
+  margin: 0;
+  color: var(--ikkon-cream);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(2rem, 3.1vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ikkon-ensemble-band-inner .ikkon-editorial-rule {
+  margin: 0;
+}
+
+.ikkon-ensemble-band-inner p {
+  margin: 0;
+  color: rgba(247, 244, 231, 0.85);
+  font-size: 1.09375rem;
+  line-height: 1.75;
+}
+
+.ikkon-ensemble-band-inner .btn {
+  align-self: flex-start;
+  margin-top: 0.5rem;
 }
 
 .ikkon-ensemble-section {
@@ -643,6 +753,16 @@ body:has(.ikkon-gateway:not(.is-hidden)) {
 .ikkon-gallery-grid figure:nth-child(1),
 .ikkon-gallery-grid figure:nth-child(5) {
   grid-row: span 2;
+}
+
+/* Página Galeria: grade uniforme de 3 x 260px, como no design de referência. */
+.ikkon-gallery-grid.is-uniform {
+  gap: 1.125rem;
+}
+
+.ikkon-gallery-grid.is-uniform figure:nth-child(1),
+.ikkon-gallery-grid.is-uniform figure:nth-child(5) {
+  grid-row: auto;
 }
 
 .ikkon-gallery-grid img {

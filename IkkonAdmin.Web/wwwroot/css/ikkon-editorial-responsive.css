@@ -18,6 +18,22 @@
 }
 
 @media (max-width: 991.98px) {
+  /* As grades editoriais são de duas colunas só no desktop; abaixo disso elas
+     precisam empilhar, senão a coluna de texto fica com poucos pixels. */
+  .ikkon-contact-grid,
+  .ikkon-meaning-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .ikkon-meaning-seal {
+    width: 160px;
+  }
+
+  .ikkon-partner-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .institucional-header,
   .institucional-header.is-scrolled {
     background: var(--ikkon-cream);
@@ -81,6 +97,26 @@
 @media (max-width: 767.98px) {
   .institucional-header .navbar {
     min-height: 64px;
+  }
+
+  /* No celular a coluna editorial encosta menos nas bordas e a linha do tempo
+     deixa de reservar 110px fixos para o ano. */
+  .ikkon-editorial-column {
+    padding-inline: 1.25rem;
+  }
+
+  .ikkon-timeline-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .ikkon-partner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ikkon-contact-links .ikkon-social-pill {
+    width: 100%;
+    justify-content: center;
   }
 
   .institucional-brand-mark {

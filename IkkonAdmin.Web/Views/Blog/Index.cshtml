@@ -11,33 +11,47 @@
     var categoria = Model.Filtro.Categoria;
     var tag = Model.Filtro.Tag;
 
-    var pageIntro = new PublicPageIntroViewModel(
-        "Blog IKKON",
-        I18n["Conteúdos, histórias e bastidores do taiko", "Taiko stories, insights, and behind the scenes", "太鼓の読みもの・物語・舞台裏"],
-        I18n["Acompanhe novidades da escola, cultura japonesa, eventos, estudos e registros da comunidade IKKON SPTD.", "Follow school news, Japanese culture, events, studies, and records from the IKKON SPTD community.", "IKKON SPTDのニュース、日本文化、イベント、学び、コミュニティの記録をお届けします。"],
-        new(I18n["Ver publicações", "See posts", "記事を見る"], "#posts", "btn btn-danger btn-lg"),
-        new(I18n["Conhecer a escola", "Discover the school", "教室を見る"], I18n.LocalizePath("/escola"), "btn btn-outline-dark btn-lg"));
 }
 
 <div class="institucional-page public-blog-page">
     <partial name="_PublicHeader" />
-    <partial name="_PublicHeroCarousel" />
+
+    <section class="public-blog-hero-band">
+        <div class="public-blog-hero-inner">
+            <p class="institucional-kicker">@I18n["Diário do dojo", "Dojo journal", "道場日記"]</p>
+            <h1>@I18n["Blog", "Blog", "ブログ"]</h1>
+            <span class="ikkon-editorial-rule" aria-hidden="true"></span>
+            <p class="public-blog-hero-subtitle">@I18n[
+                "Método, bastidores de palco e cultura japonesa contados por quem toca taiko todos os dias em São Paulo.",
+                "Method, backstage notes and Japanese culture, written by people who play taiko every day in São Paulo.",
+                "サンパウロで毎日太鼓を打つ私たちが綴る、指導法・舞台裏・日本文化の記録。"]</p>
+            <div class="public-blog-hero-actions">
+                <a class="btn btn-danger" href="#posts">
+                    <span>@I18n["Ver publicações", "See the posts", "記事を見る"]</span>
+                    <span class="ikkon-cta-arrow" aria-hidden="true">↓</span>
+                </a>
+                <a class="btn btn-outline-light" href="@I18n.LocalizePath("/aulas")">
+                    <span>@I18n["Conheça a escola", "Meet the school", "道場について"]</span>
+                    <span class="ikkon-cta-arrow" aria-hidden="true">⟶</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <partial name="_PublicBreadcrumbs" />
-    <partial name="_PublicPageIntro" model="pageIntro" />
 
     @if (Model.FeaturedPosts.Any())
     {
         <section class="institucional-section public-blog-featured reveal">
             <div class="container-xxl px-3 px-lg-4">
-                <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
-                    <div>
-                        <p class="institucional-kicker mb-2">@I18n["Destaques", "Highlights", "注目"]</p>
-                        <h2 class="institucional-section-title">@I18n["Leituras em evidência", "Featured reads", "おすすめ記事"]</h2>
-                    </div>
-                    <p class="institucional-copy public-blog-section-copy mb-0">
-                        @I18n["Curadoria dos conteúdos que merecem atenção especial no momento.", "A curated selection of content worth special attention right now.", "今、特に読んでほしい記事を選びました。"]
-                    </p>
-                </div>
+                <h2 class="ikkon-editorial-subtitle public-blog-section-title">@I18n["Destaques", "Featured", "注目の記事"]</h2>
+                <span class="ikkon-editorial-rule ikkon-editorial-rule-tight" aria-hidden="true"></span>
+                <p class="public-blog-section-copy">
+                    @I18n[
+                        "As leituras que melhor explicam o que fazemos no dojo — comece por aqui.",
+                        "The reads that best explain what we do in the dojo — start here.",
+                        "道場の活動がいちばん伝わる記事です。まずはここから。"]
+                </p>
 
                 <div class="public-blog-feature-grid">
                     @foreach (var post in Model.FeaturedPosts)
@@ -57,15 +71,18 @@
     {
         <section class="institucional-section public-blog-weekly reveal">
             <div class="container-xxl px-3 px-lg-4">
-                <div class="row g-4 align-items-center">
-                    <div class="col-12 col-lg-4">
-                        <p class="institucional-kicker mb-2">@I18n["Blog da semana", "Weekly blog", "今週のブログ"]</p>
-                        <h2 class="institucional-section-title">@I18n["Escolhas recentes da equipe", "Recent team picks", "スタッフの最近のおすすめ"]</h2>
-                        <p class="institucional-copy mb-0">
-                            @I18n["Posts marcados no painel como leitura recomendada da semana.", "Posts marked in the admin panel as recommended reading for the week.", "管理画面で今週のおすすめに設定された記事です。"]
+                <div class="public-blog-weekly-grid">
+                    <div class="public-blog-weekly-intro">
+                        <h2>@I18n["Blog da semana", "Blog of the week", "今週のブログ"]</h2>
+                        <span class="ikkon-editorial-rule" aria-hidden="true"></span>
+                        <p>
+                            @I18n[
+                                "Textos curtos que estamos comentando nas aulas desta semana. Leitura de cinco minutos entre um treino e outro.",
+                                "Short texts we are discussing in class this week. A five-minute read between drills.",
+                                "今週のレッスンで話題にしている短い記事。稽古の合間に5分で読めます。"]
                         </p>
                     </div>
-                    <div class="col-12 col-lg-8">
+                    <div>
                         <div class="public-blog-weekly-list">
                             @foreach (var post in Model.WeeklyHighlights)
                             {
@@ -91,10 +108,9 @@
         <div class="container-xxl px-3 px-lg-4">
             <div class="public-blog-filter-panel">
                 <div>
-                    <p class="institucional-kicker mb-2">@I18n["Explorar", "Explore", "探す"]</p>
-                    <h2 class="institucional-section-title">@I18n["Publicações do Blog", "Blog posts", "ブログ記事"]</h2>
-                    <p class="institucional-copy mb-0">
-                        @I18n["Pesquise por título, resumo, conteúdo, categoria ou tag.", "Search by title, summary, content, category, or tag.", "タイトル、概要、本文、カテゴリ、タグで検索できます。"]
+                    <h2 class="public-blog-filter-title">@I18n["Filtrar publicações", "Filter posts", "記事を絞り込む"]</h2>
+                    <p class="public-blog-filter-hint">
+                        @I18n["Busque por título, tema ou tag — ou escolha uma categoria abaixo.", "Search by title, theme or tag — or pick a category below.", "タイトル・テーマ・タグで検索、または下のカテゴリーから選んでください。"]
                     </p>
                 </div>
 
@@ -177,18 +193,20 @@
             else
             {
                 <div class="public-blog-empty">
-                    <span>@I18n["Sem publicações por aqui", "No posts here", "まだ記事がありません"]</span>
-                    <h3>@I18n["Nenhum post encontrado", "No posts found", "記事が見つかりません"]</h3>
-                    <p>@I18n["Quando houver conteúdos publicados no painel, eles aparecerão aqui automaticamente.", "When content is published from the admin panel, it will appear here automatically.", "管理画面で公開された記事は、ここに自動的に表示されます。"]</p>
+                    <img src="~/design-ikkon/assets/selo-pequeno.png" asp-append-version="true" alt="" aria-hidden="true" />
+                    <h3>@I18n["Nenhuma publicação encontrada", "No posts found", "記事が見つかりません"]</h3>
+                    <p>@I18n["Não encontramos textos com esses termos. Tente outra palavra ou remova os filtros ativos.", "We found no texts matching those terms. Try another word or clear the active filters.", "その条件に合う記事は見つかりませんでした。別の言葉を試すか、フィルターを解除してください。"]</p>
                     @if (Model.HasActiveFilter)
                     {
-                        <a class="btn btn-dark" href="@I18n.LocalizePath("/blog")">@I18n["Ver todos os posts", "View all posts", "すべての記事を見る"]</a>
+                        <a class="btn btn-danger" href="@I18n.LocalizePath("/blog")">
+                            <span>@I18n["Ver todos os posts", "See all posts", "すべての記事を見る"]</span>
+                            <span class="ikkon-cta-arrow" aria-hidden="true">⟶</span>
+                        </a>
                     }
                 </div>
             }
         </div>
     </section>
 
-    <partial name="_PublicContactCta" />
     <partial name="_PublicFooter" />
 </div>

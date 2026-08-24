@@ -3,94 +3,148 @@
     ViewData["ContactMode"] = "geral";
     ViewData["HeroCarouselMode"] = "home";
 
-    var pageIntro = new PublicPageIntroViewModel(
-        I18n["Sobre o IKKON", "About IKKON", "IKKONについて"],
-        I18n[
-            "Uma escola e grupo artístico dedicados ao taiko",
-            "A school and performance group dedicated to taiko",
-            "和太鼓を学び、演奏する教室・芸能グループ"],
-        I18n[
-            "Desde 2015, o IKKON São Paulo Taiko Dojo reúne ensino musical, prática coletiva e apresentações culturais em São Paulo.",
-            "Since 2015, IKKON Sao Paulo Taiko Dojo has brought together music education, ensemble practice, and cultural performances in Sao Paulo.",
-            "IKKONサンパウロ太鼓道場は2015年から、サンパウロで音楽教育、合奏、文化公演に取り組んでいます。"],
-        new(
-            I18n["Conhecer a escola", "Discover the school", "教室について"],
-            I18n.LocalizePath("/escola"),
-            "btn btn-danger btn-lg"),
-        new(
-            I18n["Ver apresentações", "See performances", "公演を見る"],
-            I18n.LocalizePath("/eventos"),
-            "btn btn-outline-dark btn-lg"));
+    var kanji = new (string Char, string Pt, string En, string Ja, string MeaningPt, string MeaningEn, string MeaningJa)[]
+    {
+        ("一", "IK", "IK", "イッ", "Um · unidade", "One · unity", "一つ · 統一"),
+        ("魂", "KON", "KON", "コン", "Alma · espírito", "Soul · spirit", "魂 · 精神")
+    };
+
+    var linhaDoTempo = new (string Ano, string TituloPt, string TituloEn, string TituloJa, string TextoPt, string TextoEn, string TextoJa)[]
+    {
+        ("2015",
+            "Nasce o dojo", "The dojo is born", "道場の誕生",
+            "Fundação do Ikkon Wadaiko — hoje Ikkon São Paulo Taiko Dojo — e do Ikkon Taiko Arts Ensemble. Desde então, aulas e oficinas já alcançaram mais de 2.000 pessoas.",
+            "Ikkon Wadaiko — today Ikkon São Paulo Taiko Dojo — and the Ikkon Taiko Arts Ensemble are founded. Since then, classes and workshops have reached over 2,000 people.",
+            "Ikkon Wadaiko（現・Ikkonサンパウロ太鼓道場）とIkkon太鼓アーツアンサンブルを設立。以来、レッスンとワークショップで2,000人以上に太鼓を届けてきました。"),
+        ("2018",
+            "110 anos da imigração japonesa", "110 years of Japanese immigration", "日本移民110周年",
+            "Direção artística da performance oficial das comemorações: mais de 150 performistas, diante da princesa Mako e de cerca de 4.500 espectadores. No mesmo ano, título de mestre em taiko pelo Chichibu Shachuu (Saitama, Japão).",
+            "Artistic direction of the official celebration performance: over 150 performers, before Princess Mako and an audience of about 4,500. That same year, taiko master title from Chichibu Shachuu (Saitama, Japan).",
+            "公式記念公演の芸術監督を担当。150名以上の出演者が、眞子内親王殿下と約4,500人の観客の前で演奏。同年、秩父社中（埼玉）より太鼓師範の称号を取得。"),
+        ("2019",
+            "Certificação internacional", "International certification", "国際認定",
+            "Certificado de instrutor pela Fundação Japonesa de Taiko (Nippon Taiko Zaidan) e oficinas ministradas no Japão — Kumamoto, Tóquio e Fukuoka — com bolsa da JICA.",
+            "Instructor certificate from the Japan Taiko Foundation (Nippon Taiko Zaidan) and workshops taught across Japan — Kumamoto, Tokyo and Fukuoka — on a JICA scholarship.",
+            "日本太鼓財団の指導員資格を取得。JICAの奨学金により、熊本・東京・福岡でワークショップを実施。"),
+        ("2020",
+            "Oficinas inclusivas", "Inclusive workshops", "インクルーシブなワークショップ",
+            "Início das oficinas gratuitas de taiko com a Associação Kodomo-no-Sono, para jovens e adultos com deficiência intelectual, com apoio do Ministério da Cultura (2020–2023).",
+            "Free taiko workshops begin with the Kodomo-no-Sono Association, for youths and adults with intellectual disabilities, supported by the Ministry of Culture (2020–2023).",
+            "コドモノソノ会との連携により、知的障がいのある若者・成人向けの無料太鼓ワークショップを開始（文化省支援、2020–2023）。"),
+        ("2023",
+            "Palcos e parcerias", "Stages and partnerships", "舞台とパートナーシップ",
+            "Performance no Creative Summit da Warner Bros, com trilhas clássicas arranjadas para taiko, e apresentação no Japão ao lado do grupo Uwakome Kanto Matsuri (Akita).",
+            "Performance at the Warner Bros Creative Summit, with classic film scores arranged for taiko, and a performance in Japan alongside the Uwakome Kanto Matsuri group (Akita).",
+            "ワーナー・ブラザースのCreative Summitで演奏（名作映画音楽を太鼓用に編曲）。秋田の竿燈まつりのグループと日本で共演。"),
+        ("2025",
+            "O Brasil no mapa do taiko", "Brazil on the taiko map", "世界の太鼓マップにブラジルを",
+            "4º lugar no 3º Katsugi Oke Battle Tournament (Ishikawa) — primeiros brasileiros na competição — e primeiro grupo brasileiro em performance solo no Earth Celebration, do Kodo. Nasce o PIPA Taiko, oficinas para crianças e adolescentes autistas em parceria com o Enkyo.",
+            "4th place at the 3rd Katsugi Oke Battle Tournament (Ishikawa) — the first Brazilians in the competition — and the first Brazilian group to perform solo at Kodo's Earth Celebration. PIPA Taiko is born: workshops for autistic children and teenagers in partnership with Enkyo.",
+            "第3回担ぎ桶太鼓バトルトーナメント（石川）で4位——ブラジル初参戦。鼓童のEarth Celebrationにブラジルのグループとして初の単独公演。エンキョウと連携したPIPA Taikoも誕生。"),
+        (I18n["Hoje", "Today", "現在"],
+            "Referência no Brasil", "A reference in Brazil", "ブラジルの指標へ",
+            "Mais de 120 alunos, duas unidades e presença nos maiores festivais de cultura japonesa de São Paulo — como o Festival do Japão e a Festa das Cerejeiras.",
+            "Over 120 students, two locations and a presence at São Paulo's largest Japanese culture festivals — such as Festival do Japão and Festa das Cerejeiras.",
+            "120名以上の生徒、2つの教室、サンパウロ最大級の日本文化祭（日本祭り、桜祭り）への出演。")
+    };
+
+    var parceiros = new[]
+    {
+        "Warner Bros. Pictures", "Globo", "Nissan", "Volkswagen", "Komatsu", "Yamaha",
+        "Asics", "Mizuno", "Track & Field", "Daiichi-Sankyo", "Bosch", "Fujifilm",
+        "TV Gazeta", "Assaí Atacadista", "Jungle Fight", "Iguana Sports"
+    };
 }
 
 <div class="institucional-page public-about-page">
     <partial name="_PublicHeader" />
     <partial name="_PublicHeroCarousel" />
     <partial name="_PublicBreadcrumbs" />
-    <partial name="_PublicPageIntro" model="pageIntro" />
 
-    <section class="institucional-section institucional-about reveal">
-        <div class="container-xxl px-3 px-lg-4">
-            <div class="institucional-about-wrap">
-                <figure class="institucional-about-media mb-0">
-                    <img src="~/design-ikkon/photos/hero-sobre-6.webp"
-                         alt="@I18n["Integrantes do IKKON São Paulo Taiko Dojo", "Members of IKKON Sao Paulo Taiko Dojo", "IKKONサンパウロ太鼓道場のメンバー"]"
-                         class="institucional-about-image"
-                         loading="lazy" />
-                </figure>
-                <article class="institucional-about-content">
-                    <p class="institucional-kicker mb-2">@I18n["Quem somos", "Who we are", "私たちについて"]</p>
-                    <h2 class="institucional-about-title">
-                        @I18n[
-                            "Taiko como aprendizado, expressão e encontro",
-                            "Taiko as learning, expression, and connection",
-                            "学び、表現し、人とつながる和太鼓"]
-                    </h2>
-                    <p class="institucional-about-text">
-                        @I18n[
-                            "O IKKON SPTD é uma escola de taiko e um grupo artístico de São Paulo. Nosso trabalho conecta a formação de novos praticantes à experiência de tocar em conjunto e levar os tambores japoneses a diferentes públicos.",
-                            "IKKON SPTD is a taiko school and performance group in Sao Paulo. Our work connects the education of new players with ensemble practice and the experience of bringing Japanese drums to different audiences.",
-                            "IKKON SPTDは、サンパウロの和太鼓教室・芸能グループです。新しい奏者を育て、仲間と音を合わせ、日本の太鼓をさまざまな人々へ届けています。"]
-                    </p>
-                    <p class="institucional-about-text mb-0">
-                        @I18n[
-                            "A prática valoriza ritmo, técnica, postura, escuta coletiva, disciplina e respeito pela cultura japonesa. Iniciantes podem começar sem experiência musical prévia.",
-                            "The practice develops rhythm, technique, posture, ensemble listening, discipline, and respect for Japanese culture. Beginners can start without previous musical experience.",
-                            "リズム、技術、姿勢、仲間の音を聴く力、規律、日本文化への敬意を大切にしています。音楽経験のない初心者も始められます。"]
-                    </p>
-                </article>
+    <section class="institucional-section ikkon-editorial-section reveal">
+        <div class="ikkon-editorial-column">
+            <h1 class="ikkon-editorial-title">@I18n["Sobre Nós", "About Us", "私たちについて"]</h1>
+            <span class="ikkon-editorial-rule" aria-hidden="true"></span>
+
+            <div class="ikkon-editorial-body">
+                <p>@I18n[
+                    "Fundado em 2015, o Ikkon São Paulo Taiko Dojo nasce com o propósito de promover a arte do Taiko por meio de aulas regulares, inspiradas na tradição japonesa, mas conectadas às necessidades formativas dos alunos no Brasil.",
+                    "Founded in 2015, Ikkon São Paulo Taiko Dojo was born to promote the art of taiko through regular classes — inspired by Japanese tradition, yet connected to the formative needs of students in Brazil.",
+                    "2015年に設立されたIkkonサンパウロ太鼓道場は、日本の伝統に学びながら、ブラジルの生徒の育成ニーズに応える定期レッスンを通じて、太鼓の芸術を広めることを目的に誕生しました。"]</p>
+                <p>@I18n[
+                    "Com estudos contínuos no Japão, certificações internacionais e embasamento em teoria musical, desenvolvemos um método pedagógico próprio, denominado \"Alfabetização Musical\". Esse modelo busca reduzir barreiras de acesso à prática musical e à expressão artística, aproximando pessoas de diferentes idades e contextos da cultura japonesa através do Taiko.",
+                    "Through continuous study in Japan, international certifications and a foundation in music theory, we developed our own teaching method, called \"Musical Literacy\". It lowers barriers to musical practice and artistic expression, bringing people of different ages and backgrounds closer to Japanese culture through taiko.",
+                    "日本での継続的な研鑽、国際的な認定、音楽理論の裏付けをもとに、独自の指導法「音楽リテラシー」を開発。音楽実践と芸術表現への障壁を下げ、さまざまな年齢や背景の人々を太鼓を通じて日本文化に近づけます。"]</p>
+                <p>@I18n[
+                    "Por meio de aulas semanais, recitais internos e apresentações em festivais culturais, estimulamos o desenvolvimento social, artístico e comunitário dos participantes. A prática promove senso de pertencimento, trabalho colaborativo, respeito à diversidade e a vivência direta da herança cultural nipo-brasileira.",
+                    "Through weekly classes, internal recitals and performances at cultural festivals, we foster the social, artistic and community development of our participants — belonging, collaboration, respect for diversity and a direct experience of Japanese-Brazilian cultural heritage.",
+                    "週次レッスン、内部発表会、文化祭での演奏を通じて、参加者の社会的・芸術的・コミュニティ的成長を促します。帰属意識、協働、多様性の尊重、日系ブラジル文化遺産の直接的な体験を育みます。"]</p>
+                <p>@I18n[
+                    "Com mais de uma década de atuação, o Ikkon São Paulo Taiko Dojo se consolida como referência no ensino de Taiko no Brasil, ampliando o alcance dessa tradição e contribuindo para a formação de novos grupos, artistas e agentes culturais.",
+                    "With more than a decade of work, Ikkon São Paulo Taiko Dojo stands as a reference in taiko education in Brazil, widening the reach of this tradition and helping form new groups, artists and cultural agents.",
+                    "10年以上の活動を経て、Ikkonサンパウロ太鼓道場はブラジルにおける太鼓教育の指標として確立し、この伝統の裾野を広げ、新しいグループ、アーティスト、文化の担い手の育成に貢献しています。"]</p>
             </div>
+
+            <div class="ikkon-mission-panel">
+                <p class="institucional-kicker">@I18n["Nossa missão", "Our mission", "私たちの使命"]</p>
+                <p class="ikkon-mission-statement">@I18n[
+                    "Divulgar o taiko e alcançar mais pessoas para conhecer essa arte.",
+                    "To spread taiko and reach more people with this art.",
+                    "太鼓を広め、より多くの人々にこの芸術を届けること。"]</p>
+            </div>
+
+            <div class="ikkon-meaning-grid">
+                <div class="ikkon-meaning-copy">
+                    <h2 class="ikkon-editorial-subtitle">@I18n["O que significa IKKON?", "What does IKKON mean?", "IKKONの意味"]</h2>
+                    <p class="ikkon-editorial-lead">@I18n[
+                        "Nosso nome é escrito com dois ideogramas japoneses (kanji):",
+                        "Our name is written with two Japanese ideograms (kanji):",
+                        "私たちの名前は二つの漢字で書かれます。"]</p>
+                    @foreach (var item in kanji)
+                    {
+                        <div class="ikkon-kanji-row">
+                            <span class="ikkon-kanji-glyph" aria-hidden="true">@item.Char</span>
+                            <span class="ikkon-kanji-copy">
+                                <strong>@I18n[item.Pt, item.En, item.Ja]</strong>
+                                <span>@I18n[item.MeaningPt, item.MeaningEn, item.MeaningJa]</span>
+                            </span>
+                        </div>
+                    }
+                    <p class="ikkon-editorial-note">@I18n[
+                        "IKKON é \"uma alma\": muitos tambores, muitas mãos, um só espírito. É esse o selo vermelho que assina a nossa marca.",
+                        "IKKON is \"one soul\": many drums, many hands, a single spirit. That is the red seal that signs our brand.",
+                        "IKKON（一魂）は「一つの魂」。多くの太鼓、多くの手、一つの心。それが私たちのブランドを刻む赤い印鑑です。"]</p>
+                </div>
+                <img class="ikkon-meaning-seal"
+                     src="~/design-ikkon/assets/selo-ikkon.png"
+                     asp-append-version="true"
+                     alt="@I18n["Selo 一魂 do IKKON", "IKKON 一魂 seal", "IKKONの一魂の印"]"
+                     loading="lazy" />
+            </div>
+
+            <h2 class="ikkon-editorial-subtitle">@I18n["História", "History", "歩み"]</h2>
+            <div class="ikkon-timeline">
+                @foreach (var marco in linhaDoTempo)
+                {
+                    <div class="ikkon-timeline-row">
+                        <span class="ikkon-timeline-year">@marco.Ano</span>
+                        <div class="ikkon-timeline-copy">
+                            <strong>@I18n[marco.TituloPt, marco.TituloEn, marco.TituloJa]</strong>
+                            <span>@I18n[marco.TextoPt, marco.TextoEn, marco.TextoJa]</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <h2 class="ikkon-editorial-subtitle ikkon-editorial-subtitle-spaced">@I18n["Marcas que já trabalhamos", "Brands we have worked with", "これまでの共演・連携先"]</h2>
+            <ul class="ikkon-partner-grid">
+                @foreach (var parceiro in parceiros)
+                {
+                    <li class="ikkon-partner-card">@parceiro</li>
+                }
+            </ul>
         </div>
     </section>
 
-    <section class="institucional-section reveal">
-        <div class="container-xxl px-3 px-lg-4">
-            <div class="institucional-section-head text-center mx-auto">
-                <p class="institucional-kicker mb-2">@I18n["Nossa atuação", "What we do", "活動内容"]</p>
-                <h2 class="institucional-section-title">
-                    @I18n[
-                        "Formação, comunidade e presença cultural",
-                        "Education, community, and cultural presence",
-                        "教育、コミュニティ、文化発信"]
-                </h2>
-            </div>
-            <div class="public-event-type-grid mt-4">
-                <article class="institucional-card">
-                    <h3>@I18n["Ensino de taiko", "Taiko education", "和太鼓の指導"]</h3>
-                    <p>@I18n["Aulas progressivas para desenvolver fundamentos musicais e corporais.", "Progressive classes that develop musical and physical foundations.", "音楽と身体の基礎を段階的に身につけるレッスン。"]</p>
-                </article>
-                <article class="institucional-card">
-                    <h3>@I18n["Prática coletiva", "Ensemble practice", "合奏"]</h3>
-                    <p>@I18n["Escuta, coordenação e cooperação para construir música em grupo.", "Listening, coordination, and cooperation to build music as a group.", "仲間の音を聴き、動きを合わせ、共に音楽をつくります。"]</p>
-                </article>
-                <article class="institucional-card">
-                    <h3>@I18n["Apresentações", "Performances", "公演"]</h3>
-                    <p>@I18n["Shows e participações em festivais, celebrações e projetos culturais.", "Shows and appearances at festivals, celebrations, and cultural projects.", "祭り、祝典、文化プロジェクトでの公演。"]</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <partial name="_PublicContactCta" />
     <partial name="_PublicFooter" />
 </div>

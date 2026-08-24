@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Site IKKON" description="Site institucional multilíngue (PT/EN/JA) no estilo editorial — 8 páginas com navegação e troca de idioma" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <script src="./i18n.js?v=2"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #F7F4E7; }
+    image-slot { display: block; width: 100%; height: 100%; }
+    button[data-ikkon-nav="1"] { color: #E73439 !important; border-bottom-color: #E73439 !important; }
+    button[data-ikkon-lang="1"] { color: #E73439 !important; font-weight: 900 !important; border-bottom-color: #E73439 !important; }
+  </style>
+</helmet>
+
+<div style="font-family:'Lato',sans-serif;color:#00203E;background:#F7F4E7;min-height:100vh;display:flex;flex-direction:column">
+
+  <sc-if value="{{ notGateway }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1240px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:11px;background:none;border:none;cursor:pointer;padding:0">
+        <span style="position:relative;display:inline-block;width:42px;height:42px">
+          <img src="assets/emblema-mitsudomoe.png" alt="" style="width:42px;height:42px;display:block">
+          <img src="assets/selo-pequeno.png" alt="一魂" style="position:absolute;right:-2px;bottom:-2px;height:13px">
+        </span>
+        <span style="font-family:'Cinzel',serif;font-weight:700;font-size:27px;line-height:1;letter-spacing:0.02em;color:#00203E">IKKON</span>
+      </button>
+      <header style="position:sticky;top:0;z-index:50;background:rgba(247,244,231,0.97);border-bottom:1px solid rgba(0,32,62,0.15)">
+    
+  </header><nav style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
+          <button onClick="{{ item.onClick }}" data-ikkon-nav="{{ item.on }}" style="background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;padding:6px 1px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#00203E;transition:color 150ms ease" style-hover="color:#E73439">{{ item.label }}</button>
+        </sc-for>
+        <a href="./BlogIkkon.dc.html" style="border-bottom:2px solid transparent;padding:6px 1px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#00203E;text-decoration:none" style-hover="color:#E73439">{{ blogLabel }}</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:4px">
+        <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="3">
+          <button onClick="{{ lg.onClick }}" data-ikkon-lang="{{ lg.on }}" style="background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;padding:4px 7px;font-family:'Lato','Hiragino Sans',sans-serif;font-size:12.5px;letter-spacing:0.06em;font-weight:400;color:#33506A">{{ lg.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <main style="flex:1">
+
+    <sc-if value="{{ isGateway }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Escolha" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:48px 32px 56px;overflow:hidden">
+        <div style="position:absolute;inset:0;pointer-events:none;opacity:{{ bgOp }};transition:opacity 400ms ease">
+          <sc-if value="{{ hasBg }}" hint-placeholder-val="{{ false }}">
+            <img src="{{ bgUrl }}" alt="" style="width:100%;height:100%;object-fit:cover;transform:scale(1.15)">
+          </sc-if>
+          <div style="position:absolute;inset:0;background:rgba(247,244,231,0.62)"></div>
+        </div>
+        <div style="position:absolute;top:20px;right:28px;display:flex;align-items:center;gap:4px">
+          <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="3">
+            <button onClick="{{ lg.onClick }}" data-ikkon-lang="{{ lg.on }}" style="background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;padding:4px 7px;font-family:'Lato','Hiragino Sans',sans-serif;font-size:12.5px;letter-spacing:0.06em;font-weight:400;color:#33506A">{{ lg.label }}</button>
+          </sc-for>
+        </div>
+        <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;margin-bottom:44px">
+          <img src="assets/emblema-mitsudomoe.png" alt="" style="height:56px">
+          <div style="font-family:'Cinzel',serif;font-weight:700;font-size:30px;letter-spacing:0.05em;color:#00203E">IKKON</div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.32em;color:#E73439;text-transform:uppercase;margin-top:-8px">{{ gw.eyebrow }}</div>
+          <h1 style="margin:18px 0 0;font-family:'Cinzel',serif;font-weight:700;font-size:40px;color:#00203E">{{ gw.title }}</h1>
+        </div>
+        <div style="position:relative;max-width:1160px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1px 1fr;align-items:stretch">
+          <div onClick="{{ goAulas }}" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:24px 48px 32px">
+            <div onMouseEnter="{{ enterAulas }}" onMouseLeave="{{ leaveGw }}" style="position:relative;width:300px;height:300px;display:grid;place-items:center;transform:scale({{ scAulas }});transition:transform 220ms ease">
+              <img src="assets/aro-enso-azul.png" alt="" style="position:absolute;width:300px">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="gateway-aulas" shape="circle" placeholder="Foto: aula de taiko" style="width:225px;height:225px" hint-size="225px,225px"></x-import>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;letter-spacing:0.18em;text-transform:uppercase;color:#00203E">Ikkon Taiko Dojo</div>
+            <div style="font-family:'Korosu','Lato','Hiragino Sans',sans-serif;font-size:38px;letter-spacing:0.06em;color:#00203E;margin-top:-8px;height:100px;display:grid;place-items:center;line-height:1.2;white-space:pre-line">{{ gwAulas.title }}</div>
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A;max-width:380px;height:82px;display:grid;place-items:center;margin-top:14px">{{ gwAulas.desc }}</p>
+            <div style="margin-top:auto;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#E73439">{{ gwAulas.cta }} ⟶</div>
+          </div>
+          <div style="background:rgba(0,32,62,0.18)"></div>
+          <div onClick="{{ goEnsembleGw }}" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:24px 48px 32px">
+            <div onMouseEnter="{{ enterShows }}" onMouseLeave="{{ leaveGw }}" style="position:relative;width:300px;height:300px;display:grid;place-items:center;transform:scale({{ scShows }});transition:transform 220ms ease">
+              <img src="assets/aro-enso-preto.png" alt="" style="position:absolute;width:300px">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="gateway-shows" shape="circle" placeholder="Foto: ensemble no palco" style="width:225px;height:225px" hint-size="225px,225px"></x-import>
+            </div>
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;letter-spacing:0.18em;text-transform:uppercase;color:#00203E">Ikkon Taiko Arts Ensemble</div>
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:38px;letter-spacing:0.06em;color:#00203E;margin-top:-8px;height:100px;display:grid;place-items:center;line-height:1.2">{{ gwShows.title }}</div>
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A;max-width:380px;height:82px;display:grid;place-items:center;margin-top:14px">{{ gwShows.desc }}</p>
+            <div style="margin-top:auto;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#E73439">{{ gwShows.cta }} ⟶</div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="HeroCarousel" prefix="hero-home" label="Home" hint-size="100%,440px"></dc-import>
+      <section data-screen-label="Home" style="padding:0 0 88px">
+        <div style="max-width:1160px;margin:0 auto;padding:88px 32px 72px;display:grid;grid-template-columns:1.15fr 0.85fr;gap:64px;align-items:center">
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.32em;color:#E73439;text-transform:uppercase">{{ t.home.eyebrow }}</div>
+            <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:900;font-size:92px;line-height:1;letter-spacing:0.03em;color:#00203E">IKKON</h1>
+            <div style="font-family:'Korosu','Lato','Hiragino Sans',sans-serif;font-size:27px;letter-spacing:0.06em;color:#00203E">{{ t.home.subtitle }}</div>
+            <p style="margin:0;font-size:18px;line-height:1.7;color:#33506A;max-width:500px">{{ t.home.intro }}</p>
+            <div style="display:flex;align-items:center;gap:26px;margin-top:10px;flex-wrap:wrap">
+              <button onClick="{{ goContato }}" style="font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:#AE272B"><span>{{ t.home.cta2 }}</span><span aria-hidden="true">⟶</span></button>
+              <button onClick="{{ goSobre }}" style="font-family:'Lato',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.1em;text-transform:uppercase;background:none;border:none;color:#00203E;cursor:pointer;padding:6px 0" style-hover="color:#E73439">{{ t.home.cta1 }} ⟶</button>
+            </div>
+          </div>
+          <div style="position:relative;min-height:420px">
+            <div style="position:absolute;top:8px;left:10%;width:230px;height:230px">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="home-circulo-1" shape="circle" placeholder="Foto 1" style="width: 339px; height: 350px; position: absolute; left: -110px; top: -71px" hint-size="230px,230px"><div style="position: absolute; top: 166px; width: 185px; height: 185px; left: 104px">
+              
+            </div></x-import>
+            </div>
+            
+            <div style="position: absolute; left: 49px; width: 150px; height: 150px; top: 286px">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="home-circulo-3" shape="circle" placeholder="Foto 3" style="width: 248px; height: 236px; position: absolute; left: 61px; top: -129px" hint-size="150px,150px"></x-import><x-import component-from-global-scope="image-slot" from="./image-slot.js" id="home-circulo-2" shape="circle" placeholder="Foto 2" style="width: 267px; height: 265px; position: absolute; left: -139px; top: -60px" hint-size="185px,185px"></x-import>
+            </div>
+          </div>
+        </div>
+        <div style="max-width:1160px;margin:0 auto;padding:0 32px">
+          <div style="border-top:1px solid rgba(0,32,62,0.18);border-bottom:1px solid rgba(0,32,62,0.18);display:grid;grid-template-columns:repeat(4,1fr);padding:28px 0">
+            <sc-for list="{{ t.home.stats }}" as="st" hint-placeholder-count="4">
+              <div style="text-align:center;padding:4px 12px;border-left:1px solid rgba(0,32,62,0.12)">
+                <div style="font-family:'Cinzel',serif;font-weight:700;font-size:30px;color:#00203E">{{ st.n }}</div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#E73439;margin-top:4px">{{ st.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:64px">
+            <sc-for list="{{ homeCards }}" as="c" hint-placeholder-count="2">
+              <div style="background:#FFFFFF;padding:30px 28px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 12px rgba(0,22,42,0.08)">
+                <div style="font-family:'Korosu','Lato','Hiragino Sans',sans-serif;font-size:22px;letter-spacing:0.05em;color:#00203E">{{ c.title }}</div>
+                <p style="margin:0;font-size:14.5px;line-height:1.65;color:#33506A;flex:1">{{ c.desc }}</p>
+                <button onClick="{{ c.go }}" style="align-self:flex-start;background:none;border:none;cursor:pointer;padding:2px 0;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#E73439" style-hover="color:#AE272B">{{ saibaMais }} ⟶</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isSobre }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="HeroCarousel" prefix="hero-sobre" label="Sobre Nós" hint-size="100%,440px"></dc-import>
+      <section data-screen-label="Sobre Nós" style="max-width:880px;margin:0 auto;padding:80px 32px 96px">
+        <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:46px;color:#00203E">{{ t.sobre.title }}</h1>
+        <div style="width:56px;height:3px;background:#E73439;margin:20px 0 40px"></div>
+        <div style="display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.75;color:#33506A">
+          <p style="margin:0">{{ t.sobre.p1 }}</p>
+          <p style="margin:0">{{ t.sobre.p2 }}</p>
+          <p style="margin:0">{{ t.sobre.p3 }}</p>
+          <p style="margin:0">{{ t.sobre.p4 }}</p>
+        </div>
+
+        <div style="position:relative;background:#00203E;margin:56px 0;padding:44px 48px;overflow:hidden">
+          <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45">
+          <div style="position:relative;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:0.32em;color:#E73439;text-transform:uppercase">{{ t.sobre.missaoTitle }}</div>
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:26px;line-height:1.4;color:#F7F4E7">{{ t.sobre.missao }}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 220px;gap:48px;align-items:center;margin:64px 0">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <h2 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:30px;color:#00203E">{{ t.sobre.nomeTitle }}</h2>
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A">{{ t.sobre.nomeIntro }}</p>
+            <sc-for list="{{ t.sobre.kanji }}" as="kj" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:20px;border-top:1px solid rgba(0,32,62,0.14);padding-top:14px">
+                <div style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:52px;line-height:1;color:#E73439">{{ kj.k }}</div>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <div style="font-weight:900;font-size:15px;letter-spacing:0.1em;color:#00203E">{{ kj.r }}</div>
+                  <div style="font-size:14px;color:#33506A">{{ kj.s }}</div>
+                </div>
+              </div>
+            </sc-for>
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A;font-style:italic">{{ t.sobre.nomeFecho }}</p>
+          </div>
+          <img src="assets/selo-ikkon.png" alt="Selo 一魂" style="width:200px;justify-self:center">
+        </div>
+
+        <h2 style="margin:0 0 28px;font-family:'Cinzel',serif;font-weight:700;font-size:30px;color:#00203E">{{ t.sobre.historiaTitle }}</h2>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ t.sobre.timeline }}" as="tl" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:110px 1fr;gap:24px;padding:22px 0;border-top:1px solid rgba(0,32,62,0.14)">
+              <div style="font-family:'Cinzel',serif;font-weight:700;font-size:22px;color:#E73439">{{ tl.ano }}</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-weight:900;font-size:17px;color:#00203E">{{ tl.t }}</div>
+                <div style="font-size:15.5px;line-height:1.65;color:#33506A">{{ tl.d }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:52px">
+          <h2 style="margin:0 0 20px;font-family:'Cinzel',serif;font-weight:700;font-size:30px;color:#00203E">{{ t.sobre.parceirosTitle }}</h2>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+            <sc-for list="{{ parceiros }}" as="pc" hint-placeholder-count="8">
+              <div style="background:#FFFFFF;border:1px solid rgba(0,32,62,0.22);display:flex;flex-direction:column;align-items:stretch">
+                <div style="height:88px;padding:10px">
+                  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ pc.slotId }}" shape="rect" fit="contain" placeholder="{{ pc.nome }}" style="width:100%;height:100%" hint-size="100%,68px"></x-import>
+                </div>
+                <div style="font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-align:center;color:#33506A;padding:6px 8px;border-top:1px solid rgba(0,32,62,0.1)">{{ pc.nome }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ showAgradec }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:56px">
+            <h2 style="margin:0 0 18px;font-family:'Cinzel',serif;font-weight:700;font-size:30px;color:#00203E">{{ t.sobre.agradecimentosTitle }}</h2>
+            <div style="background:#FFFFFF;border:1px dashed rgba(0,32,62,0.35);padding:26px 30px;font-size:15px;font-style:italic;line-height:1.7;color:#33506A">{{ t.sobre.agradecimentos }}</div>
+          </div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAulas }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="HeroCarousel" prefix="hero-aulas" label="Aulas" hint-size="100%,440px"></dc-import>
+      <section data-screen-label="Aulas" style="max-width:1080px;margin:0 auto;padding:80px 32px 96px">
+        <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:46px;color:#00203E">{{ t.aulas.title }}</h1>
+        <div style="width:56px;height:3px;background:#E73439;margin:20px 0 20px"></div>
+        <p style="margin:0 0 44px;font-size:17px;line-height:1.7;color:#33506A;max-width:680px">{{ t.aulas.intro }}</p>
+        <div style="background:#FFFFFF;border:2px solid #E73439;padding:34px 38px;margin-bottom:52px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-family:'Cinzel',serif;font-weight:700;font-size:24px;color:#00203E">{{ t.aulas.metodoTitle }}</div>
+          <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A">{{ t.aulas.metodo }}</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:36px">
+          <sc-for list="{{ t.aulas.niveis }}" as="nv" hint-placeholder-count="3">
+            <div style="background:#FFFFFF;padding:28px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 12px rgba(0,22,42,0.08)">
+              <div style="font-family:'Korosu','Lato','Hiragino Sans',sans-serif;font-size:20px;letter-spacing:0.05em;color:#E73439">{{ nv.t }}</div>
+              <p style="margin:0;font-size:14.5px;line-height:1.65;color:#33506A">{{ nv.d }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0 0 36px;font-size:16px;line-height:1.7;color:#33506A;font-style:italic">{{ t.aulas.recitais }}</p>
+        <button onClick="{{ goContato }}" style="font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:#AE272B"><span>{{ t.aulas.cta }}</span><span aria-hidden="true">⟶</span></button>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isEnsemble }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Ensemble">
+        <dc-import name="HeroCarousel" prefix="hero-ensemble" label="Ensemble" hint-size="100%,440px"></dc-import>
+        <div style="position:relative;background:#00203E;overflow:hidden;padding:88px 32px">
+          <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45">
+          <img src="assets/pincelada-enso-navy.png" alt="" style="position:absolute;right:-120px;top:-100px;width:420px;opacity:0.55;filter:brightness(3)">
+          <div style="position:relative;max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:22px">
+            <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:44px;color:#F7F4E7">{{ t.ensemble.title }}</h1>
+            <div style="width:56px;height:3px;background:#E73439"></div>
+            <p style="margin:0;font-size:17.5px;line-height:1.75;color:rgba(247,244,231,0.85)">{{ t.ensemble.p1 }}</p>
+            <p style="margin:0;font-size:17.5px;line-height:1.75;color:rgba(247,244,231,0.85)">{{ t.ensemble.p2 }}</p>
+            <button onClick="{{ goContato }}" style="align-self:flex-start;margin-top:8px;font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border-radius:999px;background:transparent;color:#F7F4E7;box-shadow:inset 0 0 0 1.5px #F7F4E7;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:rgba(247,244,231,0.12)"><span>{{ t.ensemble.cta }}</span><span aria-hidden="true">⟶</span></button>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isGaleria }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="HeroCarousel" prefix="hero-galeria" label="Galeria" hint-size="100%,440px"></dc-import>
+      <section data-screen-label="Galeria" style="max-width:1160px;margin:0 auto;padding:80px 32px 96px">
+        <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:46px;color:#00203E">{{ t.galeria.title }}</h1>
+        <div style="width:56px;height:3px;background:#E73439;margin:20px 0 20px"></div>
+        <p style="margin:0 0 44px;font-size:17px;line-height:1.7;color:#33506A">{{ t.galeria.intro }}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-1" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-2" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-3" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-4" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-5" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="galeria-6" shape="rect" placeholder="{{ t.galeria.slot }}" style="width:100%;height:260px" hint-size="100%,260px"></x-import>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isContato }}" hint-placeholder-val="{{ false }}">
+      <dc-import name="HeroCarousel" prefix="hero-contato" label="Contato" hint-size="100%,440px"></dc-import>
+      <section data-screen-label="Contato" style="max-width:1080px;margin:0 auto;padding:80px 32px 96px">
+        <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:46px;color:#00203E">{{ t.contato.title }}</h1>
+        <div style="width:56px;height:3px;background:#E73439;margin:20px 0 20px"></div>
+        <p style="margin:0 0 48px;font-size:17px;line-height:1.7;color:#33506A;max-width:620px">{{ t.contato.intro }}</p>
+        <div style="display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:start">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <sc-for list="{{ unidades }}" as="un" hint-placeholder-count="2">
+              <div style="background:#FFFFFF;padding:24px 26px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 12px rgba(0,22,42,0.08)">
+                <div style="font-weight:900;font-size:16px;color:#00203E">{{ un.t }}</div>
+                <div style="font-size:14.5px;color:#33506A">{{ un.d }}</div>
+                <a href="{{ un.dir }}" target="_blank" rel="noopener" title="{{ un.rota }}" style="position:relative;display:block;height:190px;margin-top:12px;border:1px solid rgba(0,32,62,0.18);overflow:hidden;text-decoration:none">
+                  <iframe src="{{ un.map }}" title="{{ un.t }}" loading="lazy" style="width:100%;height:100%;border:0;pointer-events:none;display:block"></iframe>
+                  <span style="position:absolute;right:10px;bottom:10px;background:#E73439;color:#F7F4E7;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:7px 14px;border-radius:999px">{{ un.rota }} ⟶</span>
+                </a>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+              <img src="assets/selo-pequeno.png" alt="" style="height:40px">
+              <span style="font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#00203E">{{ t.contato.horario }}</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.75">{{ t.contato.formNome }}</span>
+              <input type="text" style="font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#FFFFFF;border:1.5px solid rgba(0,32,62,0.2);border-radius:0;padding:12px 14px;outline:none" style-focus="border:1.5px solid #E73439">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.75">{{ t.contato.formEmail }}</span>
+              <input type="email" style="font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#FFFFFF;border:1.5px solid rgba(0,32,62,0.2);border-radius:0;padding:12px 14px;outline:none" style-focus="border:1.5px solid #E73439">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.75">{{ t.contato.formMsg }}</span>
+              <textarea rows="5" style="font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#FFFFFF;border:1.5px solid rgba(0,32,62,0.2);border-radius:0;padding:12px 14px;outline:none;resize:vertical" style-focus="border:1.5px solid #E73439"></textarea>
+            </label>
+            <button style="align-self:flex-start;font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:#AE272B"><span>{{ t.contato.formEnviar }}</span><span aria-hidden="true">⟶</span></button>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px">
+              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;font-family:'Lato',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;padding:12px 24px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;text-decoration:none;transition:background 150ms ease" style-hover="background:#AE272B">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <span>WhatsApp</span>
+              </a>
+              <a href="https://instagram.com/ikkontaiko" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;font-family:'Lato',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;padding:12px 24px;border:1.5px solid #00203E;border-radius:999px;background:none;color:#00203E;text-decoration:none;transition:background 150ms ease,color 150ms ease" style-hover="background:#00203E;color:#F7F4E7">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                <span>Escola @ikkontaiko</span>
+              </a>
+              <a href="https://instagram.com/ikkonensemble" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;font-family:'Lato',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;padding:12px 24px;border:1.5px solid #00203E;border-radius:999px;background:none;color:#00203E;text-decoration:none;transition:background 150ms ease,color 150ms ease" style-hover="background:#00203E;color:#F7F4E7">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                <span>Ensemble @ikkonensemble</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+  </main>
+
+  <sc-if value="{{ notGateway }}" hint-placeholder-val="{{ true }}">
+  <footer style="position:relative;background:#00162A;overflow:hidden;padding:48px 32px">
+    <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35">
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+      <img src="assets/logo-horizontal-branco.png" alt="IKKON São Paulo Taiko Dojo" style="height:52px">
+      <div style="font-size:13px;letter-spacing:0.08em;color:rgba(247,244,231,0.75)">{{ t.footer.tagline }}</div>
+      <div style="font-size:12px;color:rgba(247,244,231,0.45)">{{ t.footer.direitos }}</div>
+    </div>
+  </footer>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 900}, &quot;defaultLang&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;pt&quot;, &quot;en&quot;, &quot;ja&quot;], &quot;default&quot;: &quot;pt&quot;, &quot;tsType&quot;: &quot;'pt' | 'en' | 'ja'&quot;, &quot;section&quot;: &quot;Idioma&quot;}, &quot;showAgradecimentos&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Conteúdo&quot;}}">
+class Component extends DCLogic {
+  state = { lang: 'pt', page: 'gateway', i18nReady: false, hover: null, heroIdx: 0, bgUrl: '' };
+
+  _slotSrc(id) {
+    const el = document.getElementById(id);
+    const img = el && el.shadowRoot && el.shadowRoot.querySelector('.frame img');
+    return (img && img.getAttribute('src')) || '';
+  }
+
+  componentDidMount() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('ikkon-site-state') || '{}'); } catch (e) {}
+    const lang = saved.lang || this.props.defaultLang || 'pt';
+    let page = saved.page || 'gateway';
+    if (['equipe', 'servicos'].indexOf(page) !== -1) page = 'gateway';
+    this.setState({ lang, page });
+    this._poll = setInterval(() => {
+      if (window.IKKON_I18N) {
+        clearInterval(this._poll);
+        this.setState({ i18nReady: true });
+      }
+    }, 40);
+    this._hero = setInterval(() => {
+      if (this.state.page === 'home') this.setState(s => ({ heroIdx: (s.heroIdx + 1) % 6 }));
+    }, 4500);
+  }
+
+  componentWillUnmount() {
+    if (this._poll) clearInterval(this._poll);
+    if (this._hero) clearInterval(this._hero);
+  }
+
+  persist(patch) {
+    const s = {
+      lang: patch.lang !== undefined ? patch.lang : this.state.lang,
+      page: patch.page !== undefined ? patch.page : this.state.page,
+    };
+    try { localStorage.setItem('ikkon-site-state', JSON.stringify(s)); } catch (e) {}
+  }
+
+  go(page) {
+    this.persist({ page });
+    this.setState({ page });
+    try { window.scrollTo({ top: 0 }); } catch (e) {}
+  }
+
+  setLang(lang) {
+    this.persist({ lang });
+    this.setState({ lang });
+  }
+
+  renderVals() {
+    const S = window.IKKON_I18N || {};
+    const lang = this.state.lang;
+    const t = S[lang] || S.pt || {};
+    const page = this.state.page;
+    const pages = ['home', 'sobre', 'aulas', 'ensemble', 'galeria', 'contato'];
+
+    const navItems = pages.map((p) => ({
+      label: (t.nav || {})[p] || '',
+      on: page === p ? '1' : '0',
+      onClick: () => this.go(p),
+    }));
+
+    const langs = [['pt', 'PT'], ['en', 'EN'], ['ja', '日本語']].map(([id, label]) => ({
+      label,
+      on: lang === id ? '1' : '0',
+      onClick: () => this.setLang(id),
+    }));
+
+    const homeCards = ((t.home || {}).cards || []).filter((c) => c.page !== 'servicos' && c.page !== 'equipe').map((c) => ({
+      ...c,
+      go: () => this.go(c.page),
+    }));
+
+    const membros = (t.equipe || {}).membros || [];
+
+    const enderecos = [
+      'R. Trapiche, 182, São Paulo, SP, Brasil',
+      'Rua Domingos de Morais, 2975, Vila Mariana, São Paulo, SP, 04035-001, Brasil',
+    ];
+    const rotaLabel = { pt: 'Como chegar', en: 'Directions', ja: 'ルート案内' }[lang] || 'Como chegar';
+    const unidades = (((t.contato || {}).unidades) || []).map((u, i) => {
+      const q = encodeURIComponent(enderecos[i] || u.d);
+      return {
+        ...u,
+        map: 'https://maps.google.com/maps?q=' + q + '&z=16&output=embed',
+        dir: 'https://www.google.com/maps/dir/?api=1&destination=' + q,
+        rota: rotaLabel,
+      };
+    });
+
+    return {
+      t,
+      navItems,
+      langs,
+      homeCards,
+      unidades,
+      parceiros: (((t.sobre || {}).parceiros) || []).map((nome, i) => ({ nome, slotId: 'parceiro-' + i })),
+      hOp0: this.state.heroIdx === 0 ? '1' : '0', hPe0: this.state.heroIdx === 0 ? 'auto' : 'none',
+      hOp1: this.state.heroIdx === 1 ? '1' : '0', hPe1: this.state.heroIdx === 1 ? 'auto' : 'none',
+      hOp2: this.state.heroIdx === 2 ? '1' : '0', hPe2: this.state.heroIdx === 2 ? 'auto' : 'none',
+      hOp3: this.state.heroIdx === 3 ? '1' : '0', hPe3: this.state.heroIdx === 3 ? 'auto' : 'none',
+      hOp4: this.state.heroIdx === 4 ? '1' : '0', hPe4: this.state.heroIdx === 4 ? 'auto' : 'none',
+      hOp5: this.state.heroIdx === 5 ? '1' : '0', hPe5: this.state.heroIdx === 5 ? 'auto' : 'none',
+      heroDots: [0, 1, 2, 3, 4, 5].map((i) => ({
+        bg: this.state.heroIdx === i ? '#E73439' : 'rgba(247,244,231,0.25)',
+        label: 'Foto ' + (i + 1),
+        onClick: () => this.setState({ heroIdx: i }),
+      })),
+      blogLabel: { pt: 'Blog', en: 'Blog', ja: 'ブログ' }[lang] || 'Blog',
+      saibaMais: (t.home || {}).saibaMais || '',
+      equipe0: membros[0] || '',
+      equipe1: membros[1] || '',
+      equipe2: membros[2] || '',
+      equipe3: membros[3] || '',
+      gw: t.gateway || {},
+      gwAulas: (t.gateway || {}).aulas || {},
+      gwShows: (t.gateway || {}).shows || {},
+      scAulas: this.state.hover === 'aulas' ? '1.08' : '1',
+      scShows: this.state.hover === 'shows' ? '1.08' : '1',
+      bgOp: this.state.hover ? '1' : '0',
+      bgUrl: this.state.bgUrl || '',
+      hasBg: !!this.state.bgUrl,
+      enterAulas: () => this.setState({ hover: 'aulas', bgUrl: this._slotSrc('gateway-aulas') || this.state.bgUrl }),
+      enterShows: () => this.setState({ hover: 'shows', bgUrl: this._slotSrc('gateway-shows') || this.state.bgUrl }),
+      leaveGw: () => this.setState({ hover: null }),
+      goAulas: () => this.go('aulas'),
+      goEnsembleGw: () => this.go('ensemble'),
+      isGateway: page === 'gateway',
+      notGateway: page !== 'gateway',
+      isHome: page === 'home',
+      isSobre: page === 'sobre',
+      isEquipe: page === 'equipe',
+      isAulas: page === 'aulas',
+      isServicos: page === 'servicos',
+      isEnsemble: page === 'ensemble',
+      isGaleria: page === 'galeria',
+      isContato: page === 'contato',
+      showAgradec: this.props.showAgradecimentos !== false,
+      goHome: () => this.go('gateway'),
+      goSobre: () => this.go('sobre'),
+      goContato: () => this.go('contato'),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

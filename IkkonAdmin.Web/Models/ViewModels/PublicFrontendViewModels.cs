@@ -31,3 +31,19 @@ public sealed record PublicBreadcrumbItemViewModel(
 public sealed record PublicFaqItemViewModel(
     string Question,
     string Answer);
+
+/// <summary>
+/// Unidade física da escola. <paramref name="MapQuery"/> é o endereço completo
+/// usado no embed e na rota do Google Maps.
+/// </summary>
+public sealed record PublicLocationViewModel(
+    string Name,
+    string Address,
+    string MapQuery)
+{
+    public string EncodedMapQuery => Uri.EscapeDataString(MapQuery);
+
+    public string EmbedUrl => $"https://maps.google.com/maps?q={EncodedMapQuery}&z=16&output=embed";
+
+    public string DirectionsUrl => $"https://www.google.com/maps/dir/?api=1&destination={EncodedMapQuery}";
+}

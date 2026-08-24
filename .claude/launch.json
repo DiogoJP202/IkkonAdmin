@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ikkon-web",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "IkkonAdmin.Web", "--urls", "http://localhost:5037"],
+      "port": 5037
+    }
+  ]
+}

@@ -254,7 +254,13 @@ if (!app.Environment.IsDevelopment())
 app.UseWhen(
     context => HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method),
     branch => branch.UseStatusCodePagesWithReExecute("/erro/{0}"));
-app.UseHttpsRedirection();
+
+// Em Development o perfil padrão publica apenas HTTP: sem porta HTTPS o
+// middleware não tem destino para redirecionar e apenas registra um aviso.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseResponseCompression();
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -318,6 +324,13 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.MapControllerRoute(
+    name: "localized-aulas",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/aulas",
+    defaults: new { controller = "Institucional", action = "Aulas" })
+    .WithStaticAssets();
+
+// Rota histórica: responde 301 para /{culture}/aulas.
+app.MapControllerRoute(
     name: "localized-escola",
     pattern: "{culture:regex(^(pt|en|ja)$)}/escola",
     defaults: new { controller = "Institucional", action = "Escola" })
@@ -327,6 +340,12 @@ app.MapControllerRoute(
     name: "localized-eventos",
     pattern: "{culture:regex(^(pt|en|ja)$)}/eventos",
     defaults: new { controller = "Institucional", action = "Eventos" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "localized-galeria",
+    pattern: "{culture:regex(^(pt|en|ja)$)}/galeria",
+    defaults: new { controller = "Institucional", action = "Galeria" })
     .WithStaticAssets();
 
 app.MapControllerRoute(
@@ -342,6 +361,13 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.MapControllerRoute(
+    name: "aulas",
+    pattern: "aulas",
+    defaults: new { controller = "Institucional", action = "Aulas" })
+    .WithStaticAssets();
+
+// Rota histórica: responde 301 para /aulas.
+app.MapControllerRoute(
     name: "escola",
     pattern: "escola",
     defaults: new { controller = "Institucional", action = "Escola" })
@@ -351,6 +377,12 @@ app.MapControllerRoute(
     name: "eventos",
     pattern: "eventos",
     defaults: new { controller = "Institucional", action = "Eventos" })
+    .WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "galeria",
+    pattern: "galeria",
+    defaults: new { controller = "Institucional", action = "Galeria" })
     .WithStaticAssets();
 
 app.MapControllerRoute(

@@ -15,8 +15,9 @@ public sealed class SeoController(IPublicSeoService publicSeoService) : Controll
         "/",
         "/sobre",
         "/taiko",
-        "/escola",
+        "/aulas",
         "/eventos",
+        "/galeria",
         "/blog",
         "/contato"
     ];
@@ -141,8 +142,9 @@ public sealed class SeoController(IPublicSeoService publicSeoService) : Controll
             - Japanese: {baseUrl}/ja
             - About: {baseUrl}/pt/sobre
             - What is taiko: {baseUrl}/pt/taiko
-            - Taiko classes: {baseUrl}/pt/escola
+            - Taiko classes: {baseUrl}/pt/aulas
             - Performances: {baseUrl}/pt/eventos
+            - Gallery: {baseUrl}/pt/galeria
             - Blog: {baseUrl}/pt/blog
             - Contact: {baseUrl}/pt/contato
 

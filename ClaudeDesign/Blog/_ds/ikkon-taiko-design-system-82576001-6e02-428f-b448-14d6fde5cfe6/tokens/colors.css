@@ -1,0 +1,36 @@
+/* IKKON — colors
+   Fonte: Guia de identidade visual - Ikkon Wadaiko (pág. Cores)
+   + KV Rede Social (pág. Cores secundárias) */
+:root {
+  /* Primárias */
+  --azul: #00203E;        /* cor principal, maior destaque */
+  --vermelho: #E73439;    /* ponto de contraste / atenção */
+  --bege: #F7F4E7;        /* fundo claro */
+  --preto: #000000;       /* nunca como background */
+  --branco: #FFFFFF;
+
+  /* Secundárias (variações para destaques, fundos, preenchimentos) */
+  --preto-suave: #1F1F1F;
+  --vermelho-escuro: #AE272B;
+  --azul-escuro: #00162A;
+
+  /* Aliases semânticos */
+  --surface-page: var(--bege);
+  --surface-dark: var(--azul);
+  --surface-darker: var(--azul-escuro);
+  --surface-card: var(--branco);
+  --surface-accent: var(--vermelho);
+
+  --text-title: var(--azul);
+  --text-body: var(--azul);
+  --text-body-soft: #33506A;      /* azul 70% sobre claro */
+  --text-on-dark: var(--bege);
+  --text-on-dark-soft: rgba(247, 244, 231, 0.78);
+  --text-on-accent: var(--bege);
+  --accent: var(--vermelho);
+  --accent-hover: var(--vermelho-escuro);
+
+  --border-on-light: rgba(0, 32, 62, 0.18);
+  --border-on-dark: rgba(247, 244, 231, 0.25);
+  --focus-ring: rgba(231, 52, 57, 0.45);
+}

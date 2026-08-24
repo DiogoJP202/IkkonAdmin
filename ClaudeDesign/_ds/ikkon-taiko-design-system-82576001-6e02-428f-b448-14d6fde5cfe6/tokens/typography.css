@@ -1,0 +1,33 @@
+/* IKKON — typography
+   Títulos: Korosu Regular, Cinzel Bold, Lato Bold.
+   Cinzel: estritamente títulos e menções destacadas à marca IKKON.
+   Textos corridos: Lato. */
+:root {
+  --font-display: 'Korosu', 'Lato', sans-serif;          /* títulos de impacto, caixa alta */
+  --font-brand: 'Cinzel', serif;                          /* marca IKKON, títulos solenes */
+  --font-body: 'Lato', sans-serif;                        /* textos corridos e suporte */
+
+  /* Escala (base 16px) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 25px;
+  --text-2xl: 31px;
+  --text-3xl: 39px;
+  --text-4xl: 49px;
+  --text-5xl: 61px;
+
+  /* Pesos Lato */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Tracking */
+  --tracking-caps: 0.32em;   /* "SÃO PAULO TAIKO DOJO", eyebrows */
+  --tracking-display: 0.02em;
+
+  --leading-tight: 1.1;
+  --leading-body: 1.55;
+}

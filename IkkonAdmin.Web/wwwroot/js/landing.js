@@ -406,12 +406,44 @@
     rotator.start();
   };
 
+  // O projeto não possui envio de e-mail: o formulário de contato monta a
+  // mensagem e entrega no WhatsApp, que é o canal oficial da escola.
+  const initWhatsAppForms = () => {
+    const forms = document.querySelectorAll("[data-whatsapp-form]");
+
+    forms.forEach((form) => {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        if (typeof form.reportValidity === "function" && !form.reportValidity()) {
+          return;
+        }
+
+        const numero = form.dataset.whatsappNumber;
+        if (!numero) {
+          return;
+        }
+
+        const valor = (campo) => (form.elements[campo]?.value || "").trim();
+        const linhas = [
+          valor("nome") && `Nome: ${valor("nome")}`,
+          valor("email") && `E-mail: ${valor("email")}`,
+          valor("mensagem")
+        ].filter(Boolean);
+
+        const url = `https://wa.me/${numero}?text=${encodeURIComponent(linhas.join("\n"))}`;
+        window.open(url, "_blank", "noopener");
+      });
+    });
+  };
+
   const initPublicFrontend = () => {
     initGateway();
     initHeroCarousels();
     initRevealAnimations();
     initPublicHeader();
     initEventGallery();
+    initWhatsAppForms();
   };
 
   initPublicFrontend();

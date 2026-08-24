@@ -109,8 +109,26 @@ public sealed class SeoArchitectureTests
         Assert.Contains("[HttpGet(\"/llms.txt\")]", seoController, StringComparison.Ordinal);
         Assert.Contains("PublicPathRequestCultureProvider", program, StringComparison.Ordinal);
         Assert.Contains("localized-home", program, StringComparison.Ordinal);
-        Assert.Contains("localized-escola", program, StringComparison.Ordinal);
+        Assert.Contains("localized-aulas", program, StringComparison.Ordinal);
         Assert.Contains("localized-eventos", program, StringComparison.Ordinal);
+        Assert.Contains("localized-galeria", program, StringComparison.Ordinal);
+
+        // A URL histórica precisa continuar roteável para responder o redirect 301.
+        Assert.Contains("localized-escola", program, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LegacySchoolRouteRedirectsPermanentlyToClassesPage()
+    {
+        var controller = ReadRepoFile(
+            "IkkonAdmin.Web",
+            "Controllers",
+            "InstitucionalController.cs");
+
+        Assert.Contains(
+            "RedirectPermanent(i18n.LocalizePath(\"/aulas\"))",
+            controller,
+            StringComparison.Ordinal);
     }
 
     private static string ReadRepoFile(params string[] pathSegments)

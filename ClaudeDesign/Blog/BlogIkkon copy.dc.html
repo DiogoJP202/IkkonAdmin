@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Blog IKKON" description="Listagem pública do blog do IKKON São Paulo Taiko Dojo — destaques, blog da semana, filtros, busca e paginação (PT/EN/JA)" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <script src="./i18n.js?v=2"></script>
+  <script src="./blog-data.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #F7F4E7; }
+    image-slot { display: block; width: 100%; height: 100%; }
+    a { color: #E73439; text-decoration: none; }
+    a:hover { color: #AE272B; }
+    button[data-blog-on="1"] { background: #E73439 !important; color: #F7F4E7 !important; border-color: #E73439 !important; }
+    select:focus, input:focus { outline: none; border-color: #E73439 !important; }
+  </style>
+</helmet>
+
+<div style="font-family:'Lato',sans-serif;color:#00203E;background:#F7F4E7;min-height:100vh;display:flex;flex-direction:column">
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(247,244,231,0.97);border-bottom:1px solid rgba(0,32,62,0.15)">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <a href="./SiteIkkon.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none">
+        <span style="position:relative;display:inline-block;width:42px;height:42px">
+          <img src="assets/emblema-mitsudomoe.png" alt="" style="width:42px;height:42px;display:block">
+          <img src="assets/selo-pequeno.png" alt="一魂" style="position:absolute;right:-2px;bottom:-2px;height:13px">
+        </span>
+        <span style="font-family:'Cinzel',serif;font-weight:700;font-size:27px;line-height:1;letter-spacing:0.02em;color:#00203E">IKKON</span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+          <a href="./SiteIkkon.dc.html" style="border-bottom:2px solid transparent;padding:6px 1px;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#00203E;text-decoration:none" style-hover="color:#E73439">{{ item.label }}</a>
+        </sc-for>
+        <span aria-current="page" style="border-bottom:2px solid #E73439;padding:6px 1px;font-size:12px;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:#E73439">{{ ui.blog }}</span>
+      </nav>
+      <div style="display:flex;align-items:center;gap:4px">
+        <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="3">
+          <button onClick="{{ lg.onClick }}" style="background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;padding:4px 7px;font-family:'Lato','Hiragino Sans',sans-serif;font-size:12.5px;letter-spacing:0.06em;font-weight:{{ lg.weight }};color:{{ lg.color }};border-bottom-color:{{ lg.line }}">{{ lg.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </header>
+
+  <main style="flex:1">
+
+    <section data-screen-label="Hero do blog" style="position:relative;background:#00203E;overflow:hidden;padding:84px 32px 88px">
+      <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.4">
+      <img src="assets/pincelada-enso-navy.png" alt="" style="position:absolute;right:-110px;top:-90px;width:400px;opacity:0.5;filter:brightness(3)">
+      <div style="position:relative;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.32em;color:#E73439;text-transform:uppercase">{{ ui.hero.eyebrow }}</div>
+        <h1 style="margin:0;font-family:'Cinzel',serif;font-weight:900;font-size:66px;line-height:1.05;letter-spacing:0.02em;color:#F7F4E7">{{ ui.hero.title }}</h1>
+        <div style="width:56px;height:3px;background:#E73439"></div>
+        <p style="margin:0;font-size:18.5px;line-height:1.7;color:rgba(247,244,231,0.85);max-width:620px;text-wrap:pretty">{{ ui.hero.subtitle }}</p>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:10px">
+          <button onClick="{{ scrollToList }}" style="font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:#AE272B"><span>{{ ui.hero.cta1 }}</span><span aria-hidden="true">↓</span></button>
+          <a href="./SiteIkkon.dc.html" style="font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border-radius:999px;background:transparent;color:#F7F4E7;box-shadow:inset 0 0 0 1.5px rgba(247,244,231,0.7);text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:rgba(247,244,231,0.12)"><span>{{ ui.hero.cta2 }}</span><span aria-hidden="true">⟶</span></a>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ hasFeatured }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Destaques" style="max-width:1160px;margin:0 auto;padding:80px 32px 8px">
+        <h2 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:36px;color:#00203E">{{ ui.featured.title }}</h2>
+        <div style="width:56px;height:3px;background:#E73439;margin:18px 0 18px"></div>
+        <p style="margin:0 0 36px;font-size:17px;line-height:1.7;color:#33506A;max-width:620px;text-wrap:pretty">{{ ui.featured.support }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:28px">
+          <sc-for list="{{ featuredPosts }}" as="p" hint-placeholder-count="2">
+            <article id="{{ p.anchor }}" style="background:#FFFFFF;box-shadow:0 2px 14px rgba(0,22,42,0.1);display:flex;flex-direction:column">
+              <div style="position:relative;height:280px;background:{{ p.coverBg }};overflow:hidden">
+                <sc-if value="{{ p.hasSlot }}" hint-placeholder-val="{{ true }}">
+                  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ p.slotId }}" shape="rect" placeholder="{{ p.slotHint }}" style="width:100%;height:100%" hint-size="100%,280px"></x-import>
+                </sc-if>
+                <sc-if value="{{ p.noSlot }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;display:grid;place-items:center">
+                    <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45">
+                    <img src="assets/emblema-mitsudomoe.png" alt="" style="position:relative;height:74px;opacity:0.9">
+                  </div>
+                </sc-if>
+                <span style="position:absolute;left:0;top:18px;background:#E73439;color:#F7F4E7;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:7px 14px">{{ ui.featured.badge }}</span>
+              </div>
+              <div style="padding:28px 30px 24px;display:flex;flex-direction:column;gap:14px;flex:1">
+                <div style="font-size:11.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#33506A">{{ p.meta }}</div>
+                <a href="{{ p.href }}" style="font-family:'Cinzel',serif;font-weight:700;font-size:26px;line-height:1.3;color:#00203E;text-decoration:none;text-wrap:pretty" style-hover="color:#E73439">{{ p.title }}</a>
+                <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A;flex:1;text-wrap:pretty">{{ p.excerpt }}</p>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid rgba(0,32,62,0.14);padding-top:16px">
+                  <button onClick="{{ p.onCat }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'Lato',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E73439" style-hover="color:#AE272B">{{ p.catLabel }}</button>
+                  <span style="font-size:13px;color:#33506A">{{ p.readLabel }}</span>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ hasWeekly }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Blog da semana" style="max-width:1160px;margin:0 auto;padding:72px 32px 0">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:44px;align-items:start;border-top:1px solid rgba(0,32,62,0.18);padding-top:56px">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <h2 style="margin:0;font-family:'Korosu','Lato','Hiragino Sans',sans-serif;font-size:34px;letter-spacing:0.05em;color:#00203E">{{ ui.week.title }}</h2>
+            <div style="width:56px;height:3px;background:#E73439"></div>
+            <p style="margin:0;font-size:16.5px;line-height:1.7;color:#33506A;max-width:420px;text-wrap:pretty">{{ ui.week.desc }}</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ weeklyPosts }}" as="w" hint-placeholder-count="3">
+              <article style="background:#FFFFFF;padding:22px 24px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,22,42,0.07);border-left:3px solid #E73439">
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#E73439">{{ w.label }}</div>
+                <a href="{{ w.href }}" style="font-weight:900;font-size:17.5px;line-height:1.4;color:#00203E;text-decoration:none;text-wrap:pretty" style-hover="color:#E73439">{{ w.title }}</a>
+                <p style="margin:0;font-size:14.5px;line-height:1.6;color:#33506A;text-wrap:pretty">{{ w.excerpt }}</p>
+              </article>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <section data-screen-label="Listagem e filtros" style="max-width:1160px;margin:0 auto;padding:72px 32px 96px">
+
+      <div id="publicacoes" style="scroll-margin-top:90px;background:#FFFFFF;box-shadow:0 2px 12px rgba(0,22,42,0.08);padding:30px 32px 32px;display:flex;flex-direction:column;gap:8px">
+        <h2 style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:26px;color:#00203E">{{ ui.filters.title }}</h2>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#33506A">{{ ui.filters.hint }}</p>
+        <form onSubmit="{{ onSubmit }}" style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+          <label style="display:flex;flex-direction:column;gap:6px;flex:2 1 300px">
+            <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.7">{{ ui.filters.search }}</span>
+            <span style="display:flex;gap:0">
+              <input type="search" value="{{ queryInput }}" onChange="{{ onQuery }}" placeholder="{{ ui.filters.placeholder }}" style="flex:1;min-width:0;font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#F7F4E7;border:1.5px solid rgba(0,32,62,0.2);border-right:none;padding:12px 14px">
+              <button type="submit" style="font-family:'Lato',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:12px 22px;border:1.5px solid #E73439;background:#E73439;color:#F7F4E7;cursor:pointer;transition:background 150ms ease" style-hover="background:#AE272B">{{ ui.filters.search }}</button>
+            </span>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 210px">
+            <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.7">{{ catsLabel }}</span>
+            <select value="{{ catValue }}" onChange="{{ onCatSelect }}" style="font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#F7F4E7;border:1.5px solid rgba(0,32,62,0.2);padding:12px 12px">
+              <sc-for list="{{ catOptions }}" as="o" hint-placeholder-count="6">
+                <option value="{{ o.value }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;flex:1 1 210px">
+            <span style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#00203E;opacity:0.7">{{ tagsLabel }}</span>
+            <select value="{{ tagValue }}" onChange="{{ onTagSelect }}" style="font-family:'Lato',sans-serif;font-size:15px;color:#00203E;background:#F7F4E7;border:1.5px solid rgba(0,32,62,0.2);padding:12px 12px">
+              <sc-for list="{{ tagOptions }}" as="o" hint-placeholder-count="9">
+                <option value="{{ o.value }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+          </label>
+          <sc-if value="{{ hasFilter }}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{ clearAll }}" style="background:none;border:none;padding:12px 2px;cursor:pointer;font-family:'Lato',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;color:#E73439;text-decoration:underline" style-hover="color:#AE272B">{{ ui.filters.clear }}</button>
+          </sc-if>
+        </form>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 0">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="13">
+          <button onClick="{{ c.onClick }}" data-blog-on="{{ c.on }}" style="font-family:'Lato','Hiragino Sans',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:0.06em;padding:8px 16px;border-radius:999px;border:1.5px solid rgba(0,32,62,0.25);background:transparent;color:#00203E;cursor:pointer;transition:border-color 150ms ease,color 150ms ease" style-hover="border-color:#E73439;color:#E73439">{{ c.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid rgba(0,32,62,0.18);padding:28px 0 14px;margin-bottom:32px">
+        <div style="font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:#00203E">{{ countLabel }}</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#33506A">{{ ui.results.sort }}</div>
+      </div>
+
+      <sc-if value="{{ hasPosts }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:26px">
+          <sc-for list="{{ pagePosts }}" as="p" hint-placeholder-count="6">
+            <article id="{{ p.anchor }}" style="background:#FFFFFF;box-shadow:0 2px 12px rgba(0,22,42,0.08);display:flex;flex-direction:column">
+              <div style="position:relative;height:190px;background:{{ p.coverBg }};overflow:hidden">
+                <sc-if value="{{ p.hasSlot }}" hint-placeholder-val="{{ true }}">
+                  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ p.slotId }}" shape="rect" placeholder="{{ p.slotHint }}" style="width:100%;height:100%" hint-size="100%,190px"></x-import>
+                </sc-if>
+                <sc-if value="{{ p.noSlot }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;display:grid;place-items:center">
+                    <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.45">
+                    <img src="assets/emblema-mitsudomoe.png" alt="{{ ui.fallback }}" style="position:relative;height:56px;opacity:0.9">
+                  </div>
+                </sc-if>
+                <div style="position:absolute;left:0;top:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                  <sc-if value="{{ p.isFeatured }}" hint-placeholder-val="{{ false }}">
+                    <span style="background:#E73439;color:#F7F4E7;font-size:10.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:6px 12px">{{ ui.featured.badge }}</span>
+                  </sc-if>
+                  <sc-if value="{{ p.isWeekly }}" hint-placeholder-val="{{ false }}">
+                    <span style="background:#00203E;color:#F7F4E7;font-size:10.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:6px 12px">{{ ui.week.badge }}</span>
+                  </sc-if>
+                </div>
+              </div>
+              <div style="padding:22px 24px 20px;display:flex;flex-direction:column;gap:12px;flex:1">
+                <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#33506A">{{ p.meta }}</div>
+                <a href="{{ p.href }}" style="font-weight:900;font-size:19px;line-height:1.4;color:#00203E;text-decoration:none;text-wrap:pretty" style-hover="color:#E73439">{{ p.title }}</a>
+                <p style="margin:0;font-size:14.5px;line-height:1.65;color:#33506A;flex:1;text-wrap:pretty">{{ p.excerpt }}</p>
+                <div style="display:flex;flex-wrap:wrap;gap:7px">
+                  <sc-for list="{{ p.tagList }}" as="tg" hint-placeholder-count="2">
+                    <button onClick="{{ tg.onClick }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'Lato','Hiragino Sans',sans-serif;font-size:12.5px;color:#33506A;text-decoration:underline" style-hover="color:#E73439">{{ tg.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid rgba(0,32,62,0.14);padding-top:14px">
+                  <button onClick="{{ p.onCat }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'Lato',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#E73439" style-hover="color:#AE272B">{{ p.catLabel }}</button>
+                  <span style="font-size:12.5px;color:#33506A">{{ p.readLabel }}</span>
+                </div>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ manyPages }}" hint-placeholder-val="{{ true }}">
+          <nav aria-label="{{ ui.pagePrefix }}" style="display:flex;justify-content:center;gap:8px;margin-top:52px">
+            <sc-for list="{{ pageButtons }}" as="pg" hint-placeholder-count="2">
+              <button onClick="{{ pg.onClick }}" data-blog-on="{{ pg.on }}" style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;min-width:44px;height:44px;padding:0 12px;border:1.5px solid rgba(0,32,62,0.25);background:transparent;color:#00203E;cursor:pointer;transition:border-color 150ms ease,color 150ms ease" style-hover="border-color:#E73439;color:#E73439">{{ pg.label }}</button>
+            </sc-for>
+          </nav>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ noPosts }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px dashed rgba(0,32,62,0.35);padding:56px 40px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+          <img src="assets/selo-pequeno.png" alt="" style="height:44px;opacity:0.8">
+          <div style="font-family:'Cinzel',serif;font-weight:700;font-size:26px;color:#00203E">{{ ui.empty.title }}</div>
+          <p style="margin:0;font-size:16px;line-height:1.7;color:#33506A;max-width:440px;text-wrap:pretty">{{ ui.empty.text }}</p>
+          <sc-if value="{{ hasFilter }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ clearAll }}" style="margin-top:8px;font-family:'Lato',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.04em;padding:14px 30px;border:none;border-radius:999px;background:#E73439;color:#F7F4E7;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background 150ms ease" style-hover="background:#AE272B"><span>{{ ui.empty.cta }}</span><span aria-hidden="true">⟶</span></button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+    </section>
+  </main>
+
+  <footer style="position:relative;background:#00162A;overflow:hidden;padding:48px 32px">
+    <img src="assets/textura-pontos.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35">
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+      <img src="assets/logo-horizontal-branco.png" alt="IKKON São Paulo Taiko Dojo" style="height:52px">
+      <div style="font-size:13px;letter-spacing:0.08em;color:rgba(247,244,231,0.75)">{{ footer.tagline }}</div>
+      <div style="font-size:12px;color:rgba(247,244,231,0.45)">{{ footer.direitos }}</div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 1200}, &quot;defaultLang&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;pt&quot;, &quot;en&quot;, &quot;ja&quot;], &quot;default&quot;: &quot;pt&quot;, &quot;tsType&quot;: &quot;'pt' | 'en' | 'ja'&quot;, &quot;section&quot;: &quot;Idioma&quot;}, &quot;postsPerPage&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 6, &quot;min&quot;: 3, &quot;max&quot;: 12, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Listagem&quot;}, &quot;showFeatured&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Seções&quot;}, &quot;showWeekly&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Seções&quot;}}">
+class Component extends DCLogic {
+  state = { lang: 'pt', ready: false, query: '', queryInput: '', cat: 'all', tag: 'all', page: 1 };
+
+  componentDidMount() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('ikkon-blog-state') || '{}'); } catch (e) {}
+    if (saved.lang) this.setState({ lang: saved.lang });
+    else if (this.props.defaultLang) this.setState({ lang: this.props.defaultLang });
+    this._poll = setInterval(() => {
+      if (window.IKKON_BLOG && window.IKKON_I18N) {
+        clearInterval(this._poll);
+        this.setState({ ready: true });
+      }
+    }, 40);
+  }
+
+  componentWillUnmount() { if (this._poll) clearInterval(this._poll); }
+
+  setLang(lang) {
+    try { localStorage.setItem('ikkon-blog-state', JSON.stringify({ lang: lang })); } catch (e) {}
+    this.setState({ lang: lang });
+  }
+
+  scrollList() {
+    const el = document.getElementById('publicacoes');
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+    try { window.scrollTo({ top: top, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, top); }
+  }
+
+  fmtDate(iso, lang) {
+    const loc = { pt: 'pt-BR', en: 'en-US', ja: 'ja-JP' }[lang] || 'pt-BR';
+    const d = new Date(iso + 'T12:00:00');
+    try { return new Intl.DateTimeFormat(loc, { day: 'numeric', month: 'long', year: 'numeric' }).format(d); }
+    catch (e) { return iso; }
+  }
+
+  renderVals() {
+    const B = window.IKKON_BLOG || {};
+    const lang = this.state.lang;
+    const ui = (B.ui || {})[lang] || (B.ui || {}).pt || { hero: {}, featured: {}, week: {}, filters: {}, results: {}, empty: {} };
+    const site = (window.IKKON_I18N || {})[lang] || {};
+    const cats = B.categories || [];
+    const tags = B.tags || [];
+    const allPosts = (B.posts || []).slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const perPage = Math.max(1, this.props.postsPerPage || 6);
+
+    const catLabel = (id) => { const c = cats.filter((x) => x.id === id)[0]; return c ? c.label[lang] : id; };
+    const tagLabel = (id) => { const t = tags.filter((x) => x.id === id)[0]; return t ? t.label[lang] : id; };
+    const readLabel = (n) => (ui.read || '{n}').replace('{n}', String(n));
+
+    const setCat = (id) => this.setState({ cat: id, page: 1 });
+    const setTag = (id) => this.setState({ tag: id, page: 1 });
+
+    const card = (p, extra) => ({
+      anchor: 'post-' + p.id,
+      href: '#post-' + p.id,
+      title: p.title[lang],
+      excerpt: p.excerpt[lang],
+      meta: this.fmtDate(p.date, lang) + ' · ' + (ui.by || '') + ' ' + p.author,
+      catLabel: catLabel(p.cat),
+      onCat: () => setCat(p.cat),
+      readLabel: readLabel(p.minutes),
+      hasSlot: !!p.slot,
+      noSlot: !p.slot,
+      coverBg: p.slot ? '#EFEADA' : '#00203E',
+      slotId: 'blog-cover-' + p.id + (extra && extra.feat ? '-feat' : ''),
+      slotHint: p.title[lang],
+      isFeatured: !!p.featured,
+      isWeekly: !!p.weekly,
+      tagList: (p.tags || []).map((id) => ({ label: '#' + tagLabel(id), onClick: () => setTag(id) })),
+    });
+
+    const q = this.state.query.trim().toLowerCase();
+    const filtered = allPosts.filter((p) => {
+      if (this.state.cat !== 'all' && p.cat !== this.state.cat) return false;
+      if (this.state.tag !== 'all' && (p.tags || []).indexOf(this.state.tag) === -1) return false;
+      if (!q) return true;
+      const hay = [p.title[lang], p.excerpt[lang], p.author, catLabel(p.cat)]
+        .concat((p.tags || []).map(tagLabel)).join(' ').toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    const page = Math.min(this.state.page, totalPages);
+    const pagePosts = filtered.slice((page - 1) * perPage, page * perPage);
+
+    const countTpl = filtered.length === 1 ? (ui.results.one || '1') : (ui.results.many || '{n}');
+    const hasFilter = q !== '' || this.state.cat !== 'all' || this.state.tag !== 'all';
+
+    const featuredPosts = this.props.showFeatured === false ? [] : allPosts.filter((p) => p.featured);
+    const weeklyPosts = this.props.showWeekly === false ? [] : allPosts.filter((p) => p.weekly);
+
+    const countOf = (fn) => allPosts.filter(fn).length;
+
+    const chips = [{ id: 'all', label: ui.filters.allCats || '', on: this.state.cat === 'all' && this.state.tag === 'all' ? '1' : '0', onClick: () => this.setState({ cat: 'all', tag: 'all', page: 1 }) }]
+      .concat(cats.map((c) => ({ label: c.label[lang], on: this.state.cat === c.id ? '1' : '0', onClick: () => setCat(c.id) })))
+      .concat(tags.map((t) => ({ label: '#' + t.label[lang], on: this.state.tag === t.id ? '1' : '0', onClick: () => setTag(t.id) })));
+
+    return {
+      ui,
+      footer: site.footer || {},
+      navItems: ['home', 'sobre', 'aulas', 'ensemble', 'galeria', 'contato'].map((p) => ({ label: (site.nav || {})[p] || '' })),
+      langs: [['pt', 'PT'], ['en', 'EN'], ['ja', '日本語']].map(([id, label]) => ({
+        label,
+        weight: lang === id ? '900' : '400',
+        color: lang === id ? '#E73439' : '#33506A',
+        line: lang === id ? '#E73439' : 'transparent',
+        onClick: () => this.setLang(id),
+      })),
+      catsLabel: { pt: 'Categoria', en: 'Category', ja: 'カテゴリー' }[lang],
+      tagsLabel: { pt: 'Tag', en: 'Tag', ja: 'タグ' }[lang],
+      scrollToList: () => this.scrollList(),
+      hasFeatured: featuredPosts.length > 0,
+      featuredPosts: featuredPosts.map((p) => card(p, { feat: true })),
+      hasWeekly: weeklyPosts.length > 0,
+      weeklyPosts: weeklyPosts.map((p) => ({
+        label: catLabel(p.cat),
+        title: p.title[lang],
+        excerpt: p.excerpt[lang],
+        href: '#post-' + p.id,
+      })),
+      queryInput: this.state.queryInput,
+      onQuery: (e) => this.setState({ queryInput: e.target.value }),
+      onSubmit: (e) => { e.preventDefault(); this.setState({ query: this.state.queryInput, page: 1 }); },
+      catValue: this.state.cat,
+      tagValue: this.state.tag,
+      catOptions: [{ value: 'all', label: (ui.filters.allCats || '') + ' (' + allPosts.length + ')' }]
+        .concat(cats.map((c) => ({ value: c.id, label: c.label[lang] + ' (' + countOf((p) => p.cat === c.id) + ')' }))),
+      tagOptions: [{ value: 'all', label: (ui.filters.allTags || '') + ' (' + allPosts.length + ')' }]
+        .concat(tags.map((t) => ({ value: t.id, label: '#' + t.label[lang] + ' (' + countOf((p) => (p.tags || []).indexOf(t.id) !== -1) + ')' }))),
+      onCatSelect: (e) => setCat(e.target.value),
+      onTagSelect: (e) => setTag(e.target.value),
+      hasFilter,
+      clearAll: () => this.setState({ query: '', queryInput: '', cat: 'all', tag: 'all', page: 1 }),
+      chips,
+      countLabel: countTpl.replace('{n}', String(filtered.length)),
+      hasPosts: filtered.length > 0,
+      noPosts: filtered.length === 0,
+      pagePosts: pagePosts.map((p) => card(p)),
+      manyPages: totalPages > 1,
+      pageButtons: Array.from({ length: totalPages }, (_, i) => ({
+        label: String(i + 1),
+        on: page === i + 1 ? '1' : '0',
+        onClick: () => { this.setState({ page: i + 1 }); this.scrollList(); },
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

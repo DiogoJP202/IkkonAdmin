@@ -1,0 +1,46 @@
+@{
+    Layout = "_PublicLayout";
+    ViewData["ContactMode"] = "geral";
+    ViewData["HeroCarouselMode"] = "galeria";
+
+    var fotos = new (string File, string Pt, string En, string Ja)[]
+    {
+        ("galeria-1.webp", "Apresentação de taiko em evento cultural", "Taiko performance at a cultural event", "文化イベントでの和太鼓公演"),
+        ("galeria-2.webp", "Performance de percussão japonesa no palco", "Japanese percussion performance on stage", "舞台での日本の打楽器パフォーマンス"),
+        ("galeria-3.webp", "Grupo em apresentação com tambores japoneses", "Group performance with Japanese drums", "日本の太鼓で演奏するグループ"),
+        ("galeria-4.webp", "Integrantes do IKKON durante apresentação", "IKKON members during a performance", "公演中のIKKONメンバー"),
+        ("galeria-5.webp", "Prática coletiva de taiko no dojo", "Ensemble taiko practice at the dojo", "道場での和太鼓の合奏稽古"),
+        ("galeria-6.webp", "Detalhe de tambor japonês em apresentação", "Close-up of a Japanese drum during a performance", "公演中の和太鼓のクローズアップ")
+    };
+}
+
+<div class="institucional-page public-gallery-page">
+    <partial name="_PublicHeader" />
+    <partial name="_PublicHeroCarousel" />
+    <partial name="_PublicBreadcrumbs" />
+
+    <section class="institucional-section ikkon-editorial-section reveal">
+        <div class="ikkon-editorial-column ikkon-editorial-column-wide ikkon-editorial-column-gallery">
+            <h1 class="ikkon-editorial-title">@I18n["Galeria", "Gallery", "ギャラリー"]</h1>
+            <span class="ikkon-editorial-rule ikkon-editorial-rule-tight" aria-hidden="true"></span>
+            <p class="ikkon-editorial-intro">@I18n[
+                "Registros do trabalho do IKKON São Paulo Taiko Dojo dentro do dojo e nos palcos, festivais e projetos culturais em que o grupo se apresenta.",
+                "Images of IKKON Sao Paulo Taiko Dojo at work inside the dojo and on the stages, festivals, and cultural projects where the group performs.",
+                "道場での稽古から、祭りや文化イベントの舞台まで、IKKONサンパウロ太鼓道場の活動の記録です。"]</p>
+            <div class="ikkon-gallery-grid is-uniform">
+                @foreach (var foto in fotos)
+                {
+                    <figure>
+                        <img src="~/design-ikkon/photos/@foto.File"
+                             asp-append-version="true"
+                             alt="@I18n[foto.Pt, foto.En, foto.Ja]"
+                             loading="lazy"
+                             decoding="async" />
+                    </figure>
+                }
+            </div>
+        </div>
+    </section>
+
+    <partial name="_PublicFooter" />
+</div>

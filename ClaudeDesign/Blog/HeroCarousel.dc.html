@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position:relative;background:#00203E;height:440px;overflow:hidden">
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id0 }}" shape="rect" placeholder="{{ ph0 }}" style="position:absolute;inset:0;opacity:{{ hOp0 }};pointer-events:{{ hPe0 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id1 }}" shape="rect" placeholder="{{ ph1 }}" style="position:absolute;inset:0;opacity:{{ hOp1 }};pointer-events:{{ hPe1 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id2 }}" shape="rect" placeholder="{{ ph2 }}" style="position:absolute;inset:0;opacity:{{ hOp2 }};pointer-events:{{ hPe2 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id3 }}" shape="rect" placeholder="{{ ph3 }}" style="position:absolute;inset:0;opacity:{{ hOp3 }};pointer-events:{{ hPe3 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id4 }}" shape="rect" placeholder="{{ ph4 }}" style="position:absolute;inset:0;opacity:{{ hOp4 }};pointer-events:{{ hPe4 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{ id5 }}" shape="rect" placeholder="{{ ph5 }}" style="position:absolute;inset:0;opacity:{{ hOp5 }};pointer-events:{{ hPe5 }};transition:opacity 900ms ease" hint-size="100%,440px"></x-import>
+  <div style="position:absolute;left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:10px">
+    <sc-for list="{{ heroDots }}" as="dt" hint-placeholder-count="6">
+      <button onClick="{{ dt.onClick }}" aria-label="{{ dt.label }}" style="width:10px;height:10px;border-radius:999px;border:1px solid #F7F4E7;background:{{ dt.bg }};cursor:pointer;padding:0;transition:background 200ms ease"></button>
+    </sc-for>
+  </div>
+  <img src="assets/selo-pequeno.png" alt="" style="position:absolute;right:28px;bottom:24px;height:48px;pointer-events:none">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 440}, &quot;prefix&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;hero&quot;, &quot;tsType&quot;: &quot;string&quot;}, &quot;label&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;&quot;, &quot;tsType&quot;: &quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { heroIdx: 0 };
+
+  componentDidMount() {
+    this._t = setInterval(() => {
+      this.setState(s => ({ heroIdx: (s.heroIdx + 1) % 6 }));
+    }, 4500);
+  }
+  componentWillUnmount() {
+    if (this._t) clearInterval(this._t);
+  }
+
+  renderVals() {
+    const prefix = this.props.prefix || 'hero';
+    const label = this.props.label || '';
+    const idx = this.state.heroIdx;
+    const out = {
+      heroDots: [0, 1, 2, 3, 4, 5].map((i) => ({
+        bg: idx === i ? '#E73439' : 'rgba(247,244,231,0.25)',
+        label: 'Foto ' + (i + 1),
+        onClick: () => this.setState({ heroIdx: i }),
+      })),
+    };
+    for (let i = 0; i < 6; i++) {
+      out['id' + i] = prefix + '-' + (i + 1);
+      out['ph' + i] = 'Foto ' + (i + 1) + ' de 6' + (label ? ' — ' + label : '');
+      out['hOp' + i] = idx === i ? '1' : '0';
+      out['hPe' + i] = idx === i ? 'auto' : 'none';
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

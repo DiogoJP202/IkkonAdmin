@@ -135,9 +135,9 @@ body.institucional-body {
 .institucional-brand-lines strong {
   color: var(--ikkon-navy);
   font-family: var(--ikkon-font-brand);
-  font-size: 1.42rem;
+  font-size: 1.6875rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .institucional-brand-lines small {
@@ -160,10 +160,12 @@ body.institucional-body {
   border-radius: 0;
   padding: 0.38rem 0.18rem;
   color: var(--ikkon-navy);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  /* Rótulos como "Sobre Nós" e "Área do aluno" não devem quebrar em duas linhas. */
+  white-space: nowrap;
   transition: color 160ms ease, border-color 160ms ease;
 }
 
@@ -189,10 +191,10 @@ body.institucional-body {
   border: 0;
   border-bottom: 2px solid transparent;
   border-radius: 0;
-  padding: 0.3rem 0.34rem;
+  padding: 0.25rem 0.4375rem;
   color: var(--ikkon-copy);
   font-family: var(--ikkon-font-body);
-  font-size: 0.68rem;
+  font-size: 0.78125rem;
   font-weight: 400;
   letter-spacing: 0.06em;
   line-height: 1.2;
@@ -239,19 +241,58 @@ body.institucional-body {
 
 /* Shared buttons and headings */
 
+/* Cápsula do design: Lato 700 15px, tracking curto, 14px/30px, sem caixa alta. */
 .institucional-page .btn {
   border-radius: var(--ikkon-radius-pill);
-  padding: 0.68rem 1.35rem;
+  border-width: 1.5px;
+  padding: 0.875rem 1.875rem;
   font-family: var(--ikkon-font-body);
-  font-size: 0.78rem;
+  font-size: 0.9375rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.institucional-page .btn:hover {
-  transform: translateY(-1px);
+/* Cápsulas do design carregam uma seta fina à direita do rótulo. */
+.institucional-page .btn,
+.ikkon-link-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.ikkon-cta-arrow {
+  font-size: 1em;
+  line-height: 1;
+}
+
+/* Ação secundária do design: link de texto puro, sem moldura. */
+.ikkon-link-cta {
+  border: 0;
+  padding: 0.375rem 0;
+  background: none;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 150ms ease;
+}
+
+.ikkon-link-cta:hover,
+.ikkon-link-cta:focus {
+  color: var(--ikkon-red);
+}
+
+.ikkon-home-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.625rem;
+  margin-top: 0.625rem;
 }
 
 .institucional-page .btn-danger {
@@ -292,36 +333,30 @@ body.institucional-body {
   color: var(--ikkon-cream);
 }
 
+/* Cápsula vazada sobre fundo escuro, como no bloco do Ensemble. */
 .institucional-page .btn-outline-light {
-  border-color: rgba(247, 244, 231, 0.72);
+  border-color: var(--ikkon-cream);
+  background: transparent;
   color: var(--ikkon-cream);
 }
 
 .institucional-page .btn-outline-light:hover,
 .institucional-page .btn-outline-light:focus {
   border-color: var(--ikkon-cream);
-  background: var(--ikkon-cream);
-  color: var(--ikkon-navy);
+  background: rgba(247, 244, 231, 0.12);
+  color: var(--ikkon-cream);
 }
 
+/* Eyebrow do design: texto puro, sem traço decorativo. */
 .institucional-kicker {
-  display: inline-flex;
-  align-items: center;
+  display: block;
   color: var(--ikkon-red);
   font-family: var(--ikkon-font-body);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.32em;
   line-height: 1.35;
   text-transform: uppercase;
-}
-
-.institucional-kicker::before {
-  width: 24px;
-  height: 1px;
-  margin-right: 0.65rem;
-  background: currentColor;
-  content: "";
 }
 
 .institucional-section {
@@ -489,64 +524,64 @@ body.institucional-body {
   gap: 1.4rem;
 }
 
+/* Cards da home no design: superfície branca lisa, sem borda nem realce,
+   com sombra curta e conteúdo empilhado com 12px de intervalo. */
 .public-path-card {
   position: relative;
-  min-height: 22rem;
-  border: 1px solid var(--ikkon-line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border: 0;
   border-radius: 0;
   background: var(--ikkon-white);
-  box-shadow: var(--ikkon-shadow);
-  padding: clamp(1.7rem, 4vw, 2.5rem);
+  box-shadow: var(--ikkon-shadow-card);
+  padding: 1.875rem 1.75rem;
   overflow: hidden;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-}
-
-.public-path-card::after {
-  position: absolute;
-  right: -76px;
-  bottom: -86px;
-  width: 220px;
-  height: 220px;
-  background: url("/design-ikkon/assets/pincelada-enso-navy.png") center / contain no-repeat;
-  opacity: 0.07;
-  content: "";
-  pointer-events: none;
-}
-
-.public-path-card:hover {
-  border-color: rgba(231, 52, 57, 0.55);
-  box-shadow: var(--ikkon-shadow-hover);
-  transform: translateY(-4px);
-}
-
-.public-path-card-escola,
-.public-path-card-eventos {
-  border-top: 3px solid var(--ikkon-red);
 }
 
 .public-path-card span {
   color: var(--ikkon-red);
-  font-size: 0.68rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
-}
-
-.public-path-card h3 {
-  max-width: 18ch;
-  margin: 1rem 0 0.8rem;
-  color: var(--ikkon-navy);
-  font-family: var(--ikkon-font-display);
-  font-size: clamp(1.65rem, 3vw, 2.3rem);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  line-height: 1.14;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
+.public-path-card h3 {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-display);
+  font-size: 1.375rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
 .public-path-card p {
-  max-width: 52ch;
+  flex: 1;
+  margin: 0;
   color: var(--ikkon-copy);
-  line-height: 1.72;
+  font-size: 0.90625rem;
+  line-height: 1.65;
+}
+
+/* O caminho do card é um link de texto vermelho, não uma cápsula. */
+.public-path-card .btn {
+  align-self: flex-start;
+  border-color: transparent;
+  padding: 0.125rem 0;
+  background: none;
+  color: var(--ikkon-red);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.public-path-card .btn:hover,
+.public-path-card .btn:focus {
+  border-color: transparent;
+  background: none;
+  color: var(--ikkon-red-dark);
 }
 
 .public-home-about {
@@ -1031,15 +1066,30 @@ body.institucional-body {
 
 /* Footer */
 
+/* Rodapé do design: azul sólido com a textura de pontos visível a 35%.
+   O gradiente anterior cobria a textura com 94–98% de opacidade. */
 .institucional-footer {
   position: relative;
   border-top: 3px solid var(--ikkon-red);
-  background:
-    linear-gradient(rgba(0, 22, 42, 0.94), rgba(0, 22, 42, 0.98)),
-    url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  background: var(--ikkon-navy-dark);
   color: rgba(247, 244, 231, 0.7);
-  padding-block: 3.5rem;
+  padding-block: 3rem;
   overflow: hidden;
+}
+
+.institucional-footer::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  content: "";
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.institucional-footer > * {
+  position: relative;
+  z-index: 1;
 }
 
 .institucional-footer::after {
@@ -1107,62 +1157,154 @@ body.institucional-body {
   background: var(--ikkon-cream);
 }
 
-.public-blog-featured {
+/* Hero do blog: faixa azul de borda a borda, com textura e pincelada. */
+.public-blog-hero-band {
   position: relative;
-  background:
-    linear-gradient(rgba(0, 32, 62, 0.93), rgba(0, 32, 62, 0.96)),
-    url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  padding: clamp(3.5rem, 6vw, 5.25rem) 2rem clamp(3.75rem, 6.5vw, 5.5rem);
+  background: var(--ikkon-navy);
+  overflow: hidden;
 }
 
-.public-blog-featured .institucional-kicker {
-  color: var(--ikkon-red);
+.public-blog-hero-band::before {
+  position: absolute;
+  inset: 0;
+  background: url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  content: "";
+  opacity: 0.4;
+  pointer-events: none;
 }
 
-.public-blog-featured .institucional-section-title {
+.public-blog-hero-band::after {
+  position: absolute;
+  top: -90px;
+  right: -110px;
+  width: 400px;
+  height: 400px;
+  background: url("/design-ikkon/assets/pincelada-enso-navy.png") center / contain no-repeat;
+  content: "";
+  filter: brightness(3);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.public-blog-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  max-width: 1160px;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-inline: auto;
+}
+
+.public-blog-hero-inner h1 {
+  margin: 0;
   color: var(--ikkon-cream);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(2.75rem, 4.6vw, 4.125rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
 }
 
-.public-blog-featured .institucional-copy {
-  color: rgba(247, 244, 231, 0.72);
+.public-blog-hero-inner .institucional-kicker {
+  margin: 0;
+}
+
+.public-blog-hero-inner .ikkon-editorial-rule {
+  margin: 0;
+}
+
+.public-blog-hero-subtitle {
+  max-width: 620px;
+  margin: 0;
+  color: rgba(247, 244, 231, 0.85);
+  font-size: 1.15625rem;
+  line-height: 1.7;
+}
+
+.public-blog-hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.625rem;
+}
+
+/* Precisa vencer `.ikkon-editorial-subtitle`, declarado mais adiante no arquivo. */
+.public-blog-featured .public-blog-section-title {
+  margin-bottom: 0;
+  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
 }
 
 .public-blog-section-copy {
-  max-width: 460px;
+  max-width: 620px;
+  margin: 0 0 2.25rem;
+  color: var(--ikkon-copy);
+  font-size: 1.0625rem;
+  line-height: 1.7;
 }
 
-.public-blog-feature-grid,
+.public-blog-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+  gap: 1.75rem;
+}
+
 .public-blog-grid {
-  gap: 1.35rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 1.625rem;
 }
 
+/* Cards do design: superfície branca sem borda, apoiada em sombra curta. */
 .public-blog-card {
-  border: 1px solid var(--ikkon-line);
+  border: 0;
   border-radius: 0;
   background: var(--ikkon-white);
-  box-shadow: none;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  box-shadow: var(--ikkon-shadow-card);
+  transition: box-shadow 180ms ease;
+}
+
+/* A seção de destaques é clara no design. `ikkon-public-foundation.css` ainda
+   guarda o tema escuro antigo (#171411 com texto branco) em seletores mais
+   específicos, então cada peça precisa ser reposta aqui. */
+.public-blog-featured {
+  background: var(--ikkon-cream);
+  color: var(--ikkon-ink);
 }
 
 .public-blog-featured .public-blog-card {
-  border-color: var(--ikkon-line-dark);
-  background: var(--ikkon-cream);
+  border-color: transparent;
+  background: var(--ikkon-white);
+  box-shadow: 0 2px 14px rgba(0, 22, 42, 0.1);
+}
+
+.public-blog-featured .public-blog-card-body {
+  color: var(--ikkon-copy);
+}
+
+.public-blog-featured .public-blog-card h3 {
+  color: var(--ikkon-navy);
+}
+
+.public-blog-featured .public-blog-card h3 a:hover {
+  color: var(--ikkon-red);
 }
 
 .public-blog-card:hover {
-  border-color: rgba(231, 52, 57, 0.58);
-  box-shadow: var(--ikkon-shadow-hover);
-  transform: translateY(-4px);
+  box-shadow: 0 6px 22px rgba(0, 22, 42, 0.16);
 }
 
 .public-blog-card-media {
-  background:
-    radial-gradient(circle, rgba(231, 52, 57, 0.12), transparent 55%),
-    var(--ikkon-navy);
-  aspect-ratio: 16 / 10;
+  height: 190px;
+  background: var(--ikkon-navy);
+  aspect-ratio: auto;
 }
 
-.public-blog-card-featured:first-child .public-blog-card-media {
-  min-height: 21rem;
+.public-blog-card-featured .public-blog-card-media {
+  height: 280px;
+  min-height: 0;
 }
 
 .public-blog-card-media::after {
@@ -1217,10 +1359,19 @@ body.institucional-body {
   text-transform: uppercase;
 }
 
+/* Na listagem o título é Lato 900; só o destaque usa Cinzel. */
 .public-blog-card h3 {
   color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-body);
+  font-size: 1.1875rem;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.public-blog-card-featured h3 {
   font-family: var(--ikkon-font-brand);
-  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  font-size: 1.625rem;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -1248,56 +1399,102 @@ body.institucional-body {
 }
 
 .public-blog-weekly {
-  border-block: 1px solid var(--ikkon-line);
-  background: var(--ikkon-white);
+  background: var(--ikkon-cream);
+}
+
+/* Duas colunas: apresentação à esquerda, cards com filete vermelho à direita. */
+.public-blog-weekly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 2.75rem;
+  align-items: start;
+  border-top: 1px solid var(--ikkon-line);
+  padding-top: 3.5rem;
+}
+
+.public-blog-weekly-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.public-blog-weekly-intro h2 {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-display);
+  font-size: clamp(1.75rem, 2.6vw, 2.125rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.public-blog-weekly-intro .ikkon-editorial-rule {
+  margin: 0;
+}
+
+.public-blog-weekly-intro p {
+  max-width: 420px;
+  margin: 0;
+  color: var(--ikkon-copy);
+  font-size: 1.03125rem;
+  line-height: 1.7;
 }
 
 .public-blog-weekly-list {
-  gap: 0;
-  border-top: 1px solid var(--ikkon-line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  border-top: 0;
 }
 
 .public-blog-weekly-card {
-  border-bottom: 1px solid var(--ikkon-line);
+  border: 0;
+  border-left: 3px solid var(--ikkon-red);
+  background: var(--ikkon-white);
+  box-shadow: 0 2px 10px rgba(0, 22, 42, 0.07);
 }
 
 .public-blog-weekly-card a {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   border: 0;
   border-radius: 0;
+  padding: 1.375rem 1.5rem;
   background: transparent;
-  padding: 1.3rem 3rem 1.3rem 0;
   box-shadow: none;
-}
-
-.public-blog-weekly-card a::after {
-  position: absolute;
-  top: 50%;
-  right: 0.4rem;
-  color: var(--ikkon-red);
-  font-size: 1.3rem;
-  content: "⟶";
-  transform: translateY(-50%);
+  text-decoration: none;
 }
 
 .public-blog-weekly-card a:hover {
   background: transparent;
-  color: var(--ikkon-red);
   transform: none;
 }
 
 .public-blog-weekly-card span {
   color: var(--ikkon-red);
+  font-size: 0.6875rem;
+  font-weight: 700;
   letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .public-blog-weekly-card strong {
   color: var(--ikkon-navy);
-  font-family: var(--ikkon-font-brand);
+  font-family: var(--ikkon-font-body);
+  font-size: 1.09375rem;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.public-blog-weekly-card a:hover strong {
+  color: var(--ikkon-red);
 }
 
 .public-blog-weekly-card small {
   color: var(--ikkon-copy);
+  font-size: 0.90625rem;
+  line-height: 1.6;
 }
 
 .public-blog-listing {
@@ -1306,13 +1503,29 @@ body.institucional-body {
 
 .public-blog-filter-panel {
   position: relative;
-  gap: 2rem;
-  border: 1px solid var(--ikkon-line);
-  border-top: 3px solid var(--ikkon-red);
+  gap: 0.5rem;
+  border: 0;
   border-radius: 0;
   background: var(--ikkon-white);
-  box-shadow: var(--ikkon-shadow);
-  padding: clamp(1.5rem, 4vw, 2.3rem);
+  box-shadow: var(--ikkon-shadow-card);
+  padding: 1.875rem 2rem 2rem;
+  scroll-margin-top: 90px;
+}
+
+.public-blog-filter-title {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.public-blog-filter-hint {
+  margin: 0 0 1.125rem;
+  color: var(--ikkon-copy);
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 .public-blog-filter-form {
@@ -1381,40 +1594,85 @@ body.institucional-body {
   gap: 0.55rem;
 }
 
-.public-blog-chips a,
-.public-blog-tag-row a {
-  border: 1px solid var(--ikkon-line);
+/* Chips do design: cápsula vazada 12.5px; ativa fica preenchida em vermelho. */
+.public-blog-chips a {
+  border: 1.5px solid rgba(0, 32, 62, 0.25);
   border-radius: var(--ikkon-radius-pill);
+  padding: 0.5rem 1rem;
   background: transparent;
-  color: var(--ikkon-copy);
-  font-size: 0.72rem;
+  color: var(--ikkon-navy);
+  font-size: 0.78125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
-.public-blog-chips a:hover,
-.public-blog-chips a.is-active,
+.public-blog-tag-row a {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ikkon-copy);
+  font-size: 0.78125rem;
+  text-decoration: underline;
+}
+
 .public-blog-tag-row a:hover {
+  background: transparent;
+  color: var(--ikkon-red);
+}
+
+.public-blog-chips a:hover {
+  border-color: var(--ikkon-red);
+  color: var(--ikkon-red);
+}
+
+.public-blog-chips a.is-active {
   border-color: var(--ikkon-red);
   background: var(--ikkon-red);
   color: var(--ikkon-cream);
 }
 
 .public-blog-results-head {
+  align-items: baseline;
   border-bottom: 1px solid var(--ikkon-line);
+  padding-bottom: 0.875rem;
   color: var(--ikkon-copy);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.public-blog-pagination a {
-  border: 1px solid var(--ikkon-line);
-  border-radius: 0;
-  background: var(--ikkon-white);
+/* A contagem de resultados usa Cinzel 20px, sem caixa alta. */
+.public-blog-results-head > span:first-child {
   color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-.public-blog-pagination a:hover,
+.public-blog-pagination a {
+  display: grid;
+  min-width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1.5px solid rgba(0, 32, 62, 0.25);
+  border-radius: 0;
+  padding: 0 0.75rem;
+  background: transparent;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.public-blog-pagination a:hover {
+  border-color: var(--ikkon-red);
+  color: var(--ikkon-red);
+}
+
 .public-blog-pagination a.is-active {
   border-color: var(--ikkon-red);
   background: var(--ikkon-red);
@@ -1422,20 +1680,29 @@ body.institucional-body {
 }
 
 .public-blog-empty {
-  border: 1px solid var(--ikkon-line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  border: 1px dashed rgba(0, 32, 62, 0.35);
   border-radius: 0;
+  padding: 3.5rem 2.5rem;
   background: var(--ikkon-white);
   box-shadow: none;
+  text-align: center;
 }
 
-.public-blog-empty span {
-  color: var(--ikkon-red);
-  letter-spacing: 0.2em;
+.public-blog-empty img {
+  height: 44px;
+  opacity: 0.8;
 }
 
 .public-blog-empty h3 {
+  margin: 0;
   color: var(--ikkon-navy);
   font-family: var(--ikkon-font-brand);
+  font-size: 1.625rem;
+  font-weight: 700;
 }
 
 .public-blog-empty p {
@@ -1661,4 +1928,488 @@ body.institucional-body {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Coluna editorial — estrutura das páginas internas no design de referência:
+   coluna estreita centrada, título Cinzel, régua vermelha e corpo em Lato.
+   --------------------------------------------------------------------------- */
+
+.ikkon-editorial-section {
+  padding-block: 0;
+}
+
+.ikkon-editorial-column {
+  width: 100%;
+  max-width: 880px;
+  margin-inline: auto;
+  padding: 5rem 2rem 6rem;
+}
+
+.ikkon-editorial-column-wide {
+  max-width: 1080px;
+}
+
+/* A galeria usa a coluna larga do design (1160px). */
+.ikkon-editorial-column-gallery {
+  max-width: 1160px;
+}
+
+/* ---------------------------------------------------------------------------
+   Contato — unidades com mapa embutido e canais oficiais.
+   --------------------------------------------------------------------------- */
+
+.ikkon-contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 3.5rem;
+  align-items: start;
+}
+
+.ikkon-contact-places {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.ikkon-place-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.5rem 1.625rem;
+  background: var(--ikkon-white);
+  box-shadow: var(--ikkon-shadow-card);
+}
+
+.ikkon-place-card > strong {
+  color: var(--ikkon-navy);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.ikkon-place-card > span {
+  color: var(--ikkon-copy);
+  font-size: 0.90625rem;
+}
+
+.ikkon-place-map {
+  position: relative;
+  display: block;
+  height: 190px;
+  margin-top: 0.75rem;
+  border: 1px solid var(--ikkon-line);
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.ikkon-place-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /* O mapa é ilustrativo; o clique leva à rota no Google Maps. */
+  pointer-events: none;
+}
+
+.ikkon-place-map-pill {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border-radius: var(--ikkon-radius-pill);
+  padding: 7px 14px;
+  background: var(--ikkon-red);
+  color: var(--ikkon-cream);
+  font-family: var(--ikkon-font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ikkon-place-map:hover .ikkon-place-map-pill,
+.ikkon-place-map:focus-visible .ikkon-place-map-pill {
+  background: var(--ikkon-red-dark);
+}
+
+/* Lista de unidades no bloco de contato reaproveitado. */
+.institucional-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.125rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.institucional-address-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.institucional-address-list strong {
+  color: var(--ikkon-navy);
+  font-size: 0.9375rem;
+  font-weight: 900;
+}
+
+.institucional-address-list span {
+  color: var(--ikkon-copy);
+  font-size: 0.90625rem;
+}
+
+.institucional-map-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.institucional-map-stack .institucional-map-card {
+  height: auto;
+}
+
+.ikkon-contact-hours {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.375rem 0 0;
+  color: var(--ikkon-navy);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ikkon-contact-hours img {
+  height: 40px;
+}
+
+.ikkon-contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ikkon-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ikkon-contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.ikkon-contact-form label > span {
+  color: var(--ikkon-navy);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+/* Campos de canto vivo com foco vermelho, como no design. */
+.ikkon-contact-form input,
+.ikkon-contact-form textarea {
+  border: 1.5px solid rgba(0, 32, 62, 0.2);
+  border-radius: 0;
+  padding: 0.75rem 0.875rem;
+  background: var(--ikkon-white);
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-body);
+  font-size: 0.9375rem;
+  outline: none;
+}
+
+.ikkon-contact-form textarea {
+  resize: vertical;
+}
+
+.ikkon-contact-form input:focus,
+.ikkon-contact-form textarea:focus {
+  border-color: var(--ikkon-red);
+}
+
+.ikkon-contact-form .btn {
+  align-self: flex-start;
+}
+
+.ikkon-contact-form-note {
+  margin: 0;
+  color: var(--ikkon-copy);
+  font-size: 0.8125rem;
+}
+
+.ikkon-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+}
+
+/* Sprite invisível: só guarda os <symbol> reaproveitados pelos <use>. */
+.ikkon-icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Cápsula de canal com ícone: preenchida no WhatsApp, vazada no Instagram. */
+.ikkon-social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  border: 1.5px solid var(--ikkon-navy);
+  border-radius: var(--ikkon-radius-pill);
+  padding: 0.75rem 1.5rem;
+  background: none;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-body);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.ikkon-social-pill svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: currentColor;
+}
+
+.ikkon-social-pill:hover,
+.ikkon-social-pill:focus-visible {
+  background: var(--ikkon-navy);
+  color: var(--ikkon-cream);
+}
+
+.ikkon-social-pill.is-solid {
+  border-color: var(--ikkon-red);
+  background: var(--ikkon-red);
+  color: var(--ikkon-cream);
+}
+
+.ikkon-social-pill.is-solid:hover,
+.ikkon-social-pill.is-solid:focus-visible {
+  border-color: var(--ikkon-red-dark);
+  background: var(--ikkon-red-dark);
+  color: var(--ikkon-cream);
+}
+
+.ikkon-editorial-title {
+  margin: 0;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(2rem, 3.2vw, 2.875rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ikkon-editorial-rule {
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: 1.25rem 0 2.5rem;
+  background: var(--ikkon-red);
+}
+
+.ikkon-editorial-rule-tight {
+  margin-bottom: 1.25rem;
+}
+
+.ikkon-editorial-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.375rem;
+  color: var(--ikkon-copy);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.ikkon-editorial-body p {
+  margin: 0;
+}
+
+.ikkon-editorial-subtitle {
+  margin: 0 0 1.75rem;
+  color: var(--ikkon-navy);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ikkon-editorial-subtitle-spaced {
+  margin-top: 3.25rem;
+}
+
+.ikkon-editorial-lead {
+  margin: 0;
+  color: var(--ikkon-copy);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.ikkon-editorial-note {
+  margin: 0;
+  color: var(--ikkon-copy);
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.7;
+}
+
+/* Painel de missão: azul cheio com a textura de pontos por baixo do texto. */
+.ikkon-mission-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 3.5rem 0;
+  padding: 2.75rem 3rem;
+  background: var(--ikkon-navy);
+  overflow: hidden;
+}
+
+.ikkon-mission-panel::before {
+  position: absolute;
+  inset: 0;
+  background: url("/design-ikkon/assets/textura-pontos.png") center / cover;
+  content: "";
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.ikkon-mission-panel > * {
+  position: relative;
+}
+
+.ikkon-mission-panel .institucional-kicker {
+  margin: 0;
+}
+
+.ikkon-mission-statement {
+  margin: 0;
+  color: var(--ikkon-cream);
+  font-family: var(--ikkon-font-brand);
+  font-size: clamp(1.25rem, 1.9vw, 1.625rem);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.ikkon-meaning-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 3rem;
+  align-items: center;
+  margin: 4rem 0;
+}
+
+.ikkon-meaning-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.ikkon-meaning-seal {
+  width: 200px;
+  justify-self: center;
+}
+
+.ikkon-kanji-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border-top: 1px solid rgba(0, 32, 62, 0.14);
+  padding-top: 0.875rem;
+}
+
+.ikkon-kanji-glyph {
+  color: var(--ikkon-red);
+  font-family: "Noto Serif JP", "Yu Mincho", serif;
+  font-size: 3.25rem;
+  line-height: 1;
+}
+
+.ikkon-kanji-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ikkon-kanji-copy strong {
+  color: var(--ikkon-navy);
+  font-size: 0.9375rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.ikkon-kanji-copy span {
+  color: var(--ikkon-copy);
+  font-size: 0.875rem;
+}
+
+.ikkon-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.ikkon-timeline-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid rgba(0, 32, 62, 0.14);
+  padding: 1.375rem 0;
+}
+
+.ikkon-timeline-year {
+  color: var(--ikkon-red);
+  font-family: var(--ikkon-font-brand);
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.ikkon-timeline-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ikkon-timeline-copy strong {
+  color: var(--ikkon-navy);
+  font-size: 1.0625rem;
+  font-weight: 900;
+}
+
+.ikkon-timeline-copy span {
+  color: var(--ikkon-copy);
+  font-size: 0.96875rem;
+  line-height: 1.65;
+}
+
+.ikkon-partner-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ikkon-partner-card {
+  display: grid;
+  min-height: 64px;
+  align-items: center;
+  border: 1px solid rgba(0, 32, 62, 0.22);
+  padding: 0.75rem 0.5rem;
+  background: var(--ikkon-white);
+  color: var(--ikkon-copy);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
 }

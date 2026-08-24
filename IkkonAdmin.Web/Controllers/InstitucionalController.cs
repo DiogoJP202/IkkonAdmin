@@ -27,8 +27,16 @@ public class InstitucionalController(IViewTextService i18n) : Controller
         return View();
     }
 
+    /// <summary>
+    /// Mantém as URLs históricas <c>/escola</c> e <c>/{culture}/escola</c> indexadas,
+    /// redirecionando de forma permanente para a rota atual da página de aulas.
+    /// </summary>
     [HttpGet]
-    public IActionResult Escola()
+    public IActionResult Escola() =>
+        RedirectPermanent(i18n.LocalizePath("/aulas"));
+
+    [HttpGet]
+    public IActionResult Aulas()
     {
         SetPageSeo(
             i18n[
@@ -39,16 +47,16 @@ public class InstitucionalController(IViewTextService i18n) : Controller
                 "Aulas de taiko em São Paulo para iniciantes e alunos em evolução, com prática em grupo, ritmo, técnica, postura e cultura japonesa.",
                 "Taiko classes in Sao Paulo for beginners and developing students, with group practice, rhythm, technique, posture, and Japanese culture.",
                 "サンパウロで初心者から経験者まで学べる和太鼓教室。リズム、技術、姿勢、合奏、日本文化を段階的に学びます。"],
-            "escola",
-            "/escola",
-            i18n["Escola", "School", "教室"]);
+            "aulas",
+            "/aulas",
+            i18n["Aulas", "Classes", "クラス"]);
 
         var faqItems = PublicContentCatalog.StudentFaq(i18n);
         GetStructuredData().Add(PublicSeoHelper.FaqPage(
             faqItems.Select(item => (item.Question, item.Answer))));
         GetStructuredData().Add(PublicSeoHelper.Courses(
             Request,
-            PublicSiteLocales.AbsoluteUrl(Request, i18n.LocalizePath("/escola")),
+            PublicSiteLocales.AbsoluteUrl(Request, i18n.LocalizePath("/aulas")),
         [
             (
                 "Taiko",
@@ -92,6 +100,26 @@ public class InstitucionalController(IViewTextService i18n) : Controller
         GetStructuredData().Add(PublicSeoHelper.MusicGroup(
             Request,
             PublicSiteLocales.AbsoluteUrl(Request, i18n.LocalizePath("/eventos"))));
+
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Galeria()
+    {
+        SetPageSeo(
+            i18n[
+                "Galeria de Fotos | IKKON SPTD",
+                "Photo Gallery | IKKON SPTD",
+                "フォトギャラリー | IKKON SPTD"],
+            i18n[
+                "Registros de aulas, ensaios e apresentações do IKKON São Paulo Taiko Dojo em festivais, eventos culturais e projetos com a comunidade.",
+                "Images of classes, rehearsals, and performances by IKKON Sao Paulo Taiko Dojo at festivals, cultural events, and community projects.",
+                "IKKONサンパウロ太鼓道場のレッスン、稽古、祭りや文化イベントでの公演の記録です。"],
+            "galeria",
+            "/galeria",
+            i18n["Galeria", "Gallery", "ギャラリー"],
+            "CollectionPage");
 
         return View();
     }

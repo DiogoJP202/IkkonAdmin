@@ -5,6 +5,22 @@ namespace IkkonAdmin.Web.Helpers;
 
 public static class PublicContentCatalog
 {
+    /// <summary>
+    /// Unidades públicas da escola. Fonte única para a página de Contato e para
+    /// o bloco de contato reaproveitado nas demais páginas públicas.
+    /// </summary>
+    public static IReadOnlyList<PublicLocationViewModel> Unidades(IViewTextService i18n) =>
+    [
+        new(
+            i18n["Unidade Patriarca", "Patriarca location", "パトリアルカ教室"],
+            "R. Trapiche, 182 · São Paulo",
+            "R. Trapiche, 182, São Paulo, SP, Brasil"),
+        new(
+            i18n["Unidade Vila Mariana", "Vila Mariana location", "ヴィラ・マリアナ教室"],
+            "Rua Domingos de Morais, 2975 · Vila Mariana · São Paulo · 04035-001",
+            "Rua Domingos de Morais, 2975, Vila Mariana, São Paulo, SP, 04035-001, Brasil")
+    ];
+
     public static IReadOnlyList<PublicFaqItemViewModel> StudentFaq(IViewTextService i18n) =>
     [
         new(

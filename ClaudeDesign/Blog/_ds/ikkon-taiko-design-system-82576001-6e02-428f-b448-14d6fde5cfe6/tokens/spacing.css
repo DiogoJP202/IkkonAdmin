@@ -1,0 +1,27 @@
+/* IKKON — spacing, radii, borders, shadows, motion */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* A marca usa formas retas — cantos vivos ou quase vivos */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-pill: 999px;   /* apenas CTAs cápsula */
+
+  --border-hairline: 1px solid var(--border-on-light);
+  --border-frame: 2px solid var(--vermelho);   /* moldura de cards claros */
+
+  --shadow-card: 0 2px 12px rgba(0, 22, 42, 0.10);
+  --shadow-raised: 0 8px 28px rgba(0, 22, 42, 0.22);
+
+  --ease-brand: cubic-bezier(0.25, 0.1, 0.25, 1); /* @kind other */
+  --duration-fast: 150ms; /* @kind other */
+  --duration-base: 250ms; /* @kind other */
+}

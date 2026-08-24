@@ -103,5 +103,9 @@
   --ikkon-touch-target: 44px;
   --ikkon-shadow: 0 12px 34px rgba(0, 22, 42, 0.09);
   --ikkon-shadow-hover: 0 18px 42px rgba(0, 22, 42, 0.14);
+  /* Sombra curta de card do design system (tokens/spacing.css). */
+  --ikkon-shadow-card: 0 2px 12px rgba(0, 22, 42, 0.08);
   --ikkon-focus-ring: 0 0 0 3px rgba(231, 52, 57, 0.14);
+  /* Moldura vermelha de destaque (tokens/spacing.css: --border-frame). */
+  --ikkon-border-frame: 2px solid var(--ikkon-red);
 }
