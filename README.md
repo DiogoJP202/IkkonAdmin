@@ -184,6 +184,14 @@ dotnet ef database update --project IkkonAdmin.Web/IkkonAdmin.Web.csproj --start
 dotnet run --project IkkonAdmin.Web/IkkonAdmin.Web.csproj
 ```
 
+O log de desenvolvimento é enxuto de propósito, para a URL do servidor e os
+erros não ficarem soterrados. Para ver o detalhe completo — incluindo cada SQL
+executado pelo Entity Framework — use:
+
+```bash
+IKKON_LOGS=verbose dotnet run --project IkkonAdmin.Web/IkkonAdmin.Web.csproj
+```
+
 URL comum em desenvolvimento:
 
 ```text
