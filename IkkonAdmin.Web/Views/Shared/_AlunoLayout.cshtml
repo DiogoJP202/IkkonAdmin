@@ -81,6 +81,19 @@
                         <small>@I18n["Área do Aluno", "Student Area", "生徒エリア"]</small>
                     </span>
                 </a>
+                @* Minimizar vale só no desktop; no mobile o menu é uma gaveta e
+                   quem aparece aqui é o botão de fechar. *@
+                <button class="aluno-portal-sidebar-collapse"
+                        type="button"
+                        data-aluno-menu-collapse
+                        aria-controls="alunoPortalSidebar"
+                        aria-expanded="true"
+                        data-collapse-label="@I18n["Minimizar menu", "Collapse menu", "メニューを最小化する"]"
+                        data-expand-label="@I18n["Expandir menu", "Expand menu", "メニューを広げる"]"
+                        aria-label="@I18n["Minimizar menu", "Collapse menu", "メニューを最小化する"]">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </button>
                 <button class="aluno-portal-sidebar-close"
                         type="button"
                         data-aluno-menu-close
@@ -92,53 +105,53 @@
             <nav class="aluno-portal-nav" aria-label="@I18n["Navegação da Área do Aluno", "Student Area navigation", "生徒エリアのナビゲーション"]">
                 <p class="aluno-portal-nav-label">@I18n["Acompanhar", "Track", "確認"]</p>
                 <a class="@NavClass(string.Empty, true)" aria-current="@NavCurrent(string.Empty, true)" href="/area-do-aluno">
-                    <span aria-hidden="true">01</span>@I18n["Início", "Home", "ホーム"]
+                    <span aria-hidden="true">01</span><span class="aluno-portal-nav-text">@I18n["Início", "Home", "ホーム"]</span>
                 </a>
                 <a class="@NavClass("/aulas")" aria-current="@NavCurrent("/aulas")" href="/area-do-aluno/aulas">
-                    <span aria-hidden="true">02</span>@I18n["Aulas", "Classes", "レッスン"]
+                    <span aria-hidden="true">02</span><span class="aluno-portal-nav-text">@I18n["Aulas", "Classes", "レッスン"]</span>
                 </a>
                 <a class="@NavClass("/frequencia")" aria-current="@NavCurrent("/frequencia")" href="/area-do-aluno/frequencia">
-                    <span aria-hidden="true">03</span>@I18n["Frequência", "Attendance", "出席状況"]
+                    <span aria-hidden="true">03</span><span class="aluno-portal-nav-text">@I18n["Frequência", "Attendance", "出席状況"]</span>
                 </a>
 
                 <p class="aluno-portal-nav-label">@I18n["Minha conta", "My account", "マイアカウント"]</p>
                 <a class="@NavClass("/perfil")" aria-current="@NavCurrent("/perfil")" href="/area-do-aluno/perfil">
-                    <span aria-hidden="true">04</span>@I18n["Meu perfil", "My profile", "プロフィール"]
+                    <span aria-hidden="true">04</span><span class="aluno-portal-nav-text">@I18n["Meu perfil", "My profile", "プロフィール"]</span>
                 </a>
                 <a class="@NavClass("/financeiro")" aria-current="@NavCurrent("/financeiro")" href="/area-do-aluno/financeiro">
-                    <span aria-hidden="true">05</span>@I18n["Financeiro", "Finance", "お支払い"]
+                    <span aria-hidden="true">05</span><span class="aluno-portal-nav-text">@I18n["Financeiro", "Finance", "お支払い"]</span>
                 </a>
                 <a class="@NavClass("/documentos")" aria-current="@NavCurrent("/documentos")" href="/area-do-aluno/documentos">
-                    <span aria-hidden="true">06</span>@I18n["Documentos", "Documents", "書類"]
+                    <span aria-hidden="true">06</span><span class="aluno-portal-nav-text">@I18n["Documentos", "Documents", "書類"]</span>
                 </a>
                 <a class="@NavClass("/configuracoes")" aria-current="@NavCurrent("/configuracoes")" href="/configuracoes">
-                    <span aria-hidden="true">07</span>@I18n["Conta e senha", "Account and password", "アカウントとパスワード"]
+                    <span aria-hidden="true">07</span><span class="aluno-portal-nav-text">@I18n["Conta e senha", "Account and password", "アカウントとパスワード"]</span>
                 </a>
 
                 <p class="aluno-portal-nav-label">@I18n["Comunidade", "Community", "コミュニティ"]</p>
                 <a class="@NavClass("/turmas")" aria-current="@NavCurrent("/turmas")" href="/area-do-aluno/turmas">
-                    <span aria-hidden="true">08</span>@I18n["Turmas", "Groups", "クラス"]
+                    <span aria-hidden="true">08</span><span class="aluno-portal-nav-text">@I18n["Turmas", "Groups", "クラス"]</span>
                 </a>
                 <a class="@NavClass("/comunicados")" aria-current="@NavCurrent("/comunicados")" href="/area-do-aluno/comunicados">
-                    <span aria-hidden="true">09</span>@I18n["Comunicados", "Announcements", "お知らせ"]
+                    <span aria-hidden="true">09</span><span class="aluno-portal-nav-text">@I18n["Comunicados", "Announcements", "お知らせ"]</span>
                 </a>
                 <a class="@NavClass("/eventos")" aria-current="@NavCurrent("/eventos")" href="/area-do-aluno/eventos">
-                    <span aria-hidden="true">10</span>@I18n["Eventos", "Events", "イベント"]
+                    <span aria-hidden="true">10</span><span class="aluno-portal-nav-text">@I18n["Eventos", "Events", "イベント"]</span>
                 </a>
                 <a class="@NavClass("/conquistas")" aria-current="@NavCurrent("/conquistas")" href="/area-do-aluno/conquistas">
-                    <span aria-hidden="true">11</span>@I18n["Conquistas", "Achievements", "実績"]
+                    <span aria-hidden="true">11</span><span class="aluno-portal-nav-text">@I18n["Conquistas", "Achievements", "実績"]</span>
                 </a>
             </nav>
 
             <div class="aluno-portal-sidebar-footer">
                 <a href="@I18n.LocalizePath("/")">
-                    @I18n["Site institucional", "Institutional site", "公式サイト"]
+                    <span class="aluno-portal-footer-text">@I18n["Site institucional", "Institutional site", "公式サイト"]</span>
                     <span aria-hidden="true">↗</span>
                 </a>
                 <form action="/aluno/sair" method="post">
                     @Html.AntiForgeryToken()
                     <button type="submit">
-                        @I18n["Sair com segurança", "Sign out securely", "安全にログアウト"]
+                        <span class="aluno-portal-footer-text">@I18n["Sair com segurança", "Sign out securely", "安全にログアウト"]</span>
                         <span aria-hidden="true">→</span>
                     </button>
                 </form>

@@ -212,6 +212,40 @@ html[lang="ja"] .aluno-portal-brand-copy strong {
   line-height: 1;
 }
 
+/* Botão de minimizar: só existe no desktop, onde o menu é uma coluna fixa. */
+.aluno-portal-sidebar-collapse {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.12rem;
+  border: 1px solid var(--ikkon-line-dark);
+  background: transparent;
+  color: rgba(247, 244, 231, 0.72);
+  cursor: pointer;
+}
+
+.aluno-portal-sidebar-collapse:hover,
+.aluno-portal-sidebar-collapse:focus-visible {
+  border-color: var(--aluno-accent);
+  color: var(--ikkon-white);
+}
+
+/* Duas divisas formando «; viram » quando o menu está minimizado. */
+.aluno-portal-sidebar-collapse span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+body.aluno-sidebar-collapsed .aluno-portal-sidebar-collapse span {
+  transform: rotate(-135deg);
+}
+
 .aluno-portal-nav {
   display: grid;
   gap: 0.12rem;
@@ -296,6 +330,78 @@ html[lang="ja"] .aluno-portal-brand-copy strong {
 .aluno-portal-sidebar-footer > a:hover,
 .aluno-portal-sidebar-footer button:hover {
   color: var(--ikkon-white);
+}
+
+/* Menu minimizado. Vale só a partir de 768px: abaixo disso o menu vira gaveta e
+   tem largura própria. Os rótulos não são escondidos com `display: none` — eles
+   saem do fluxo mas continuam no acessível, senão os links ficariam sem nome. */
+@media (min-width: 768px) {
+  body.aluno-sidebar-collapsed .aluno-portal-shell {
+    grid-template-columns: 5rem minmax(0, 1fr);
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-sidebar {
+    width: 5rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-brand-row {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6rem;
+    padding-inline: 0.5rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-brand {
+    justify-content: center;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-brand-copy,
+  body.aluno-sidebar-collapsed .aluno-portal-nav-text,
+  body.aluno-sidebar-collapsed .aluno-portal-footer-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* O título de grupo vira um filete divisor, mantendo o texto para leitores. */
+  body.aluno-sidebar-collapsed .aluno-portal-nav-label {
+    height: 1px;
+    margin: 0.85rem 0.6rem 0.6rem;
+    padding: 0;
+    overflow: hidden;
+    background: var(--ikkon-line-dark);
+    text-indent: -999em;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-nav {
+    padding-inline: 0.5rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-nav a {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    padding-inline: 0.3rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-nav a > span:first-child {
+    font-size: 0.78rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-sidebar-footer {
+    padding-inline: 0.5rem;
+  }
+
+  body.aluno-sidebar-collapsed .aluno-portal-sidebar-footer > a,
+  body.aluno-sidebar-collapsed .aluno-portal-sidebar-footer button {
+    justify-content: center;
+    gap: 0;
+  }
 }
 
 .aluno-portal-main {
@@ -1445,6 +1551,10 @@ html[lang="ja"] .aluno-portal-brand-copy strong {
   .aluno-portal-sidebar-close,
   .aluno-portal-menu-toggle {
     display: flex;
+  }
+
+  .aluno-portal-sidebar-collapse {
+    display: none;
   }
 
   .aluno-portal-topbar {
