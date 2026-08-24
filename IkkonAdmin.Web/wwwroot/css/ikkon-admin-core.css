@@ -30,7 +30,7 @@ body.admin-body {
 }
 
 .admin-sidebar {
-  width: 260px;
+  width: 18.5rem;
   background:
     linear-gradient(180deg, rgba(0, 22, 42, 0.08), rgba(0, 22, 42, 0.88)),
     var(--admin-sidebar-bg);
@@ -239,7 +239,7 @@ a.sidebar-user-card:focus-visible {
 }
 
 body.admin-sidebar-collapsed .admin-sidebar {
-  width: 78px;
+  width: 5rem;
 }
 
 body.admin-sidebar-collapsed .sidebar-toggle {
