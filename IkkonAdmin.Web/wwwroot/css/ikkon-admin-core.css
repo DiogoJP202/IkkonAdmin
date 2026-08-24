@@ -17,7 +17,8 @@ body.admin-body {
 .admin-body h2,
 .admin-body h3,
 .admin-body .card-header h2,
-.admin-body .card-header h3 {
+.admin-body .card-header h3,
+.admin-body .admin-topbar-title {
   color: var(--brand-title);
   font-family: var(--ikkon-font-brand);
   font-weight: 700;

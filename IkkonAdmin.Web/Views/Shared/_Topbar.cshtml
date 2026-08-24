@@ -14,7 +14,10 @@
             <span aria-hidden="true"></span>
         </button>
         <div>
-            <h1 class="h5 mb-1">@ViewData["Title"]</h1>
+            @* O titulo real da pagina esta no conteudo; aqui e so o rotulo da barra.
+               Manter um <h1> nos dois lugares deixava toda tela do admin com dois
+               titulos principais para leitores de tela. *@
+            <p class="admin-topbar-title h5 mb-1">@ViewData["Title"]</p>
             <small class="text-muted">@I18n["Painel administrativo interno", "Internal admin panel"]</small>
         </div>
     </div>
