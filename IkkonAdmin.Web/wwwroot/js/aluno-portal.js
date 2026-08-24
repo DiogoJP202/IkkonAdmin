@@ -88,7 +88,80 @@
     }
   });
 
+  /* Minimizar o menu no desktop. Mesmo contrato do painel administrativo
+     (ver site.js): a preferência fica no localStorage e vale entre páginas. */
+  const collapseToggle = document.querySelector("[data-aluno-menu-collapse]");
+  const collapseKey = "ikkon.aluno.sidebar.collapsed";
+
+  const lerColapsado = () => {
+    try {
+      return window.localStorage?.getItem(collapseKey) === "true";
+    } catch {
+      return false;
+    }
+  };
+
+  const gravarColapsado = collapsed => {
+    try {
+      window.localStorage?.setItem(collapseKey, collapsed ? "true" : "false");
+    } catch {
+      // Sem storage o menu continua funcionando, só não lembra da escolha.
+    }
+  };
+
+  /* Minimizado, o rótulo sai do fluxo e sobra o número do item. O `title`
+     devolve o nome no hover; sem ele o mouse ficaria sem pista nenhuma. */
+  const sincronizarTitles = collapsed => {
+    sidebar
+      .querySelectorAll(".aluno-portal-nav a, .aluno-portal-sidebar-footer a, .aluno-portal-sidebar-footer button")
+      .forEach(item => {
+        const rotulo = item.querySelector(".aluno-portal-nav-text, .aluno-portal-footer-text");
+        if (!rotulo) {
+          return;
+        }
+
+        if (collapsed) {
+          item.setAttribute("title", rotulo.textContent.trim());
+        } else {
+          item.removeAttribute("title");
+        }
+      });
+  };
+
+  const aplicarColapso = (collapsed, persistir = true) => {
+    body.classList.toggle("aluno-sidebar-collapsed", collapsed);
+    sincronizarTitles(collapsed);
+
+    if (collapseToggle) {
+      collapseToggle.setAttribute("aria-expanded", String(!collapsed));
+      collapseToggle.setAttribute(
+        "aria-label",
+        collapsed ? collapseToggle.dataset.expandLabel : collapseToggle.dataset.collapseLabel
+      );
+    }
+
+    if (persistir) {
+      gravarColapsado(collapsed);
+    }
+  };
+
+  const restaurarColapso = () => {
+    if (mobileQuery.matches) {
+      // Na gaveta o menu abre inteiro; o estado minimizado não se aplica.
+      aplicarColapso(false, false);
+      return;
+    }
+
+    aplicarColapso(lerColapsado(), false);
+  };
+
+  collapseToggle?.addEventListener("click", () => {
+    aplicarColapso(!body.classList.contains("aluno-sidebar-collapsed"));
+  });
+
   mobileQuery.addEventListener("change", event => {
+    restaurarColapso();
+
     if (event.matches) {
       setOpen(false, false);
     } else {
@@ -101,4 +174,5 @@
   });
 
   setOpen(false, false);
+  restaurarColapso();
 })();
